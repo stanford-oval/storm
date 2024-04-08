@@ -36,6 +36,7 @@ Below, we provide a quick start guide to run STORM locally to reproduce our expe
 1. Install the required packages.
    ```shell
    conda create -n storm python=3.9
+   conda activate storm
    pip install -r requirements.txt
    ```
 2. Set up OpenAI API key and [You.com search API](https://api.you.com/) key. Create a file `secrets.toml` under the root directory and add the following content:
