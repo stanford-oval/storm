@@ -1,0 +1,979 @@
+{
+  "title": "SpaceX_Starship_Integrated_Flight_Test",
+  "url": "https://en.wikipedia.org/wiki/SpaceX_Starship_Integrated_Flight_Test",
+  "summary": "On April 20, 2023, SpaceX performed the first integrated near-orbital flight of its Starship rocket. The prototype vehicle was destroyed less than four minutes after lifting off from the SpaceX Starbase in Boca Chica, Texas. The vehicle became the most powerful rocket ever flown, breaking the half-century-old record held by the Soviet Union's N1 rocket.The launch was part of SpaceX's Starship development program, which follows an iterative and incremental approach involving frequent\u2014and often destructive\u2014test flights of prototype vehicles. Before the launch, SpaceX officials said they would measure the mission's success \"by how much we can learn\" and that various planned mission events \"are not required for a successful test\". The flight was generally regarded as having furthered Starship's development, and a variety of public officials congratulated SpaceX, including NASA administrator Bill Nelson and European Space Agency Director General Josef Aschbacher.It was planned for the Starship spacecraft to complete nearly one orbit around the Earth before reentering the atmosphere, performing a controlled landing and splashing down in the Pacific Ocean near Hawaii. The Super Heavy booster was to have performed a similar landing in the Gulf of Mexico, about 20 mi (30 km) off the Texas coast about 8 minutes after liftoff.The rocket lifted off at 08:33 CDT (13:33 UTC) from SpaceX's private launch site, Boca Chica, Texas. The liftoff damaged the launch pad and its surrounding infrastructure, which SpaceX said was unexpected. Some debris spread into Boca Chica State Park. Three engines did not start or aborted before liftoff, and several others failed during the flight. The vehicle passed max q and entered supersonic flight, but, due to a lack of thrust or thrust vector control, no attempt was made at stage separation. Starship tumbled and the autonomous flight termination system (AFTS) was activated but did not destroy the vehicle immediately, as was intended. The vehicle disintegrated 40 seconds later, nearly 4 minutes into the flight.After the test, the Federal Aviation Administration (FAA) grounded the launch program pending results of a standard \u201cmishap investigation\u201d overseen by the agency and performed by SpaceX. The FAA said that a return to flight would depend on the agency's determination that future launches would not affect public safety. In August 2023, SpaceX submitted to the FAA the 63 \"corrective actions\" that it would need to take before another Starship launch would be allowed. Dust scattered by the launch initially caused some health concerns, but was later found by a laboratory to be ordinary beach sand, not posing a health hazard.A second flight test of the Starship vehicle was granted its license by the FAA for a planned launch on November 17, 2023. The launch was postponed to November 18, due to one of the grid fin actuators needing to be replaced. The launch ended in both stages successfully separating as planned, only to explode.",
+  "content": [
+    {
+      "section_title": "Background",
+      "section_content": [],
+      "subsections": [
+        {
+          "section_title": "Starship",
+          "section_content": [
+            {
+              "sentence": "Developed by SpaceX, Starship is a super heavy-lift launch vehicle,  the largest and most powerful ever developed",
+              "refs": [
+                "https://www.spacex.com/vehicles/starship"
+              ]
+            },
+            {
+              "sentence": "Standing 121\u00a0m (397\u00a0ft) tall, it is projected to be able to carry 150\u00a0t (330,000\u00a0lb) of payload in a fully reusable configuration",
+              "refs": []
+            },
+            {
+              "sentence": "Its 33 first-stage Raptor engines nominally generate more than 16,000,000\u00a0lbf (71\u00a0MN) of thrust",
+              "refs": []
+            },
+            {
+              "sentence": "This is roughly twice that of NASA's Saturn V (7,750,000\u00a0lbf (34.5\u00a0MN) ) which flew between 1967 and 1973; more than NASA's SLS, which produced 8,800,000\u00a0lbf (39\u00a0MN) of thrust at liftoff in 2022; and well above the 10,000,000\u00a0lbf (44\u00a0MN) of thrust from the 30 engines that powered the Soviet Union's N1 rocket between 1969 and 1972",
+              "refs": [
+                "https://files.eric.ed.gov/fulltext/ED252377.pdf"
+              ]
+            },
+            {
+              "sentence": "On its first orbital test flight, Starship broke N1's half-century-old record for the most powerful rocket-stage ever launched",
+              "refs": []
+            },
+            {
+              "sentence": "Both of Starship's stages are designed to perform controlled landings at the launch site so they can be flown multiple times",
+              "refs": []
+            },
+            {
+              "sentence": "SpaceX plans to use the launch vehicle for launching satellites, space tourism, and interplanetary spaceflight",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Development",
+          "section_content": [
+            {
+              "sentence": "Starting in 2019, SpaceX built several prototypes for the upper stage and launched them a total of nine times, culminating with the launch of Starship SN15 on May 5, 2021 that completed a successful high-altitude flight test of six minutes",
+              "refs": []
+            },
+            {
+              "sentence": "SpaceX continued to build new upper stages, completed several first stages, and performed ground tests while waiting for governmental launch clearances.",
+              "refs": [
+                "https://arstechnica.com/science/2021/05/spacex-successfully-lands-a-starship-test-flight/"
+              ]
+            },
+            {
+              "sentence": "In 2021, SpaceX filed an application with the Federal Communications Commission in which it described the planned first flight test of the Starship-Super Heavy booster stack",
+              "refs": []
+            },
+            {
+              "sentence": "The application said that, after liftoff from Starbase, the booster would separate and land about 20 miles (30\u00a0km) offshore while Starship would continue flying east and land about 62 miles (100\u00a0km) off the Hawaiian island of Kauai",
+              "refs": []
+            },
+            {
+              "sentence": "In June 2022, the environmental review of the launch site concluded with a \"mitigated FONSI\" (Finding of No Significant Impact) ruling, requiring the company to implement various mitigations to local wildlife and historical sites but otherwise permitting a launch license to be issued",
+              "refs": []
+            },
+            {
+              "sentence": "On February 9, 2023, SpaceX performed a final static fire of the Super Heavy booster",
+              "refs": []
+            },
+            {
+              "sentence": "A flight readiness review was completed on April 8, 2023",
+              "refs": [
+                "https://www.nytimes.com/2023/02/09/science/spacex-starship-static-fire.html"
+              ]
+            },
+            {
+              "sentence": "An April 11 launch rehearsal was canceled",
+              "refs": [
+                "https://www.nytimes.com/article/elon-musk-starship.html"
+              ]
+            },
+            {
+              "sentence": "The Federal Aviation Administration (FAA) issued an orbital launch license for the vehicle on April 14, 2023",
+              "refs": [
+                "https://www.nasaspaceflight.com/2023/04/starship-ready-for-historic-flight"
+              ]
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Opinions before launch",
+          "section_content": [
+            {
+              "sentence": "Before the launch, 27 organizations including the Sierra Club, South Texas Environmental Justice Network, Another Gulf is Possible, Voces Unidas, and the Carrizo/Comecrudo Tribe signed a letter expressing their concerns and opposition to it",
+              "refs": []
+            },
+            {
+              "sentence": "They cited gentrification and overpolicing of the area, wildlife habitat and native ceremony disruption, and risk of methane-emitting accidents, among others",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Test objectives",
+          "section_content": [
+            {
+              "sentence": "SpaceX said it would measure the mission's success \"by how much  [SpaceX] can learn\" and that completion of mission milestones were \"not required for a successful test\"",
+              "refs": []
+            },
+            {
+              "sentence": "Before the April 20 launch, SpaceX CEO Elon Musk estimated a 50% chance for a successful test, saying that if the rocket gets \"far enough away from the launchpad before something goes wrong, then I think I would consider that to be a success",
+              "refs": [
+                "https://web.archive.org/web/20230419182009/https://www.spacex.com/launches/mission/?missionId=starship-flight-test"
+              ]
+            },
+            {
+              "sentence": "Just don't blow up the launchpad.\"",
+              "refs": [
+                "https://www.washingtonpost.com/technology/2023/04/20/starship-spacex-test-launch/"
+              ]
+            }
+          ],
+          "subsections": []
+        }
+      ]
+    },
+    {
+      "section_title": "Launch",
+      "section_content": [],
+      "subsections": [
+        {
+          "section_title": "Flight profile",
+          "section_content": [
+            {
+              "sentence": "The spacecraft flight plan was to lift off from SpaceX's Starbase facility along the south Texas coast, then conduct a powered flight until reaching the desired transatmospheric Earth orbit, estimated to be around 250 \u00d7 50 km (155 \u00d7 31 mi), which would have caused Starship to re-enter the atmosphere after roughly 1 hour, 17 minutes of flight, nearly completing a full orbit",
+              "refs": []
+            },
+            {
+              "sentence": "The projected flight path would have been suborbital",
+              "refs": [
+                "https://www.spacex.com/launches/mission/?missionId=starship-flight-test"
+              ]
+            },
+            {
+              "sentence": "Though both of Starship's rocket stages are eventually intended to be reusable, SpaceX planned to discard both stages at the end of this flight",
+              "refs": []
+            },
+            {
+              "sentence": "The test flight consisted of prototype vehicles Ship 24 and Booster 7",
+              "refs": []
+            },
+            {
+              "sentence": "Both the booster and the spacecraft would have performed controlled touchdowns on the ocean surface",
+              "refs": []
+            },
+            {
+              "sentence": "According to filings with the FCC, the booster would have performed a boostback burn and sought to land about 20\u00a0mi (32\u00a0km) offshore in the Gulf of Mexico, while the Starship spacecraft would have sought to land in the Pacific Ocean about 62\u00a0mi (100\u00a0km) northwest of Kauai",
+              "refs": [
+                "https://www.spacex.com/launches/mission/?missionId=starship-flight-test"
+              ]
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "April 17 attempt",
+          "section_content": [
+            {
+              "sentence": "The Starship and Super Heavy stack was loaded with propellant at Starbase and was set to launch at 13:20\u00a0UTC (8:20\u00a0a.m",
+              "refs": []
+            },
+            {
+              "sentence": "CDT)",
+              "refs": []
+            },
+            {
+              "sentence": "However, the launch was aborted at T-8:05 due to a frozen pressurization valve on Booster 7",
+              "refs": []
+            },
+            {
+              "sentence": "Before the abort, SpaceX launch control worked to fix the problem, aiming to proceed with a launch the same day",
+              "refs": []
+            },
+            {
+              "sentence": "But the valve exhibited low responsiveness, therefore SpaceX changed the scheduled flight to a wet dress rehearsal that ended at T-40 seconds",
+              "refs": []
+            },
+            {
+              "sentence": "SpaceX said it would need at least 48 hours to prepare for a second attempt",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "April 20 launch",
+          "section_content": [
+            {
+              "sentence": "A 62-minute launch window opened at 8:28\u00a0a.m",
+              "refs": []
+            },
+            {
+              "sentence": "CDT (13:28 UTC) on April 20, 2023",
+              "refs": []
+            },
+            {
+              "sentence": "At 08:33 CDT (13:33 UTC), the vehicle successfully lifted off, albeit while causing damage to the launch pad",
+              "refs": [
+                "https://spaceflightnow.com/2023/04/17/spacexs-starship-test-flight-delayed-until-thursday-after-valve-problem/"
+              ]
+            },
+            {
+              "sentence": "Starship slid laterally off the launchpad, as three engines failed to ignite upon liftoff",
+              "refs": []
+            },
+            {
+              "sentence": "Multiple Raptor engines failed during flight",
+              "refs": []
+            },
+            {
+              "sentence": "At about 27 seconds into the flight, SpaceX lost communications with another engine because of \"some kind of energetic event\"",
+              "refs": [
+                "https://arstechnica.com/science/2023/04/so-what-was-that-was-starships-launch-a-failure-or-a-success/",
+                "https://spacenews.com/starship-lifts-off-on-first-integrated-test-flight-breaks-apart-minutes-later/"
+              ]
+            },
+            {
+              "sentence": "SpaceX shows a discrepancy in its webcast, between the number of engines seen not working in the live video, and the number of engines shut down in the superimposed graphics",
+              "refs": [
+                "https://www.cnbc.com/2023/04/29/elon-musk-spacexs-starship-costing-about-2-billion-this-year.html"
+              ]
+            },
+            {
+              "sentence": "It has been suggested that a small explosion visible around T+0:30 was the failure of a hydraulic power unit, but this has not yet been confirmed",
+              "refs": []
+            },
+            {
+              "sentence": "Eighty-five seconds into the launch, SpaceX lost thrust vector control of the 13 central engines and thus the ability to steer the rocket",
+              "refs": []
+            },
+            {
+              "sentence": "The vehicle rose to about 39\u00a0km (24\u00a0mi) before losing altitude and entering a spin,  after which its AFTS (autonomous flight termination system) was activated",
+              "refs": [
+                "https://www.cnbc.com/2023/04/29/elon-musk-spacexs-starship-costing-about-2-billion-this-year.html",
+                "https://www.reuters.com/business/aerospace-defense/elon-musks-spacex-launches-debut-flight-starship-rocket-system-2023-04-20/"
+              ]
+            },
+            {
+              "sentence": "The AFTS was intended to immediately destroy the vehicle,  but the Starship did not disintegrate, with the booster engines continuing to fire, until 40 seconds after the AFTS was triggered,  about four minutes into the flight  at a height of 29\u00a0km (18\u00a0mi)",
+              "refs": [
+                "https://www.cnbc.com/2023/04/29/elon-musk-spacexs-starship-costing-about-2-billion-this-year.html",
+                "https://www.nasaspaceflight.com/2023/05/musk-orbital-goal-starship-debut/",
+                "https://www.cnbc.com/2023/04/29/elon-musk-spacexs-starship-costing-about-2-billion-this-year.html",
+                "https://www.bbc.co.uk/news/live/science-environment-65330571"
+              ]
+            },
+            {
+              "sentence": "No injuries or public property damage were reported by the Federal Aviation Administration",
+              "refs": [
+                "https://tlpnetwork.com/news/2023/04/starship-ift-anomaly"
+              ]
+            }
+          ],
+          "subsections": []
+        }
+      ]
+    },
+    {
+      "section_title": "Aftermath",
+      "section_content": [],
+      "subsections": [
+        {
+          "section_title": "Technical assessments",
+          "section_content": [
+            {
+              "sentence": "The launch was generally regarded as an important step in Starship's iterative and incremental developmental progress",
+              "refs": []
+            },
+            {
+              "sentence": "A variety of public officials and figures congratulated SpaceX on the outcome of the test flight, including NASA administrator Bill Nelson,  European Space Agency Director General Josef Aschbacher,  retired Canadian astronaut Chris Hadfield,  and executive director of the American Institute of Aeronautics and Astronautics (AIAA) Dan Dumbacher",
+              "refs": [
+                "https://www.npr.org/2023/04/20/1170983959/spacex-starship-launch-elon-musk",
+                "https://apnews.com/article/spacex-starship-launch-elon-musk-d9989401e2e07cdfc9753f352e44f6e2",
+                "https://www.bloomberg.com/graphics/2023-spacex-starship-refuel/",
+                "https://www.npr.org/2023/04/20/1170983959/spacex-starship-launch-elon-musk",
+                "https://www.bbc.co.uk/news/live/science-environment-65330571",
+                "https://www.youtube.com/watch?v=iiDGb1CXw4I"
+              ]
+            },
+            {
+              "sentence": "University of Chicago space historian Jordan Brimm said that \"it fell somewhere between a small step and their hoped-for giant leap, but it still represents significant progress toward a reusable super-heavy lift rocket\"",
+              "refs": []
+            },
+            {
+              "sentence": "Bloomberg News space reporter Loren Grush said the explosion \"highlights the challenges ahead for Musk's grandiose plan for Starship to open up space to human travel\", and that beyond the engineering work required for Starship to successfully land, SpaceX will still need to work on Starship's life support systems and ability to refuel in outer space",
+              "refs": [
+                "https://apnews.com/article/spacex-starship-launch-elon-musk-d9989401e2e07cdfc9753f352e44f6e2"
+              ]
+            },
+            {
+              "sentence": "Grush also described the booster's first takeoff as a \"win\", and noted that commercial rockets' first launches are rarely successful",
+              "refs": []
+            },
+            {
+              "sentence": "Ars Technica editor Eric Berger reported that launch industry officials believed that \"getting the Super Heavy rocket and Starship upper stage off the launch pad was a huge success\"",
+              "refs": [
+                "https://www.bloomberg.com/graphics/2023-spacex-starship-refuel/"
+              ]
+            },
+            {
+              "sentence": "According to Elon Musk, requalification of the flight termination system will be the main delay to the next launch, as despite the system activating and setting off the explosives, it \"took way too long to rupture the tanks\"",
+              "refs": []
+            },
+            {
+              "sentence": "On September 8, 2023, SpaceX summarized the root cause of the loss of vehicle control in a company blog post: \"During ascent, the vehicle sustained fires from leaking propellant in the aft end of the Super Heavy booster, which eventually severed connection with the vehicle\u2019s primary flight computer",
+              "refs": []
+            },
+            {
+              "sentence": "This led to a loss of communications to the majority of booster engines and, ultimately, control of the vehicle.\"",
+              "refs": [
+                "https://arstechnica.com/space/2023/09/faa-says-spacex-has-more-to-do-before-starship-can-fly-again/"
+              ]
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Launch site",
+          "section_content": [
+            {
+              "sentence": "The launch pad was built without flame diverters, water deluge systems or sound suppression systems,  systems commonly used to prevent damage during liftoff",
+              "refs": [
+                "https://www.nytimes.com/2023/04/21/us/spacex-rocket-dust-texas.html"
+              ]
+            },
+            {
+              "sentence": "SpaceX's CEO Elon Musk tweeted in 2020, \"Aspiring to have no flame diverter in Boca, but this could turn out to be a mistake.\"",
+              "refs": [
+                "https://twitter.com/elonmusk/status/1313952039869788173?s=20"
+              ]
+            },
+            {
+              "sentence": "After the launch, photos showed damage to the concrete under the launch pad and to infrastructure at the launch site",
+              "refs": []
+            },
+            {
+              "sentence": "SpaceX video of the launch showed debris shooting into the ocean nearly half a mile away",
+              "refs": [
+                "https://www.teslarati.com/spacex-starship-launch-pad-damage/"
+              ]
+            },
+            {
+              "sentence": "The rocket exhaust scattered debris for hundreds of yards, leaving a crater under its launch mount, and dented inert storage tanks near the launch pad",
+              "refs": [
+                "https://www.washingtonpost.com/technology/2023/04/21/spacex-starship-launch-debris-shrapnel/"
+              ]
+            },
+            {
+              "sentence": "Musk said large chunks of concrete hit the launch tower but caused no meaningful damage",
+              "refs": [
+                "https://www.washingtonpost.com/technology/2023/04/21/spacex-starship-launch-debris-shrapnel/"
+              ]
+            },
+            {
+              "sentence": "On April 21, 2023\u2014the day after the launch\u2014Musk tweeted that SpaceX workers had planned three months earlier to add a \"massive water-cooled steel plate\" to the pad but that the team had \"wrongly thought, based on static fire data, that  [the concrete in use on the pad] would make it through the launch\"",
+              "refs": []
+            },
+            {
+              "sentence": "SpaceX told NASA administrator Bill Nelson in April that it would take at least two months to rebuild the launchpad",
+              "refs": []
+            },
+            {
+              "sentence": "For the next launch, the company planned to put water-cooled steel plates under the launch mount",
+              "refs": [
+                "https://www.cnbc.com/2023/04/29/spacex-starship-whats-next.html"
+              ]
+            },
+            {
+              "sentence": "Installation began on July 5, 2023,  and finished on July 17",
+              "refs": [
+                "https://www.cnbc.com/2023/04/29/elon-musk-spacexs-starship-costing-about-2-billion-this-year.html",
+                "https://twitter.com/NASASpaceflight/status/1676688040972918788"
+              ]
+            },
+            {
+              "sentence": "The system's first full-pressure test was conducted on July 28.",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Effects on environment",
+          "section_content": [
+            {
+              "sentence": "Residents and researchers were \"scrambling\" after the launch to assess its effects on local communities' health and wildlife",
+              "refs": []
+            },
+            {
+              "sentence": "Soon after the launch, residents of Port Isabel, Texas, a town roughly 6.5 miles (10.5\u00a0km) from the launch site, reported particulate matter falling from the sky",
+              "refs": [
+                "https://www.cnbc.com/2023/04/24/spacex-starship-explosion-spread-particulate-matter-for-miles.html"
+              ]
+            },
+            {
+              "sentence": "A Port Isabel spokesperson called the debris a \"thick, granular, sand grain that just landed on everything\", adding that the debris posed no \"immediate concern\" to resident health",
+              "refs": [
+                "https://www.commondreams.org/news/spacex-explosion-sparks-environmental-concerns"
+              ]
+            },
+            {
+              "sentence": "Several Port Isabel residents reported shaking and shattered windows",
+              "refs": [
+                "https://www.nytimes.com/2023/04/21/us/spacex-rocket-dust-texas.html"
+              ]
+            },
+            {
+              "sentence": "Representatives of Another Gulf is Possible,  the Sierra Club, and Center for Biological Diversity expressed concerns that the particulate matter might harm Port Isabel residents and nearby endangered species, The latter two groups' representatives also said the blast's damage to roads had kept wildlife biologists from investigating the launch site until April 22, two days after the launch",
+              "refs": [
+                "https://www.nytimes.com/2023/04/21/us/spacex-rocket-dust-texas.html",
+                "https://www.sacurrent.com/news/faa-grounds-elon-musks-spacex-pending-investigation-into-potential-environmental-damage-31578176",
+                "https://www.democracynow.org/2023/4/21/spacex_gulf_coast"
+              ]
+            },
+            {
+              "sentence": "The U.S",
+              "refs": []
+            },
+            {
+              "sentence": "Fish and Wildlife Service's Texas Division reported that the launch scattered debris across 385 acres (156\u00a0ha) on SpaceX property and Boca Chica State Park",
+              "refs": []
+            },
+            {
+              "sentence": "It deposited a pulverized material,  thought to be concrete dust, up to 6.5 miles (10.5\u00a0km) northwest",
+              "refs": []
+            },
+            {
+              "sentence": "A wildfire started and burned 3.5 acres (1.4\u00a0ha) of state parkland to the south of the pad",
+              "refs": []
+            },
+            {
+              "sentence": "Olivier de Weck, editor-in-chief of the Journal of Spacecraft and Rockets and a MIT professor, said that much of the dust and debris could have been better contained by flame trenches diverting the engine blast underground or a \"pipeline...bring [ing] seawater\" to the launch site",
+              "refs": [
+                "https://www.bloomberg.com/news/articles/2023-04-26/spacex-launch-sparked-3-5-acre-fire-on-state-park-land-us-says-lgy2cc46?leadSource=uverify%20wall"
+              ]
+            },
+            {
+              "sentence": "(de Weck nevertheless called the event \"more of a success than a failure\"",
+              "refs": [
+                "https://nymag.com/intelligencer/2023/04/elon-musk-messy-420-rocket-launch-may-delay-spacex-plan.html"
+              ]
+            },
+            {
+              "sentence": ")",
+              "refs": [
+                "https://www.yahoo.com/lifestyle/giant-spacex-rocket-leaves-crater-014055008.html"
+              ]
+            },
+            {
+              "sentence": "Similarly, Eric Roesch, an expert in environmental compliance and risk assessment, criticized SpaceX for not disclosing the launch's risks and for failing to use a trench or water system to dampen the launch's impact",
+              "refs": []
+            },
+            {
+              "sentence": "Roesch said that a chemical analysis would be required to determine whether the dust and debris would be harmful to health",
+              "refs": [
+                "https://www.nytimes.com/2023/04/21/us/spacex-rocket-dust-texas.html"
+              ]
+            },
+            {
+              "sentence": "A later chemical analysis by the University of Central Florida and another by Rice University identified the dust-like material as harmless beach sand from below the launchpad",
+              "refs": [
+                "https://www.nytimes.com/2023/04/21/us/spacex-rocket-dust-texas.html"
+              ]
+            },
+            {
+              "sentence": "The heat and pressure went through fresh cracks in the launch pad, causing an eruption that propelled sand six miles to Port Isabel",
+              "refs": [
+                "https://www.houstonchronicle.com/news/houston-texas/space/article/spacex-starship-launch-dumped-sand-across-south-18266534.php"
+              ]
+            },
+            {
+              "sentence": "Though large amounts of dust measuring between 1 and 10 microns can be harmful to breathe, the researchers did not find them in enough quantity and concluded that the sand was not a health hazard",
+              "refs": []
+            },
+            {
+              "sentence": "A pre-launch FAA assessment had stated there would be \"no significant impact\" on the region",
+              "refs": []
+            },
+            {
+              "sentence": "After the launch, SpaceX activated the FAA required \"anomaly response plan\", but otherwise refused to comment on the situation",
+              "refs": [
+                "https://www.nytimes.com/2023/04/21/us/spacex-rocket-dust-texas.html"
+              ]
+            },
+            {
+              "sentence": "The US Fish and Wildlife Service's Texas division said it had not found evidence of dead birds or wildlife,  though Texas Public Radio reported finding a charred quail's nest",
+              "refs": [
+                "https://www.washingtonpost.com/technology/2023/04/20/spacex-starship-explosion-launch/",
+                "https://www.nytimes.com/2023/04/21/us/spacex-rocket-dust-texas.html",
+                "https://www.bloomberg.com/news/articles/2023-04-26/spacex-launch-sparked-3-5-acre-fire-on-state-park-land-us-says-lgy2cc46?leadSource=uverify%20wall"
+              ]
+            },
+            {
+              "sentence": "Biologist David Newstead suggested that the delay in conducting a survey may have skewed the result, noting, for example, that predators would be likely to consume a \"dead bird on the flats\" within an hour",
+              "refs": [
+                "https://www.tpr.org/environment/2023-04-27/photos-spacex-is-grounded-after-rocket-explosion-caused-extensive-environmental-damage"
+              ]
+            },
+            {
+              "sentence": "Justin LeClaire, a biologist who was allowed into the area 54 hours after launch, said that SpaceX has \"altered a habitat on a wildlife refuge\", and that it would take time to understand the effects",
+              "refs": [
+                "https://www.expressnews.com/opinion/article/lingle-full-impact-of-spacex-launch-comes-into-17924161.php"
+              ]
+            },
+            {
+              "sentence": "On May 1, 2023, ten days after the launch, four environmental groups\u2014the Center for Biological Diversity, Surfrider Foundation, American Bird Conservancy, and Save Rio Grande Valley (Save RGV)\u2014and the Carrizo Comecrudo Nation of Texas jointly sued the FAA for having granted SpaceX a launch license",
+              "refs": []
+            },
+            {
+              "sentence": "SpaceX requested that it be allowed to join the FAA as a defendant, which was granted in June",
+              "refs": [
+                "https://www.nbcnews.com/science/space/faa-sued-spacex-starship-launch-program-april-explosion-rcna82289",
+                "https://www.reuters.com/technology/space/environmentalists-sue-faa-over-spacex-launch-license-texas-2023-05-01/"
+              ]
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "FAA investigation",
+          "section_content": [
+            {
+              "sentence": "Following Starship's first flight failure, the Federal Aviation Administration (FAA) required SpaceX to conduct an investigation on the mishap, grounding Starship pending the outcome of their investigation",
+              "refs": []
+            },
+            {
+              "sentence": "The FAA would oversee the investigation, a standard practice when a vehicle was lost in flight",
+              "refs": [
+                "https://www.faa.gov/media/70901",
+                "https://www.cnbc.com/2023/04/24/spacex-starship-explosion-spread-particulate-matter-for-miles.html"
+              ]
+            },
+            {
+              "sentence": "The agency grounded Starship flights during the investigation, also a standard practice,   and said that \"a return to flight of the Starship/Super Heavy vehicle is based on the FAA determining that any system, process or procedure related to the mishap does not affect public safety\" and that there were no reports of injuries or public property damage",
+              "refs": [
+                "https://www.cnbc.com/2023/04/24/spacex-starship-explosion-spread-particulate-matter-for-miles.html",
+                "https://news.yahoo.com/faa-investigating-starship-explosion-204600279.html"
+              ]
+            },
+            {
+              "sentence": "The FAA also announced that it would monitor the cleanup, which included the standard removal of launch debris from \"sensitive habitats\"",
+              "refs": [
+                "https://www.washingtonpost.com/technology/2023/04/20/starship-spacex-test-launch/",
+                "https://web.archive.org/web/20230423124613/https://www.faa.gov/newsroom/statements"
+              ]
+            },
+            {
+              "sentence": "On May 15, SpaceX filed a request for FCC approval for a second flight between June 15 and December 15, using Booster 9 and Ship 25",
+              "refs": [
+                "https://spacepolicyonline.com/news/faa-monitoring-spacexs-clean-up-after-starship-launch/"
+              ]
+            },
+            {
+              "sentence": "In August, SpaceX submitted an initial mishap report to NASA for review and approval",
+              "refs": [
+                "https://observer.com/2023/05/spacex-starship-orbital-test-date/"
+              ]
+            },
+            {
+              "sentence": "The FAA stated in September 2023",
+              "refs": [
+                "https://www.faa.gov/media/70901",
+                "https://www.faa.gov/newsroom/faa-closes-spacex-starship-mishap-investigation"
+              ]
+            },
+            {
+              "sentence": "Following SpaceX's final report, the FAA closed the investigation on September 8, 2023",
+              "refs": []
+            },
+            {
+              "sentence": "In the same statement, FAA officials emphasized that \"The closure of the mishap investigation does not signal an immediate resumption of Starship launches at Boca Chica.\"   And that SpaceX first had to \"implement all corrective actions that impact public safety\" and applied for a \"license modification from the FAA\" that addresses the FAA's \"safety and other environmental regulatory requirements\"",
+              "refs": [
+                "https://www.faa.gov/newsroom/faa-closes-spacex-starship-mishap-investigation",
+                "[ERROR retrieving ref link]",
+                "https://www.faa.gov/newsroom/faa-closes-spacex-starship-mishap-investigation",
+                "https://www.cnn.com/2023/09/08/world/faa-launch-license-starship-scn/index.html"
+              ]
+            },
+            {
+              "sentence": "The FAA also announced that the full investigatory report would not be released due to confidential contents including export control information",
+              "refs": [
+                "https://www.faa.gov/newsroom/faa-closes-spacex-starship-mishap-investigation",
+                "https://www.cnbc.com/amp/2023/09/08/faa-starship-grounded-corrective-action.html"
+              ]
+            }
+          ],
+          "subsections": []
+        }
+      ]
+    },
+    {
+      "section_title": "See also",
+      "section_content": [],
+      "subsections": []
+    },
+    {
+      "section_title": "Notes",
+      "section_content": [],
+      "subsections": []
+    }
+  ],
+  "references": {
+    "85": "[ERROR retrieving ref link]",
+    "1": "https://edition.cnn.com/us/live-news/spacex-starship-rocket-launch-04-20-23/index.html#:~:text=%22At%208%3A33%20a.m.,of%20any%20Starship%20to%2Ddate.",
+    "2": "https://spacenews.com/starship-lifts-off-on-first-integrated-test-flight-breaks-apart-minutes-later/",
+    "3": "https://www.nbcnews.com/science/space/spacexs-starship-rocket-blasts-first-test-flight-rcna79988",
+    "4": "https://spaceflightnow.com/2023/04/17/how-spacexs-starship-stacks-up-to-other-rockets/",
+    "5": "https://www.space.com/spacex-starship-flight-test-whats-next",
+    "6": "https://web.archive.org/web/20230419182009/https://www.spacex.com/launches/mission/?missionId=starship-flight-test",
+    "7": "https://www.npr.org/2023/04/20/1170983959/spacex-starship-launch-elon-musk",
+    "8": "https://www.bbc.co.uk/news/live/science-environment-65330571",
+    "9": "https://www.space.com/spacex-starship-first-orbital-launch-explainer",
+    "10": "https://www.yahoo.com/lifestyle/giant-spacex-rocket-leaves-crater-014055008.html",
+    "11": "https://gizmodo.com/spacex-starship-launch-pad-damage-video-1850357836",
+    "12": "https://spacenews.com/musk-predicts-next-starship-launch-in-a-couple-months/",
+    "13": "https://www.nasaspaceflight.com/2023/05/musk-orbital-goal-starship-debut/",
+    "14": "https://tlpnetwork.com/news/2023/04/starship-ift-anomaly",
+    "15": "https://www.cnbc.com/2023/04/24/spacex-starship-explosion-spread-particulate-matter-for-miles.html",
+    "16": "https://web.archive.org/web/20230423124613/https://www.faa.gov/newsroom/statements",
+    "17": "https://web.archive.org/web/20230908173658/https://www.faa.gov/media/70901",
+    "18": "https://www.faa.gov/newsroom/faa-closes-spacex-starship-mishap-investigation",
+    "19": "https://www.cnbc.com/amp/2023/09/08/faa-starship-grounded-corrective-action.html",
+    "20": "https://www.houstonchronicle.com/news/houston-texas/space/article/spacex-starship-launch-dumped-sand-across-south-18266534.php",
+    "21": "https://www.reuters.com/technology/space/faa-approves-license-second-launch-spacex-starship-super-heavy-2023-11-15/",
+    "22": "https://twitter.com/elonmusk/status/1725231694645461403",
+    "23": "https://twitter.com/FAANews/status/1725890315251228682",
+    "24": "https://www.spacex.com/vehicles/starship",
+    "25": "https://files.eric.ed.gov/fulltext/ED252377.pdf",
+    "26": "https://www.nytimes.com/article/elon-musk-starship.html",
+    "27": "https://www.cnbc.com/2022/03/13/why-starship-is-the-holy-grail-for-spacex.html",
+    "28": "https://arstechnica.com/science/2021/05/spacex-successfully-lands-a-starship-test-flight/",
+    "29": "https://web.archive.org/web/20210513192042/https://apps.fcc.gov/els/GetAtt.html?id=273481",
+    "30": "https://www.nytimes.com/2023/02/09/science/spacex-starship-static-fire.html",
+    "31": "https://www.nasaspaceflight.com/2023/04/starship-ready-for-historic-flight",
+    "32": "https://www.cnbc.com/2023/04/14/faa-clears-spacex-to-launch-starship-flight.html",
+    "33": "https://www.sierraclub.org/sites/www.sierraclub.org/files/2023-04/PressStatement_%20SpaceXlaunchthreatensRioGrandeValleycommunity_19April2023.pdf",
+    "34": "https://www.washingtonpost.com/technology/2023/04/20/starship-spacex-test-launch/",
+    "35": "https://www.spacex.com/launches/mission/?missionId=starship-flight-test",
+    "36": "https://www.spacelaunchschedule.com/launch/starship-integrated-flight-test",
+    "37": "https://arstechnica.com/science/2023/04/spacexs-starship-vehicle-is-ready-to-fly-just-waiting-for-a-launch-license/",
+    "38": "https://apps.fcc.gov/els/GetAtt.html?id=273481",
+    "39": "https://arstechnica.com/science/2023/05/elon-musk-provides-detailed-review-of-starships-first-launch-and-whats-next/",
+    "40": "https://www.theverge.com/2023/4/26/23699365/spacex-starship-damage-launch-pad-debris",
+    "41": "https://gizmodo.com/spacex-starship-launch-pad-damage-video-1850357836",
+    "42": "https://www.space.com/spacex-starship-damage-starbase-launch-pad",
+    "43": "https://www.youtube.com/watch?v=iiDGb1CXw4I",
+    "44": "https://www.youtube.com/watch?v=w8q24QLXixo&t=72s&ab_channel=ScottManley",
+    "45": "https://www.space.com/spacex-scrubs-first-space-launch-starship",
+    "46": "https://www.nytimes.com/live/2023/04/17/science/spacex-starship-launch",
+    "47": "https://spaceflightnow.com/2023/04/17/spacexs-starship-test-flight-delayed-until-thursday-after-valve-problem/",
+    "48": "https://www.cnbc.com/2023/04/29/elon-musk-spacexs-starship-costing-about-2-billion-this-year.html",
+    "49": "https://arstechnica.com/science/2023/04/so-what-was-that-was-starships-launch-a-failure-or-a-success/",
+    "50": "https://www.youtube.com/watch?v=-1wcilQ58hI#t=2785s",
+    "51": "https://web.archive.org/web/20230531015202/https://www.planet4589.org/space/jsr/jsr.html",
+    "52": "https://www.reuters.com/business/aerospace-defense/elon-musks-spacex-launches-debut-flight-starship-rocket-system-2023-04-20/",
+    "53": "https://apnews.com/article/spacex-starship-launch-elon-musk-d9989401e2e07cdfc9753f352e44f6e2",
+    "54": "https://www.bloomberg.com/graphics/2023-spacex-starship-refuel/",
+    "55": "https://arstechnica.com/space/2023/09/faa-says-spacex-has-more-to-do-before-starship-can-fly-again/",
+    "56": "https://www.nytimes.com/2023/04/21/us/spacex-rocket-dust-texas.html",
+    "57": "https://twitter.com/elonmusk/status/1313952039869788173?s=20",
+    "58": "https://www.teslarati.com/spacex-starship-launch-pad-damage/",
+    "59": "https://www.washingtonpost.com/technology/2023/04/21/spacex-starship-launch-debris-shrapnel/",
+    "60": "https://twitter.com/elonmusk/status/1649523985837686784",
+    "61": "https://www.cnbc.com/2023/04/29/spacex-starship-whats-next.html",
+    "62": "https://twitter.com/NASASpaceflight/status/1676688040972918788",
+    "63": "https://www.cnbc.com/2023/04/24/spacex-starship-explosion-spread-particulate-matter-for-miles.html",
+    "64": "https://www.commondreams.org/news/spacex-explosion-sparks-environmental-concerns",
+    "65": "https://www.sacurrent.com/news/faa-grounds-elon-musks-spacex-pending-investigation-into-potential-environmental-damage-31578176",
+    "66": "https://www.democracynow.org/2023/4/21/spacex_gulf_coast",
+    "67": "https://www.bloomberg.com/news/articles/2023-04-26/spacex-launch-sparked-3-5-acre-fire-on-state-park-land-us-says-lgy2cc46?leadSource=uverify%20wall",
+    "68": "https://nymag.com/intelligencer/2023/04/elon-musk-messy-420-rocket-launch-may-delay-spacex-plan.html",
+    "69": "https://www.washingtonpost.com/technology/2023/04/20/spacex-starship-explosion-launch/",
+    "70": "https://www.tpr.org/environment/2023-04-27/photos-spacex-is-grounded-after-rocket-explosion-caused-extensive-environmental-damage",
+    "71": "https://www.expressnews.com/opinion/article/lingle-full-impact-of-spacex-launch-comes-into-17924161.php",
+    "72": "https://www.nbcnews.com/science/space/faa-sued-spacex-starship-launch-program-april-explosion-rcna82289",
+    "73": "https://www.reuters.com/technology/space/environmentalists-sue-faa-over-spacex-launch-license-texas-2023-05-01/",
+    "74": "https://www.cnbc.com/2023/05/22/spacex-joining-faa-to-fight-environmental-lawsuit-over-starship.html",
+    "75": "https://expressnews.com/business/article/spacex-joins-faa-defendant-lawsuit-south-texas-18114267.php",
+    "76": "https://cnbc.com/2023/05/22/spacex-joining-faa-to-fight-environmental-lawsuit-over-starship.html",
+    "77": "https://www.faa.gov/media/70901",
+    "78": "https://www.bbc.com/news/science-environment-65334810",
+    "79": "https://news.yahoo.com/faa-investigating-starship-explosion-204600279.html",
+    "80": "https://spacepolicyonline.com/news/faa-monitoring-spacexs-clean-up-after-starship-launch/",
+    "81": "https://observer.com/2023/05/spacex-starship-orbital-test-date/",
+    "82": "https://www.space.com/spacex-submits-starship-mishap-report-faa",
+    "83": "https://arstechnica.com/space/2023/08/let-the-review-begin-spacex-takes-another-step-toward-launching-starship-again/",
+    "84": "https://www.faa.gov/newsroom/faa-closes-spacex-starship-mishap-investigation",
+    "86": "https://www.cnn.com/2023/09/08/world/faa-launch-license-starship-scn/index.html",
+    "87": "https://www.space.com/faa-closes-spacex-starship-mishap-investigation"
+  },
+  "spicy_entities": {
+    "april 20, 2023": "DATE",
+    "first": "ORDINAL",
+    "starship": "PERSON",
+    "less than four minutes": "TIME",
+    "the spacex starbase": "FAC",
+    "boca chica": "GPE",
+    "texas": "GPE",
+    "the half-century-old": "DATE",
+    "the soviet union's": "GPE",
+    "n1": "CARDINAL",
+    "spacex's starship": "ORG",
+    "nasa": "ORG",
+    "bill nelson": "PERSON",
+    "european space agency": "ORG",
+    "josef aschbacher": "PERSON",
+    "nearly one": "CARDINAL",
+    "earth": "LOC",
+    "the pacific ocean": "LOC",
+    "hawaii": "GPE",
+    "super heavy": "ORG",
+    "the gulf of mexico": "LOC",
+    "about 20": "CARDINAL",
+    "30 km": "QUANTITY",
+    "about 8 minutes": "TIME",
+    "utc": "ORG",
+    "spacex": "PERSON",
+    "three": "CARDINAL",
+    "max": "PERSON",
+    "afts": "GPE",
+    "40 seconds later": "TIME",
+    "nearly 4 minutes": "TIME",
+    "the federal aviation administration": "ORG",
+    "faa": "ORG",
+    "august 2023": "DATE",
+    "63": "CARDINAL",
+    "second": "ORDINAL",
+    "november 17, 2023": "DATE",
+    "november 18": "DATE",
+    "one": "CARDINAL",
+    "121": "CARDINAL",
+    "397": "CARDINAL",
+    "150": "CARDINAL",
+    "330,000": "CARDINAL",
+    "33": "CARDINAL",
+    "more than 16,000,000": "CARDINAL",
+    "71": "CARDINAL",
+    "mn": "ORG",
+    "saturn v": "PRODUCT",
+    "7,750,000\u00a0lbf": "QUANTITY",
+    "34.5": "CARDINAL",
+    "between 1967 and 1973": "DATE",
+    "sls": "ORG",
+    "8,800,000": "CARDINAL",
+    "39": "CARDINAL",
+    "2022": "DATE",
+    "10,000,000\u00a0lbf": "QUANTITY",
+    "44": "CARDINAL",
+    "30": "CARDINAL",
+    "between 1969 and 1972": "DATE",
+    "n1's": "FAC",
+    "half-century-old": "DATE",
+    "2019": "DATE",
+    "nine": "CARDINAL",
+    "may 5, 2021": "DATE",
+    "six minutes": "TIME",
+    "2021": "DATE",
+    "the federal communications commission": "ORG",
+    "the starship-super heavy": "ORG",
+    "about 20 miles": "QUANTITY",
+    "30\u00a0km": "QUANTITY",
+    "about 62 miles": "QUANTITY",
+    "100\u00a0km": "QUANTITY",
+    "hawaiian": "NORP",
+    "kauai": "GPE",
+    "june 2022": "DATE",
+    "february 9, 2023": "DATE",
+    "april 8, 2023": "DATE",
+    "april 11": "DATE",
+    "april 14, 2023": "DATE",
+    "27": "CARDINAL",
+    "the sierra club": "ORG",
+    "another gulf is possible": "LOC",
+    "unidas": "PERSON",
+    "the carrizo/comecrudo tribe": "ORG",
+    "april 20": "DATE",
+    "elon musk": "PERSON",
+    "50%": "PERCENT",
+    "launch": "NORP",
+    "250": "CARDINAL",
+    "155": "CARDINAL",
+    "roughly 1 hour": "TIME",
+    "17 minutes": "TIME",
+    "ship 24": "LAW",
+    "fcc": "ORG",
+    "32\u00a0km": "QUANTITY",
+    "april 17": "DATE",
+    "the starship and super heavy": "WORK_OF_ART",
+    "13:20": "TIME",
+    "cdt": "PERSON",
+    "the same day": "DATE",
+    "t-40 seconds": "WORK_OF_ART",
+    "at least 48 hours": "TIME",
+    "62-minute": "TIME",
+    "8:28\u00a0a.m.": "TIME",
+    "multiple raptor": "ORG",
+    "about 27 seconds": "TIME",
+    "eighty-five seconds": "QUANTITY",
+    "13": "CARDINAL",
+    "about 39\u00a0km": "QUANTITY",
+    "40 seconds": "TIME",
+    "about four minutes": "TIME",
+    "29\u00a0km": "QUANTITY",
+    "aftermath\n\ntechnical": "ORG",
+    "canadian": "NORP",
+    "chris hadfield": "PERSON",
+    "the american institute of aeronautics and astronautics": "ORG",
+    "dan dumbacher      ": "PERSON",
+    "university of chicago": "ORG",
+    "jordan brimm": "PERSON",
+    "bloomberg news": "ORG",
+    "loren grush": "PERSON",
+    "musk": "PERSON",
+    "grush": "PERSON",
+    "technica": "PERSON",
+    "eric berger": "PERSON",
+    "september 8, 2023": "DATE",
+    "2020": "DATE",
+    "boca": "GPE",
+    "the ocean nearly half": "DATE",
+    "hundreds of yards": "QUANTITY",
+    "april 21, 2023": "DATE",
+    "the day": "DATE",
+    "three months earlier": "DATE",
+    "april": "DATE",
+    "at least two months": "DATE",
+    "july 5, 2023": "DATE",
+    "july 17": "DATE",
+    "july 28": "DATE",
+    "port isabel": "FAC",
+    "roughly 6.5 miles": "QUANTITY",
+    "10.5\u00a0km": "QUANTITY",
+    "center for biological diversity": "ORG",
+    "two": "CARDINAL",
+    "april 22, two days": "DATE",
+    "u.s.": "GPE",
+    "wildlife service's": "ORG",
+    "texas division": "ORG",
+    "385 acres": "QUANTITY",
+    "156": "CARDINAL",
+    "6.5 miles": "QUANTITY",
+    "3.5 acres": "QUANTITY",
+    "1.4": "CARDINAL",
+    "olivier de weck": "PERSON",
+    "the journal of spacecraft": "ORG",
+    "rockets": "ORG",
+    "mit": "ORG",
+    "eric roesch": "PERSON",
+    "roesch": "PERSON",
+    "the university of central florida": "ORG",
+    "rice university": "ORG",
+    "six miles": "QUANTITY",
+    "between 1 and 10": "CARDINAL",
+    "us": "GPE",
+    "texas public radio": "ORG",
+    "david newstead": "PERSON",
+    "an hour": "TIME",
+    "justin leclaire": "PERSON",
+    "54 hours": "TIME",
+    "may 1, 2023": "DATE",
+    "ten days": "DATE",
+    "four": "CARDINAL",
+    "the center for biological diversity": "ORG",
+    "surfrider foundation": "ORG",
+    "american bird conservancy": "ORG",
+    "save rio grande valley": "ORG",
+    "the carrizo comecrudo nation of texas": "ORG",
+    "june": "DATE",
+    "the starship/super heavy": "ORG",
+    "may 15": "DATE",
+    "between june 15 and december 15": "DATE",
+    "booster": "PERSON",
+    "august": "DATE",
+    "september 2023": "DATE"
+  },
+  "flair_entities": [
+    "sierra club",
+    "bill nelson",
+    "american bird conservancy",
+    "surfrider foundation",
+    "super heavy",
+    "chris hadfield",
+    "mit",
+    "university of chicago",
+    "david newstead",
+    "pacific ocean",
+    "gulf of mexico",
+    "loren grush",
+    "journal of spacecraft and rockets",
+    "super heavy booster",
+    "south texas environmental justice network",
+    "american institute of aeronautics and astronautics",
+    "josef aschbacher.it",
+    "faa",
+    "justin leclaire",
+    "texas public radio",
+    "ship 24",
+    "rice university",
+    "roesch",
+    "the starship and super heavy",
+    "spacex",
+    "saturn v",
+    "another gulf",
+    "save rio grande valley",
+    "raptor",
+    "port isabel",
+    "booster 9",
+    "starship sn15",
+    "boca",
+    "de weck",
+    "center for biological diversity",
+    "soviet union",
+    "josef aschbacher",
+    "booster 7",
+    "starship/super heavy",
+    "starship-super heavy",
+    "eric roesch",
+    "comecrudo tribe",
+    "afts",
+    "voces unidas",
+    "eric berger",
+    "boca chica",
+    "dan dumbacher",
+    "hawaii",
+    "olivier de weck",
+    "n1",
+    "hawaiian",
+    "grush",
+    "texas division",
+    "starship",
+    "federal aviation administration",
+    "carrizo comecrudo nation of texas",
+    "spacex starbase",
+    "texas",
+    "kauai",
+    "fcc",
+    "jordan brimm",
+    "sls",
+    "u.s. fish and wildlife service",
+    "mn",
+    "save rgv",
+    "bloomberg news",
+    "nasa",
+    "musk",
+    "us fish and wildlife service",
+    "elon musk",
+    "canadian",
+    "ars technica",
+    "university of central florida",
+    "federal communications commission",
+    "boca chica state park",
+    "carrizo",
+    "utc",
+    "another gulf is possible",
+    "aiaa",
+    "starbase",
+    "european space agency",
+    "earth"
+  ]
+}

@@ -1,0 +1,34 @@
+[
+    {
+        "criteria_description": "Interest Level: How engaging and thought-provoking is the article?",
+        "score1_description": "Not engaging at all; no attempt to capture the reader's attention.",
+        "score2_description": "Fairly engaging with a basic narrative but lacking depth.",
+        "score3_description": "Moderately engaging with several interesting points.",
+        "score4_description": "Quite engaging with a well-structured narrative and noteworthy points that frequently capture and retain attention.",
+        "score5_description": "Exceptionally engaging throughout, with a compelling narrative that consistently stimulates interest."
+    },
+    {
+        "criteria_description": "Coherence and Organization: Is the article well-organized and logically structured?",
+        "score1_description": "Disorganized; lacks logical structure and coherence.",
+        "score2_description": "Fairly organized; a basic structure is present but not consistently followed.",
+        "score3_description": "Organized; a clear structure is mostly followed with some lapses in coherence.",
+        "score4_description": "Good organization; a clear structure with minor lapses in coherence.",
+        "score5_description": "Excellently organized; the article is logically structured with seamless transitions and a clear argument."
+    },
+    {
+        "criteria_description": "Relevance and Focus: Does the article stay on topic and maintain a clear focus",
+        "score1_description": "Off-topic; the content does not align with the headline or core subject.",
+        "score2_description": "Somewhat on topic but with several digressions; the core subject is evident but not consistently adhered to.",
+        "score3_description": "Generally on topic, despite a few unrelated details.",
+        "score4_description": "Mostly on topic and focused; the narrative has a consistent relevance to the core subject with infrequent digressions.",
+        "score5_description": "Exceptionally focused and entirely on topic; the article is tightly centered on the subject, with every piece of information contributing to a comprehensive understanding of the topic."
+    },
+    {
+        "criteria_description": "Broad Coverage: Does the article provide an in-depth exploration of the topic and have good coverage?",
+        "score1_description": "Severely lacking; offers little to no coverage of the topic's primary aspects, resulting in a very narrow perspective.",
+        "score2_description": "Partial coverage; includes some of the topic's main aspects but misses others, resulting in an incomplete portrayal.",
+        "score3_description": "Acceptable breadth; covers most main aspects, though it may stray into minor unnecessary details or overlook some relevant points.",
+        "score4_description": "Good coverage; achieves broad coverage of the topic, hitting on all major points with minimal extraneous information.",
+        "score5_description": "Exemplary in breadth; delivers outstanding coverage, thoroughly detailing all crucial aspects of the topic without including irrelevant information."
+    }
+]

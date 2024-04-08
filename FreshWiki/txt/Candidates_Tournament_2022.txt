@@ -1,0 +1,85 @@
+Candidates_Tournament_2022
+
+The 2022 Candidates Tournament was an eight-player chess tournament to decide the challenger for the World Chess Championship 2023. The tournament took place at the Palacio de Santoña in Madrid, Spain, from June 16 to July 5, 2022, with the World Championship finishing in April 2023. As with every Candidates tournament since 2013, it was a double round-robin tournament.The eight qualifiers were Ian Nepomniachtchi, Teimour Radjabov, Jan-Krzysztof Duda, Alireza Firouzja, Fabiano Caruana, Hikaru Nakamura, Richárd Rapport, and Ding Liren. Sergey Karjakin was originally a qualifier, but was disqualified for breaching the FIDE Code of Ethics after publicly expressing approval of the Russian invasion of Ukraine. Karjakin was replaced by Ding, the highest-rated player who had not yet qualified.
+Nepomniachtchi won the tournament undefeated with a round to spare and the highest score in any Candidates tournament since the modern format was introduced in 2013. This made him one of five players to win consecutive Candidates, the others being Vasily Smyslov, Boris Spassky, Viktor Korchnoi, and Anatoly Karpov. Ding ended up in second place, having pulled off a last-round victory against Nakamura who failed to hold the game to a draw that would have seen him finish in second place instead.
+Nepomniachtchi was scheduled to play a match against Magnus Carlsen for the World Chess Championship. But after the tournament, Carlsen confirmed that he would not play, which he already had announced as likely after the World Chess Championship 2021. Instead Nepomniachtchi played Ding, the second-place finisher, for the world championship.
+
+# Participants
+
+## Qualification of Radjabov
+
+Teimour Radjabov had qualified for the previous Candidates Tournament, which was scheduled to begin on 17 March 2020 in Russia. With the COVID-19 pandemic rapidly spreading around the world in early 2020, Radjabov privately asked FIDE to postpone the tournament. FIDE refused to do so, so Radjabov withdrew on 6 March 2020. The tournament began on time, but after one week of play (half the matches completed) FIDE suspended the tournament anyway, citing public health restrictions imposed by the Russian government due to the pandemic . With his concerns vindicated by the events, Radjabov called for his reinstatement into the 2020 tournament once it was rescheduled. FIDE again refused Radjabov's request, instead offering him a direct entry into the 2022 Candidates, which he accepted [16]. The 2020 Candidates was not completed until April 2021. . 
+
+## Disqualification of Karjakin
+
+Following the Russian invasion of Ukraine, Sergey Karjakin made numerous public statements praising the invasion, and shared Russian-government statements about the military action, which many commentators viewed as propaganda. In March 2022, the FIDE Ethics and Disciplinary Commission ruled that Karjakin had breached the FIDE Code of Ethics with his statements, so banned him from playing FIDE-related tournaments for a period of six months,   including the 2022 Candidates Tournament [18] [19]. Karjakin had 21 days to appeal,  though was unrepentant and said he did not see any point in doing so [18]. Nevertheless, the Chess Federation of Russia filed an appeal on his behalf [21]. On May 6, FIDE's Appeal Chamber upheld the decision [22]. Karjakin had the option of a further appeal to the Court of Arbitration for Sport,  but none was submitted before the Candidates Tournament started. [23] [24] [24]. 
+
+## Qualification of Ding Liren
+
+Originally, no player would have qualified solely by their rating. However, following the ban of Karjakin, the rules stated the replacement would be the highest rated player who had not already qualified, based on the May 2022 rating list, with a requirement of having played at least 30 officially rated games between June 2021 and May 2022 [25]. In the April 2022 rating list,  the highest rated player (who was not world champion or already qualified) was Ding Liren with a rating of 2799 [26]. However Ding had only played 4 of the required 30 rated games  due to his inability to travel to tournaments outside China during the COVID-19 pandemic [21]. Ding therefore needed to play at least 26 rated games in March and April, which would be incorporated into the May 2022 rating list [27]. He also needed to maintain his rating lead over the next highest non-qualifier – several other players could potentially have overtaken him, including Shakhriyar Mamedyarov and Levon Aronian. The Chinese Chess Association organized three different rated events at short notice, each involving Ding,  thereby allowing him to meet the minimum games requirement [28]. A strong performance in those events meant he also increased his rating, moving up to #2 in the rating list. Once Karjakin's appeal was denied, Ding officially qualified for the Candidates Tournament [29]. 
+
+# Organization
+
+The tournament was an eight-player, double round-robin tournament, meaning there were 14 rounds with each player facing the others twice: once with the black pieces and once with the white pieces. The tournament winner qualified to play Magnus Carlsen for the World Championship in 2023. However, Carlsen said following the previous championship in 2021 that, due to a lack of motivation, he might not defend his title unless the challenger was Alireza Firouzja, who rose to number two in the world rankings in 2021 at the age of 18. In April 2022, he went further, saying that he is unlikely to play, with no mention of any potential opponent [32]. After the tournament, FIDE gave a deadline of July 20, 2022 for Carlsen to make a decision before retracting it later calling it a "misunderstanding" [33]. However on July 20, Magnus Carlsen stated that he was unwilling to play, meaning that the top two finishers of the candidates played for the world championship in 2023. Players from the same federation were required to play each other in the first rounds of each half  to avoid collusion [4]. The players affected in the 2022 Candidates were Fabiano Caruana and Hikaru Nakamura from the US; they faced each other in rounds 1 and 8. [34]. 
+
+## Regulations
+
+The time control was 120 minutes for the first 40 moves, 60 minutes for the next 20 moves, and then 15 minutes for the rest of the game, plus a 30-second increment per move starting from move 61. Players got 1 point for a win, ½ point for a draw and 0 points for a loss.. While there was no tie for first place, such a situation would have been addressed as follows: [4]. This was a change from previous candidates tournaments from 2013 to 2021, which used tie-breaks based on players' results in the tournament (such as results of head-to-head games between tied players, and number of wins). Ties for places other than first were broken by, in order: (1) Sonneborn–Berger score; (2) total number of wins; (3) head-to-head score among tied players; (4) drawing of lots.. The prize money was €48,000 for first place, €36,000 for second place, and €24,000 for third place (with players on the same number of points sharing prize money, irrespective of tie-breaks), plus €3,500 per half-point for every player, for a total prize pool of €500,000. During the 2022 Chess Candidates tournament, the players were uncertain if Magnus Carlsen would defend or forfeit his World Chess Champion title. As such, it was not clear if the tournament's runner-up would become the challenger for the 2023 World Chess Championship title match until the event was over.. 
+
+# Results
+
+## Standings
+
+As world champion Carlsen announced after the tournament that he would not defend the world title, both first and second place advanced to the 2023 title match.. Tie-breakers for first place: (1) results in tie-break games for first place;. Tie breakers for non-first place:  (1) results in tie-break games for first place, if any; (2) Sonneborn–Berger score (SB); (3) total number of wins; (4) head-to-head score among tied players; (5) drawing of lots. Note: Numbers in the crosstable in a white background indicate the result playing the respective opponent with the white pieces (black pieces if on a black background). This does not give information which of the two games was played in the first half of the tournament, and which in the second.. 
+
+## Points by round
+
+This table shows each player's cumulative difference between their number of wins and losses after each round. Green backgrounds indicate the player(s) with the highest score after each round. Magenta backgrounds indicate player(s) who could no longer win the tournament after each round, while red backgrounds indicate those who could no longer finish second either.. 
+
+## Results by round
+
+In April 2022, FIDE announced pairings for the tournament. Tie-breaks, if they had been required, would have been played on 5 July [36]. Since Nepomniachtchi had a decisive result, no tie breaks were actually played.. First named player is white. 1–0 indicates a white win, 0–1 indicates a black win, and ½–½ indicates a draw. Numbers in parentheses show players' scores prior to the round. Final column indicates opening played, sourced from The Week in Chess. 
+
+# References
+
+[14] [ERROR retrieving ref link]
+[15] [ERROR retrieving ref link]
+[17] [ERROR retrieving ref link]
+[1] https://fide.com/news/1646
+[2] https://en.chessbase.com/post/fide-candidates-2022-announcement
+[3] https://www.theguardian.com/sport/2021/dec/17/magnus-carlsen-chess-alireza-firouzja-world-title
+[4] https://handbook.fide.com/files/handbook/Regulations_for_the_FIDE_Candidates_Tournament_2022.pdf
+[5] https://www.chess.com/news/view/2022-fide-candidates-tournament-round-14
+[6] https://www.chess.com/news/view/2022-fide-candidates-tournament-round-13
+[7] https://www.chess.com/news/view/magnus-carlsen-not-to-defend-chess-world-title
+[8] https://defector.com/magnus-carlsen-says-hell-only-defend-his-title-against-teenage-genius-alireza-firouzja/
+[9] https://www.fide.com/news/1787
+[10] https://fide.com/news/1097
+[11] https://worldchampionshipcycle.fide.com/
+[12] https://ratings.fide.com/top.phtml?list=men
+[13] https://www.chess.com/news/view/2022-fide-council-ukraine-belarus-russia
+[16] https://fide.com/news/1097
+[18] https://en.chessbase.com/post/radjabov-retires-from-candidates-vachier-lagrave-to-jump-in
+[19] https://www.chess.com/news/view/teimour-radjabov-interview-fide-candidates-chess
+[20] https://chess24.com/en/read/news/radjabov-given-controversial-spot-in-2022-candidates
+[21] https://www.fide.com/news/1650
+[22] https://web.archive.org/web/20220321232616/https://worldchess.com/news/all/gm-sergey-karjakin-is-banned-for-6-months-by-fide-ethics/
+[23] https://www.chess.com/news/view/sergey-karjakin-banned-for-6-months
+[24] https://chess24.com/en/read/news/sergey-karjakin-banned-from-chess-for-6-months-over-ukraine-stance
+[25] https://ruchess.ru/en/news/all/cfr_to_appeal_fide_edc_s_decision_to_disqualify_sergey_karjakin/
+[26] https://www.fide.com/news/1736
+[27] https://chess24.com/en/read/news/fide-dismisses-sergey-karjakin-s-appeal
+[28] https://en.chessbase.com/post/qualification-criteria-candidates-2022
+[29] https://ratings.fide.com/toparc.phtml?cod=685
+[30] https://www.theguardian.com/sport/2022/mar/25/chess-china-ding-liren-could-make-unlikely-late-bid-for-candidates-place-magnus-carlsen
+[31] https://www.chess.com/news/view/ding-liren-world-number-two-candidates
+[32] https://ratings.fide.com/toparc.phtml?cod=689
+[33] https://chess24.com/en/read/news/ding-liren-world-no-2-on-may-2022-fide-rating-list
+[34] https://en.chessbase.com/post/ding-liren-confirmed-to-play-in-the-candidates
+[35] https://www.chess.com/news/view/magnus-carlsen-defend-world-chess-title-alireza-firouzja
+[36] https://www.theguardian.com/sport/2022/apr/22/chess-magnus-carlsen-unlikely-to-defend-crown-but-questions-remain
+[37] https://chess24.com/en/read/news/berlin-candidates-1-a-stunning-start
+[38] https://candidates.fide.com/
+[39] https://fide.com/news/1716
+[40] https://theweekinchess.com/chessnews/events/fide-candidates-tournament-2022
+[41] https://theweekinchess.com/live

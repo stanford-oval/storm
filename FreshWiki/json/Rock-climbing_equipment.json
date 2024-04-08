@@ -1,0 +1,722 @@
+{
+  "title": "Rock-climbing_equipment",
+  "url": "https://en.wikipedia.org/wiki/Rock-climbing_equipment",
+  "summary": "Rock-climbing equipment varies with the type of climbing undertaken. Bouldering needs the least equipment outside of shoes and chalk and optional crash pads.  Sport climbing adds ropes, harnesses, belay devices, and quickdraws to clip into pre-drilled bolts. Traditional climbing adds the need for carrying a \"rack\" of temporary passive and active protection devices.  Multi-pitch climbing (and big wall climbing) adds devices to assist in ascending and descending fixed ropes. And finally aid climbing uses unique equipment (e.g. aiders).\nAdvances in equipment are a key part of the rock climbing history, starting with the climbing rope.  Modern devices enable climbers to perform tasks that were previously done manually and with greater control (in all conditions) and less effort. Examples of replacements include the harness (replaced tieing the rope around the waist), the carabiner (replaced many knots), the descender/abseil device (replaced the d\u00fclfersitz), the ascender (replaced the prusik knot), the belay device (replaced the body belay), and the nuts/hexes (replaced chockstones). \nModern equipment includes dynamic ropes, plyometric training tools, advanced spring-loaded camming devices (SLCDs) for protection, and advanced rope control devices such as self-locking devices (SLDs), progress capture devices (PCDs), and assisted braking devices (ABDs). Modern equipment uses advanced materials that are increasingly more durable, stronger, and lighter (e.g. spectra/dyneema and aluminum alloys).  The equipment must meet specific standards (e.g. the UIAA standards) for strength, durability, and reliability, and must be certified and tested against such standards (with individual pieces carrying such certification marks).",
+  "content": [
+    {
+      "section_title": "Use and certification",
+      "section_content": [],
+      "subsections": [
+        {
+          "section_title": "Type of climbing",
+          "section_content": [
+            {
+              "sentence": "The rock-climbing equipment needed varies materially depending on the type of rock climbing being undertaken",
+              "refs": []
+            },
+            {
+              "sentence": "Starting from the least equipment-intensive type of climbing, the general equipment needs are as follows:",
+              "refs": [
+                "https://books.google.com/books?id=3OnLEAAAQBAJ&dq=%22sling%22+%22runner%22+%22cord%22+%22climbing%22&pg=PA16"
+              ]
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Certification",
+          "section_content": [
+            {
+              "sentence": "Rock-climbing equipment is broadly classed as Personal Protective Equipment (PPE)",
+              "refs": []
+            },
+            {
+              "sentence": "The UIAA was an important early body in setting standards (and pre-1995 it was the only body setting standards) for equipment, and the UIAA Safety Commission continues to play a central worldwide role in this area",
+              "refs": [
+                "https://www.thebmc.co.uk/guidance-on-gear-recalls-and-safety-warnings?s=2"
+              ]
+            },
+            {
+              "sentence": "The European CEN is also an important major regulator of PPE, and which works closely with the UIAA Safety Commission through its CEN Working Group for Mountaineering Equipment",
+              "refs": [
+                "https://www.thebmc.co.uk/climbing-equipment-standards"
+              ]
+            },
+            {
+              "sentence": "North America has fewer specific regulations as rock-climbing equipment as it is not classed as military or professional PPE and thus does not fall under OSHA regulation;  in effect, the UIAA and CEN have become the most important bodies for setting standards and regulating rock-climbing equipment worldwide, and most major manufacturers (and distributors) produce equipment certified and stamped with UIAA and CE marking",
+              "refs": [
+                "https://www.thebmc.co.uk/technical-equipment",
+                "https://www.climbing.com/gear/behind-the-scenes-how-climbing-harnesses-are-designed-and-tested/",
+                "https://www.climbing.com/gear/behind-the-scenes-how-climbing-harnesses-are-designed-and-tested/"
+              ]
+            },
+            {
+              "sentence": "Post Brexit, the United Kingdom use \"UKCA\" certification in lieu CEN",
+              "refs": [
+                "https://www.climbing.com/gear/behind-the-scenes-how-climbing-harnesses-are-designed-and-tested/"
+              ]
+            }
+          ],
+          "subsections": []
+        }
+      ]
+    },
+    {
+      "section_title": "Ropes and slings",
+      "section_content": [],
+      "subsections": [
+        {
+          "section_title": "Ropes",
+          "section_content": [
+            {
+              "sentence": "Modern climbing ropes are 50\u201380 metres (160\u2013260\u00a0ft) in length (the longer versions are for multi-pitch climbing), and have a kernmantle construction consisting of a core (kern) of twisted nylon fibers and an outer sheath (mantle) of woven colored coarse nylon fibers",
+              "refs": []
+            },
+            {
+              "sentence": "They are either dynamic ropes, which can stretch to absorb the energy of a falling climber, or are the less expensive but more hard-wearing static ropes, which are only for use in constant-load situations such as descending (e.g",
+              "refs": []
+            },
+            {
+              "sentence": "abseiling) and ascending (also called fixed-roping)",
+              "refs": []
+            },
+            {
+              "sentence": "Some climbers will use a single climbing rope of full-thickness (circa 9\u201311\u00a0mm), whereas others will use double ropes (or \"half-ropes\") to reduce rope drag (e.g",
+              "refs": []
+            },
+            {
+              "sentence": "they are not both clipped into each anchor or protection point), which have less thickness (circa 8\u20139\u00a0mm) to limit the weight of the extra rope",
+              "refs": []
+            },
+            {
+              "sentence": "Where two thinner ropes are used that are both clipped into each anchor or protection point (i.e",
+              "refs": []
+            },
+            {
+              "sentence": "it is not to reduce rope drag, but instead to have a backup rope for long climbs), it is known as twin roping, which are (circa 7\u20138\u00a0mm)",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Slings",
+          "section_content": [
+            {
+              "sentence": "Modern webbing (or \"tape\"), is made of strong tubular nylon and/or the even stronger spectra/dyneema material",
+              "refs": []
+            },
+            {
+              "sentence": "Climbers use webbing that has been sewn (using a certified standard of reinforced stitching) into various lengths of closed loops called \"slings\" (or \"runners\") that can be used in a wide range of situations, including wrapping around sections of rock (for abseiling, or creating belay anchors, or as passive protection), or tied to other pieces of equipment (often via carabiners) to create a longer version of a quickdraw or even a makeshift lanyard",
+              "refs": []
+            },
+            {
+              "sentence": "Slings can be made into more complex pieces of equipment such as the daisy chain, which is used in aid climbing,  and the Personal Anchor System, which is used in securing a climber to a fixed anchor point",
+              "refs": [
+                "ISBN: 978-1846892622"
+              ]
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Cords",
+          "section_content": [
+            {
+              "sentence": "While lengths of webbing can be tied via a knot (e.g",
+              "refs": []
+            },
+            {
+              "sentence": "a water knot) to create custom-length loops (instead of the pre-sewn fixed-length slings), their load-bearing capacity can be materially reduced making them less safe",
+              "refs": []
+            },
+            {
+              "sentence": "Climbers instead use cord (or \"accessory cord\"), which is a length of thinner (circa 4\u20138\u00a0mm) static kernmantle rope, tied via a double fisherman's knot into closed loops of any size",
+              "refs": []
+            },
+            {
+              "sentence": "Cord loops (also known as \"cordelettes\") serve a wide variety of functions in rock climbing including creating friction prusik knots for ascending or gripping fixed climbing ropes (usually using thinner circa 5\u20136\u00a0mm cord), or for attaching to, and equalizing forces across, multiple fixed anchors points,  such as when setting up abseil or belay anchors on multi-pitch climbing routes (usually using thicker circa 7\u20138\u00a0mm cord)",
+              "refs": [
+                "https://www.climbing.com/skills/building-anchors-bad-rock/"
+              ]
+            }
+          ],
+          "subsections": []
+        }
+      ]
+    },
+    {
+      "section_title": "Rope connectors",
+      "section_content": [
+        {
+          "sentence": "A number of devices help climbers securely attach items to the rope, including themselves (e.g",
+          "refs": []
+        },
+        {
+          "sentence": "via a harness) and protection devices (e.g",
+          "refs": []
+        },
+        {
+          "sentence": "via carabiners and quickdraws)",
+          "refs": []
+        },
+        {
+          "sentence": "Before their invention, climbers used alternative techniques such as looping the rope around the body in lieu of a harness (e.g",
+          "refs": []
+        },
+        {
+          "sentence": "the body belay), or around the rock in lieu of protection, as well as using various climbing knots to link ropes and anchor points together",
+          "refs": []
+        }
+      ],
+      "subsections": [
+        {
+          "section_title": "Carabiners",
+          "section_content": [
+            {
+              "sentence": "Carabiners are closed metal clips with spring-loaded gates that are used as connectors between the rope and various devices",
+              "refs": []
+            },
+            {
+              "sentence": "Modern carabiners are made from a lightweight but strong aluminum alloy that can withstand the load of a fall",
+              "refs": []
+            },
+            {
+              "sentence": "Carabiners come in various shapes (e.g",
+              "refs": []
+            },
+            {
+              "sentence": "the asymmetric/offset D-shape is the most common), and gate styles (e.g",
+              "refs": []
+            },
+            {
+              "sentence": "a straight gate or a bent gate)",
+              "refs": []
+            },
+            {
+              "sentence": "A particular variation is whether the gate is locking (for extra security for example when belaying, but making the carabiner heavier and slightly tricker to clip into) or non-locking (the easiest to clip into and out of for example when leading a bolted sport climbing route, but with the risk that the gate may unintentionally open)",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Harnesses",
+          "section_content": [
+            {
+              "sentence": "Climbing harnesses are used for connecting the rope to the climber (via a \"belay loop\" on the harness)",
+              "refs": []
+            },
+            {
+              "sentence": "Harnesses are made of strong materials to specific strength guidelines that can withstand the load of a major fall",
+              "refs": []
+            },
+            {
+              "sentence": "There are many types of harness designs (and materials used) depending on the type of climbing undertaken",
+              "refs": []
+            },
+            {
+              "sentence": "Examples include minimal \"sit\" harnesses for sport climbing (e.g",
+              "refs": []
+            },
+            {
+              "sentence": "they require little in the way of gear-carrying loops), lightweight and detachable leg-loop harnesses for alpine climbing (e.g",
+              "refs": []
+            },
+            {
+              "sentence": "to fit around heaving winter clothing), padded harnesses for big wall climbing (to give comfort for long hanging belays and abseils), and chest/full-body harnesses for children and when carrying heavy loads",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Lanyards",
+          "section_content": [
+            {
+              "sentence": "Lanyards (or \"teather\", or \"via ferrata set\") are much longer versions of quickdraws that attach from a harness to a rope (or other anchor points, such as a metal cable)",
+              "refs": []
+            },
+            {
+              "sentence": "The difference is that lanyards are much stronger than quickdraws and are capable of withstanding fall factors of 2 as found on via ferrata or on multi-pitch climbing routes",
+              "refs": []
+            },
+            {
+              "sentence": "They are often made from materials that can absorb dynamic energy and often come with additional optional fall energy absorption devices, and lanyards that have had heavy falls often have to be discarded",
+              "refs": []
+            },
+            {
+              "sentence": "Lanyards are also constructed to be sufficiently flexible to resist being twisted",
+              "refs": []
+            }
+          ],
+          "subsections": [
+            {
+              "section_title": "Personal Anchor Systems",
+              "section_content": [
+                {
+                  "sentence": "A sub-class of lanyards is the Personal Anchor System (PAS), which is a section of rope or interconnected chains of slings, which are used to tie the harness to an anchor point such as a belay station",
+                  "refs": []
+                },
+                {
+                  "sentence": "Traditionally, climbers would tie their harness to anchors using part of the climbing rope; however, the PAS has become popular as a way to avoid reducing the effective length of the climbing rope, and to use a more straightforward and direct connection",
+                  "refs": []
+                }
+              ],
+              "subsections": []
+            }
+          ]
+        },
+        {
+          "section_title": "Quickdraws",
+          "section_content": [
+            {
+              "sentence": "Quickdraws are used by climbers to connect ropes to fixed items such as bolted anchors in sport climbing, or protection devices in traditional climbing",
+              "refs": []
+            },
+            {
+              "sentence": "The quickdraw consists of two non-locking carabiners connected together by a short, pre-sewn loop of webbing",
+              "refs": []
+            },
+            {
+              "sentence": "They are used to reduce the friction and drag between the rope of the fixed item (i.e",
+              "refs": []
+            },
+            {
+              "sentence": "instead of just clipping into a carabiner clipped into the bolt); in competition climbing the quickdraws are already hanging from the bolts, which is called pinkpointing in sport climbing (i.e",
+              "refs": []
+            },
+            {
+              "sentence": "instead of the lead climber carrying the quickdraws, they are already in-situ)",
+              "refs": []
+            },
+            {
+              "sentence": "The quickdraws used on advanced sport and competition climbing routes often have a \"bent-gate\" on the lower carabiner to make clipping-in easier",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        }
+      ]
+    },
+    {
+      "section_title": "Rope devices",
+      "section_content": [
+        {
+          "sentence": "A number of devices are used for controlling the rope (belay devices and self-locking devices), moving up the rope (ascender devices), or moving down the rope (rappel/abseil or descender devices)",
+          "refs": []
+        },
+        {
+          "sentence": "These actions were historically done by climbers with no devices (e.g",
+          "refs": []
+        },
+        {
+          "sentence": "the body belay for belaying, the d\u00fclfersitz abseil for descending, and the prusik knot for ascending), and the devices help with control and safety in all conditions (e.g wet or icy ropes)",
+          "refs": []
+        }
+      ],
+      "subsections": [
+        {
+          "section_title": "Ascenders",
+          "section_content": [
+            {
+              "sentence": "Ascenders (also called \"jumars\" or \"crolls\" after popular brands) are mechanical devices to enable a climber to move up a fixed rope (e.g",
+              "refs": []
+            },
+            {
+              "sentence": "a static rope that is hanging from a fixed anchor)",
+              "refs": []
+            },
+            {
+              "sentence": "Ascenders perform the same basic function as friction or prusik knots made from cord but far less effort and concentration are needed to use them (e.g",
+              "refs": []
+            },
+            {
+              "sentence": "tired climbers at high-altitude), they can handle much heavier loads (e.g",
+              "refs": []
+            },
+            {
+              "sentence": "climbers with ruck-sacks), and they are more reliable in all conditions (e.g",
+              "refs": []
+            },
+            {
+              "sentence": "on wet and icy ropes)",
+              "refs": []
+            },
+            {
+              "sentence": "The ascender uses an internal cam that allows the device to slide freely in one direction but tightly grip the rope when pulled on in the opposite direction",
+              "refs": []
+            },
+            {
+              "sentence": "To prevent the ascender device from accidentally falling off the rope, a locking carabiner is also used",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Belay devices",
+          "section_content": [
+            {
+              "sentence": "Belay devices are mechanical friction-brake devices used to control the climbing rope(s) when belaying a climber",
+              "refs": []
+            },
+            {
+              "sentence": "Their main purpose is to allow the rope to be locked-off/fully-braked with minimal effort when arresting a climber's fall",
+              "refs": []
+            },
+            {
+              "sentence": "There are many kinds of belay devices, such as the original passive braking devices like \"sticht plates\" and the later \"tubers/tubulars\" (e.g",
+              "refs": []
+            },
+            {
+              "sentence": "the original Black Diamond ATC, or the Petzl Reverso)",
+              "refs": []
+            },
+            {
+              "sentence": "Modern belay devices include auto-block devices (e.g",
+              "refs": []
+            },
+            {
+              "sentence": "the GiGi) allowing the belay device to be attached to a separate anchor point (e.g",
+              "refs": []
+            },
+            {
+              "sentence": "and not to the belayer, which is useful for bringing up the second-climber on multi-pitch routes), and active assisted-braking devices (ABDs) that will self-lock with sudden rope movements (e.g",
+              "refs": []
+            },
+            {
+              "sentence": "the Petzl GriGri or the Wild Country Revo)",
+              "refs": []
+            },
+            {
+              "sentence": "Some passive belay devices may also be used as descenders for abseiling",
+              "refs": []
+            },
+            {
+              "sentence": "Indoor climbing walls can provide in-situ fixed mechanical auto belay devices that enable the climber to top rope a route alone; more recent lead auto belay models allow the climber to also lead climb the route alone",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Descenders",
+          "section_content": [
+            {
+              "sentence": "Descenders (or abseil devices) enable a climber to abseil (or rappel) down a fixed rope (e.g",
+              "refs": []
+            },
+            {
+              "sentence": "a static rope that is hanging from a fixed anchor)",
+              "refs": []
+            },
+            {
+              "sentence": "They perform the same basic function as the d\u00fclfersitz abseil but with more control and less effort",
+              "refs": []
+            },
+            {
+              "sentence": "The classic passive descender, and still widely used, is the figure-eight, although it is offered in more complex variations with \"ears\" and \"wings\" to prevent the rope from locking up",
+              "refs": []
+            },
+            {
+              "sentence": "Many passive belay devices can be used as descenders, such as tubers/tubulars",
+              "refs": []
+            },
+            {
+              "sentence": "Some modern descenders come with self-locking device (SLD) features that will grip the rope in the event of an uncontrolled fall (e.g",
+              "refs": []
+            },
+            {
+              "sentence": "the Petzl I'D S\u00a0 [de])",
+              "refs": []
+            },
+            {
+              "sentence": "Heavy-duty descenders such as abseil racks are used for greater control and friction when carrying heavy loads and/or in very wet or icy conditions (e.g",
+              "refs": [
+                "ISBN: 978-1493056262"
+              ]
+            },
+            {
+              "sentence": "big wall climbing and caving)",
+              "refs": []
+            },
+            {
+              "sentence": "The modern technique is to use a descender with a Personal Anchor System",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Self-locking devices",
+          "section_content": [
+            {
+              "sentence": "Self-locking devices (SLDs), also called progress capture devices (PCDs), are the terms given to the broader class of rope devices that allow the climbing rope to move more freely in one direction but will lock quickly if the rope tries to move in the opposite direction",
+              "refs": []
+            },
+            {
+              "sentence": "Their basic action means that several can also used as emergency ascenders or assisted-belaying devices (ABDs), but they come in a broad range for a variety of uses (e.g",
+              "refs": []
+            },
+            {
+              "sentence": "as a hauling or rescue pulley, like the Petzel Traxion)",
+              "refs": []
+            },
+            {
+              "sentence": "The most complex use is for rope solo climbing, for which devices such as Wren's Silent Partner, the Petzel GriGri, and the Wild Country Revo have been used (rope solo climbing requires the widest range of rope devices including ascenders and descenders),   or the more straightforward top rope solo climbing, for which the Petzel Micro Traxion, and Camp Lift have been used",
+              "refs": [
+                "https://gearjunkie.com/climbing/rope-solo-rock-climbing-how-to",
+                "https://www.ukclimbing.com/articles/skills/series/pete_whittaker/how_to_rope_solo_-_with_pete_whittaker-11160"
+              ]
+            }
+          ],
+          "subsections": []
+        }
+      ]
+    },
+    {
+      "section_title": "Protection devices",
+      "section_content": [
+        {
+          "sentence": "As discussed in types of climbing, rock climbing protection devices are mainly used in traditional climbing and in sport climbing (both of which can be done in single and multi-pitch formats)",
+          "refs": []
+        },
+        {
+          "sentence": "In addition, clean aid climbing also uses many of the traditional climbing protection devices",
+          "refs": []
+        }
+      ],
+      "subsections": [
+        {
+          "section_title": "Temporary",
+          "section_content": [
+            {
+              "sentence": "Temporary protection devices (also known as pro, gear or the rack), provide the means to place temporary anchor points on the rock to which a lead climber can clip their rope (via a quickdraw) when traditional climbing; they also can be used for anchor points for belaying and for abseiling",
+              "refs": []
+            },
+            {
+              "sentence": "The devices are categorized as being passive (i.e., they maintain a static position throughout), or active (i.e",
+              "refs": []
+            },
+            {
+              "sentence": "they dynamically move or adjust in the case of a fall)",
+              "refs": []
+            }
+          ],
+          "subsections": [
+            {
+              "section_title": "Passive",
+              "section_content": [],
+              "subsections": []
+            },
+            {
+              "section_title": "Active",
+              "section_content": [],
+              "subsections": []
+            }
+          ]
+        },
+        {
+          "section_title": "Fixed",
+          "section_content": [
+            {
+              "sentence": "Fixed protection devices are permanent in-situ anchors to which a lead climber can clip their rope (via a quickdraw) when sport climbing; they also can be used to create anchor points for belaying and for abseiling",
+              "refs": []
+            },
+            {
+              "sentence": "The main types are:",
+              "refs": [
+                "ISBN: 978-1846892622"
+              ]
+            }
+          ],
+          "subsections": []
+        }
+      ]
+    },
+    {
+      "section_title": "Aid equipment",
+      "section_content": [
+        {
+          "sentence": "Aid climbing uses several of the above devices but in a way that gives \"aid\" to the aid climber in ascending (e.g",
+          "refs": []
+        },
+        {
+          "sentence": "pulling up on pitons and hooks)",
+          "refs": []
+        },
+        {
+          "sentence": "There are also a number of other pieces of equipment that are more exclusively associated with aid climbing",
+          "refs": []
+        }
+      ],
+      "subsections": []
+    },
+    {
+      "section_title": "Clothing equipment",
+      "section_content": [
+        {
+          "sentence": "Rock climbers use a number of pieces of specialized clothing equipment including:",
+          "refs": []
+        }
+      ],
+      "subsections": []
+    },
+    {
+      "section_title": "Miscellaneous equipment",
+      "section_content": [],
+      "subsections": []
+    },
+    {
+      "section_title": "Training equipment",
+      "section_content": [
+        {
+          "sentence": "Various items of equipment are employed during climbing-specific training to strengthen the climber's fingers, tendons and muscles:",
+          "refs": []
+        }
+      ],
+      "subsections": []
+    },
+    {
+      "section_title": "See also",
+      "section_content": [],
+      "subsections": []
+    },
+    {
+      "section_title": "References",
+      "section_content": [],
+      "subsections": [
+        {
+          "section_title": "Further reading",
+          "section_content": [],
+          "subsections": []
+        }
+      ]
+    },
+    {
+      "section_title": "External links",
+      "section_content": [],
+      "subsections": []
+    }
+  ],
+  "references": {
+    "1": "https://books.google.com/books?id=3OnLEAAAQBAJ&dq=%22sling%22+%22runner%22+%22cord%22+%22climbing%22&pg=PA16",
+    "2": "ISBN: 978-1846892622",
+    "3": "https://gearjunkie.com/climbing/rope-solo-rock-climbing-how-to",
+    "4": "https://www.ukclimbing.com/articles/skills/series/pete_whittaker/how_to_rope_solo_-_with_pete_whittaker-11160",
+    "5": "https://www.climbing.com/skills/how-to-toprope-solo/",
+    "6": "ISBN: 978-1846892622",
+    "7": "https://www.thebmc.co.uk/guidance-on-gear-recalls-and-safety-warnings?s=2",
+    "8": "https://www.thebmc.co.uk/climbing-equipment-standards",
+    "9": "https://www.thebmc.co.uk/technical-equipment",
+    "10": "https://www.climbing.com/gear/behind-the-scenes-how-climbing-harnesses-are-designed-and-tested/",
+    "11": "ISBN: 978-1846892622",
+    "12": "https://www.climbing.com/gear/a-beginners-guide-to-climbing-ropes/",
+    "13": "https://www.thebmc.co.uk/slings-for-climbers",
+    "14": "ISBN: 978-1493056262",
+    "15": "https://www.climbing.com/skills/building-anchors-bad-rock/",
+    "16": "https://www.thebmc.co.uk/karabiners-and-connectors-for-climbers",
+    "17": "https://www.thebmc.co.uk/get-into-via-ferrata-the-gear",
+    "18": "ISBN: 978-1493056262",
+    "19": "https://www.thebmc.co.uk/quickdraws-a-guide-for-climbers",
+    "20": "ISBN: 978-1493056262",
+    "21": "https://www.climbing.com/skills/no-belayer-necessary-understanding-autobelays/",
+    "22": "https://www.climbing.com/skills/how-to-haul-pack-climbing/",
+    "23": "https://www.climbing.com/gear/nuts-rock-climbing-protection/",
+    "24": "https://www.climbing.com/gear/the-nut-chronicles/",
+    "25": "https://www.climbing.com/places/the-carrot-bolt-an-australian-icon/",
+    "26": "https://www.climbing.com/skills/tricams-101-a-guide-to-using-this-tool/",
+    "27": "https://www.climbing.com/gear/the-history-of-friends/",
+    "28": "https://www.climbing.com/skills/learn-this-offwidth-protection-primer/",
+    "29": "https://gearjunkie.com/climbing/extreme-off-width-trad-climbing-gear",
+    "30": "https://www.outsideonline.com/outdoor-adventure/climbing/what-happens-when-climbing-bolts-go-bad/",
+    "31": "https://www.climbing.com/skills/how-to-identify-bad-climbing-bolts/",
+    "32": "https://www.thebmc.co.uk/the-dangers-of-worn-permadraws",
+    "33": "https://www.climbing.com/skills/how-to-place-evaluate-climbing-pitons/",
+    "34": "https://www.climbing.com/skills/tech-tip-big-wall-copperheading/",
+    "35": "ISBN: 978-1493056262",
+    "36": "https://books.google.com/books?id=1xW-r4gaP0gC&pg=PA21",
+    "37": "https://gripped.com/indoor-climbing/a-beginners-guide-to-campus-board-training/",
+    "38": "https://theclimbingdoctor.com/rock-climbing-injury-tips-finger-pulley-sprain/",
+    "39": "https://www.climbing.com/skills/hangboarding-easier-or-harder/"
+  },
+  "spicy_entities": {
+    "spectra": "PERSON",
+    "uiaa": "ORG",
+    "personal protective equipment": "ORG",
+    "ppe": "ORG",
+    "the uiaa safety commission": "ORG",
+    "the european cen": "ORG",
+    "cen working group for mountaineering equipment": "ORG",
+    "north america": "LOC",
+    "osha": "ORG",
+    "cen": "ORG",
+    "ce": "ORG",
+    "post brexit": "PERSON",
+    "the united kingdom": "GPE",
+    "ropes\n\nmodern": "WORK_OF_ART",
+    "50\u201380 metres": "QUANTITY",
+    "160\u2013260": "CARDINAL",
+    "8\u20139\u00a0mm": "QUANTITY",
+    "two": "CARDINAL",
+    "mm": "PERSON",
+    "the personal anchor system": "ORG",
+    "cord": "PERSON",
+    "winter": "DATE",
+    "2": "CARDINAL",
+    "personal anchor systems": "ORG",
+    "pas": "ORG",
+    "one": "CARDINAL",
+    "black diamond atc": "PERSON",
+    "the petzl reverso": "FAC",
+    "gigi": "ORG",
+    "second": "ORDINAL",
+    "the wild country revo": "LOC",
+    "sld": "ORG",
+    "petzl": "PERSON",
+    "e.g .": "ORG",
+    "a personal anchor system": "ORG",
+    "the petzel traxion": "ORG",
+    "wren": "ORG",
+    "silent partner": "PERSON",
+    "the petzel grigri": "ORG",
+    "the petzel micro traxion": "ORG",
+    "camp lift": "FAC"
+  },
+  "flair_entities": [
+    "uiaa safety commission",
+    "petzel traxion",
+    "personal anchor system",
+    "pas",
+    "ce",
+    "carabiners  carabiners",
+    "petzl reverso",
+    "united kingdom",
+    "ropes  modern",
+    "camp lift",
+    "ppe",
+    "petzel grigri",
+    "petzel micro traxion",
+    "european cen",
+    "wren",
+    "wild country revo",
+    "pcds",
+    "silent partner",
+    "petzl grigri",
+    "lanyards  lanyards",
+    "uiaa",
+    "osha",
+    "slds",
+    "petzl i'd s",
+    "personal protective equipment",
+    "ascenders  ascenders",
+    "abds",
+    "north america",
+    "cen working group for mountaineering equipment",
+    "cen",
+    "black diamond atc",
+    "gigi",
+    "ukca"
+  ]
+}

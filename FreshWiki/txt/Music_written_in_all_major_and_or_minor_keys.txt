@@ -1,0 +1,453 @@
+Music_written_in_all_major_and/or_minor_keys
+
+There is a long tradition in classical music of writing music in sets of pieces that cover all the major and minor keys of the chromatic scale. These sets typically consist of 24 pieces, one for each of the major and minor keys (sets that comprise all the enharmonic variants include 30 pieces).
+Examples include Johann Sebastian Bach's The Well-Tempered Clavier and Frédéric Chopin's 24 Preludes, Op. 28. Such sets are often organized as preludes and fugues or designated as preludes or études. Some composers have restricted their sets to cover only the 12 major keys or the 12 minor keys; or only the flat keys (Franz Liszt's Transcendental Études) or the sharp keys (Sergei Lyapunov's Op. 11 set). In yet another type, a single piece may progressively modulate through a set of tonalities, as occurs in Ludwig van Beethoven's Two Preludes through all twelve major keys, Op. 39.
+The bulk of works of this type have been written for piano solo, but there also exist sets for piano 4-hands; two pianos; organ; guitar; two guitars; flute; recorder; oboe; violin solo; violin and piano; cello solo; cello and piano; voice and piano; and string quartet. There are examples of attempts to write full sets that, for one reason or another, were never completed (Josef Rheinberger's organ sonatas, Dmitri Shostakovich's string quartets, César Franck's L'Organiste).
+
+# Well-known sets that cover all 24 keys
+
+Some examples of well-known works covering all 24 major and minor keys are:. 
+
+## Composers who wrote multiple sets
+
+A number of composers have written multiple sets of works covering all the keys of the scale.. Full details are shown in the tables below.. 
+
+# Variants
+
+## Single pieces that modulate through many keys
+
+Ludwig van Beethoven wrote 2 Preludes through all 12 Major Keys, Op. 39 for piano (1789). [a] These two preludes each progressively traverse the 12 major keys. In Prelude No. 1, each key occupies from 2 to 26 bars. The keys of C# and D♭, which are enharmonically equivalent, are both represented. C major both opens and closes the set. In Prelude No. 2, the cycle of keys appears twice; in the first cycle, the number of bars per key ranges from 1 to 8; in the second half, after C every new key signature lasts for only one bar; the cycle concludes with 15 bars of C major. There is no evidence that Beethoven intended to write similar sets in the 12 minor keys.. Giovanni Battista Vitali (1632–1692) included in Artificii musicali, Op. 13 (1689) a passacaglia which modulates through eight major keys (out of twelve) from E♭ major to E major through the cycle of fifths.. Fugue No. 8 from Anton Reicha's Trente six Fugues pour le Piano-Forté composées d'après un nouveau systême (subtitled Cercle harmonique) modulates through all keys.. The rondo theme of Darius Milhaud's Le bœuf sur le toit is played fifteen times in all 12 major keys (twice in A major and thrice in the tonic, C major). It also passes through every minor key except E minor and B minor.. 
+
+## Works covering all eight church modes
+
+Around 1704, Johann Pachelbel completed his 95 Magnificat Fugues, which covered all eight of the church modes.. Charles-Valentin Alkan composed Petits préludes sur les huit gammes du plain-chant, for organ (1859, no opus number), a sequence of eight organ preludes covering each of the church modes.. In the music of the Eastern Orthodox Church, the doxasticon for Vespers of the Dormition is notable as a single hymn that includes passages in all eight tones of the Byzantine Octoechos. 
+
+## Other sets of 24 pieces
+
+Not all sets of 24 pieces belong in this category. For example, there was no intention in Niccolò Paganini's 24 Caprices for solo violin, Claude Debussy's 24 Préludes for piano, or Pavel Zemek Novak's 24 Preludes and Fugues for piano  to cover all the keys [6]. (Paganini may not have been aware of Pierre Rode's 24 Caprices for violin, which did span the 24 keys and were written almost at the same time as Paganini's.). Chopin's 24 Études, Opp. 10 & 25 might have originally been planned to be in all 24 keys. In fact, apart from Nos. 7 and 8, the first series (Op. 10) is made of couples of études in a major key and its relative minor (the major key either preceding the minor key or following it) with none of the tonalities occurring twice (except for C major, which appears in No. 1 and then in the only couple which is not major-minor, i.e. Nos. 7 and 8). But in the second series (Op. 25) this tonal scheme gets more and more loose. It is still possible to see connections on a tonal basis between the couples of études in Op. 25, but they are not based on one principle (e.g. Nos. 3 and 4 in F major – A minor, two tonalities which Chopin likes to put together very often, as in his second Ballade). One might suppose that Chopin considered writing the études in all the tonalities but eventually came to the conclusion that it wasn't practical, and turned back to it later, for the 24 Preludes, Op. 28. The fact that the first étude of Op. 10 is made of arpeggios in C major draws a connection to Bach's first book of The Well-Tempered Clavier and makes it clear that Chopin had the tradition on his mind. [original research?]. 
+
+# Keys
+
+There are 12 notes in the octave, and each of them can be the tonic of one major and one minor key. This gives 24 possible keys, but each note can be represented by several enharmonic note names (note names which designate the same actual note in the 12 note octave such as G# and A♭) and so each key can be represented by several enharmonic key names (e.g. G# minor and A♭ minor).. In practice, the choice of key name is restricted to the 30 keys whose signatures have no double flats or double sharps. (Such key signatures are used for so-called theoretical keys which are almost never encountered outside music-theoretical exercises.) [b] Keys with 6 flats and 6 sharps, [c] with 7 flats and 5 sharps [d] and with 5 flats and 7 sharps [e] are enharmonic to one another. Composers will, in most (though not all) cases, choose only one key from each enharmonic pair. But there are also cases of sets covering all 30 keys, which, in other words, include all enharmonic variants.. The table below outlines the choices made in the various collections listed here. The keys are in the order that J.S. Bach used.. 
+
+## Order of keys in published works
+
+The circle of fifths, whereby each major key is followed by its relative minor key, and the sequence proceeds in fifths (C, a, G, e, D, b ...) is a commonly used schema. Angelo Michele Bartolotti used this approach as early as 1640, and it was also adopted by such later composers as Rode, Hummel, Chopin, Heller, Busoni, Scriabin, Shostakovich, Kabalevsky and Kapustin.. In J.S. Bach's The Well-Tempered Clavier and some other earlier sets, major keys were followed by their parallel minor keys, and the sequence ascends chromatically (C, c, C#/D♭, c#, D, d, ...). The Bach order was adopted by Arensky, Glière, York Bowen and others.. Other composers derived their own schemas based on certain logical rationales. For example, in Alkan’s 25 Preludes, Op. 31, the sequence of keys moves alternately up a fourth and down a third: the major keys take the odd-numbered positions in the cycle, proceeding chromatically upwards from C to C again, and each major key is followed by its subdominant minor.. Yet others used no systematic ordering. Palmgren, Rachmaninoff and Castelnuovo-Tedesco's works are examples of this.. 
+
+# History
+
+## Bach and his precursors
+
+Johann Sebastian Bach's The Well-Tempered Clavier, two complete sets of 24 Preludes and Fugues written for keyboard in 1722 and 1742, and often known as "the 48", is generally considered the greatest example of music traversing all 24 keys. Many later composers clearly modelled their sets on Bach's, including the order of the keys.. It was long believed that Bach had taken the title The Well-Tempered Clavier from a similarly named set of 24 Preludes and Fugues in all the keys, for which a manuscript dated 1689 was found in the library of the Brussels Conservatoire. It was later shown that this was the work of a composer who was not even born by 1689: Bernhard Christian Weber (1712–1758). In fact, the work was written in 1745–50 in imitation of Bach's example. While Bach can safely claim the title The Well-Tempered Clavier, he was not the earliest composer to write sets of pieces in all the keys: . As early as 1567, Giacomo Gorzanis  [it; de; ca; fr] (c.1520–c.1577) composed twelve settings of the passamezzo antico and passamezzo moderno, each followed by a saltarello, in all 24 keys. In 1584, Vincenzo Galilei, father of Galileo Galilei, wrote a Codex of pieces illustrating the use of all 24 major and minor keys . [citation needed]. In 1640, Angelo Michele Bartolotti wrote Libro primo di chitarra spagnola, a cycle of passacaglias that moves through all 24 major and minor keys according to the circle of fifths. Also in 1640, Antonio Carbonchi wrote Sonate di chitarra spagnola con intavolatura franzese for guitar . In 1702, Johann Caspar Ferdinand Fischer wrote a cycle of 20 organ pieces all in different keys in his Ariadne musica. These included E major as well as E in Phrygian mode and again in Dorian mode, but not E minor per se. They also excluded C#/D♭ major, D#/E♭ minor, F#/G♭ major, G#/A♭ minor, and A#/B♭ minor. Bach modelled the sequence of his 48 Preludes on Fischer's example. In 1735, between Bach's two sets, Johann Christian Schickhardt wrote his L'alphabet de la musique, Op. 30, which contained 24 sonatas for flute, violin, or recorder in all keys. In 1749, the year before Bach's death, Johann Gottlieb Goldberg, the inspiration for J.S [15]. Bach's Goldberg Variations, wrote his own 24 polonaises for keyboard, one in each of the major and minor keys. Other examples include works by John Wilson (1595–1674), Daniel Croner (1682), Christoph Graupner (1718), Johann Mattheson (1719), Friedrich Suppig (1722), and Johann David Heinichen (1683–1729). [16]. 
+
+## After Bach
+
+The following is an incomplete list of works of this type that have been written since the death of J.S. Bach.. Legend: AC = ascending chromatic; C5 = circle of fifths, major followed by relative minor; C5* = circle of fifths, major followed by parallel minor. 
+
+### 18th and 19th centuries
+
+### 20th century
+
+# References
+
+[5] [ERROR retrieving ref link]
+[9] [ERROR retrieving ref link]
+[10] [ERROR retrieving ref link]
+[11] [ERROR retrieving ref link]
+[12] [ERROR retrieving ref link]
+[22] [ERROR retrieving ref link]
+[23] [ERROR retrieving ref link]
+[26] [ERROR retrieving ref link]
+[28] [ERROR retrieving ref link]
+[29] [ERROR retrieving ref link]
+[32] [ERROR retrieving ref link]
+[34] [ERROR retrieving ref link]
+[37] [ERROR retrieving ref link]
+[40] [ERROR retrieving ref link]
+[47] [ERROR retrieving ref link]
+[48] [ERROR retrieving ref link]
+[50] [ERROR retrieving ref link]
+[51] [ERROR retrieving ref link]
+[53] [ERROR retrieving ref link]
+[55] [ERROR retrieving ref link]
+[56] [ERROR retrieving ref link]
+[57] [ERROR retrieving ref link]
+[60] [ERROR retrieving ref link]
+[62] [ERROR retrieving ref link]
+[64] [ERROR retrieving ref link]
+[67] [ERROR retrieving ref link]
+[69] [ERROR retrieving ref link]
+[72] [ERROR retrieving ref link]
+[75] [ERROR retrieving ref link]
+[76] [ERROR retrieving ref link]
+[77] [ERROR retrieving ref link]
+[79] [ERROR retrieving ref link]
+[81] [ERROR retrieving ref link]
+[86] [ERROR retrieving ref link]
+[88] [ERROR retrieving ref link]
+[92] [ERROR retrieving ref link]
+[97] [ERROR retrieving ref link]
+[98] [ERROR retrieving ref link]
+[100] [ERROR retrieving ref link]
+[101] [ERROR retrieving ref link]
+[105] [ERROR retrieving ref link]
+[107] [ERROR retrieving ref link]
+[113] [ERROR retrieving ref link]
+[115] [ERROR retrieving ref link]
+[117] [ERROR retrieving ref link]
+[119] [ERROR retrieving ref link]
+[121] [ERROR retrieving ref link]
+[125] [ERROR retrieving ref link]
+[127] [ERROR retrieving ref link]
+[133] [ERROR retrieving ref link]
+[142] [ERROR retrieving ref link]
+[147] [ERROR retrieving ref link]
+[150] [ERROR retrieving ref link]
+[152] [ERROR retrieving ref link]
+[157] [ERROR retrieving ref link]
+[159] [ERROR retrieving ref link]
+[163] [ERROR retrieving ref link]
+[165] [ERROR retrieving ref link]
+[167] [ERROR retrieving ref link]
+[169] [ERROR retrieving ref link]
+[171] [ERROR retrieving ref link]
+[175] [ERROR retrieving ref link]
+[177] [ERROR retrieving ref link]
+[179] [ERROR retrieving ref link]
+[181] [ERROR retrieving ref link]
+[184] [ERROR retrieving ref link]
+[186] [ERROR retrieving ref link]
+[191] [ERROR retrieving ref link]
+[193] [ERROR retrieving ref link]
+[196] [ERROR retrieving ref link]
+[199] [ERROR retrieving ref link]
+[210] [ERROR retrieving ref link]
+[213] [ERROR retrieving ref link]
+[214] [ERROR retrieving ref link]
+[215] [ERROR retrieving ref link]
+[231] [ERROR retrieving ref link]
+[240] [ERROR retrieving ref link]
+[245] [ERROR retrieving ref link]
+[252] [ERROR retrieving ref link]
+[254] [ERROR retrieving ref link]
+[266] [ERROR retrieving ref link]
+[275] [ERROR retrieving ref link]
+[279] [ERROR retrieving ref link]
+[280] [ERROR retrieving ref link]
+[297] [ERROR retrieving ref link]
+[299] [ERROR retrieving ref link]
+[301] [ERROR retrieving ref link]
+[307] [ERROR retrieving ref link]
+[315] [ERROR retrieving ref link]
+[319] [ERROR retrieving ref link]
+[321] [ERROR retrieving ref link]
+[324] [ERROR retrieving ref link]
+[327] [ERROR retrieving ref link]
+[329] [ERROR retrieving ref link]
+[331] [ERROR retrieving ref link]
+[338] [ERROR retrieving ref link]
+[340] [ERROR retrieving ref link]
+[341] [ERROR retrieving ref link]
+[344] [ERROR retrieving ref link]
+[346] [ERROR retrieving ref link]
+[348] [ERROR retrieving ref link]
+[350] [ERROR retrieving ref link]
+[353] [ERROR retrieving ref link]
+[355] [ERROR retrieving ref link]
+[357] [ERROR retrieving ref link]
+[364] [ERROR retrieving ref link]
+[368] [ERROR retrieving ref link]
+[371] [ERROR retrieving ref link]
+[373] [ERROR retrieving ref link]
+[379] [ERROR retrieving ref link]
+[383] [ERROR retrieving ref link]
+[385] [ERROR retrieving ref link]
+[390] [ERROR retrieving ref link]
+[395] [ERROR retrieving ref link]
+[1] http://www.hyperion-records.co.uk/al.asp?al=CDA66357
+[2] http://www.musicweb-international.com/classrev/2000/may00/bentzon.htm
+[3] http://www.bach-cantatas.com/Arran/L-WTC.htm
+[4] [ERROR retrieving ref link]
+[6] https://www.johnsanidopoulos.com/2013/08/the-unique-eight-toned-hymn-of.html
+[7] https://web.archive.org/web/20130514072728/http://www.arkivmusic.com/classical/Name/Pavel-Zemek-Nov%C3%A1k/Composer/193094-1
+[8] https://www.wisemusicclassical.com/work/14652/A-World-Requiem--John-Foulds/
+[13] [ERROR retrieving ref link]
+[14] [ERROR retrieving ref link]
+[15] http://www.erpmusic.com/records/cds/the-well-tempered-clavier-I
+[16] https://earlymusicreview.com/giacomo-gorzanis-solo-lute-music/
+[17] https://www.ayros.eu/shop/gorzanis-1567/
+[18] https://web.archive.org/web/20110820141829/http://www.library.appstate.edu/music/guitar/1640bartolotti.html
+[19] https://web.archive.org/web/20110820141942/http://www.library.appstate.edu/music/guitar/1640carbonchi.html
+[20] https://web.archive.org/web/20180128190435/http://diapason.xentonic.org./dp/dp054.html
+[21] [ERROR retrieving ref link]
+[24] [ERROR retrieving ref link]
+[25] [ERROR retrieving ref link]
+[27] [ERROR retrieving ref link]
+[30] [ERROR retrieving ref link]
+[31] https://ravencd.com/merchantmanager/product_info.php?products_id=115
+[33] [ERROR retrieving ref link]
+[35] [ERROR retrieving ref link]
+[36] [ERROR retrieving ref link]
+[38] http://www.clementisociety.com/Clementi-lifeandwork.html#compositions
+[39] [ERROR retrieving ref link]
+[41] [ERROR retrieving ref link]
+[42] http://etd.ohiolink.edu/send-pdf.cgi/Hsieh%20Chialing.pdf?ucin1276527870
+[43] https://web.archive.org/web/20070509235213/http://www.thegoldenfingerstechnique.com/212/?s212p4
+[44] http://www.arkivmusic.com/classical/album.jsp?album_id=442992
+[45] https://www.amazon.com/Rode-Caprices-For-Solo-Violin/dp/B002TQNGTA
+[46] http://archive.org/details/twentyfourcapric00rodeuoft
+[49] https://ripm.org/index.php?page=JournalInfo&ABB=PIA
+[52] [ERROR retrieving ref link]
+[54] https://web.archive.org/web/20171225203227/http://hz.imslp.info/files/imglnks/usimg/f/fb/IMSLP17694-Campagnoli_-_30_Preludes_for_violin.pdf
+[58] https://www.discogs.com/release/18198727-Joseph-Christoph-Kessler-Magdalena-Brzozowska-Preludes-Op-31-Etudes-Op-20-Vol-I
+[59] https://books.google.com/books?id=3fjQGJqPM_MC&dq=kessler+24+preludes+op.+31&pg=PA446
+[61] [ERROR retrieving ref link]
+[63] [ERROR retrieving ref link]
+[65] [ERROR retrieving ref link]
+[66] https://www.naxos.com/Bio/Person/Johann_Heinrich_Luft/51608
+[68] [ERROR retrieving ref link]
+[70] [ERROR retrieving ref link]
+[71] https://www.trevcomusic.com/products/krahmer-ernest-24-solo-pieces-solo-ob
+[73] [ERROR retrieving ref link]
+[74] [ERROR retrieving ref link]
+[78] [ERROR retrieving ref link]
+[80] [ERROR retrieving ref link]
+[82] [ERROR retrieving ref link]
+[83] https://books.google.com/books?id=3fjQGJqPM_MC&dq=edward+wolff+composer+24+etudes&pg=PA852
+[84] [ERROR retrieving ref link]
+[85] https://www.hyperion-records.co.uk/dc.asp?dc=D_CDA66506
+[87] [ERROR retrieving ref link]
+[89] [ERROR retrieving ref link]
+[90] [ERROR retrieving ref link]
+[91] [ERROR retrieving ref link]
+[93] [ERROR retrieving ref link]
+[94] https://web.archive.org/web/20140712204235/http://www.classicsonline.com/catalogue/product.aspx?pid=1018
+[95] https://www.musiklexikon.ac.at/ml/musik_F/Feigerl_Familie.xml
+[96] [ERROR retrieving ref link]
+[99] [ERROR retrieving ref link]
+[102] [ERROR retrieving ref link]
+[103] [ERROR retrieving ref link]
+[104] [ERROR retrieving ref link]
+[106] [ERROR retrieving ref link]
+[108] [ERROR retrieving ref link]
+[109] https://books.google.com/books?id=MqtJRRxh__oC&dq=klengel+1784+1852&pg=PA250
+[110] [ERROR retrieving ref link]
+[111] [ERROR retrieving ref link]
+[112] [ERROR retrieving ref link]
+[114] [ERROR retrieving ref link]
+[116] [ERROR retrieving ref link]
+[118] [ERROR retrieving ref link]
+[120] [ERROR retrieving ref link]
+[122] https://www.stringsbymail.com/schneiderman-timofeyev-a-tribute-to-vladimir-morkov-the-czars-guitars-25708.html
+[123] [ERROR retrieving ref link]
+[124] [ERROR retrieving ref link]
+[126] [ERROR retrieving ref link]
+[128] [ERROR retrieving ref link]
+[129] https://www.artlyriquefr.fr/personnages/Barbot%20Paul.html
+[130] [ERROR retrieving ref link]
+[131] [ERROR retrieving ref link]
+[132] [ERROR retrieving ref link]
+[134] [ERROR retrieving ref link]
+[135] [ERROR retrieving ref link]
+[136] https://web.archive.org/web/20111217010105/http://onclassical.com/artists/petralia/preludes/
+[137] http://www.arkivmusic.com/classical/album.jsp?album_id=147069
+[138] http://www.musicweb-international.com/classrev/2020/Oct/Busoni-early-C5416.htm
+[139] http://www.classicalarchives.com/work/91509.html#tvf=tracks&tv=about
+[140] http://www.musicweb-international.com/classrev/2000/mar00/busoni.htm
+[141] [ERROR retrieving ref link]
+[143] [ERROR retrieving ref link]
+[144] [ERROR retrieving ref link]
+[145] [ERROR retrieving ref link]
+[146] [ERROR retrieving ref link]
+[148] [ERROR retrieving ref link]
+[149] [ERROR retrieving ref link]
+[151] https://www.youtube.com/watch?v=2CkJlyozScg
+[153] [ERROR retrieving ref link]
+[154] http://www.ivoryclassics.com/releases/71002/
+[155] [ERROR retrieving ref link]
+[156] [ERROR retrieving ref link]
+[158] [ERROR retrieving ref link]
+[160] [ERROR retrieving ref link]
+[161] https://www.hyperion-records.co.uk/dc.asp?dc=D_CDH55450
+[162] [ERROR retrieving ref link]
+[164] [ERROR retrieving ref link]
+[166] [ERROR retrieving ref link]
+[168] [ERROR retrieving ref link]
+[170] https://web.archive.org/web/20140201205836/http://worcesterago.org/2011/10/dr-ken-wolf-in-memoriam/
+[172] [ERROR retrieving ref link]
+[173] https://web.archive.org/web/20171226020654/http://mjroy.blogspot.com.au/2012/05/preludophilia-cesar-cuis-op-64.html
+[174] [ERROR retrieving ref link]
+[176] [ERROR retrieving ref link]
+[178] [ERROR retrieving ref link]
+[180] [ERROR retrieving ref link]
+[182] [ERROR retrieving ref link]
+[183] [ERROR retrieving ref link]
+[185] http://www.hyperion-records.co.uk/tw.asp?w=W6686
+[187] [ERROR retrieving ref link]
+[188] [ERROR retrieving ref link]
+[189] [ERROR retrieving ref link]
+[190] https://web.archive.org/web/20120620195720/http://notredamedeparis.fr/spip.php?article399
+[192] [ERROR retrieving ref link]
+[194] https://www.youtube.com/watch?v=BiFUA9A7Pwg
+[195] https://toccataclassics.com/product/frederick-septimus-kelly-piano-music/
+[197] [ERROR retrieving ref link]
+[198] [ERROR retrieving ref link]
+[200] [ERROR retrieving ref link]
+[201] [ERROR retrieving ref link]
+[202] https://www.bach-cantatas.com/Bio/Jacobs-Peter.htm
+[203] [ERROR retrieving ref link]
+[204] http://www.musicweb-international.com/classrev/2003/Oct03/Stanford_errors.htm
+[205] [ERROR retrieving ref link]
+[206] [ERROR retrieving ref link]
+[207] [ERROR retrieving ref link]
+[208] [ERROR retrieving ref link]
+[209] https://web.archive.org/web/20150407001658/http://etd.lsu.edu/docs/available/etd-11112011-090013/unrestricted/Historical_etudes_for_oboe.pdf
+[211] http://de.pluspedia.org/wiki/Gustav_Hanns_Str%C3%BCmpel
+[212] http://www.cisdur.de/e_cisdur.html
+[216] http://www.unsungcomposers.com/forum/index.php?topic=1088.0
+[217] [ERROR retrieving ref link]
+[218] http://www.sheetmusicwarehouse.co.uk/classical-piano/24-preludes-pour-piano-dans-tous-les-tons-majeurs-et-mineur/
+[219] https://web.archive.org/web/20140717190856/http://dbserv1-bcu.unil.ch/persovd/composvd.php?Code=D&Num=183
+[220] http://www.classicalarchives.com/work/132296.html#tvf=tracks&tv=about
+[221] https://nmbx.newmusicusa.org/notes-from-underground-ivan-wyschnegradskys-manual-of-quarter-tone-harmony/
+[222] [ERROR retrieving ref link]
+[223] https://archive.today/20121127123742/http://mjroy.blogspot.com.au/2012/03/lecture-recital-soviet-prelude-sets-of.html
+[224] https://web.archive.org/web/20150407165904/http://mjroy.blogspot.nl/2012/08/the-adventure-of-elusive-goltz.html
+[225] https://www.allmusic.com/album/mw0001428068
+[226] [ERROR retrieving ref link]
+[227] https://web.archive.org/web/20140223033622/http://www.englishmusicfestival.org.uk/composer-profiles.html
+[228] http://www.musicweb-international.com/Ashton/index.htm
+[229] http://www.hannotte.com/Fugues.htm
+[230] https://archive.today/20130423212106/http://www.suppressedmusic.org.uk/newsletter/articles/008.html
+[232] [ERROR retrieving ref link]
+[233] https://mic.hr/en/product/24-two-part-inventions-in-all-major-and-minor-key/
+[234] https://www.somm-recordings.com/recording/roger-sacheverell-coke-24-preludes-15-variations-finale/
+[235] https://www.planethugill.com/2015/08/music-by-roger-sacheverell-coke-from.html
+[236] https://www.allmusic.com/composition/mc0002418854
+[237] https://web.archive.org/web/20151223141709/http://www.cebedem.be/en/composers/j/86-jongen-joseph
+[238] http://www.musicweb-international.com/classrev/2003/Jun03/Jongen_piano1.htm
+[239] https://web.archive.org/web/20160203142249/http://www.arkivmusic.com/classical/album.jsp?album_id=188707
+[241] https://www.youtube.com/watch?v=CU8MFQ45sEM&t=264s
+[242] [ERROR retrieving ref link]
+[243] [ERROR retrieving ref link]
+[244] [ERROR retrieving ref link]
+[246] [ERROR retrieving ref link]
+[247] https://www.youtube.com/watch?v=BYSoXOYf2sI
+[248] https://www.youtube.com/watch?v=ZxPgCfLqKrY
+[249] https://www.youtube.com/watch?v=-epON8V2smg
+[250] https://www.youtube.com/watch?v=74bK6x0f_xs
+[251] https://www.youtube.com/watch?v=blZ23ttm2ig
+[253] http://www.hansgal.com/works/op83.html
+[255] https://www.soloduo.it/news/mario-castelnuovo-tedesco-the-well-tempered-guitars/
+[256] https://toccataclassics.com/product/gara-garayev-sonata-for-violin-and-piano-24-preludes-for-piano/
+[257] http://www.musicweb-international.com/classrev/2018/Sep/Garayev_preludes_TOCC0255.htm
+[258] https://www.youtube.com/watch?v=tchlrBiM9Pg
+[259] http://www.bruceduffie.com/cumming.html
+[260] https://web.archive.org/web/20111227225818/http://www.eroica.com/phoenix/jdt105.html
+[261] http://sansbaton.blogspot.com/2009/11/richard-cumming.html
+[262] https://web.archive.org/web/20160203142249/http://www.arkivmusic.com/classical/album.jsp?album_id=51186
+[263] http://repositories.lib.utexas.edu/bitstream/handle/2152/930/seoy032.pdf
+[264] http://www.classicalrecords.ru/shop/index.php?productID=172
+[265] https://en.secretsofarmenia.com/abramian
+[267] https://www.classicstoday.com/review/eduard-abramians-24-piano-preludes/
+[268] http://www.musicweb-international.com/classrev/2014/Sep14/Abramian_preludes_GP665.htm
+[269] https://www.youtube.com/watch?v=UMFEiiqle_I
+[270] https://www.youtube.com/watch?v=R-JulAC2TfE
+[271] https://www.youtube.com/watch?v=ztB6xe_o_GY
+[272] https://www.youtube.com/watch?v=tNFwq_nf9GQ
+[273] https://www.youtube.com/watch?v=iViop8IqWvQ
+[274] https://www.ikuedelweiss.at/lithuanian-authors/
+[276] http://www.quartets.de/articles/structure.html
+[277] https://www.youtube.com/watch?v=yUK01t_kaxs
+[278] http://www.alanbushtrust.org.uk/music/compositions/PN.asp?room=Music#103
+[281] https://www.youtube.com/watch?v=vZ-e_kSsg08
+[282] https://www.youtube.com/watch?v=7_UwVTqs12M
+[283] https://www.youtube.com/watch?v=8bf0NeL6Bcg
+[284] https://www.boosey.com/shop/prod/Gal-Hans-Fugues-24-Op-108/922178
+[285] http://www.musicweb-international.com/classrev/2002/Sept02/raats.htm
+[286] http://www.musicweb-international.com/classrev/2019/Oct/McLeod_piano_MSV77207.htm
+[287] https://www.anthonyburgess.org/blog-posts/music-review-bad-tempered-electronic-keyboard-anthony-burgess/
+[288] http://www.musicweb-international.com/classrev/2020/Aug/Cummings-Knight-piano-PFCD120-DJ.htm
+[289] http://www.musicweb-international.com/classrev/2020/Aug/Cummings-Knight-piano-PFCD120.htm
+[290] https://www.naxos.com/mainsite/blurbs_reviews.asp?item_code=8.572272&catNum=572272&filetype=About+this+Recording&language=English
+[291] http://lute.ru/guitar/rekhin_eng.htm
+[292] http://www.classicalarchives.com/work/23020.html
+[293] http://www.rekhin.narod.ru/seminar_en.htm
+[294] https://wenatcheethehatchet.blogspot.com/2009/11/preludes-and-fugues-for-solo-guitar_15.html
+[295] http://www.rekhin.narod.ru/cello-list_en.htm
+[296] http://www.classicalarchives.com/work/22995.html
+[298] https://lawostore.no/cd/madsen-24-preludes-fugues-82
+[300] https://www.howardblake.com/music/Instrumental-Music/Piano/55/
+[302] http://www.musicweb-international.com/classrev/2002/jun02/Kapustin.htm
+[303] https://www.imi.org.il/Ron-Weidberg-Israel-Music-Institute?language=eng
+[304] https://www.openu.ac.il/en/personalsites/DrRonWeidberg.aspx
+[305] https://web.archive.org/web/20111018174522/http://www.leraauerbach.com/content/discographydetail.php?id=10
+[306] https://www.naxos.com/CatalogueDetail/?id=8.574464
+[308] https://core.ac.uk/reader/326236280
+[309] http://www.henrymartin.org/henry_martin.html
+[310] https://divineartrecords.com/composer/john-ramsden-williamson/
+[311] http://www.classicalarchives.com/work/392895.html
+[312] https://web.archive.org/web/20090105164425/http://www.murraymclachlan.com/reviews/reviews_john_r_williamson_vol2.htm
+[313] http://www.musicweb-international.com/classrev/2003/Oct03/jr_williamson_v2.htm
+[314] [ERROR retrieving ref link]
+[316] https://www.youtube.com/watch?v=vAhGc1wshdk
+[317] [ERROR retrieving ref link]
+[318] [ERROR retrieving ref link]
+[320] [ERROR retrieving ref link]
+[322] [ERROR retrieving ref link]
+[323] https://danielpadron.com/biography.htm
+[325] https://sounz.org.nz/works/16256?locale=en
+[326] https://www.nzasia.org.nz/uploads/1/3/2/1/132180707/5_johnson_3.pdf
+[328] [ERROR retrieving ref link]
+[330] https://web.archive.org/web/20171225203301/http://hz.imslp.info/files/imglnks/usimg/b/b1/IMSLP236737-PMLP383720-119.pdf
+[332] [ERROR retrieving ref link]
+[333] https://www.robertandmeri.com/zwaag
+[334] https://archive.today/20130223032231/http://www.wimzwaag.nl/index.php?15
+[335] https://ump.co.uk/catalogue/edward-cowie-24-preludes-for-solo-piano-vol-1/
+[336] https://edwardcowie.com/recording/24-preludes/
+[337] http://www.jeroenvanveen.com/compositions/minimalpreludes/index.html
+[339] [ERROR retrieving ref link]
+[342] [ERROR retrieving ref link]
+[343] [ERROR retrieving ref link]
+[345] [ERROR retrieving ref link]
+[347] [ERROR retrieving ref link]
+[349] [ERROR retrieving ref link]
+[351] https://francisrouth.net/op-77-the-well-tempered-pianist/
+[352] https://www.michellegorrell.com/
+[354] [ERROR retrieving ref link]
+[356] [ERROR retrieving ref link]
+[358] [ERROR retrieving ref link]
+[359] https://www.youtube.com/watch?v=XZEc3NGZ8HE
+[360] https://geertvanhoorick.be/
+[361] [ERROR retrieving ref link]
+[362] [ERROR retrieving ref link]
+[363] [ERROR retrieving ref link]
+[365] [ERROR retrieving ref link]
+[366] https://aaronandrewhunt.zentral.zone/
+[367] [ERROR retrieving ref link]
+[369] https://toccataclassics.com/product/michael-brough-picture-preludes-piano/
+[370] https://johnburge.ca/item/view/140
+[372] [ERROR retrieving ref link]
+[374] [ERROR retrieving ref link]
+[375] [ERROR retrieving ref link]
+[376] https://sirbrandes.wixsite.com/felipebrandes/biography
+[377] [ERROR retrieving ref link]
+[378] https://www.amazon.com.au/Preludes-Piano-Major-Minor-Keys/dp/1974609634
+[380] https://www.youtube.com/watch?v=FD6yzKaEg5M
+[381] http://www.musography.co.uk/chamber%20music.html
+[382] [ERROR retrieving ref link]
+[384] [ERROR retrieving ref link]
+[386] http://www.musicweb-international.com/classrev/2020/Apr/Skempton_piano_ORC100116.htm
+[387] https://www.youtube.com/playlist?list=PLtsOUr2yK67bKUYtF38MiQbeVoHOSdDPj
+[388] [ERROR retrieving ref link]
+[389] [ERROR retrieving ref link]
+[391] https://www.churchilltrust.com.au/fellow/kirill-monorosi-nsw-2014/
+[392] https://www.youtube.com/playlist?list=PLSFHNq95NCPlk5rAo9jCAIqFxd0-3VVj4
+[393] https://pl.linkedin.com/in/andrzej-chmielewski-pianista
+[394] [ERROR retrieving ref link]
+[396] [ERROR retrieving ref link]
+[397] [ERROR retrieving ref link]
+[398] [ERROR retrieving ref link]
+[399] https://www.njmta.com/dennisalexander
+[400] https://kenhatfield.com/presss/etudes-for-solo-guitar-in-24-keys/
+[401] https://www.alfred.com/piano-miniatures/p/00-29153/

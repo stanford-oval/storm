@@ -1,0 +1,126 @@
+2022_Luzon_earthquake
+
+On July 27, 2022, at 8:43:24 a.m. (PHT), an earthquake struck the island of Luzon in the Philippines. The earthquake had a magnitude of 7.0 Mw , with an epicenter in Abra province. Eleven people were reported dead and 615 were injured. At least 35,798 homes, schools and other buildings were damaged or destroyed, resulting in ₱1.88 billion (US$34 million) worth of damage.
+
+# Earthquake
+
+The tectonics of the northern Philippines and around the island of Luzon are complex. Luzon is bounded to the east and west by subduction zones. In the southern part of Luzon, the subduction zone is located east of the island along the Philippine Trench, where the Philippine Sea Plate subducts westward beneath the Sunda Plate. In northern Luzon, where the July 27 earthquake occurred, the subduction zone location and direction changes, with another trench (Manila Trench) located west of Luzon and the Sunda Plate subducts eastward beneath the Philippine Sea Plate. The complexity of plate tectonics on and around Luzon is evidenced by the diversity of faulting mechanisms in large earthquakes. Magnitude 7 or greater earthquakes in this region since 1970 have exhibited reverse, normal, and strike-slip faulting. These active plate boundaries lead to high seismic activity. Since 1970, 11 other earthquakes of magnitude 6.5 or larger have occurred within 250 km (155 mi) of the July 27, 2022, earthquake. The largest of these earthquakes was a magnitude 7.7 strike-slip earthquake on July 16, 1990, located approximately 215 km (134 mi) south of the July 27 earthquake. At least 1,600 people died and more than 3,000 people were injured in the 1990 earthquake. The 1990 earthquake also caused landslides, liquefaction, subsidence, and sand boils in the Baguio–Cabanatuan–Dagupan area. 
+
+## Characteristics
+
+The earthquake occurred as a result of oblique-reverse faulting. Preliminary analysis indicates that the earthquake occurred on either of a low-angle reverse fault dipping to the east with a small component of left-lateral (strike-slip) motion, or on a steeply dipping reverse fault dipping to the northwest with a small component of right-lateral motion. The earthquake depth, mechanism, and location are consistent with the earthquake having occurred in the Philippine Sea Plate above the Sunda Plate. The Sunda Plate subducts eastward beneath Luzon with the plate boundary located off the western coast of Luzon. According to the USGS, the seismic moment released was 5.4e+19 N-m, corresponding to a moment magnitude of 7.1 (Mw ). A finite fault obtained from seismic inversion suggest rupture occurred along a east-dipping thrust fault, and produced a maximum displacement of 0.9 m (2 ft 11 in). It was reported as 7.3 Ms  by the Philippine Institute of Volcanology and Seismology (PHIVOLCS). The report was later revised to an earthquake of 7.0 Mw  with the epicenter 3 km (1.9 mi) N 25° W of Tayum, Abra at a depth of 17 km (11 mi) [8] [9]. Despite being a relatively shallow event, no surface ruptures were identified [9]. A focal mechanism analysis indicate rupture on a reverse fault with either a northeast–southwest striking, steep dipping (69°) plane or a north–south, shallow dipping (8°) plane. PHIVOLCS initially suspected the earthquake may have occurred on the Abra River Fault. Geologists had been aware of the potential for large earthquakes on the fault. The last known earthquake on the fault was in 1868, measuring 4.0–5.0 in magnitude. The Abra River Fault is a northern extension of the Philippine Fault Zone [11]. As it runs through Luzon, it splays into three branches that runs beneath the southern Sierra Madre mountains, the Central Cordillera Mountains before terminating at the northern coast of the island. The three branches strike north-south and are named (west to east) the Vigan-Agao Fault, the Abra River Fault and the Digdig Fault, respectively. The Philippine Fault Zone is associated with Pliocene and Quaternary uplift of the Cordillera Mountains. The Abra River and Digdig faults display pure strike-slip displacement, while the Vigan-Agao Fault display a large thrust component. In the northern part of Luzon, the Digdig Fault display a normal component. However the steep-dipping plane and slip sense associated with the Abra River Fault is not consistent with rupture on it. The fault which produced the mainshock had a shallow dip angle and produced oblique-reverse displacement. A scientific journal published by Rimando and others in 2022 revealed the earthquake did not occur on any of the known faults in the area [10]. Modelling of the earthquake indicate a source west of and parallel to the Abra River Fault. Pure dip-slip displacement of 95 cm (37 in) occurred at depths of 13–16 km (8.1–9.9 mi). 
+
+## Aftershocks
+
+At least 3,496 aftershocks were recorded by PHIVOLCS,  with magnitudes in the range of 1.4 to 5.1 [6]. Sixty-three were strong enough to be felt [6]. On July 28, PHIVOLCS revised the depth of focus of the earthquake to 15.0 km (9 mi) [6]. The strongest aftershock occurred on October 25, measuring Mww  6.4, and having a maximum intensity of VII (Very destructive) on the PHIVOLCS Earthquake Intensity Scale [14]. It caused extensive damage to thousands of infrastructures including homes and roads, and left 139 people injured [15] [16]. Two days later, four soldiers giving aid to the affected area were attacked by the New People's Army, leaving two of them dead, another injured and one missing [3] [17] [18] [19] [20]. At least 409 aftershocks were recorded by October 26 [21]. 
+
+## Intensity
+
+On the PHIVOLCS Earthquake Intensity Scale (PEIS), intensity VII (Destructive) was instrumentally recorded in Vigan, corresponding to an intensity of VII (Very strong) in the Modified Mercalli Intensity Scale. The maximum intensity of VIII (Very destructive) was experienced in isolated areas [14] [23]. Intensity VII was reported in Bucloc and Manabo, Abra [24]. In Vigan, Sinait, Bantay, San Esteban (in Ilocos Sur), Laoac (in Pangasinan), and Baguio, shaking corresponding to intensity VI (Very strong) was reported. In an interview with a local radio station, Renato U. Solidum, the head of PHIVOLCS,  it was felt with "relatively moderate intensity" in Manila, the capital of the Philippines [25]. 
+
+## Tsunami
+
+Despite the earthquake having an inland epicentre, a tsunami of around 0.08 m (0.26 ft) was observed in Currimao, Ilocos Norte. 
+
+# Response
+
+PHIVOLCS stated that there was no tsunami threat,  and an alert was not issued [27]. Due to the inland epicenter, the earthquake could not cause seafloor uplift and trigger large waves. However, PHIVOLCS noted that shorelines and enclosed bodies of water may experience seiches due to oscillation from the earthquake. According to the National Grid Corporation of the Philippines (NGCP), power services in Manila and the surrounding provinces were uninterrupted. The NGCP said that load tripping may have occurred. Commanders of the Philippine National Police (PNP) in Luzon were tasked to cooperate with the regional Risk Reduction and Management Office to maximize relief operations. All PNP infrastructures were also inspected for damage. The Army and Coast Guard also were dispatched to the affected areas [30]. President Bongbong Marcos conducted a press briefing addressing the disaster and was scheduled to fly to Abra. He was expected to coordinate with national and local government establishments in relief efforts,  but was "staying away" at the present [32] [32]. He added that this was so that the local government could carry out their procedures without "disturb(ing) the work (of local officials)". President Marcos has also called for telecommunication companies to give free communication to areas where transmission towers had collapsed [33]. Local authorities stated that work and schools would be suspended in parts of Ilocos Norte to allow damage assessments to take place [33]. In the Ilocos region, the Department of Social Welfare and Development (DSWD) said that it would be ready to serve the affected. More than 17,410 family food packs and 9,291 non-food items had been prepared and stored at warehouses, ready for distribution. An additional ₱2.70 million (US$48.6 thousand) was set as standby for emergency response. Work and school was also suspended in Baguio by its mayor [35]. The Governor of Abra, Dominic Valera, declared the entire province under a state of calamity. Province officials also authorized the use of 58 percent of the Calamity Reserve Fund for relief efforts. The House of Representatives said it would allocate funds in the national budget to restore damaged buildings, including affected heritage and cultural buildings [37]. UNICEF said that emergency supplies were on standby to support government relief efforts and to assist affected children and families [38]. 
+
+# Impact
+
+Eleven fatalities were reported, including four from a landslide,    and at least 616 people were injured [46] [47] [48]. More than 513,330 people were affected, of which, 57,022 were displaced [6]. A total of 35,798 homes were affected, including 686 which were totally damaged. An additional 177 healthcare infrastructures were destroyed [6]. Over 8,000 schools were affected [49]. Eleven schools in Central Luzon, nine in the Cagayan Valley, eight from the Cordillera Administrative Region and seven in the Ilocos Region, were seriously damaged [50]. The Department of Agriculture and National Irrigation Administration also reported damage estimated at ₱56.4 million (US$1.02 million). The National Irrigation Administration estimated around ₱22.7 million (US$406,942) worth of damage to irrigation systems. There was an additional 2,383 buildings damaged, incurring a loss of ₱1.81 billion (US$32.5 million). Total damage was estimated to be worth ₱1.88 billion (US$34 million). 
+
+## Abra
+
+A preliminary survey of damage suggested at least 80 percent of Abra was affected. A power outage occurred across the province due to destroyed power lines [37]. Many businesses were disrupted. Residents stayed outside their homes and were left without food. One villager died when he was hit by falling cement slabs in his house [37]. In Bangued, a person died when the walls of a dormitory collapsed, and an additional 44 were injured due to falling debris [51]. A 59-year-old resident from Tubo died of his injuries after the roof of his house collapsed [52]. The bodies of four people were recovered from a landslide. Historical churches in the province were also affected [47]. The Shrine of San Lorenzo Ruiz in Bangued sustained major damage and one of its bell-towers was reduced to rubble. The Tayum Church in the town of the same name also sustained damage [53]. Over 640 displaced people took refuge at the town plaza [54]. Two bridges, one in Manabo and Bangued, respectively, were affected [55]. Schools,  and 20 government properties were damaged [56] [57]. At least 31 landslides were reported, and a partially collapsed hospital was evacuated [56]. Road infrastructures including three bridges were damaged [58]. 
+
+## Baguio
+
+Officials in Baguio stated that several crucial roadways were affected by debris. Thirty-three buildings were damaged. Road closures affected motorists along Kennon Road, Baguio–Bua–Itogon National Road and Benguet–Nueva Vizcaya Road, leaving only the Aspiras–Palispis Highway open [59]. Patients at Baguio General Hospital were evacuated [60]. A student at Saint Louis University was injured during a panic [25]. 
+
+## Ilocos Sur
+
+A total of 32 towns and two cities received damage, with the heaviest in Vigan. Nearly 100 homes were heavily damaged [61]. Heritage sites in the UNESCO World Heritage City of Vigan were damaged, including the Vigan Cathedral and old-century houses, as well as few toppled power lines along Calle Crisologo [61]. Parts of the old historic belfry of Bantay Church in the town of the same name also crumbled to the ground [62] [63]. It was felt strongly in Ilocos Sur for 30 seconds or longer [54]. 
+
+## Metro Manila
+
+The earthquake was felt strongly in Metro Manila, where minor damage to a hospital and several other buildings were reported. The earthquake prompted the Manila Metro Rail Transit System to suspend service during rush hour [64] [65]. Operations resumed at 10:12 a.m, with the exception of LRT Line 2 due to inspections [64]. Occupants of the Senate building in Pasay were also evacuated [66]. 
+
+## Elsewhere
+
+In Apayao, officials noted that two structures were damaged. Sixty-one schools were damaged, including 76 classrooms which were completely destroyed [59]. In Kalinga, a worker fell from a building and suffered leg fractures [67]. One fatality was also reported in the province [68]. In Ilocos Norte, bricks fell from old buildings, including at an elementary school [69]. Cracks also appeared in the public market. The Philippine Ports Authority (PAA) said that hairline cracks occurred in a building at the Port of Currimao, Ilocos Norte, and at a passenger terminal in Claveria, Cagayan. In Asipulo, Ifugao, a landslide partially buried an ambulance; four occupants including a pregnant woman escaped unhurt [70]. There were two deaths in Benguet,  including one in La Trinidad, who died due to falling debris from a collapsed building [71] [69]. At least 62 buildings were damaged in the province [72]. 
+
+# References
+
+[1] https://www.ngdc.noaa.gov/hazel/view/hazards/tsunami/related-runups/5855
+[2] https://www.cnnphilippines.com/news/2022/8/28/M5.2-quake-Pilar-Abra-828.html
+[3] https://ndrrmc.gov.ph/attachments/article/4210/SitRep_No._4_for_Magnitude_6.4_Earthquake_in_Lagayan_Abra_2022.pdf
+[4] https://earthquake.usgs.gov/earthquakes/eventpage/us6000i5rd/executive
+[5] https://www.rappler.com/nation/luzon/abra-earthquake-july-27-2022/
+[6] https://ndrrmc.gov.ph/attachments/article/4192/SitRep_No_15_for_Magnitude_7_0_Earthquake_in_Tayum_Abra_2022.pdf
+[7] https://earthquake.usgs.gov/earthquakes/search/
+[8] https://earthquake.phivolcs.dost.gov.ph/2022_Earthquake_Information/July/2022_0727_0043_B1F.html
+[9] https://earthquake.phivolcs.dost.gov.ph/2022_Earthquake_Information/July/2022_0727_0043_B2F.html
+[10] https://temblor.net/earthquake-insights/fault-that-caused-a-july-quake-in-the-philippines-still-in-question-14355/
+[11] https://mb.com.ph/2022/07/27/abra-river-fault-which-last-moved-in-1868-may-have-triggered-powerful-quake-solidum/
+[12] https://ui.adsabs.harvard.edu/abs/2012MarGR..33..369A
+[13] https://doi.org/10.26443%2Fseismica.v1i1.217
+[14] https://earthquake.phivolcs.dost.gov.ph/2022_Earthquake_Information/July/2022_0727_0043_B3F.html
+[15] https://earthquake.phivolcs.dost.gov.ph/2022_Earthquake_Information/October/2022_1025_1459_B4F.html
+[16] https://earthquake.usgs.gov/earthquakes/eventpage/us6000iwds/executive
+[17] https://www.philstar.com/headlines/2022/10/28/2219924/ndrrmc-85-hurt-44k-families-affected-abra-quake/
+[18] https://apnews.com/article/science-philippines-manila-earthquakes-ferdinand-marcos-jr-be94326447233d3eae14763ada43dc1c
+[19] https://news.abs-cbn.com/amp/news/10/26/22/look-rockslide-damaged-structure-in-wake-of-abra-quake
+[20] https://www.gmanetwork.com/news/topstories/regions/849281/part-of-church-belfry-falls-cracks-show-after-abra-quake/story/?amp
+[21] https://www.expressandstar.com/news/world-news/2022/10/27/rebels-kill-two-soldiers-helping-with-aid-efforts-in-area-hit-by-earthquake/
+[22] https://www.gmanetwork.com/news/scitech/science/849331/phivolcs-logs-409-aftershocks-following-magnitude-6-4-quake-in-abra/story/
+[23] https://doi.org/10.3389%2Ffeart.2023.1091595
+[24] https://www.phivolcs.dost.gov.ph/index.php/news/15340-primer-on-the-27-july-2022-magnitude-mw-7-0-northwestern-luzon-earthquake
+[25] https://www.nytimes.com/2022/07/26/world/asia/philippines-earthquake.html
+[26] https://www.gmanetwork.com/news/balitambayan/balita/839559/magnitude-7-na-lindol-yumanig-sa-abra-1-tao-napaulat-na-namatay/story/
+[27] https://www.gmanetwork.com/news/scitech/science/839533/no-tsunami-threat-phivolcs-assures-after-magnitude-7-quake/story/
+[28] https://www.rappler.com/newsbreak/fact-check/no-tsunami-alert-raised-after-luzon-earthquake-july-27-2022/
+[29] https://www.gmanetwork.com/news/topstories/nation/839530/power-transmission-services-normal-despite-earthquake-ngcp/story/
+[30] https://www.manilatimes.net/2022/07/27/latest-stories/pnp-mobilizes-all-luzon-commanders-to-assist-in-quake-relief-operations/1852444
+[31] https://mb.com.ph/2022/07/27/ph-army-pcg-rescue-quake-victims/
+[32] https://www.rappler.com/nation/video-marcos-jr-press-briefing-luzon-earthquake-july-2022/
+[33] https://www.philstar.com/headlines/2022/07/27/2198332/marcos-visit-abra-after-magnitude-70-quake
+[34] https://www.pna.gov.ph/articles/1179908
+[35] https://newsinfo.inquirer.net/1636023/dswd-prepares-aid-for-earthquake-hit-residents-in-ilocos-abra
+[36] https://www.gmanetwork.com/news/topstories/regions/839532/magalong-suspends-work-classes-in-baguio-after-magnitude-7-quake/story/
+[37] https://www.pna.gov.ph/articles/1180085
+[38] https://pia.gov.ph/news/2022/08/01/kongreso-susuportahan-ang-rehabilitasyon-ng-mga-lugar-na-nasalanta-ng-lindol-sa-abra
+[39] https://reliefweb.int/report/philippines/unicef-stands-ready-reach-children-affected-philippines-earthquake
+[40] https://www.pna.gov.ph/articles/1179900
+[41] https://www.rappler.com/nation/list-countries-offering-aid-luzon-earthquake-july-2022/
+[42] https://www.pna.gov.ph/articles/1180663
+[43] https://www.pna.gov.ph/articles/1180326
+[44] https://focustaiwan.tw/society/202207270022
+[45] https://www.pna.gov.ph/articles/1181064
+[46] https://newsinfo.inquirer.net/1641491/fwd-11-now-dead-in-abra-quake-ndrrmc/amp
+[47] https://newsinfo.inquirer.net/1637355/bodies-of-4-missing-abra-residents-retrieved-from-landslide
+[48] https://www.manilatimes.net/2022/07/30/news/national/death-toll-in-northern-luzon-quake-climbs-to-10/1852751
+[49] https://www.peoplestonightonline.com/news/177-health-facilities-apektado-ng-lindol-sa-abra/
+[50] https://www.philstar.com/pilipino-star-ngayon/bansa/2022/07/29/2198727/8k-paaralan-sinira-ng-lindol
+[51] https://www.washingtonpost.com/world/73-earthquake-shakes-northern-philippines-felt-in-capital/2022/07/26/783dc34e-0d4b-11ed-88e8-c58dc3dbaee2_story.html
+[52] https://newsinfo.inquirer.net/1635722/1-dead-44-injured-in-earthquake-hit-abra
+[53] https://www.deseret.com/faith/2022/7/27/23280563/massive-earthquake-rocks-northern-philippines-setting-off-landslides
+[54] https://mb.com.ph/2022/07/27/strong-abra-quake-damages-vigan-cathedral-bantay-bell-tower-in-ilocos-sur/
+[55] https://newsinfo.inquirer.net/1636522/watch-abra-residents-take-shelter-at-bangued-plaza-after-strong-quake
+[56] https://www.philstar.com/nation/2022/07/28/2198624/abra-declares-state-calamity-due-earthquake-damage
+[57] https://www.gmanetwork.com/news/topstories/regions/839552/deped-cracks-seen-at-several-abra-schools-after-magnitude-7-quake/story/
+[58] https://www.straitstimes.com/asia/se-asia/71-magnitude-earthquake-hits-northern-philippines
+[59] https://www.rappler.com/nation/death-toll-damage-luzon-earthquake-july-27-2022/
+[60] https://www.cnnphilippines.com/news/2022/7/27/earthquake-7.3-magnitude-Abra-Luzon.html
+[61] https://rmn.ph/100-bahay-sa-ilocos-sur-totally-damaged-sa-magnitude-7-na-lindol-restoration-sa-heritage-sites-aabutin-pa-ng-isang-taon/
+[62] https://www.topgear.com.ph/news/motoring-news/abra-earthquake-vigan-city-aftermath-a4354-20220727
+[63] https://newsinfo.inquirer.net/1635457/heritage-structures-churches-damaged-by-7-3-quake
+[64] https://www.reuters.com/world/asia-pacific/magnitude-72-earthquake-strikes-luzon-philippines-emsc-2022-07-27/
+[65] https://news.detik.com/internasional/d-6201018/gempa-m-71-di-filipina-terasa-kuat-di-manila-layanan-kereta-disetop/1
+[66] https://web.archive.org/web/20220727062024/https://newsinfo.inquirer.net/1635661/mrt-lrt-1-pnr-back-to-normal-operations-after-strong-luzon-earthquake
+[67] https://brigadanews.ph/bilang-ng-mga-paaralang-winasak-ng-lindol-umabot-sa-61/
+[68] https://newsinfo.inquirer.net/1635947/laborer-hurt-when-he-falls-from-building-in-kalinga-due-to-earthquake
+[69] https://newsinfo.inquirer.net/1636975/luzon-earthquake-leaves-3494-houses-51-buildings-damaged-dilg/amp
+[70] https://newsinfo.inquirer.net/1636061/normal-operations-no-major-structural-damage-in-eight-ports-after-abra-earthquake-ppa
+[71] https://news.abs-cbn.com/news/07/27/22/lindol-nagdulot-ng-landslide-sa-ifugao-ambulansya-natabunan
+[72] https://newsinfo.inquirer.net/1635558/1-dead-as-building-collapses-in-benguet-town-due-to-quake

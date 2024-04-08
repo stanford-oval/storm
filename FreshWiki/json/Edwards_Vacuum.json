@@ -1,0 +1,940 @@
+{
+  "title": "Edwards_Vacuum",
+  "url": "https://en.wikipedia.org/wiki/Edwards_Vacuum",
+  "summary": "Edwards Ltd is a British multinational vacuum pump and exhaust gas management systems manufacturer. Its headquarters are in Burgess Hill, UK, and has been part of the Atlas Copco Group since 2014. Edwards holds 1,700 patents, including for dry (oil-free) vacuum pumps, and produces equipment used for manufacturing semiconductors,  scientific research, freeze drying and other industries. Its pumps remove contaminants at CERN's Large Hadron Collider. Manufacturing is predominantly handled by subsidiary businesses in the Czech Republic, South Korea, USA and China. Edwards' global research and development facilities remain in the UK.Major customers in 2012 included Samsung, Hynix, Agilent and LG.",
+  "content": [
+    {
+      "section_title": "History",
+      "section_content": [],
+      "subsections": [
+        {
+          "section_title": "Independent (1919-1967)",
+          "section_content": [
+            {
+              "sentence": "In 1919, physicist and university lecturer Frederick David Edwards and his father William founded their eponymous business in Camberwell, London, as Edwards Equipment and Services",
+              "refs": []
+            },
+            {
+              "sentence": "They sold vacuum pumps to research laboratories from the UK, France, Germany and the USA",
+              "refs": []
+            },
+            {
+              "sentence": "When World War II began, German patents were voided in the UK, which meant Edwards was cut off from their suppliers",
+              "refs": []
+            },
+            {
+              "sentence": "This led the company to begin manufacturing its own products in 1939",
+              "refs": []
+            },
+            {
+              "sentence": "The firm was rebranded W Edwards and Co in 1940, then Edwards High Vacuum International Ltd in 1950, and moved from London to Crawley in 1953",
+              "refs": []
+            },
+            {
+              "sentence": "Edwards purchased Italian freeze-drying equipment manufacturer Alto Vuoto SpA in 1954, followed by the Shoreham factory of former subcontractor J H Holmes and Son Ltd in 1958",
+              "refs": []
+            },
+            {
+              "sentence": "In the 1960s the firm listed as a public company and suffered from strike actions",
+              "refs": [
+                "https://collection.sciencemuseumgroup.org.uk/people/cp31571/edwards-high-vacuum-international",
+                "https://www.gracesguide.co.uk/Edwards_High_Vacuum"
+              ]
+            },
+            {
+              "sentence": "Its founder FD Edwards died, and after financial difficulties, the company was sold to BOC",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "BOC (1968-2006)",
+          "section_content": [
+            {
+              "sentence": "BOC Group's purchase of Edwards in 1968 was followed by international expansion, particularly into Asia, and investment at the Crawley, Eastbourne, Shoreham and Burgess Hill sites",
+              "refs": []
+            },
+            {
+              "sentence": "In 1984, Edwards developed and patented the first practical high vacuum dry (no-oil) pump",
+              "refs": []
+            },
+            {
+              "sentence": "The design was taken up by the fast-growing semiconductor manufacturing market",
+              "refs": []
+            },
+            {
+              "sentence": "In 1992, Edwards purchased Electrotech Ltd's semiconductor manufacturing exhaust gas management systems",
+              "refs": [
+                "https://drive.google.com/file/d/1ZBYS56kTP7f2ns9Uu5rdXjCjj0D0OlaC/view?usp=drivesdk"
+              ]
+            },
+            {
+              "sentence": "It was based in Nailsea before moving to Clevedon, UK to add to Edwards' semiconductor manufacturing environmental abatement technology",
+              "refs": []
+            },
+            {
+              "sentence": "Four years later in 1996, new facilities in Burgess Hill are inaugurated",
+              "refs": [
+                "https://www.gracesguide.co.uk/Edwards_High_Vacuum"
+              ]
+            },
+            {
+              "sentence": "In 1997, BOC merged its electronics gases business with Edwards as BOC Edwards",
+              "refs": []
+            },
+            {
+              "sentence": "In the same year, the company purchased Systems Chemistry Inc, a supplier of management systems for ultrapure chemicals used in semiconductor manufacturing, from Submicron Systems Corp of Allentown (USA)",
+              "refs": []
+            },
+            {
+              "sentence": "It became Edwards' chemical management division",
+              "refs": []
+            },
+            {
+              "sentence": "Allentown, USA",
+              "refs": []
+            },
+            {
+              "sentence": "It became Edwards' chemical management division",
+              "refs": []
+            },
+            {
+              "sentence": "In 1999, Edwards acquired the Minneapolis-based division of FSI International Inc, for US$38 million",
+              "refs": []
+            },
+            {
+              "sentence": "This was followed by the purchase of the Hick Hargreaves vacuum ejector and deaerator units; Wilhelm Klein GmbH; Stokes piston pump operations, and Hibon Inc for \u00a312.8 million from Smiths Group",
+              "refs": [
+                "https://www.edn.com/deals-bloom-in-capital-equipment/"
+              ]
+            },
+            {
+              "sentence": "In 2002, they purchased Seiko Industry's turbomolecular pump manufacturing business for \u00a370 million",
+              "refs": [
+                "https://zna3-group-prd-sitecorecontent-webapp01.azurewebsites.net/investors/regulatory-news/regulatory-news-item/?reqid=1146898"
+              ]
+            },
+            {
+              "sentence": "Edwards then sold The Hibon, Hicks Hargreaves and Wilhelm Klein low pressure compressor businesses were sold on to Ingersoll Rand in 2006",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Linde and CCMP Capital (2006-2014)",
+          "section_content": [
+            {
+              "sentence": "Linde AG purchased BOC in 2006 for \u20ac12.4 billion, selling Edwards to CCMP Capital and its Asian fund in 2007 for US$901 million",
+              "refs": []
+            },
+            {
+              "sentence": "Edwards was renamed Edwards Group Ltd, and then Edwards Group plc",
+              "refs": []
+            },
+            {
+              "sentence": "A new, Cayman Island-based holding company called Edwards Group Ltd was listed on NASDAQ in 2012 via ADS under the ticker symbol EVAC, with a US$100 million IPO",
+              "refs": []
+            },
+            {
+              "sentence": "It was delisted in 2014 when Atlas Copco purchased the operating subsidiary Edwards Ltd for \u00a31 billion",
+              "refs": []
+            },
+            {
+              "sentence": "Manufacturing sites were opened in 2011 in the Czech Republic for the industrial, pharmaceutical, chemical, and scientific markets while manufacturing sites for the semiconductor market were opened in South Korea",
+              "refs": []
+            },
+            {
+              "sentence": "Most of Edwards' UK manufacturing capacity was moved, with abatement systems remaining in Clevedon, completing plans proposed under BOC in 2005",
+              "refs": []
+            },
+            {
+              "sentence": "Edwards was awarded its seventh Queen's Award in 2012, and acquired USA-based Gamma Vacuum in 2013, maintaining the brand until this day",
+              "refs": []
+            },
+            {
+              "sentence": "Gamma Vacuum specialises in ion and titanium sublimation pumps, with customers mainly in the scientific industry",
+              "refs": [
+                "https://mobile.stevieawards.com/edwards-group-shows-why-working-vacuum-can-pay"
+              ]
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Atlas Copco (2014-present)",
+          "section_content": [
+            {
+              "sentence": "The Atlas Copco Group, a Swedish multinational industrial company, acquires Edwards Vacuum",
+              "refs": []
+            },
+            {
+              "sentence": "Edwards purchased Brooks Automation's CTI-Cryogenics and Polycold branded cryopump operations based in Chelmsford and Monterrey for US$675 million in 2018",
+              "refs": []
+            },
+            {
+              "sentence": "In 2019, Edwards marked its 100th anniversary",
+              "refs": [
+                "http://www.semiconductor-today.com/news_items/2018/sep/edwards_030918.shtml",
+                "https://cms.law/en/deu/news-information/cms-advises-atlas-copco-on-acquisition-of-cryogenic-business-of-brooks-automation"
+              ]
+            },
+            {
+              "sentence": "Its new North America Semiconductor Technology Centre in Hillsboro opened in the same year",
+              "refs": [
+                "https://www.gasworld.com/story/edwards-vacuum-celebrates-100-years/"
+              ]
+            },
+            {
+              "sentence": "Edwards joined MIT.nano as a founding member, following its completion in 2018",
+              "refs": [
+                "https://www.gasworld.com/story/edwards-vacuum-breaks-ground-on-new-high-technology-innovation-centre-in-oregan/"
+              ]
+            },
+            {
+              "sentence": "MIT.nano is a 214,000-square-foot laboratory dedicated to the characterisation and fabrication of nanoscale materials, structures, devices, and processes",
+              "refs": []
+            },
+            {
+              "sentence": "In 2020, the company opened a new Service Technology Centre in Dublin",
+              "refs": [
+                "https://news.mit.edu/2019/mit-nano-announces-corporate-consortium-founding-members-0708"
+              ]
+            },
+            {
+              "sentence": "In 2022, Edwards invested in a new facility to manufacture products for the semiconductor industry in Arizona, USA",
+              "refs": []
+            },
+            {
+              "sentence": "During the same yeat, Edwards acquired Ceres Technologies, Inc.",
+              "refs": []
+            },
+            {
+              "sentence": "Ceres is a US-based manufacturer and designer of gas and vapour delivery equipment for the semiconductor industry",
+              "refs": []
+            },
+            {
+              "sentence": "It also purchased HHV Pumps Pvt Ltd, a designer and manufacturer of vacuum pumps located in Bengalaru, India, for \u00a310.9 million",
+              "refs": [
+                "https://www.dailyfreeman.com/2022/07/19/saugerties-based-ceres-technologies-acquired-by-multinational-industrial-company/"
+              ]
+            },
+            {
+              "sentence": "Atlas Copco also agreed to purchase the assets of Chinese, liquid ring vacuum pump manufacturer Shandong Jinggong Pump Co Ltd, to join the  Edwards vacuum pump business",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        }
+      ]
+    },
+    {
+      "section_title": "Products and markets",
+      "section_content": [
+        {
+          "sentence": "Vacuum technology has always been an important utility in the production of electronics",
+          "refs": []
+        },
+        {
+          "sentence": "The first TV and radio technologies emerged in the 1920s and 1930s, and Edwards Vacuum delivered vacuum pumps for the production of valve amplifiers, which enabled transmission and reception",
+          "refs": []
+        },
+        {
+          "sentence": "In its initial years, Edwards Vacuum imported vacuum equipment from Germany's Leybold",
+          "refs": [
+            "https://www.history.com/news/who-invented-television"
+          ]
+        },
+        {
+          "sentence": "A freeze-drying method using vacuum chambers was patented in the 1930s",
+          "refs": [
+            "https://www.edwardsvacuum.com/en/about-us/history",
+            "https://www.gracesguide.co.uk/Frederick_David_Edwards"
+          ]
+        },
+        {
+          "sentence": "During World War II, the technology was further perfected and expanded to freeze-dry instant coffee, but also blood plasma and penicillin",
+          "refs": []
+        },
+        {
+          "sentence": "Penicillin itself was also produced using vacuum technology",
+          "refs": []
+        },
+        {
+          "sentence": "[citation needed]",
+          "refs": []
+        },
+        {
+          "sentence": "World War II marked an acceleration in technological development for vacuum technology",
+          "refs": []
+        },
+        {
+          "sentence": "Vacuum pump manufacturers innovated their products and new applications for vacuum emerged",
+          "refs": []
+        },
+        {
+          "sentence": "This included  but wasn't limited to, the development of radar transmitters and receivers used in operations, glass coating of binoculars and windscreens, infrared systems, used for night flying and operations, foil coating, which confused radar systems and the introduction of freeze-drying to remove moisture, applied to various pharmaceutical processes.",
+          "refs": []
+        }
+      ],
+      "subsections": [
+        {
+          "section_title": "1950-60s",
+          "section_content": [
+            {
+              "sentence": "After the war, some of the inventions found new applications",
+              "refs": []
+            },
+            {
+              "sentence": "The first transistor radio was released in 1954, and its manufacturing process made use of vacuum pumps",
+              "refs": []
+            },
+            {
+              "sentence": "The first integrated circuit or \u201cchip\u201d came to the market at the end of the 1950s, and vacuum pumps again played an important role in their production",
+              "refs": []
+            },
+            {
+              "sentence": "These early inventions were Edwards' first steps into the electronics and semiconductors industry, which is to this day the company\u2019s biggest market",
+              "refs": []
+            },
+            {
+              "sentence": "Chips became increasingly small throughout the decades, increasing the importance of vacuum purity",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "1970s",
+          "section_content": [
+            {
+              "sentence": "The scientific and medical markets have always been important for Edwards",
+              "refs": []
+            },
+            {
+              "sentence": "The introduction of X-ray technology required the use of a vacuum",
+              "refs": []
+            },
+            {
+              "sentence": "Vacuum technology also played an important role in the development of neuroimaging (brain scanners), like MRI, CT, and PET scanners.",
+              "refs": []
+            },
+            {
+              "sentence": "The first home computers were brought to the market in the 1970s and the development of computer technology has been unstoppable ever since",
+              "refs": []
+            },
+            {
+              "sentence": "The mass production of CRT displays and integrated circuits necessitated electronic companies to scale up, with vacuum installations becoming bigger and demand for vacuum purity increasing.",
+              "refs": []
+            },
+            {
+              "sentence": "In the 1970s, Edwards Vacuum also collaborated with Seiko Seiki for the invention of magnetically suspended turbopumps",
+              "refs": []
+            },
+            {
+              "sentence": "These molecular turbopumps use magnetically levitated bearings, which eliminate the risk of vacuum contamination, require less maintenance, and feature lower noise and vibration levels",
+              "refs": []
+            },
+            {
+              "sentence": "This type of technology is particularly suitable for scientific applications and the harsh processes in semiconductor manufacturing",
+              "refs": []
+            },
+            {
+              "sentence": "The newly emerged dry pumps and turbomolecular pumps supported innovation in the scientific instrument markets over the next couple of decades",
+              "refs": []
+            },
+            {
+              "sentence": "The scientific instrument market is now the second biggest market for Edwards Vacuum, after the semiconductor and electronics industry.",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "1980s",
+          "section_content": [
+            {
+              "sentence": "The compact disk was invented in the 1980s, initially to store and play digital audio recordings but a few years later also as general data storage",
+              "refs": []
+            },
+            {
+              "sentence": "Vacuum is used for the metallization of CD surfaces.",
+              "refs": []
+            },
+            {
+              "sentence": "In 1984, Edwards\u2019 Henry Wycliffe invented the Drystar roots/claw dry pump, patended by Edwards",
+              "refs": []
+            },
+            {
+              "sentence": "The Drystar was a positivie-displacement roots/claw pump that does not require oil for lubrication",
+              "refs": []
+            },
+            {
+              "sentence": "The semiconductor industry in particular moved away quickly from oil-sealed pumps in favour of the new dry pumps",
+              "refs": []
+            },
+            {
+              "sentence": "In the harsh semiconductor processes, oil-sealed pumps required frequent servicing and oil changes: this new dry pump technology enabled more complex production processes in the semiconductor industry",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "1990s",
+          "section_content": [
+            {
+              "sentence": "The United Nations Framework Convention on Climate Change came into force in 1994, driving the need for environmental solutions in the electronics industry",
+              "refs": []
+            },
+            {
+              "sentence": "Two years prior, in 1992, Edwards Vacuum had acquired a small start-up company specialising in the abatement of semiconductor process exhaust gases, allowing for a more environmentally friendly manufacturing process of semiconductors.",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Recent",
+          "section_content": [
+            {
+              "sentence": "Flat-screen display technology began in the 2000s, replacing the cathode ray tube displays of the previous century",
+              "refs": []
+            },
+            {
+              "sentence": "In the years that followed, technology evolved and displays became increasingly thinner, higher in resolution and larger",
+              "refs": []
+            },
+            {
+              "sentence": "As a result, the required composite structures become increasingly complex, and the manufacturing methods became more demanding",
+              "refs": []
+            },
+            {
+              "sentence": "Edwards Vacuum is involved in flat-screen display production with its turbomolecular pumps, which enable the high levels of vacuum required for the production process and coating of these displays",
+              "refs": []
+            },
+            {
+              "sentence": "Abatement installations remove global warming, toxic, pyrophoric, and corrosive gases in a safe, regulatory way",
+              "refs": []
+            },
+            {
+              "sentence": "[citation needed]",
+              "refs": []
+            },
+            {
+              "sentence": "Vacuum coating is used in other industries, including solar cell photovoltaics",
+              "refs": []
+            },
+            {
+              "sentence": "They are produced with processes such as crystalline silicon, CdTe, CIGS, or Silicon Thin Film Technology, all of which require vacuum",
+              "refs": []
+            },
+            {
+              "sentence": "Lithium-ion batteryies are a rapidly growing market, that also requires large amounts of vacuum in various stages of their production.",
+              "refs": []
+            },
+            {
+              "sentence": "Edwards CTI-Cryogenics and Edwards Polycold cryopumps and cryochillers play their role in cryogenic fields: MRI machines that uses liquid helium and require cryogenic cooling, storage of large quantities of food, freezing of blood and tissues samples, and semiconductors, as their technology and structures become more complex.",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        }
+      ]
+    },
+    {
+      "section_title": "Edwards Lecture Series",
+      "section_content": [
+        {
+          "sentence": "The Edwards Lecture Series is the longest-running lecture series at City, University of London, having reached its 44th edition in 2023",
+          "refs": []
+        },
+        {
+          "sentence": "The lecture commemorates the work of physicist and Edwards Vacuum founder FD Edwards, a member of staff at City, University of London\u2019s predecessor institution, The Northampton Institute, and Past Master of the Worshipful Company of Scientific Instrument Makers",
+          "refs": []
+        },
+        {
+          "sentence": "The lecture has a distinguished history and has been given by five Nobel Laureates over the years (Professor Denis Gabor, Professor Sir Harry Kroto, Professor Sir Peter Mansfield, Professor Sir Paul Nurse, and Professor Carlo Rubbia), as well as several Fellows of the Royal Society and Fellows of the Royal Academy of Engineering.",
+          "refs": []
+        }
+      ],
+      "subsections": []
+    },
+    {
+      "section_title": "Controversies",
+      "section_content": [],
+      "subsections": [
+        {
+          "section_title": "Domain registration",
+          "section_content": [
+            {
+              "sentence": "In 2005, Nominet determined the domain name bocedwards.co.uk had been abusively registered by Eaton Engineering (Herts) Ltd and ordered that it be transferred to The BOC Group Ltd, the then owners of Edwards",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Hoffman Instrumentation Supply Inc",
+          "section_content": [
+            {
+              "sentence": "In 2019, Hoffman Instrumentation Supply Inc was a component vendor to Edwards' US, subsidiary Edwards Vacuum LLC, and held talks about becoming exclusive supplier for some items",
+              "refs": []
+            },
+            {
+              "sentence": "It was also proposed that Hoffman would construct subassemblies and complete systems, but only for Edwards",
+              "refs": []
+            },
+            {
+              "sentence": "One of Hoffman's key customers enquired whether it could provide a vacuum system that would work with pumps other than Edwards'",
+              "refs": []
+            },
+            {
+              "sentence": "Hoffman  informed Edwards whose response was to suggest purchasing Hoffman",
+              "refs": []
+            },
+            {
+              "sentence": "Information was provided about Hoffman to Edwards for due diligence, under a non disclosure agreement, in order to progress the acquisition",
+              "refs": []
+            },
+            {
+              "sentence": "It included technical specifications for the pump agnostic vacuum system and Hoffman's cost structures",
+              "refs": []
+            },
+            {
+              "sentence": "The parties did not agree terms to purchase Hoffman and Edwards withdrew from the process",
+              "refs": []
+            },
+            {
+              "sentence": "A group of employees left Edwards to work for Hoffman and in 2020, Edwards sought an injunction against Hoffman to prevent misuse of the ex employees's trade secrets",
+              "refs": []
+            },
+            {
+              "sentence": "Hoffman counter claimed Edwards used the confidential due diligence information to pitch their products to Hoffman's key customer at prices just below Hoffman's own intended level, and to demand cost reductions from suppliers to match those obtained by Hoffman",
+              "refs": []
+            },
+            {
+              "sentence": "Hoffman alleged Edwards employed monopoly practices in breach of the Sherman Act because it had 70% share of the integrated vacuum pump frame systems market in the US and suppressed competition, imposing non-compete covenants on its suppliers and engaged in employee intimidation; customer threats, and bad faith litigation",
+              "refs": []
+            },
+            {
+              "sentence": "In May 2021, Edwards was granted a partial, interim injunction against Hoffman selling a bellows component",
+              "refs": []
+            },
+            {
+              "sentence": "Judgement declined to accept Edwards' application of Noerr\u2013Pennington doctrine to dismiss Hoffman's   anti competition counterclaim",
+              "refs": [
+                "https://ecf.ord.uscourts.gov/doc1/15118467227"
+              ]
+            },
+            {
+              "sentence": "In June 2022, the parties entered into a Confidential Settlement Agreement through which both parties' claims were dismissed with prejudice",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        }
+      ]
+    },
+    {
+      "section_title": "References",
+      "section_content": [],
+      "subsections": []
+    },
+    {
+      "section_title": "External links",
+      "section_content": [],
+      "subsections": []
+    }
+  ],
+  "references": {
+    "1": "[ERROR retrieving ref link]",
+    "2": "https://www.edwardsvacuum.com/en/about-us/history",
+    "3": "https://www.gracesguide.co.uk/Frederick_David_Edwards",
+    "4": "https://sec.report/Document/0001047469-13-007516/",
+    "5": "https://www.worldpumps.com/content/news/edwards-opens-vacuum-pump-plant-in-czech-republic/",
+    "6": "http://www.semiconductor-today.com/news_items/2018/sep/edwards_030918.shtml",
+    "7": "https://www.edwardsvacuum.com/en/our-products/uhv-pumps",
+    "8": "https://www.edwardsvacuum.com/en/our-products/diffusion-pumps",
+    "9": "https://www.edwardsvacuum.com/en/our-products/small-dry-pumps",
+    "10": "https://www.edwardsvacuum.com/en/our-products/industrial-dry-pumps",
+    "11": "https://www.edwardsvacuum.com/en/our-products/oil-sealed-pumps",
+    "12": "https://web.archive.org/web/20150327023710/http://www.atlascopco.com/us/news/corporatenews/140109_edwards.aspx",
+    "13": "https://find-and-update.company-information.service.gov.uk/company/06124750",
+    "14": "https://www.heraldscotland.com/business_hq/13118930.vacuum-pump-maker-edwards-snapped-1-billion-deal/",
+    "15": "https://www.businesswire.com/news/home/20110215006503/en/CEA-Leti-and-Edwards-Demonstrate-Energy-Saving-System-For-Subfab-Process-Support-Equipment",
+    "16": "https://www.theguardian.com/business/2011/apr/08/vacuum-maker-edwards-pulls-float",
+    "17": "https://drive.google.com/file/d/1ZBYS56kTP7f2ns9Uu5rdXjCjj0D0OlaC/view?usp=drivesdk",
+    "18": "https://collection.sciencemuseumgroup.org.uk/people/cp31571/edwards-high-vacuum-international",
+    "19": "https://find-and-update.company-information.service.gov.uk/company/00476995",
+    "20": "https://www.gracesguide.co.uk/Edwards_High_Vacuum",
+    "21": "http://news.bbc.co.uk/2/hi/uk_news/england/sussex/8458230.stm",
+    "22": "https://www.bailii.org/cgi-bin/format.cgi?doc=/uk/cases/DRS/2005/2829.html",
+    "23": "https://find-and-update.company-information.service.gov.uk/company/06124472",
+    "24": "https://www.edn.com/deals-bloom-in-capital-equipment/",
+    "25": "http://www.cccs.gov.sg/public-register-and-consultation/public-consultation-items/proposed-merger-between-air-liquide-electronics-us-lp-and-chemical-management-division-of-edwards-vacuum-inc",
+    "26": "https://zna3-group-prd-sitecorecontent-webapp01.azurewebsites.net/investors/regulatory-news/regulatory-news-item/?reqid=1146898",
+    "27": "https://www.chemeurope.com/en/news/8066/boc-to-acquire-turbomolecular-pump-business-from-seiko-instruments-inc.html",
+    "28": "https://investors.tranetechnologies.com/news-and-events/news-releases/news-release-details/2006/Ingersoll-Rand-Acquires-the-Global-Low-pressure-Air-Business-of-BOC-Edwards/default.aspx",
+    "29": "https://www.photonics.com/Articles/BOC_Edwards_Unit_Sold_to_Private_Equity_Firm/a28866",
+    "30": "[ERROR retrieving ref link]",
+    "31": "https://www.investegate.co.uk/boc-group-plc--boc-/prn/1st-quarter-results/20060208070357P7E3A/",
+    "32": "https://mobile.stevieawards.com/edwards-group-shows-why-working-vacuum-can-pay",
+    "33": "https://cms.law/en/deu/news-information/cms-advises-atlas-copco-on-acquisition-of-cryogenic-business-of-brooks-automation",
+    "34": "https://www.gasworld.com/story/edwards-vacuum-celebrates-100-years/",
+    "35": "https://www.gasworld.com/story/edwards-vacuum-breaks-ground-on-new-high-technology-innovation-centre-in-oregan/",
+    "36": "https://news.mit.edu/2019/mit-nano-announces-corporate-consortium-founding-members-0708",
+    "37": "https://www.rte.ie/news/business/2020/0922/1166669-edwards-to-create-120-dublin-jobs/",
+    "38": "https://www.bizjournals.com/phoenix/news/2022/03/03/semiconductor-supplier-to-open-manufacturing-facil.html",
+    "39": "https://www.edwardsvacuum.com/en/about-us/news-and-events/edwards-invests-in-new-arizona-facility-to-support-north-america-semiconductor-growth",
+    "40": "https://www.dailyfreeman.com/2022/07/19/saugerties-based-ceres-technologies-acquired-by-multinational-industrial-company/",
+    "41": "https://impeller.net/magazin/atlas-copco-to-acquire-a-chinese-manufacturer-of-industrial-vacuum-pumps-and-systems/",
+    "42": "https://www.history.com/news/who-invented-television",
+    "43": "https://www.sciencedirect.com/science/article/abs/pii/0042207X5990555X",
+    "44": "https://avs.scitation.org/doi/abs/10.1116/1.579038",
+    "45": "https://www.city.ac.uk/news-and-events/events/2021/06/44th-edwards-lecture-professor-dame-jocelyn-bell-burnell/_nocache",
+    "46": "https://casetext.com/case/edwards-vacuum-llc-v-hoffman-instrumentation-supply-inc-1/",
+    "47": "https://www.courtlistener.com/docket/18483773/edwards-vacuum-llc-v-hoffman-instrumentation-supply-inc/",
+    "48": "https://ecf.ord.uscourts.gov/doc1/15118467227",
+    "49": "https://www.leagle.com/decision/infdco20210511a64",
+    "50": "https://www.tradesecrettracker.com/2021/09/noerr-pennington-doctrine-does-not-shield-litigants-bringing-bad-faith-trade-secret-claims-from-antitrust-liability/",
+    "51": "https://ecf.ord.uscourts.gov/doc1/15118467227"
+  },
+  "spicy_entities": {
+    "edwards ltd": "ORG",
+    "british": "NORP",
+    "burgess hill": "LOC",
+    "uk": "GPE",
+    "the atlas copco group": "ORG",
+    "2014": "DATE",
+    "edwards": "ORG",
+    "1,700": "CARDINAL",
+    "cern": "GPE",
+    "the czech republic": "GPE",
+    "south korea": "GPE",
+    "usa": "GPE",
+    "china": "GPE",
+    "2012": "DATE",
+    "samsung": "ORG",
+    "hynix": "GPE",
+    "lg": "GPE",
+    "1919-1967": "DATE",
+    "1919": "DATE",
+    "frederick david edwards": "PERSON",
+    "william": "PERSON",
+    "camberwell": "GPE",
+    "london": "GPE",
+    "edwards equipment and services": "ORG",
+    "france": "GPE",
+    "germany": "GPE",
+    "world war ii": "EVENT",
+    "german": "NORP",
+    "1939": "DATE",
+    "w edwards": "ORG",
+    "co": "ORG",
+    "1940": "DATE",
+    "edwards high vacuum international ltd": "ORG",
+    "1950": "DATE",
+    "crawley": "GPE",
+    "1953": "DATE",
+    "italian": "NORP",
+    "alto vuoto spa": "PERSON",
+    "1954": "DATE",
+    "shoreham": "ORG",
+    "j h holmes and son ltd": "ORG",
+    "1958": "DATE",
+    "the 1960s": "DATE",
+    "1968-2006": "DATE",
+    "boc group's": "ORG",
+    "1968": "DATE",
+    "asia": "LOC",
+    "1984": "DATE",
+    "first": "ORDINAL",
+    "1992": "DATE",
+    "electrotech ltd's": "ORG",
+    "nailsea": "GPE",
+    "clevedon": "GPE",
+    "four years later in 1996": "DATE",
+    "1997": "DATE",
+    "the same year": "DATE",
+    "systems chemistry inc": "ORG",
+    "submicron systems corp of allentown": "ORG",
+    "allentown": "GPE",
+    "1999": "DATE",
+    "minneapolis": "GPE",
+    "fsi international inc": "ORG",
+    "us$38 million": "MONEY",
+    "hick hargreaves": "PERSON",
+    "wilhelm klein gmbh": "ORG",
+    "stokes": "ORG",
+    "hibon inc": "ORG",
+    "\u00a312.8 million": "MONEY",
+    "smiths group": "ORG",
+    "2002": "DATE",
+    "seiko industry's": "ORG",
+    "\u00a370 million": "MONEY",
+    "hicks hargreaves": "ORG",
+    "wilhelm klein": "PERSON",
+    "ingersoll rand": "ORG",
+    "2006": "DATE",
+    "linde": "ORG",
+    "ccmp capital": "ORG",
+    "2006-2014": "DATE",
+    "linde ag": "ORG",
+    "\u20ac12.4 billion": "MONEY",
+    "asian": "NORP",
+    "2007": "DATE",
+    "us$901 million": "MONEY",
+    "edwards group ltd": "ORG",
+    "edwards group plc": "ORG",
+    "cayman island": "GPE",
+    "nasdaq": "ORG",
+    "ads": "ORG",
+    "evac": "ORG",
+    "us$100 million": "MONEY",
+    "ipo": "ORG",
+    "atlas copco": "PERSON",
+    "\u00a31 billion": "MONEY",
+    "2011": "DATE",
+    "boc": "ORG",
+    "2005": "DATE",
+    "seventh": "ORDINAL",
+    "queen's award": "WORK_OF_ART",
+    "gamma vacuum": "PERSON",
+    "2013": "DATE",
+    "this day": "DATE",
+    "swedish": "NORP",
+    "edwards vacuum": "PERSON",
+    "brooks automation's": "ORG",
+    "cti-cryogenics": "ORG",
+    "polycold": "PERSON",
+    "chelmsford": "ORG",
+    "us$675 million": "MONEY",
+    "2018": "DATE",
+    "2019": "DATE",
+    "100th": "ORDINAL",
+    "north america semiconductor technology centre": "ORG",
+    "hillsboro": "GPE",
+    "mit.nano": "PERSON",
+    "214,000-square-foot": "QUANTITY",
+    "2020": "DATE",
+    "service technology centre": "ORG",
+    "dublin": "GPE",
+    "2022": "DATE",
+    "arizona": "GPE",
+    "ceres technologies, inc.. ceres": "ORG",
+    "us": "GPE",
+    "hhv pumps pvt ltd": "ORG",
+    "bengalaru": "GPE",
+    "india": "GPE",
+    "\u00a310.9 million": "MONEY",
+    "chinese": "NORP",
+    "shandong jinggong pump co ltd": "ORG",
+    "vacuum": "PERSON",
+    "the 1920s": "DATE",
+    "1930s": "DATE",
+    "its initial years": "DATE",
+    "leybold": "PERSON",
+    "penicillin": "GPE",
+    "night": "TIME",
+    "1950-60s": "DATE",
+    "the end of the 1950s": "DATE",
+    "the decades": "DATE",
+    "1970s": "DATE",
+    "ct": "ORG",
+    "pet": "ORG",
+    "the 1970s": "DATE",
+    "seiko seiki": "PERSON",
+    "the next couple of decades": "DATE",
+    "second": "ORDINAL",
+    "1980s": "DATE",
+    "the 1980s": "DATE",
+    "a few years later": "DATE",
+    "henry wycliffe": "PERSON",
+    "drystar": "ORG",
+    "1990s": "DATE",
+    "the united nations framework convention on climate change": "ORG",
+    "1994": "DATE",
+    "two years": "DATE",
+    "the 2000s": "DATE",
+    "the previous century": "DATE",
+    "the years": "DATE",
+    "cdte": "PERSON",
+    "cigs": "ORG",
+    "silicon thin film technology": "ORG",
+    "edwards cti-cryogenics": "PERSON",
+    "edwards polycold": "PERSON",
+    "cryogenic": "CARDINAL",
+    "edwards lecture series": "PERSON",
+    "city, university of london": "ORG",
+    "44th": "ORDINAL",
+    "2023": "DATE",
+    "city, university of london\u2019s": "ORG",
+    "the northampton institute": "ORG",
+    "past master of the worshipful company of scientific instrument makers": "WORK_OF_ART",
+    "five": "CARDINAL",
+    "nobel laureates": "GPE",
+    "denis gabor": "PERSON",
+    "harry kroto": "PERSON",
+    "peter mansfield": "PERSON",
+    "paul nurse": "PERSON",
+    "carlo rubbia": "PERSON",
+    "fellows of the royal society": "ORG",
+    "fellows of the royal academy of engineering": "ORG",
+    "nominet": "ORG",
+    "bocedwards.co.uk": "ORG",
+    "eaton engineering": "ORG",
+    "herts) ltd": "ORG",
+    "the boc group ltd": "ORG",
+    "hoffman instrumentation supply inc": "ORG",
+    "hoffman": "PERSON",
+    "one": "CARDINAL",
+    "the sherman act": "LAW",
+    "70%": "PERCENT",
+    "may 2021": "DATE",
+    "noerr": "ORG",
+    "pennington": "ORG",
+    "june 2022": "DATE",
+    "confidential settlement agreement": "ORG"
+  },
+  "flair_entities": [
+    "uk.major",
+    "nasdaq",
+    "wilhelm klein",
+    "chelmsford",
+    "burgess hill",
+    "agilent",
+    "edwards\u2019 henry wycliffe",
+    "smiths group",
+    "paul nurse",
+    "china",
+    "edwards group ltd",
+    "peter mansfield",
+    "eastbourne",
+    "hicks hargreaves",
+    "monterrey",
+    "edwards group",
+    "university of london",
+    "cern",
+    "denis gabor",
+    "vacuum  edwards ltd",
+    "alto vuoto spa",
+    "usa-based",
+    "minneapolis-based",
+    "hillsboro",
+    "swedish",
+    "france",
+    "world war ii",
+    "ct",
+    "ceres technologies, inc.",
+    "camberwell",
+    "frederick david edwards",
+    "large hadron collider",
+    "us-based",
+    "british",
+    "cdte",
+    "edwards'",
+    "edwards vacuum",
+    "nominet",
+    "ccmp capital",
+    "usa",
+    "royal academy of engineering.",
+    "hick hargreaves",
+    "clevedon",
+    "samsung",
+    "cti-cryogenics",
+    "linde ag",
+    "william",
+    "j h holmes",
+    "ltd",
+    "penicillin",
+    "mit.nano",
+    "germany",
+    "bocedwards.co.uk",
+    "asian",
+    "submicron systems corp",
+    "systems chemistry inc",
+    "city, university of london",
+    "edwards' us",
+    "uk",
+    "ceres",
+    "the northampton institute",
+    "royal society",
+    "asia",
+    "chinese",
+    "electrotech ltd",
+    "edwards lecture series  the edwards lecture series",
+    "the hibon",
+    "edwards cti-cryogenics",
+    "hibon inc",
+    "mri",
+    "atlas copco group",
+    "shandong jinggong pump co ltd",
+    "linde",
+    "noerr\u2013pennington",
+    "w edwards and co",
+    "boc",
+    "edwards' uk",
+    "drystar",
+    "history  independent",
+    "eaton engineering",
+    "czech republic",
+    "cayman island-based",
+    "harry kroto",
+    "brooks automation",
+    "polycold",
+    "hynix",
+    "cigs",
+    "nailsea",
+    "shoreham",
+    "bengalaru",
+    "edwards ltd",
+    "the boc group ltd",
+    "edwards equipment and services",
+    "north america semiconductor technology centre",
+    "india",
+    "ingersoll rand",
+    "wilhelm klein gmbh",
+    "ads",
+    "stokes",
+    "seiko industry",
+    "seiko seiki",
+    "south korea",
+    "edwards",
+    "nobel laureates",
+    "gamma vacuum",
+    "sherman act",
+    "allentown",
+    "carlo rubbia",
+    "london",
+    "dublin",
+    "hhv pumps pvt ltd",
+    "united nations framework convention on climate change",
+    "edwards polycold",
+    "german",
+    "city",
+    "evac",
+    "herts",
+    "edwards high vacuum international ltd",
+    "confidential settlement agreement",
+    "edwards vacuum llc",
+    "atlas copco",
+    "pet",
+    "arizona",
+    "fsi international inc",
+    "worshipful company of scientific instrument makers",
+    "boc edwards",
+    "leybold",
+    "lg",
+    "crawley",
+    "boc group",
+    "hoffman instrumentation supply inc",
+    "us",
+    "fd edwards",
+    "hoffman",
+    "queen's award",
+    "son ltd",
+    "italian"
+  ]
+}

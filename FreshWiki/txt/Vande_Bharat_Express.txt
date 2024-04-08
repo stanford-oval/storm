@@ -1,0 +1,126 @@
+Vande_Bharat_Express
+
+The  Vande Bharat Express is a medium-distance train service operated by Indian Railways. Similar to Shatabdi Express, these are day train services that connect Indian cities which are less than 10 hours apart. Vande Bharat trainsets can achieve semi-high speeds, but due to speed restrictions, multiple stoppages and traffic congestion, the maximum permissible speed of the services are limited to 160 km/h (99 mph) on a section of the Delhi-Bhopal service, and 110–130 km/h (68–81 mph) on other services.The trains have achieved 183 km/h during trials which is higher than the certified speed of 160 km/h. A notable feature of the train is its faster acceleration and deceleration, because of which it can go from 0 to 100 km/h in just 52 seconds during trial.The trainset, then known as Train 18, was designed by the RDSO and manufactured by the Integral Coach Factory (ICF). The specifications were also standardised by the RDSO. It was made for low-cost maintenance and operational optimisation. The cost of a 16-coach Vande Bharat train is about ₹115 crore (US$14 million).On 27 January 2019, the services using Train 18 sets were named Vande Bharat Express with the first service commencing on 15 February 2019.
+
+# Background
+
+## Efforts to increase speeds
+
+For most of Indian Railways' history, speed and comfort were not of primary concern as safety was of utmost importance. The replacement of old ICF coaches by the modern and safer LHB coaches helped in reducing rail accidents significantly. After tackling the safety concerns to an extent, speed and comfort were finally on the Indian Railways agenda [13]. Proposals were made to introduce semi-high-speed (160–200 km/h) services between major cities. In 2016, Gatimaan Express was inaugurated as the country's first semi-high-speed service [14]. The train ran on the newly upgraded Grade A line between Tughlakabad and Agra Cantonment that supported speeds up to 160 km/h. In June 2016, Indian Railways sought Requests For Qualification (RFQ) to jointly manufacture 5000 modern EMU sets and was met with a good response from countries like Canada, China, France, Germany, and Switzerland. Native companies like Medha and BHEL also made the cut. Spanish Talgo trains went as far as conducting a trial run on the Mumbai - Delhi route [16]. The train completed the journey in ten hours (almost six hours quicker than Rajdhani Express) with an average speed of 117.5 km/h but there were many problems related to rakes such as height, coupling, maintenance, problems related to cost-effectiveness and robustness related to harsh environment. However, the ministry said that Indian Railways could not come with a direct agreement and wanted them to go through a tendering process [17]. Since there was no other bidder, the procurement of these trains was deemed impossible. The Make in India campaign also fuelled the cause for developing the next generation EMU semi-high-speed trainsets indigenously. 
+
+## Making an indigenous trainset
+
+After foreign proposals for introducing semi-high-speed capable EMUs were unsuccessful, Indian Railways at ICF headed by general manager Sudhanshu Mani, started developing a new EMU trainset at half the imported cost. Since these trains were planned to be ready by 2018, they were named 'Train-2018' and later 'Train 18'. They were designed to be fully air-conditioned and equipped with automatic plug doors, onboard Wi-Fi, and infotainment out of many other modern facilities. With these modern facilities along with modern technical features, the train was one of its kind in the country and marked a leap into the future. With sixteen chair cars and a 160 km/h speed, the technology was set to replace Shatabdi services [19]. During its trial runs, Train 18 became the fastest EMU train in India after attaining a speed of 183 km/h. 
+
+## Inaugural run
+
+Train 18 was renamed as 'Vande Bharat' as an acknowledgement of the fact that it was completely built in India by Indian engineers and the services were thus named 'Vande Bharat Express'. On 15 February 2019, the first Vande Bharat Express between New Delhi and Varanasi was flagged off at the New Delhi railway station by Prime Minister Narendra Modi. The train ran from New Delhi to Varanasi via Kanpur and Prayagraj, connecting Uttar Pradesh's Varanasi to the capital city and reduced the existing travel time along the route by 15% [25] [26]. The 8-hour journey from New Delhi to Varanasi station covered a total distance of 762 km (473 mi) between the two cities [27]. However, while returning from Varanasi, the train broke down due to a cattle runover. According to reports, four cars of the train experienced an electrical outage and the brakes were reported to be jammed as the train was halted for over an hour at Tundla Junction railway station before resumption. Later in the year, the second Vande Bharat service was launched between New Delhi and Katra, it is one of the only two first version trainsets of Vande Bharat Express [28]. 
+
+## Replacement of Shatabdis
+
+Since the Vande Bharat Express was built to provide a short-distance, fast and modern service between major cities, similar to the Shatabdi Express which was introduced back in 1988 for similar purposes, several train sets were supposed to be built to replace the existing Shatabdis on all routes. But after the inauguration of first two services, the Indian Railways had stopped the production of new sets owing to internal issues. After the intervention of the Railway Minister, they decided to resume tenders for the production of new sets [30]. However, they wished to provide more time for the manufacturers to come up with the cheapest bid and the fact that the train would require a major upgrade from scratch, as per one of the officials. These second generation trainsets were developed in 2022 and they entered service on 30 September 2022 [31]. It is planned that all Shatabdi Express trains will be phased out and replaced with Vande Bharat trains. 
+
+# Facilities
+
+The train has two seating options, Chair Car and Executive Chair Car. The coaches are air-conditioned and feature airline-style seats in a 2-3 configuration. The service offers onboard catering with both vegetarian and non-vegetarian meal options included in the fare as standard.. The service also offers onboard Wi-Fi and an infotainment system, along with electric outlets and reading lights. The train has features such as automatic doors, smoke alarms, CCTV cameras, an odour control system, bio-vacuum toilets, and sensor-based water taps. Roller blinds are featured on all windows, and overhead racks provide storage for luggage. 
+
+# Ridership
+
+Northern Railway stated that the New Delhi-Varanasi Vande Bharat Express, which was launched in 2019, had a cumulative earning of ₹92 crore (US$12 million) with 100% occupancy after one year of service. According to Southern Railway authorities, more than 200% booking rate on the Thiruvananthapuram - Kasaragod Vande Bharat Express points to the wide acceptance of the train in Kerala [34]. The trip from Kasaragod to Thiruvananthapuram earned ₹ 1.17 crore. According to data shared by the Indian Railways, between 1 April 2022 and 8 February 2023, the Vande Bharat Express had an average occupancy of 99%. The Vande Bharat Express from Nagpur to Bilaspur had the lowest occupancy rate of 52.86%. In comparison, from 2019-2020, Rajdhani, Shatabdi and Duronto express trains had occupancy of 97.01% with Flexi Fare schemes [36]. CAG found faults in Railway's Flexi-fare scheme, hence it was scrapped in many premium trains [37]. Central Railways has earned ₹10.72 crore (US$1.3 million) from Vande Bharat trains operating from Mumbai to Solapur, Shirdi, Goa and one from Nagpur to Bilaspur in just 25 days from 15 August 2023 till 9 September 2023. CSMT-Solapur Vande Bharat with an occupancy of 93.71% made ₹1.71 crore (US$210,000) and Solapur-CSMT with occupancy of 105.09% made ₹1.97 crore (US$250,000). In May 2023, the 16-coach rake of Bilaspur–Nagpur Vande Bharat Express was swapped with the 8-coach rake of Secunderabad–Tirupati Vande Bharat Express because of low occupancy on the former route. Tejas Express rake was temporarily used on the former route. 
+
+# Speed Restrictions
+
+The maximum permissible speed of the train is 160 km/h (99 mph) and the Vande Bharat Express held a trial run with the train clocking a speed of 183 km/h (114 mph). But most of the Indian railway tracks are not capable of supporting this speed and so most Vande Bharat Express trains have a lower maximum permissible speed. According to maximum permissible speed, the Gatimaan Express and Rani Kamalapati (Habibganj)–Hazrat Nizamuddin Vande Bharat Express are the fastest trains in India as they pass through the Tughlakabad–Agra segment where their maximum permissible speed is 160 km/h.. 
+
+# Services
+
+## Vande Metro services
+
+"Vande Metro" is a proposed service that will operate on a short-distance, intercity rail network to connect major cities within a distance of around 100 km (62 mi). The design speed of Vande Metro will be 130 km/h (81 mph) and the train is likely to run at a very high frequency (4-5 times a day). Vande Metro will become a replacement for the existing MEMU services for regional rail connectivity between any two big cities, which are at a distance of 100–120 km (62–75 mi). 
+
+# External links
+
+Media related to Vande Bharat Express trains at Wikimedia Commons. 
+
+# References
+
+[43] [ERROR retrieving ref link]
+[44] [ERROR retrieving ref link]
+[1] https://rdso.indianrailways.gov.in/uploads/VBE_Trainset(V2)_Maintenance_Manual_Volume_II_Chapter1_Introduction_Draft(3).pdf
+[2] https://www.ndtv.com/india-news/train-18-indias-fastest-named-vande-bharat-express-piyush-goyal-1983965
+[3] https://www.timesnownews.com/business-economy/industry/bhopal-delhi-vande-bharat-express-top-speed-of-160-kmph-is-food-free-in-delhi-to-bhopal-semi-high-speed-train-know-time-route-ticket-price-article-99210203
+[4] https://www.dnaindia.com/india/report-delhi-jaipur-ajmer-vande-bharat-express-s-schedule-revealed-to-take-145-hours-at-150-kmph-3031905
+[5] https://www.ndtv.com/india-news/watch-new-vande-bharat-trains-stability-test-as-it-clocks-180-km-hr-3319998
+[6] https://static.pib.gov.in/WriteReadData/specificdocs/documents/2023/jan/doc2023116152601.pdf
+[7] https://economictimes.indiatimes.com/news/mumbai-news/vande-bharat-takes-around-5-hours-in-ahmedabad-mumbai-trial-run-breaks-bullet-train-record/articleshow/94127912.cms
+[8] https://www.hindustantimes.com/india-news/new-vande-bharat-breaks-bullet-train-record-at-100km-hr-speed-in-52-seconds-101662792490135.html
+[9] https://timesofindia.indiatimes.com/business/india-business/rdso-design-light-aluminum-coaches-of-train-18-which-can-cruise-at-200-kmph/articleshow/92405563.cms
+[10] https://rdso.indianrailways.gov.in/works/uploads/File/VANDE_BHARAT_Volume_2.pdf
+[11] https://www.financialexpress.com/infrastructure/railways/new-upgraded-ande-bharat-trains-to-cost-about-rs-115-crore-officials/2540671/
+[12] https://www.businesstoday.in/current/economy-politics/train-18-pm-modi-to-flag-off-vande-bharat-express-on-february-15-from-new-delhi/story/317978.html
+[13] https://www.deccanherald.com/content/415982/lhb-coaches-reduced-number-casualties.html
+[14] https://economictimes.indiatimes.com/industry/transportation/railways/rail-budget-2014-high-speed-trains-proposed-to-connect-major-cities/articleshow/38006664.cms
+[15] https://www.hindustantimes.com/india/prabhu-flags-off-gatimaan-10-key-points-about-india-s-fastest-train/story-WSmZmGiV58EU7heiryGtZO.html
+[16] https://www.thestatesman.com/business/indian-railways-to-invite-bids-for-manufacturing-modern-coaches-1493700790.html
+[17] https://economictimes.indiatimes.com/industry/transportation/railways/train-from-spain-government-considering-talgo-proposal-to-run-trial-runs-of-faster-trains-between-mumbai-delhi/articleshow/48195747.cms
+[18] https://www.indiatoday.in/mail-today/story/no-talgo-trains-government-tender-process-1120294-2018-01-02
+[19] https://www.financialexpress.com/india-news/indian-railways-to-roll-out-make-in-india-160-kmph-self-propelled-world-class-train-sets-at-half-the-cost-of-imports/558791/
+[20] https://www.financialexpress.com/photos/business-gallery/1112743/train-18-indian-railways-self-propelled-160kmph-speed-features-images-make-in-india/
+[21] https://www.india.com/news/india/indian-railways-to-replace-shatabdi-express-with-made-in-india-semi-high-speed-engine-less-train-18-2968511/
+[22] https://economictimes.indiatimes.com/news/new-updates/watch-vande-bharat-clocks-183-km-but-glass-filled-to-the-brim-with-water-stays-stable/articleshow/94026983.cms
+[23] https://www.youtube.com/watch?v=5W1oscdjJhc
+[24] https://economictimes.indiatimes.com/industry/transportation/railways/train-18-named-vande-bharat-express-piyush-goyal/articleshow/67709409.cms
+[25] https://www.hindustantimes.com/india-news/vande-bharat-express-flagged-off-how-to-book-fares-and-more/story-WJIT6vuRhVGZwf1jwdtnKJ.html
+[26] https://www.businesstoday.in/current/economy-politics/train-18-pm-modi-to-flag-off-vande-bharat-express-on-february-15-from-new-delhi/story/317978.html
+[27] https://indianexpress.com/article/india/train-18-indias-first-engine-less-train-set-to-hit-tracks-on-october-29-5415892/
+[28] https://www.indiatoday.in/india/story/a-day-after-launch-vande-bharat-express-breaks-down-while-returning-from-varanasi-1457476-2019-02-16
+[29] https://economictimes.indiatimes.com/industry/transportation/railways/vande-bharat-express-reach-katra-in-8-hours-from-delhi/amit-shah-flags-off-vande-bharat-express/slideshow/71418210.cms
+[30] https://www.ndtv.com/india-news/railways-introduces-fresh-tender-system-for-vande-bharat-express-after-favouritism-charges-2070639
+[31] https://www.hindustantimes.com/india-news/40-new-vande-bharat-express-trains-by-2022/story-jOMnZOLenfRUpZeajC3D7O.html
+[32] https://www.businesstoday.in/latest/economy/story/vande-bharat-express-20-pm-modi-flags-off-new-train-between-gandhinagar-and-mumbai-348690-2022-09-30
+[33] https://pib.gov.in/PressReleaseIframePage.aspx?PRID=1945080
+[34] https://www.livemint.com/news/india/vande-bharat-express-completes-1-year-earns-rs-92-crore-for-railways-11582054801643.html
+[35] https://www.onmanorama.com/travel/travel-news/2023/05/05/vande-bharat-express-ticket-revenue-kerala.html
+[36] https://www.deccanherald.com/national/vande-bharat-running-at-an-average-capacity-of-99-1190295.html
+[37] https://www.indiatvnews.com/news/india-flexi-fare-trains-railway-minister-rajdhani-shatabdi-duronto-537745
+[38] https://www.businesstoday.in/latest/economy-politics/story/cag-finds-faults-indian-railways-flexi-fare-scheme-flights-108278-2018-07-21
+[39] https://indianexpress.com/article/cities/mumbai/vande-bharat-trains-earn-cr-rs-10-72-crore-in-25-days-8932708/
+[40] https://www.financialexpress.com/business/railways-indian-railways-temporarily-replaces-nagpur-bilaspur-vande-bharat-express-train-with-tejas-rake-details-inside-3089134/
+[41] https://thelivenagpur.com/2023/04/08/mini-vande-bharat-trains-may-be-introduced-on-nagpur-bilaspur-route/
+[42] https://www.businessworld.in/article/Tejas-Express-Replaces-Bilaspur-Nagpur-Vande-Bharat-Express-Due-To-Poor-Passenger-Response/16-05-2023-476820/
+[45] https://timesofindia.indiatimes.com/city/bengaluru/vande-bharat-train-reaches-16-minutes-early-activists-bat-for-more-speed/articleshow/95366214.cms
+[46] https://zeenews.india.com/railways/vande-bharat-express-from-fastest-to-slowest-semi-high-speed-trains-in-india-full-list-here-2535748.html
+[47] https://indianexpress.com/article/cities/ahmedabad/pm-narendra-modi-to-flag-off-gandhinagar-mumbai-vande-bharat-express-train-on-september-30-8148418/
+[48] https://www.thehindu.com/news/national/karnataka/speed-of-vande-bharat-will-be-increased-say-railway-officials/article66129637.ece
+[49] https://www.hindustantimes.com/india-news/6th-vande-bharat-train-to-be-inaugurated-on-december-11-101670177073449.html
+[50] https://www.bhaskar.com/local/chhattisgarh/raipur/news/tejas-closed-in-3-days-vande-bharat-on-track-again-from-today-now-only-8-coaches-instead-of-16-131291506.html
+[51] https://indianexpress.com/article/cities/mumbai/cr-strengthening-tracks-to-increase-speed-of-vande-bharat-trains-8450109/
+[52] https://www.india.com/business/csmt-shirdi-vande-bharat-express-train-speed-set-to-increase-to-130-kmph-to-reduce-travel-time-by-30-mins-6269389/
+[53] https://news24online.com/business/vande-bharat-express-now-travel-from-bhopal-to-delhi-in-just-eight-hours-psg/115007/
+[54] https://www.zeebiz.com/indian-railways/news-vande-bharat-express-speed-lower-semi-high-rti-reveals-indian-railways-mumbai-delhi-varanasi-230998
+[55] https://timesofindia.indiatimes.com/city/lucknow/from-april-1-vande-bharat-express-to-connect-bhopal-with-delhi-via-agra/articleshow/99037878.cms
+[56] https://economictimes.indiatimes.com/industry/transportation/railways/secunderabad-tirupati-vande-bharat-express-to-get-faster-have-additional-coaches-check-revised-timings/articleshow/100266941.cms
+[57] https://timesofindia.indiatimes.com/city/amaravati/tirupati-secunderabad-vande-bharat-express-train-likely-to-hit-tracks-from-april-8/articleshow/98997965.cms
+[58] https://tamil.abplive.com/news/coimbatore/chennai-to-coimbatore-vande-bharat-express-pm-modi-will-flag-off-chennai-kovai-vande-bharat-train-on-april-8-107742
+[59] https://www.indiatoday.in/information/story/delhi-jaipur-ajmer-vande-bharat-express-know-the-routes-distance-toll-charges-and-timings-2350984-2023-03-25
+[60] https://www.dnaindia.com/india/report-delhi-jaipur-ajmer-vande-bharat-express-s-schedule-revealed-to-take-145-hours-at-150-kmph-3031905
+[61] https://www.abplive.com/states/rajasthan/railway-minister-ashwini-vaishnaw-announce-new-vande-bharat-train-will-run-from-ajmer-instead-of-jaipur-ann-2363246
+[62] https://www.ndtv.com/india-news/pm-modi-flags-off-vande-bharat-express-in-kerala-the-states-first-3976878
+[63] https://www.zeebiz.com/indian-railways/news-howrah-puri-vande-bharat-express-check-launch-date-route-train-schedule-timing-ticket-price-stoppage-stations-complete-list-odishas-first-vande-bharat-train-234397
+[64] https://www.indiatoday.in/india/story/pm-modi-inaugurate-delhi-dehradun-vande-bharat-check-timings-stoppages-ticket-price-2383965-2023-05-25
+[65] https://indiarailinfo.com/train/198521
+[66] https://www.indiatoday.in/india/story/vande-bharat-express-narendra-modi-launch-assam-northeast-bengal-2384641-2023-05-26
+[67] https://indianexpress.com/article/cities/mumbai/mumbai-goa-vande-bharat-train-to-be-inaugurated-on-june-3-8638786/
+[68] https://www.mid-day.com/mumbai/mumbai-news/article/mumbai-goa-vande-bharat-express-speed-likely-to-be-restricted-23289787
+[69] https://www.ndtv.com/india-news/pm-modi-in-madhya-pradesh-eye-on-madhya-pradesh-polls-pm-flags-off-5-vande-bharat-trains-in-bhopal-4155765
+[70] https://timesofindia.indiatimes.com/city/mumbai/mumbai-goa-vande-bharat-express-to-operate-thrice-a-week/articleshow/101249067.cms
+[71] https://www.timesnownews.com/bengaluru/bengaluru-dharwad-vande-bharat-timings-to-change-starting-october-7-details-article-104233045
+[72] https://www.news9live.com/utility/jodhpur-ahmedabad-sabarmati-vande-bharat-express-to-hit-tracks-on-july-7-check-details-here-2204196
+[73] https://www.news18.com/auto/vande-bharat-express-lucknow-to-gorakhpur-via-ayodhya-in-under-4-hours-check-details-8252527.html
+[74] https://www.news18.com/india/vande-bharat-gorakhpur-lucknow-trial-run-begins-connect-ayodhya-8227003.html
+[75] https://timesofindia.indiatimes.com/business/india-business/pm-modi-9-new-vande-bharat-express-trains-flag-off-routes-timetable-stoppages-full-details-indian-railways-orange-vande-bharat/articleshow/103903169.cms
+[76] https://www.news9live.com/state/tamil-nadu/chennai-tirunelveli-vande-bharat-express-likely-to-be-inaugurated-by-pm-modi-on-august-6-2232110
+[77] https://www.indiatvnews.com/tamil-nadu/chennai-chennai-tirunelveli-vande-bharat-express-pm-modi-likely-to-flag-off-on-august-6-tamil-nadu-2023-07-31-884047
+[78] https://www.dnpindia.in/states/ranchi-news-vande-bharat-express-to-howrah-all-set-to-roll-out-on-september-24-route-and-schedule-inside/306758/
+[79] https://www.hindustantimes.com/india-news/vande-metro-to-be-rolled-out-by-december-2023-check-features-other-details-101681475678629.html
+[80] https://metrorailtoday.com/article/vande-metro-know-all-about-indias-fastest-and-next-generation-intercity-train

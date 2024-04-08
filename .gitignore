@@ -1,0 +1,25 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# mac
+.DS_Store
+
+# Other
+.vscode
+*.tsv
+*.pt
+gpt*.txt
+*.env
+local/
+local_*
+build/
+*.egg-info/
+.idea
+
+# Project-specific
+secrets.toml
+*.log
+*/assertion.log
+*results/

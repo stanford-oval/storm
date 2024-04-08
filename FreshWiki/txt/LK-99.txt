@@ -1,0 +1,152 @@
+LK-99
+
+LK-99 (from the Lee-Kim 1999 research) is a gray–black, polycrystalline compound, identified as a copper-doped lead‒oxyapatite. A team from Korea University led by Lee Sukbae (이석배) and Kim Ji-Hoon (김지훈) began studying this material as a potential superconductor starting in 1999.: 1  In July 2023, they published preprints claiming that it acts as a room-temperature superconductor: 8  at temperatures of up to 400 K (127 °C; 260 °F) at ambient pressure.: 1 Many different researchers have attempted to replicate the work, and were able to reach initial results within weeks, as the process of producing the material is relatively straightforward. By mid-August 2023, the consensus was that LK-99 is not a superconductor at any temperature, and is an insulator in pure form.As of October 1, no replications have gone through the peer review process of a journal, but some have been reviewed by a materials science lab. A number of replication attempts identified non-superconducting ferromagnetic and diamagnetic causes for observations that suggested superconductivity. A prominent cause was a copper sulfide impurity occurring during the proposed synthesis, which can produce resistance drops, lambda transition in heat capacity, and magnetic response in small samples.After the initial preprints were published, Lee claimed they were incomplete, and coauthor Kim Hyun-Tak (김현탁) said one of the papers contained flaws.
+
+# Chemical properties and structure
+
+The chemical composition of LK-99 is approximately Pb9Cu(PO4)6O, in which— compared to pure lead-apatite (Pb10(PO4)6O) : 5 — approximately one quarter of Pb(II) ions in position 2 of the apatite structure are replaced by Cu(II) ions [18]. : 9 [3]. The structure is similar to that of apatite, space group P63/m (No. 176).. 
+
+## Synthesis
+
+Lee et al. provide a method for chemical synthesis of LK-99 : 2  in three steps [18]. First they produce lanarkite from a 1:1 molar mixing of lead(II) oxide (PbO) and lead(II) sulfate (Pb(SO4)) powders, and heating at 725 °C (1,000 K; 1,340 °F) for 24 hours:. Then, copper(I) phosphide (Cu3P) is produced by mixing copper (Cu) and phosphorus (P) powders in a 3:1 molar ratio in a sealed tube under a vacuum and heated to 550 °C (820 K; 1,000 °F) for 48 hours: : 3 [18]. Then, lanarkite and copper phosphide crystals are ground into a powder, placed in a sealed tube under a vacuum, and heated to 925 °C (1,200 K; 1,700 °F) for between 5‒20 hours: : 3 [18]. There were a number of problems with the above synthesis from the initial paper. The reaction is not balanced, and others reported the presence of copper(I) sulfide (Cu2S) as well. For x=1{\displaystyle x=1} a balanced reaction might be: [19] [71]. Many syntheses produced fragmentary results in different phases, where some of the resulting fragments were responsive to magnetic fields, other fragments were not. The first synthesis to produce pure crystals found them to be diamagnetic insulators [21]. 
+
+# Physical properties
+
+Some small LK-99 samples were reported to show strong diamagnetic properties, including a response confusingly  referred to as "partial levitation" over a magnet [23]. This was misinterpreted by some as a sign of superconductivity, although it is a sign of regular diamagnetism or ferromagnetism [18]. While initial preprints claimed the material was a room-temperature superconductor, : 1  they did not report observing any definitive features of superconductivity, such as zero resistance, the Meissner effect, flux pinning, AC magnetic susceptibility, the Josephson effect, a temperature-dependent critical field and current, or a sudden jump in specific heat around the critical temperature [18]. As it is common for a new material to spuriously seem like a potential candidate for high-temperature superconductivity,  thorough experimental reports normally demonstrate a number of these expected properties [13]. As of 15 October 2023, [update] not one of these properties had been observed by the original experiment or any replications. 
+
+## Proposed mechanism for superconductivity
+
+Partial replacement of Pb2+ ions with smaller Cu2+ ions is said to cause a 0.48% reduction in volume, creating internal stress in the material, : 8  causing a heterojunction quantum well between the Pb(1) and oxygen within the phosphate ( [PO4]3−) [3]. This quantum well was proposed to be superconducting : 10 , based on a 2021 paper  by Kim Hyun-Tak describing a novel and complicated theory combining ideas from a classical theory of metal-insulator transitions,  the standard Bardeen–Cooper–Schrieffer theory, and the theory of hole superconductivity  by J.E.Hirsch. [3] [26] [27] [28]. 
+
+### Response
+
+Materials scientists and superconductor researchers responded with skepticism. The highest-temperature superconductors known at the time of publication had a critical temperature of 250 K (−23 °C; −10 °F) at pressures of over 170 gigapascals (1,680,000 atm; 24,700,000 psi) [17] [46]. The highest-temperature superconductors at atmospheric pressure (1 atm) had a critical temperature of at most 150 K (−123 °C; −190 °F).. On 2 August 2023, the The Korean Society of Superconductivity and Cryogenics established a verification committee as a response to the controversy and unverified claims of LK-99, in order to arrive at conclusions over these claims. The verification committee is headed by Kim Chang-Young of Seoul National University and consists of members of the university, Sungkyunkwan University and Pohang University of Science and Technology. Upon formation, the verification committee did not agree that the two 22 July arXiv papers by Lee et al. or the publicly available videos at the time supported the claim of LK-99 being a superconductor. As of 15 August 2023, [update] the measured properties do not prove that LK-99 is a superconductor. The published material does not explain how the LK-99's magnetisation can change, demonstrate its specific heat capacity, or demonstrate it crossing its transition temperature. A more likely explanation for LK-99's magnetic response is a mix of ferromagnetism and non-superconductive diamagnetism [17]. A number of studies found that copper(I) sulfide contamination common to the synthesis process could closely replicate the observations that inspired the initial preprints [40] [15] [48]. 
+
+# Compound name
+
+The name LK-99 comes from the initials of discoverers Lee and Kim, and the year of discovery (1999). The pair had worked with Tong-Seek Chair (최동식) at Korea University in the 1990s [2]. In 2008, they founded the Quantum Energy Research Centre (퀀텀 에너지연구소; also known as Q-Centre) with other researchers from Korea University. Lee would later become CEO of Q-Centre, and Kim would become director of research and development. [16]. 
+
+# Publication history
+
+Lee has stated that in 2020, an initial paper was submitted to Nature, but was rejected. Similarly-presented research on room-temperature superconductors (but a completely different chemical system) by Ranga P [34]. Dias had been published in Nature earlier that year, and received with skepticism—Dias's paper would subsequently be retracted in 2022 after its data was questioned as having been falsified. In 2020, Lee and Kim Ji-Hoon filed a patent application. A second patent application (additionally listing Young-Wan Kwon), was filed in 2021, which was published on 3 March 2023 [36]. A World Intellectual Property Organization (WIPO) patent was also published on 2 March 2023 [37]. On 4 April 2023, a Korean trademark application for "LK-99" was filed by the Q-Centre [38]. 
+
+## Scholarly articles and preprints
+
+A series of academic publications summarizing initial findings came out in 2023, with a total of seven authors across four publications.. On 31 March 2023, a Korean-language paper, "Consideration for the development of room-temperature ambient-pressure superconductor (LK-99)", was submitted to the Korean Journal of Crystal Growth and Crystal Technology. It was accepted on 18 April, but was not widely read until three months later. [4]. On 22 July 2023, two preprints appeared on arXiv. The first was submitted by Young-Wan Kwon, and listed Kwon, former Q-Centre CTO, as third author. The second preprint was submitted only 2 hours later by Kim Hyun-Tak, former principal researcher at the Electronics & Telecommunications Research Institute and professor at the College of William & Mary, listing himself as third author, as well as three new authors [3]. On 23 July, the findings were also submitted by Lee to APL Materials for peer review. On 3 August 2023, a newly-formed Korean LK-99 Verification Committee requested a high-quality sample from the original research team [34] [16]. The team responded that they would only provide the sample once the review process of their APL paper was completed, expected to take several weeks or months. On 31 July 2023, a group led by Kapil Kumar published a preprint on arXiv documenting their replication attempts, which confirmed the structure using X-ray crystallography (XRD) but failed to find strong diamagnetism. On 16 August 2023, Nature published an article declaring that LK-99 had been demonstrated to not be a superconductor, but rather an insulator. It cited statements by an condensed matter experimentalist at the University of California, Davis, and several studies previewed in August 2023. 
+
+### Other discussion by authors
+
+On 26 July 2023, Kim Hyun-Tak stated in an interview with the New Scientist that the first paper submitted by Kwon contained "many defects" and was submitted without his permission. On 28 July 2023, Kwon presented the findings at a symposium held at Korea University. That same day, Yonhap News Agency published an article quoting an official from Korea University as saying that Kwon was no longer in contact with the University [42] [43] [44]. The article also quoted Lee saying that Kwon had left the Q-Centre Research Institute four months previously [16]. On the same day, Kim Hyun-Tak provided The New York Times with a new video presumably showing a sample displaying strong signs of diamagnetism. The video appears to show a sample different to the one in the original preprint [2]. On 4 August 2023, he informed SBS News that high-quality LK-99 samples may exhibit diamagnetism over 5,000 times greater than graphite, which he claimed would be inexplicable unless the substance is a superconductor. 
+
+# Response
+
+Materials scientists and superconductor researchers responded with skepticism. The highest-temperature superconductors known at the time of publication had a critical temperature of 250 K (−23 °C; −10 °F) at pressures of over 170 gigapascals (1,680,000 atm; 24,700,000 psi) [17] [46]. The highest-temperature superconductors at atmospheric pressure (1 atm) had a critical temperature of at most 150 K (−123 °C; −190 °F).. On 2 August 2023, the The Korean Society of Superconductivity and Cryogenics established a verification committee as a response to the controversy and unverified claims of LK-99, in order to arrive at conclusions over these claims. The verification committee is headed by Kim Chang-Young of Seoul National University and consists of members of the university, Sungkyunkwan University and Pohang University of Science and Technology. Upon formation, the verification committee did not agree that the two 22 July arXiv papers by Lee et al. or the publicly available videos at the time supported the claim of LK-99 being a superconductor. As of 15 August 2023, [update] the measured properties do not prove that LK-99 is a superconductor. The published material does not explain how the LK-99's magnetisation can change, demonstrate its specific heat capacity, or demonstrate it crossing its transition temperature. A more likely explanation for LK-99's magnetic response is a mix of ferromagnetism and non-superconductive diamagnetism [17]. A number of studies found that copper(I) sulfide contamination common to the synthesis process could closely replicate the observations that inspired the initial preprints [40] [15] [48]. 
+
+## Public response
+
+The claims in the 22 July papers by Lee et al. went viral on social media platforms the following week. The viral nature of the claim resulted in posts from users using pseudonyms from Russia and China claiming to have replicated LK-99 on both Twitter and Zhihu [5] [49]. Other viral videos described themselves as having replicated samples of LK-99 "partially levitating", most of which were found to be fake [50]. Scientists interviewed by the press remained skeptical,   because of the quality of both the original preprints, the lack of purity in the sample they reported, and the legitimacy of the claim after the failure of previous claims of room temperature superconductivity did not show legitimacy (such as the Ranga Dias affair) [51] [52]. The Korean Society of Superconductivity and Cryogenics expressed concern on the social and economic impacts of the preliminary and unverified LK-99 research [40]. A video from Huazhong University of Science and Technology uploaded on 1 August 2023 by a postdoctoral researcher on the team of Chang Haixin,  apparently showed a micrometre-sized sample of LK-99 partially levitating [40]. This went viral on Chinese social media, becoming the most viewed video on Bilibili by the next day,   and a prediction market briefly put the chance of successful replication at 60% [54] [40]. A researcher from the Chinese Academy of Sciences refused to comment on the video for the press, dismissing the claim as "ridiculous" [55]. In early August, people began to create memes about "floating rocks",  and there was a brief surge in Korean and Chinese technology stocks,    despite warnings from the Korean stock exchange against speculative bets in light of the excitement around LK-99,  which eventually fell on August 8 [56] [57] [58] [59] [53]. Following the publication of the Nature article on August 16 that proclaimed LK-99 is not a superconductor,  South Korean superconductor stocks fell further, as the interest about LK-99 from investors in previous weeks disappeared [60] [1]. 
+
+# Replication attempts
+
+After the July 2023 publication's release, independent groups reported that they had begun attempting to reproduce the synthesis, with initial results expected within weeks. As of 15 August 2023, [update] no replication attempts had yet been peer-reviewed by a journal. Of the non-peer-reviewed attempts, over 15 notable labs have published results that failed to observe any superconductivity, and a few have observed magnetic response in small fragments that could be explained by normal diamagnetism or ferromagnetism. Some demonstrated and replicated alternate causes of the observations in the original papers: Copper-deficient copper (I) sulfide  has a known phase transition at 377 K (104 °C; 219 °F) from a low-temperature phase to a high-temperature superionic phase, with a sharp rise in resistivity   and a λ-like-feature in the heat capacity [9] [10] [9]. Furthermore, Cu2S is diamagnetic [9]. Only one attempt observed any sign of superconductivity: Southeast University claimed to measure very low resistance in a flake of LK-99, in one of four synthesis attempts, below a temperature of 110 K (−163 °C; −262 °F). Doubts were expressed by experts in the field, as they saw no dropoff to zero resistance, and used crude instruments that could not measure resistance below 10 μΩ (too high to distinguish superconductivity from less exotic low-temperature conductivity), and had large measurement artifacts [2] [62]. Some replication efforts gained global visibility, with the aid of online replication trackers that catalogued new announcements and status updates. 
+
+## Experimental studies
+
+Selected experimental studies.. Results Key:  Success  Partial success  Partial failure  Failure. 
+
+## Theoretical studies
+
+In the initial papers, the theoretical explanations for potential mechanisms of superconductivity in LK-99 were incomplete. Later analyses by other labs added simulations and theoretical evaluations of the material's electronic properties from first principles.. Selected theoretical studies:. 
+
+# References
+
+[84] [ERROR retrieving ref link]
+[1] https://www.nature.com/articles/d41586-023-02585-7
+[2] https://www.nytimes.com/2023/08/03/science/lk-99-superconductor-ambient.html
+[3] https://arxiv.org/abs/2307.12008
+[4] http://journal.kci.go.kr/jkcgct/archive/articleView?artiId=ART002955269
+[5] https://www.scientificamerican.com/article/viral-new-superconductivity-claims-leave-many-scientists-skeptical/
+[6] https://www.washingtonpost.com/science/2023/08/09/room-temperature-superconductor-lk99-evidence/
+[7] https://www.theregister.com/2023/08/09/lk99_more_physicists_fail_reproduce/
+[8] https://www.newscientist.com/article/2386866-lk-99-mounting-evidence-suggests-material-is-not-a-superconductor/
+[9] https://arxiv.org/abs/2308.05222v1
+[10] https://arxiv.org/abs/2308.04353
+[11] https://arxiv.org/abs/2308.03110
+[12] https://twitter.com/andrewmccalip/status/1689476909208600576
+[13] https://twitter.com/MichaelSFuhrer/status/1686644235414720512
+[14] https://arxiv.org/abs/2308.05001
+[15] https://www.popularmechanics.com/science/green-tech/a44764458/lk-99-not-a-superconductor/
+[16] https://www.yna.co.kr/view/AKR20230728146700017
+[17] https://www.newscientist.com/article/2384782-room-temperature-superconductor-breakthrough-met-with-scepticism/
+[18] https://arxiv.org/abs/2307.12037
+[19] https://arxiv.org/abs/2307.16402
+[20] https://arxiv.org/abs/2308.03544
+[21] https://arxiv.org/abs/2308.01723
+[22] https://arxiv.org/abs/2308.06256
+[23] https://arxiv.org/abs/2308.11542
+[24] https://twitter.com/MichaelSFuhrer/status/1686644237742526464
+[25] https://www.science.org/content/blog-post/room-temperature-superconductor-new-developments
+[26] https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8121790
+[27] https://link.aps.org/doi/10.1103/PhysRevB.2.4302
+[28] https://dx.doi.org/10.1016/0375-9601%2889%2990370-8
+[29] https://arxiv.org/abs/2307.16892
+[30] https://arxiv.org/abs/2308.00676
+[31] https://arxiv.org/abs/2308.01516
+[32] https://archive.today/2023.07.26-181113/https://www.newscientist.com/article/2384782-room-temperature-superconductor-breakthrough-met-with-scepticism/#selection-689.37-689.118
+[33] https://www.bilibili.com/video/BV13k4y1G7i1/
+[34] https://n.news.naver.com/article/366/0000920152
+[35] https://www.nature.com/articles/d41586-023-02401-2
+[36] https://worldwide.espacenet.com/textdoc?DB=EPODOC&IDX=KR102404607
+[37] https://worldwide.espacenet.com/textdoc?DB=EPODOC&IDX=WO2023027536
+[38] https://patents.google.com/patent/WO2023027537A1/en
+[39] http://engdtj.kipris.or.kr/engdtj/grrt1000a.do?method=biblioTMFrame&masterKey=4020230059989&index=0&kindOfReq=A&valid_fg=
+[40] https://time.com/6301391/experts-skeptical-about-ambient-superconductor/
+[41] https://m.yna.co.kr/view/AKR20230803120200017
+[42] https://www.mml2023.org/
+[43] https://twitter.com/TeraTom_S/status/1684808086547238912
+[44] https://twitter.com/KennethBodin/status/1684831376850157568
+[45] https://mnews.sbs.co.kr/news/endPage.do?newsId=N1007295801&plink=SEARCH&cooper=SBSNEWSSEARCH
+[46] https://www.nature.com/articles/d41586-023-02481-0
+[47] https://www.kedglobal.com/tech,-media-telecom/newsView/ked202308020020
+[48] https://inews.co.uk/news/science/room-temperature-superconductors-latest-breakthrough-nonsense-2506774
+[49] https://www.wired.com/story/inside-the-diy-race-to-replicate-lk-99/
+[50] https://www.vice.com/en/article/5d9yez/diy-scientists-and-institutions-are-racing-to-replicate-the-room-temperature-superconductor
+[51] https://www.independent.co.uk/tech/superconductor-breakthrough-electricity-power-paper-b2382711.html
+[52] https://www.vice.com/en/article/bvj7pm/viral-room-temperature-superconductor-study-lk-99
+[53] https://www.taipeitimes.com/News/biz/archives/2023/08/04/2003804195
+[54] https://www.scmp.com/news/china/science/article/3229778/could-chinese-teams-viral-lk-99-video-offer-clue-superconductor-holy-grail-physicists
+[55] https://www.independent.co.uk/tech/superconductor-lk-99-material-room-temperature-ambient-b2385781.html
+[56] https://web.archive.org/web/20230802181810/https://www.cnet.com/tech/computing/lk-99-superconductor-maybe-a-breakthrough-maybe-not-so-much/
+[57] https://web.archive.org/web/20230802200014/https://www.bloomberg.com/news/articles/2023-08-02/superconductor-breakthrough-buzz-spurs-china-korea-tech-rally
+[58] https://www.washingtonpost.com/business/energy/2023/08/02/lk-99-and-the-desperation-for-scientific-discovery/74c4f774-317a-11ee-85dd-5c3c97d6acda_story.html
+[59] https://www.reuters.com/technology/superconductor-claims-spark-investor-frenzy-scientists-are-skeptical-2023-08-03/
+[60] https://www.bloomberg.com/news/articles/2023-08-09/superconductor-stocks-drop-in-korea-amid-doubts-on-breakthrough
+[61] https://www.kedglobal.com/tech,-media-telecom/newsView/ked202308170016
+[62] https://targum.video/embed/388e770217a654ba9175b391eedd7802
+[63] https://twitter.com/condensed_the/status/1686895266329174016
+[64] https://arxiv.org/abs/2308.06256
+[65] https://www.forbes.com/sites/alexknapp/2023/08/18/the-rise-and-fall-of-the-would-be-superconductor-that-transfixed-the-internet
+[66] https://www.bilibili.com/video/BV14p4y1V7kS/
+[67] https://arxiv.org/abs/2307.16802
+[68] https://www.thedailybeast.com/why-the-room-temperature-lk-99-superconductor-might-be-total-bs
+[69] https://arxiv.org/abs/2308.01192
+[70] https://arxiv.org/abs/2308.05778
+[71] https://arxiv.org/abs/2308.03110
+[72] https://drive.google.com/file/d/1ekD2KVV_SUid2wH__o1ODS3hTl1GUFb5/view?usp=embed_facebook
+[73] https://arxiv.org/abs/2308.03823
+[74] https://www.facebook.com/100008122782686/videos/661722942350287
+[75] https://www.nplindia.org/index.php/peoplecsir-npl/
+[76] https://www.journals.elsevier.com/superconductivity/editorial-board/dr-vps-awana-phd
+[77] https://twitter.com/andrewmccalip/status/1687405505604734978
+[78] https://twitter.com/andrewmccalip/status/1688082372250755072
+[79] https://twitter.com/andrewmccalip/status/1685871360948748288
+[80] https://www.science.org/content/article/spectacular-superconductor-claim-making-news-here-s-why-experts-are-doubtful
+[81] https://arxiv.org/abs/2307.16040
+[82] https://beijingtimes.com/china/2023/08/01/breakthrough-in-superconductivity-huazhong-university-scientists-report-first-successful-replication-of-lk-99/
+[83] https://arxiv.org/abs/2308.00698
+[85] https://twitter.com/sineatrix/status/1686659102674751488
+[86] https://twitter.com/condensed_the/status/1686373899662213123
+[87] https://arxiv.org/abs/2308.01135
+[88] https://arxiv.org/abs/2308.07295
+[89] https://twitter.com/AlexandruBG/status/1689735667041861633
+[90] https://twitter.com/AlexandruBG/status/1691876959737762172

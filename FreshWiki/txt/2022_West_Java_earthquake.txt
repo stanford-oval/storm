@@ -1,0 +1,207 @@
+2022_West_Java_earthquake
+
+On 21 November 2022, at 13:21 WIB (UTC+07:00), a Mww 5.6 earthquake struck near Cianjur in West Java, Indonesia. The strike-slip earthquake occurred with a focal depth of 11 km (6.8 mi). Between 335 and 635 people died, 7,729 were injured and five remain missing. More than 62,628 homes were damaged across 16 districts in Cianjur Regency and the surrounding region. It is the deadliest earthquake to hit Indonesia since the 2018 Sulawesi earthquake. Damage evaluated after the event earned it a maximum Modified Mercalli intensity of VIII (Severe).
+
+# Tectonic setting
+
+Java lies near an active convergent boundary that separates the Sunda Plate to the north and the Australian Plate to the south. At the boundary, marked by the Sunda Trench, the northward-moving Australian Plate subducts beneath the Sunda Plate. The subduction zone is capable of generating earthquakes of up to magnitude 8.7, while the Australian Plate may also host deeper earthquakes within the downgoing lithosphere (intraslab earthquakes) beneath the coast of Java. The subduction zone produced two destructive earthquakes and tsunamis in 2006 and 1994. An intraslab earthquake in 2009 also caused severe destruction. Compared to the highly oblique convergence across the plate boundary in Sumatra, near Java, it is close to orthogonal. However, there is still a small component of left-lateral strike-slip that is accommodated within the over-riding Sunda Plate. The Cimandiri Fault is one of the structures thought to be responsible. Field investigations, combined with morphometric analysis show that the Cimandiri Fault zone is a relatively broad zone of faulting and folding, with six segments identified [5]. Older parts of the fault zone show evidence of dominant left-lateral strike-slip, while younger parts show mainly oblique slip, with a mixture of reverse faulting and left-lateral strike-slip. 
+
+# Earthquake
+
+Earthquakes have been recorded in Cianjur since 1844. In 1910, 1912, 1958, 1982 and 2000, earthquakes caused damage and casualties in the area. Cianjur was also affected by an 1879 earthquake that claimed lives [7]. Shallow inland earthquakes in Java are infrequent but deadly. In 1924, near Wonosobo, about 800 people died from two earthquakes. Four other earthquakes in the 20th century caused between 10 and 100 deaths. The 2006 Yogyakarta earthquake was a shallow crustal earthquake that left 5,749 people dead. 
+
+## Geology
+
+According to the Meteorology, Climatology, and Geophysical Agency (BMKG), the earthquake occurred at a depth of 11 km (7 mi), classifying it as a shallow event. It had a strike-slip focal mechanism,  The United States Geological Survey (USGS) stated that the earthquake occurred as a result of strike-slip faulting within the crust of the Sunda Plate [9] [9]. Focal mechanisms indicate that the rupture occurred on either a steeply dipping north–striking, right-lateral strike-slip fault, or a steeply dipping east-striking left-lateral strike-slip fault. Its location is 260 km (160 mi) northeast of the subduction zone. The Cimandiri Fault or Padalarang Fault may be potential sources of the earthquake. The Cimandiri Fault is 100 km (62 mi) long and runs along the Mandiri River [11]. It stretches from Palabuhanratu Bay to Cianjur Regency. It is a strike-slip fault with a small vertical component along the section from Palabuhanratu Bay to southeast of Sukabumi. Along with the Lembang and Baribis Faults, these structures can generate damaging earthquakes. An engineering geology professor at Padjadjaran University said the epicenter location, 10 km (6.2 mi) from the Cimandiri Fault trace, makes it an unlikely source [12]. The possible source fault was one that had been buried under volcanic deposits from Mount Gede. On 9 December, the BMKG revealed a previously unknown fault in Cugenang District, now called the Cugenang Fault, was the source of the earthquake. The newly identified 8–9 km (5.0–5.6 mi)-long fault strikes north-northwest–south-southeast, and displays a right-lateral strike-slip focal mechanism [14]. Due to its moderate magnitude, no surface ruptures were produced [15] [16]. However, an analysis of the aftershocks revealed a fault rupture extending northeast–southwest for 12 km (7.5 mi) and 8 km (5.0 mi) wide. The greatest damage occurred in areas along the rupture while lighter damage occurred further away. By 9 December, more than 400 aftershocks with magnitudes between 1.2 and 4.2 had been recorded—some were felt by residents. 
+
+## Ground motion
+
+The earthquake had a maximum Modified Mercalli intensity of VIII (Severe) in an area southeast of the epicenter and striking northeast–southwest. Intensity VI–VII (Strong–Very strong) was felt in Cianjur while an intensity of IV–V (Light–Moderate) was felt at Garut and Sukabumi. In Cimahi, Lembang, Bandung City, Cikalong Wetan, Rangkasbitung, Bogor and Bayah, the earthquake was felt at an intensity of III (Weak) [19]. Intensity II–III (Weak) was felt in the Rancaekek, South Tangerang, Jakarta and Depok areas [9]. A field investigation of damage in Cianjur Regency by the Volcanological Survey of Indonesia revealed the greatest damage occurred above volcanic breccia deposited by Mount Gede [20]. The severity of building damage in Cugenang District, particularly in the villages of Gasol and Sarampad, led geologists to assign a maximum Modified Mercalli intensity of VII–VIII. Damage corresponding to VII also occurred in Cianjur, Warungkondang and Gekbrong districts. A maximum peak ground acceleration of 0.145 g in the east–west component [17]. 
+
+# Impact
+
+Despite the moderate size of the earthquake, its shallow depth caused strong shaking. Earthquakes of such size are usually associated with relatively minor damage but the shallow depth and poor construction factored in the destruction [22]. The National Agency for Disaster Countermeasure (BNPB) stated that the extent of damage to homes and buildings was still being assessed,  but described the damage as "massive" [23] [24]. Damage occurred in 16 of the 32 districts of Cianjur Regency —Cugenang District was the worst affected [25] [26]. The total cost of damage was Rp 4 trillion. At least 62,628 homes were damaged,   including 27,434 homes which were heavily damaged [28] [29] [30]. At least 13,070 and 22,124 homes had moderate and light damage, respectively [31] [32]. At least 524 schools,  144 religious locations,  13 offices and three health facilities were also damaged [29] [33] [34]. A shopping mall collapsed [31]. Two government office buildings, three schools, a hospital, a religious facility and an Islamic boarding school were damaged [35]. The Ministry of Religious Affairs stated 21 mosques were damaged [35] [36]. In Cilaku District, many buildings with two or three floors were heavily damaged, and a minimart completely collapsed [37]. Landslides cut off roads. A landslide along Puncak-Cipanas-Cianjur national road forced a traffic diversion [38]. Toppled trees, uprooted power poles and downed power cables also occurred along roads. The Ministry of Energy and Mineral Resources said two landslides occurred in Cugenang District [39]. One measured 44 m (144 ft) and 16 m (52 ft) high while the latter measured 162 m (531 ft) and 45 m (148 ft) high. A village in Cugenang with eight homes was completely buried under a landslide [40]. Landslides occurred in areas composed of weal volcanic soil [41]. Power outages affected more than 366,000 homes, of which 89 percent were already restored. At least 681 homes, six schools and 10 religious buildings were damaged in Sukabumi Regency [42] [43]. No deaths were recorded there, although 11 people were injured and 58 families were displaced. In Caringin Subdistrict, Lebak Regency, two schools and 89 houses were damaged, and a person was injured [44]. Seventy eight homes, a madrasah, and an Islamic boarding school were damaged in Bogor Regency [45]. The earthquake was felt strongly in Jakarta, Indonesia's capital, causing residents to flock to the streets. High-rise buildings swayed and were evacuated [47]. Cracks appeared on an apartment building in Ancol, North Jakarta. 
+
+# Casualties
+
+There were 335 confirmed deaths according to the BNPB,   165 of them had been successfully identified [49] [50]. The regent of Cianjur, Herman Suherman, claimed the total death toll was 635. He said many deaths went unreported as they were immediately buried by relatives for religious reasons and did not report these deaths [53] [54] [1]. According to him, Cugenang District saw 397 deaths—the most number of deaths among the 13 districts affected [55]. In Cianjur District, 78 died and 50 died in Warungkondang District. The BNPB said on 13 December that additional verifications and reevaluations would be carried out to address the discrepancy in the death toll [56]. The agency said if deaths were not recorded and no death certificate is presented, the individual would not be considered deceased [57]. Most of the deaths were caused by collapsing buildings. A majority were students of several schools who died after being hit by falling debris. The BNPB revealed more than one third of those killed were children [59]. In Cikancana, a village in Gekbrong District, six students died from head injuries [60] [61]. The bodies of ten people were found beneath a landslide in Cugenang District [62]. More than 30 people were killed by a landslide in Cijedil village [27] [63]. One person was killed and another 20 were injured after a factory partially collapsed [17]. A further 7,729 people were injured —593 in serious condition [65]. Five people remained missing,   possibly buried under collapsed structures [66] [67] [68]. Dozens of students were injured by falling debris at their schools [69] [70]. The injured were taken to the four hospitals around Cianjur [71]. Due to a large number of injured arriving at Cianjur Hospital, a field hospital was constructed in the parking lot [72]. At Cimacan Hospital, 237 people received treatment—150 were released while 13 others died [73]. A further 114,683 people were displaced [74]. 
+
+## Search and rescue
+
+A state of emergency was declared for 30 days from 21 November to 20 December. About 6,000 rescuers were deployed [76]. The Indonesian Medical Association mobilized 200 doctors,  while the National Search and Rescue Agency mobilized personnel and equipment to five affected areas [77] [78]. Search and rescue teams were deployed to locate the missing [79]. Helicopters conducted aerial surveys and evacuated people. As many as 796 personnel were distributed across 12 districts to search for missing individuals. The governor of West Java, Ridwan Kamil, called for the Jabar Quick Response Team to respond [81]. The team would arrive in the Cugenang, Warung Kondang, and Pacet Cipanas areas of Cianjur Regency. Heavy rain and the risk of landslides have slowed down search and rescue work [82]. Aftershocks also raised the potential for landslides to be triggered. On 23 November, rescuers attended to Cugenang, where a village was buried by a landslide. A six-year-old was rescued alive after being trapped under his collapsed home for two days [77]. On 24 November, over 1,000 rescuers used rescue dogs, heavy equipment and their bare hands to quicken the search for the missing. The Cianjur Regency government established a response effort that would continue until 30 December 2022 [60]. Rain and landslides continue to disrupt the search for the 39 missing individuals [83]. The BNPB said heavy equipment would be deployed to the village but its use could endanger potential survivors and road conditions were still unfavorable. Search for the missing continued on 25 November—472 personnel and two rescue dogs participated in the effort at Cugenang District [84]. Seven bodies were discovered in a landslide in the same district that day [85]. On 26 November, eight additional bodies were found [86]. The search for missing people was scheduled to end on 30 November, but was extended to 3 December after more reports of missing individuals arrived. On 4 December, the regency government discussed plans to extend the search by three days [88]. The National Search and Rescue Agency announced plans to extend the search for the eight missing people to 20 December [89]. 
+
+# Aftermath
+
+Survivors in Cianjur constructed makeshift tents in public spaces or their yards. On 22 November, a survivor stated that they were still self-dependent because no assistance has been given. For fear of aftershocks, residents did not return to their homes [91]. In Pamoyanan village, Cianjur District, 150 residents spent the night under a pavilion. Others slept along roadsides or under the overhangs of shops. Food was still unavailable on the morning of 22 November. According to the BNPB, homes that were damaged will be reconstructed with earthquake resistance. The Ministry of Public Works and Housing mobilized personnel and heavy equipment to clear trees and landslide debris on roads [93]. Electricity was cut from Cianjur District [94]. Perusahaan Listrik Negara (PLN) workers were deployed to restore power to 366,675 customers after the earthquake affected 1,957 substations [95]. By the morning of 22 November, 1,802 substations were functioning and electricity was restored in 89 percent of the area [96]. On 29 November, officials in Cianjur Regency reported 2,000 cases of acute respiratory infection, hypertension and diarrhea among the displaced people. On 3 December, another earthquake measuring Mww  5.7 struck Garut Regency. Both earthquakes were unrelated as they occurred at different focal depths [99] [100]. In Cianjur, cracks appeared on walls and windows broke [101]. 
+
+## Reconstruction
+
+The Indonesian government allocated Rp 50 million for reconstructing earthquake-resistant homes. Homes that were moderately or lightly damaged would be repaired through a Rp10 million assistance fund. Reconstruction and repair works are planned to be undertaken by the Ministry of Public Works and Public Housing. While not all the displaced had severely damaged homes, but many fled due to the aftershocks [103]. On 25 November, data collection on the number of damaged houses was ongoing. Preparations for reconstruction began—residents were evacuated and the search for missing people continued. Reconstruction would be funded by government ministries and the provincial government. A 2-hectare zone in Sirnagalih village, Cilaku District was allocated for the construction of 200 homes to relocate displaced residents [104]. Muhadjir Effendy, the Coordinating Minister for Human Development and Cultural Affairs, said 8,341 damaged homes would be repaired in the first phase of reconstruction [105]. With the identification of the Cugenang Fault, the BMKG said the 1,800 homes in several villages where the structure intersects would have to be relocated. The BMKG prohibited the reconstruction of homes along the fault due to the present seismic hazard it poses [16]. By 27 April 2023, 351 houses had been reconstructed [106]. 
+
+# Response
+
+President Joko Widodo directed the minister of public works and housing, Basuki Hadimuljono, to survey the damage. Basuki arrived in Cianjur Regency on 21 November at 21:45. According to President Widodo, residents whose homes were heavily and moderately damaged would receive Rp 50 million and Rp 25 million in assistance, respectively [108]. Rp 10 million would be given to homes with light damage. The BMKG urged residents to be wary of potential flash floods and rain due to unstable slopes [109]. The agency's head, Dwikorita Karnawati, stated that materials on unstable slopes could be washed away, triggering floods and landslides. Residents were also advised not to visit slopes and riverbanks due to the risk of flash floods. Thirty five personnel including five health professionals from Husein Sastranegara Air Force Base visited the affected area. The base also supplied food, medicine, kitchen appliances and logistics. More than 1,000 soldiers from nearby units were dispatched to the area [111]. Due to landslides blocking roads and cutting road access to some villages, helicopters were dispatched to drop food and water. While delivering aid to survivors across a bamboo bridge on 6 December, a police officer fell into a river and sustained light injuries [113]. The government of West Jakarta donated Rp 250 million in aid,  and other local companies also donated aid, totaling Rp 500 million [114] [115]. On 7 December, an accident involving a pickup truck delivering aid and bus occurred along the Cikopo–Palimanan Toll Road in Kalijati District, killing a person [116]. 
+
+# Controversy
+
+The head of the National Counter Terrorism Agency, Boy Rafli Amar, claimed Islamic terrorist group Jamaah Ansharut Daulah raised humanitarian fund only for it to be used in terrorist-related activities. 
+
+# See also
+
+Earthquakes <M6.0 with a high death toll. 
+
+# References
+
+# References
+
+[2] [ERROR retrieving ref link]
+[1] https://en.antaranews.com/news/265123/cianjur-quake-death-toll-climbs-to-600-government
+[3] https://www.kompas.com/nasional/read/2022/12/02/17402351/update-gempa-cianjur-per-12-desember-2022-331-meninggal-dunia-12-orang-belum
+[4] https://mb.com.ph/2022/11/23/indonesia-quake-survivors-appeal-for-supplies-as-rescuers-trawl-rubble/
+[5] https://www.researchgate.net/publication/324427092
+[6] https://ui.adsabs.harvard.edu/abs/2019Tectp.751..180D
+[7] https://ui.adsabs.harvard.edu/abs/2016JGRF..121.2287M
+[8] https://nasional.okezone.com/read/2022/11/21/337/2711880/bmkg-wilayah-cianjur-kerap-diguncang-gempa-sejak-tahun-1844
+[9] https://theconversation.com/why-are-shallow-earthquakes-more-destructive-the-disaster-in-java-is-a-devastating-example-195110
+[10] https://www.cnbcindonesia.com/news/20221121143615-4-389891/penjelasan-bmkg-soal-gempa-m56-guncang-cianjur-terasa-di-jkt
+[11] https://earthquake.usgs.gov/earthquakes/eventpage/us7000ir9t/executive
+[12] https://www.kompas.tv/article/350831/kepala-bmkg-62-gempa-susulan-terjadi-hingga-malam-terbesar-m-4-2
+[13] https://bandung.kompas.com/read/2022/11/21/174529778/mengenal-sesar-cimandiri-yang-diduga-menjadi-penyebab-sejumlah-gempa-besar
+[14] https://nasional.okezone.com/read/2022/11/23/337/2713319/sesar-cimandiri-diragukan-jadi-penyebab-gempa-besar-cianjur-ada-sesar-lain
+[15] https://www.liputan6.com/regional/read/5149010/sesar-cugenang-patahan-baru-penyebab-gempa-cianjur
+[16] https://en.antaranews.com/news/264687/new-fault-caused-56-m-cianjur-quake-bmkg
+[17] https://en.tempo.co/read/1666139/bmkg-announces-cugenang-fault-zone-suggests-relocation-of-1800-houses
+[18] https://vsi.esdm.go.id/index.php/gempabumi-a-tsunami/kejadian-gempabumi-a-tsunami/4023
+[19] https://www.viva.co.id/berita/nasional/1548006-bmkg-mencatat-236-kali-gempa-susulan-di-cianjur-terbesar-magnitudo-4-2
+[20] https://www.bmkg.go.id/seismologi-teknik/peta-isoseismal.bmkg?p=peta-isoseismal-gempabumi-cianjur-jawa-barat-21-november-2022&tag=peta-isoseismal&lang=ID
+[21] https://news.detik.com/berita/d-6418040/kekuatan-gempa-cianjur-m-56-hingga-mmi-vi-ini-artinya
+[22] https://inatews.bmkg.go.id/web/detail?name=20221121132444&day=578
+[23] https://www.idntimes.com/news/indonesia/muhammad-ilman-nafian-2/gempa-cianjur-merusak-begini-penjelasan-bmkg
+[24] https://www.pbs.org/newshour/world/at-least-268-dead-in-indonesia-earthquake-search-for-missing-continues
+[25] https://babel.antaranews.com/berita/317797/rumah-dan-bangunan-di-cianjur-rusak-akibat-gempa
+[26] https://nasional.sindonews.com/read/947491/15/bnpb-sebut-dampak-gempa-cianjur-kerusakannya-masif-1669021878
+[27] https://tirto.id/dampak-gempa-cianjur-53408-rumah-hingga-540-sekolah-rusak-gzxt
+[28] https://radarjember.jawapos.com/nasional/23/11/2022/ratusan-orang-belum-ditemukan-akibat-gempa-cianjur/
+[29] https://jabar.inews.id/berita/kerugian-gempa-cianjur-rp4-triliun-pemkab-fokus-pemulihan-ekonomi
+[30] https://www.bnpb.go.id/berita/-update-korban-meninggal-dunia-pasca-gempabumi-cianjur-321-orang-
+[31] https://www.cnnindonesia.com/nasional/20221121174536-20-876648/bnpb-1362-rumah-rusak-imbas-gempa-cianjur
+[32] https://news.detik.com/berita/d-6422675/data-terbaru-56320-rumah-rusak-akibat-gempa-cianjur
+[33] https://www.cnnindonesia.com/nasional/20221121163708-20-876595/gempa-cianjur-343-rumah-rusak-berat-3-kecamatan-tedampak-parah
+[34] https://www.gatra.com/news-559203-kebencanaan-gempa-cianjur-524-satuan-pendidikan-terdampak-tangani-hak-anak.html
+[35] https://www.bnpb.go.id/berita/-update-310-warga-meninggal-dunia-pascagempa-cianjur-
+[36] https://video.tribunnews.com/view/497550/dua-orang-meninggal-dunia-hingga-tujuh-rumah-rusak-berat-berikut-fakta-terkini-gempa-cianjur
+[37] https://jabarekspres.com/berita/2022/11/21/runtuh-terkena-gempa-cianjur-bangunan-toko-mas-ibu-kota-dikerumuni-warga/
+[38] https://hidayatullah.com/berita/nasional/read/2022/11/23/240672/21-masjid-rusak-tiga-kantor-kua-alami-rusak-berat-akibat-gempa-cianjur.html
+[39] https://www.cnnindonesia.com/nasional/20221121143105-20-876506/bupati-wilayah-cugenang-paling-parah-terdampak-gempa-cianjur
+[40] https://finance.detik.com/infrastruktur/d-6418181/gempa-cianjur-berimbas-longsor-di-jalur-puncak-pupr-kirim-alat-berat
+[41] https://jabar.antaranews.com/berita/418445/badan-geologi-kementerian-esdm-temukan-2-longsoran-usai-gempa-di-cianjur
+[42] https://www.aljazeera.com/news/2022/11/23/quake-rescue-efforts-in-indonesia-focus-on-landslide-hit-villages
+[43] https://amp.kompas.com/bandung/read/2022/11/21/185645378/cianjur-gelap-jaringan-listrik-ratusan-ribu-rumah-warga-putus-akibat-gempa
+[44] https://jabar.inews.id/amp/berita/cianjur-sempat-gelap-gulita-pln-pastikan-89-persen-jaringan-listrik-pulih
+[45] https://jabar.inews.id/berita/bpbd-681-rumah-dan-10-masjid-di-sukabumi-rusak-akibat-gempa-cianjur
+[46] https://www.beritasatu.com/news/1001549/dampak-gempa-cianjur-bpbd-434-rumah-di-sukabumi-rusak/1/?utm_source=beritasatu.com&utm_medium=article&utm_campaign=Baca-Selanjutnya
+[47] https://megapolitan.okezone.com/read/2022/11/22/338/2712284/gempa-cianjur-78-rumah-di-bogor-terdampak
+[48] https://abcnews.go.com/Technology/wireStory/earthquake-shakes-indonesias-java-island-damages-buildings-93704305
+[49] https://voi.id/en/amp/229392/impact-of-the-cianjur-earthquake-the-wall-of-the-apartment-in-ancol-rentak
+[50] https://cirebon.tribunnews.com/2022/12/12/korban-tewas-gempa-cianjur-ternyata-600-an-orang-bupati-banyak-yang-langsung-dimakamkan
+[51] https://megapolitan.kompas.com/read/2022/12/03/17360451/update-gempa-cianjur-korban-meninggal-334-jiwa-8-orang-masih-hilang
+[52] https://www.kompas.com/nasional/read/2022/11/24/17294461/update-gempa-cianjur-korban-meninggal-272-orang-165-sudah-teridentifikasi
+[53] https://jatim.antaranews.com/amp/berita/658969/hari-kelima-korban-meninggal-gempa-cianjur-naik-jadi-310-jiwa
+[54] https://www.cnnindonesia.com/nasional/20221220154139-20-889802/bupati-cianjur-korban-gempa-cianjur-bertambah-jadi-635-orang
+[55] https://www.tvonenews.com/channel/news/96231-tim-sar-gabungan-kembali-temukan-jasad-korban-gempa-cianjur
+[56] https://jabar.inews.id/berita/korban-meninggal-akibat-gempa-jadi-600-orang-bupati-cianjur-banyak-warga-tak-lapor
+[57] https://www.detik.com/jabar/berita/d-6461709/beda-versi-data-korban-gempa-cianjur-menurut-bupati-dan-bnpb
+[58] https://jabarekspres.com/berita/2022/12/13/terkait-jumlah-korban-gempa-cianjur-ridwan-kamil-minta-warga-mengacu-pada-data-bnpb/
+[59] https://m.merdeka.com/peristiwa/bnpb-tidak-ada-korban-jiwa-gempa-cianjur-tidak-terdata.html?page=2
+[60] https://www.aljazeera.com/news/2022/11/21/deadly-earthquake-rocks-indonesia
+[61] https://www.voaindonesia.com/a/jumlah-korban-gempa-cianjur-meningkat-tim-sar-fokus-pada-lokasi-longsor/6848276.html
+[62] https://www.kompas.com/nasional/read/2022/11/23/18491871/korban-jiwa-gempa-cianjur-capai-271-orang-37-persennya-anak-anak
+[63] https://bandung.kompas.com/read/2022/11/22/063000478/gempa-cianjur-6-murid-madrasah-tewas-tertimpa-reruntuhan-bangunan-sekolah
+[64] https://bandung.kompas.com/read/2022/11/22/094816778/5-orang-ditemukan-tewas-tertimbun-longsor-akibat-gempa-cianjur
+[65] https://world.kbs.co.kr/service/news_view.htm?lang=i&Seq_Code=68875
+[66] https://news.detik.com/kolom/d-6437440/mencegah-korupsi-bantuan-keuangan-gempa-cianjur/
+[67] https://www.beritasatu.com/news/1005185/update-gempa-cianjur-korban-meninggal-jadi-331-jiwa/amp
+[68] https://banyumas.tribunnews.com/2022/12/19/tim-sar-temukan-lagi-satu-jenazah-korban-gempa-cianjur-lima-korban-masih-hilang
+[69] https://bnpb.go.id/berita/-update-318-warga-meninggal-dunia-pascagempa-cianjur-
+[70] https://kabar24.bisnis.com/read/20221122/15/1600754/gempa-cianjur-25-orang-tertimbun-runtuhan-bangunan
+[71] https://www.cnnindonesia.com/nasional/20221122160006-20-877167/pemkab-cianjur-korban-meninggal-dunia-akibat-gempa-252-orang/
+[72] https://jabar.inews.id/berita/gempa-magnitudo-56-guncang-cianjur-puluhan-siswa-terluka
+[73] https://nasional.okezone.com/read/2022/11/21/337/2711835/gempa-cianjur-kapolres-44-orang-meninggal-dunia
+[74] https://padang.viva.co.id/ragam-perkara/843-sudah-20-warga-dilaporkan-tewas-akibat-gempa-m56-cianjur
+[75] https://kumparan.com/kumparannews/update-gempa-cianjur-237-orang-dirawat-di-rsud-cimacan-meninggal-13-orang-1zINVxFhTjS/3
+[76] https://jogja.antaranews.com/berita/592563/pencarian-11-korban-bencana-gempa-cianjur-dilanjutkan
+[77] https://www.eeas.europa.eu/delegations/indonesia/european-union-brings-relief-victims-earthquake-indonesia_en
+[78] https://www.channelnewsasia.com/asia/indonesia-earthquake-rescue-heavy-rain-survivors-3097441
+[79] https://www.liputan6.com/health/read/5131781/idi-cianjur-kerahkan-200-an-dokter-tangani-korban-gempa
+[80] https://www.idntimes.com/news/indonesia/santi-dewi/bantu-korban-gempa-cianjur-sar-kirimkan-tim-dari-5-lokasi-berbeda
+[81] https://kumparan.com/kumparannews/basarnas-kerahkan-helikopter-untuk-cari-korban-gempa-cianjur-yang-tertimbun-1zIQoQul7fo/full
+[82] https://www.liputan6.com/regional/read/5133402/tim-sar-lanjutkan-pencarian-151-orang-yang-hilang-usai-gempa-cianjur
+[83] https://jabar.antaranews.com/berita/417521/gubernur-ridwan-kamil-berangkatkan-tim-jqr-ke-lokasi-gempa-cianjur?utm_source=topnews&utm_medium=home&utm_campaign=news
+[84] https://www.voaindonesia.com/a/gempa-cianjur-operasi-pencarian-dilanjutkan-masa-tanggap-darurat-satu-bulan/6848768.html
+[85] https://www.beritasatu.com/news/1002789/update-gempa-cianjur-hujan-sulitkan-pencarian-39-korban-hilang
+[86] https://kepri.antaranews.com/berita/140657/sar-lanjutkan-pencarian-39-orang-hilang-pada-hari-kelima-usai-gempa-cianjur
+[87] https://www.cnnindonesia.com/nasional/20221125110509-20-878558/7-orang-hilang-akibat-gempa-cianjur-ditemukan-tewas
+[88] https://nasional.kompas.com/read/2022/11/26/17581041/korban-gempa-cianjur-masih-bertambah-318-meninggal-7729-luka-luka
+[89] https://www.liputan6.com/news/read/5140828/pencarian-korban-gempa-cianjur-diperpanjang-selama-3-hari
+[90] https://jogja.antaranews.com/berita/592735/pencarian-korban-gempa-cianjur-diperpanjang
+[91] https://www.tribunnews.com/regional/2022/12/07/pencarian-8-korban-hilang-akibat-gempa-cianjur-dilakukan-hingga-20-desember
+[92] https://www.liputan6.com/news/read/5132007/korban-gempa-cianjur-bangun-sendiri-tenda-darurat-mengaku-belum-ada-bantuan
+[93] https://repjabar.republika.co.id/berita/rlq10z396/takut-gempa-susulan-warga-ngungsi-di-pendopo-cianjur-dan-emperan-toko
+[94] https://www.liputan6.com/news/read/5131625/kepala-bnpb-pastikan-rumah-rusak-akibat-gempa-cianjur-akan-dibangun-lagi
+[95] https://bisnis.tempo.co/read/1659400/gempa-cianjur-pupr-mobilisasi-alat-berat-untuk-bersihkan-jalan-dari-pohon-tumbang
+[96] https://www.cnnindonesia.com/nasional/20221121140601-20-876484/bupati-cianjur-listrik-terputus-usai-gempa?utm_source=twitter&utm_medium=oa&utm_content=cnnindonesia&utm_campaign=cmssocmed
+[97] https://www.republika.co.id/berita/rloway368/1957-gardu-listrik-terdampak-gempa-cianjur-pln-kerja-keras-pulihkan
+[98] https://bisnis.tempo.co/read/1659616/89-persen-listrik-di-lokasi-gempa-cianjur-mulai-pulih
+[99] https://www.tvonenews.com/daerah/jabar/84867-2000-an-pengungsi-gempa-terserang-ispa-dinkes-cianjur-juga-terserang-diare-dan-hipertensi
+[100] https://earthquake.usgs.gov/earthquakes/eventpage/us6000j6k5/executive
+[101] https://www.cnbcindonesia.com/news/20221203175107-4-393494/garut-diguncang-gempa-ini-penjelasan-bmkg/amp
+[102] https://www.metrotvnews.com/play/NleC0p0B-bmkg-tegaskan-gempa-garut-tak-berhubungan-dengan-gempa-cianjur
+[103] https://www.cnnindonesia.com/nasional/20221203184232-20-882419/rumah-hingga-sekolah-di-cidaun-cianjur-rusak-diguncang-gempa-garut/
+[104] https://en.antaranews.com/news/261865/cianjur-quake-minister-assures-of-swift-reconstruction-of-homes
+[105] https://polri.go.id/berita-polri/2717
+[106] https://www.victorynews.id/nasional/pr-3315839461/pemkab-cianjur-siap-relokasi-dan-bangun-rumah-bagi-warga-korban-gempa-cianjur
+[107] https://en.antaranews.com/news/264607/bmkg-prohibits-public-to-rebuild-settlements-along-cugenang-fault
+[108] https://finance.detik.com/properti/d-6693570/siap-huni-351-rumah-buat-korban-gempa-cianjur-rampung
+[109] https://koran-jakarta.com/presiden-jokowi-perintahkan-menteri-pupr-tinjau-dampak-gempa-di-cianjur
+[110] https://bnpb.go.id/berita/-update-268-warga-meninggal-dunia-akibat-gempa-cianjur-
+[111] https://www.cnnindonesia.com/nasional/20221121161030-20-876579/bmkg-wanti-wanti-banjir-bandang-dan-longsor-usai-gempa-cianjur
+[112] https://jabar.inews.id/berita/35-personel-lanud-husein-sastranegara-bantu-penanganan-bencana-di-cianjur
+[113] https://koran-jakarta.com/1-000-prajurit-tni-ad-dikerahkan-bantu-penanganan-gempa-cianjur
+[114] https://www.straitstimes.com/asia/se-asia/traumatised-relatives-await-news-of-missing-in-quake-hit-indonesia
+[115] https://www.tvonenews.com/channel/news/94718-polisi-jatuh-ke-sungai-dari-motor-saat-antarkan-bantuan-gempa-cianjur
+[116] https://barat.jakarta.go.id/detailberita/7933
+[117] https://penamas.id/phri-cianjur-salurkan-bantuan-hingga-rp-500-juta-ke-beberapa-lokasi-pengungsian-gempa/
+[118] https://www.gridoto.com/read/223604911/sedih-dihantam-bus-mobil-pembawa-bantuan-gempa-cianjur-terguling-di-tol-cipali-satu-meninggal-dunia
+[119] https://jabar.inews.id/berita/antisipasi-gempa-susulan-kemensos-siapkan-1000-tenda-untuk-korban-gempa-cianjur
+[120] https://en.antaranews.com/news/261953/ministry-sends-aid-to-schools-affected-by-cianjur-quake
+[121] https://jabar.antaranews.com/berita/419061/kementan-salurkan-bantuan-pangan-rp269-miliar-untuk-korban-gempa-di-cianjur
+[122] https://ekonomi.bisnis.com/read/20221209/9/1607056/pip-kemenkeu-salurkan-bantuan-rp200-juta-untuk-korban-gempa-cianjur
+[123] https://www.niaga.asia/isran-serahkan-bantun-pemerintah-dan-rakyat-kaltim-rp7-miliar-untuk-korban-gempa-cianjur/
+[124] https://kabarpapua.co/pj-gubernur-papua-barat-serahkan-bantuan-bencana-alam-untuk-cianjur/
+[125] https://maluku.polri.go.id/informasi/berita/baca/polda-maluku-salurkan-bantuan-untuk-korban-gempa-bumi-di-cianjur
+[126] https://www.suarasurabaya.net/kelanakota/2022/pemerintah-provinsi-sumbar-kirim-13-ton-paket-rendang-untuk-korban-gempa-cianjur/
+[127] https://suaracirebon.com/2022/12/19/pemkab-cirebon-kembali-salurkan-rp1-miliar-lebih-donasi-gempa-cianjur/
+[128] https://www.goriau.com/berita/baca/gubri-serahkan-bantuan-uang-sebesar-rp533-juta-lebih-untuk-korban-gempa-cianjur.html
+[129] https://penghubung.acehprov.go.id/berita/pemerintah-aceh-salurkan-bantuan-tunai-untuk-warga-aceh-korban-gempa-cianjur/
+[130] https://kepri.antaranews.com/berita/141221/pemkab-karimun-bantu-korban-gempa-di-cianjur-rp269-juta
+[131] https://lomboktimur.pikiran-rakyat.com/lombok-timur/pr-2555952094/pemda-lombok-timur-himpun-donasi-rp12-miliyar-bantuan-bakal-dikirim-untuk-korban-gempa-cianjur
+[132] https://mediaindonesia.com/humaniora/541941/warga-jatiasih-kumpulkan-donasi-rp272-juta-untuk-korban-gempa-cianjur
+[133] https://mercusuar.web.id/berita-utama/gempa-cianjur-pemkot-palu-serahkan-donasi-rp324-juta/
+[134] https://radarmojokerto.jawapos.com/mojokerto/821020543/pemkot-mojokerto-salurkan-donasi-korban-gempa-cianjur
+[135] https://www.detik.com/jatim/berita/d-6429308/surabaya-kirim-1000-paket-sembako-untuk-korban-gempa-cianjur
+[136] https://jatengprov.go.id/publik/kirim-bantuan-gempa-cianjur-senilai-rp187-miliar-ganjar-relawan-harus-solid/
+[137] https://en.antaranews.com/news/262157/cianjur-quake-pertamina-provides-12-tons-rice-to-public-kitchens
+[138] https://news.detik.com/berita/d-6422940/kai-salurkan-bantuan--hadirkan-rail-clinic-di-stasiun-cianjur/
+[139] https://nasional.sindonews.com/read/952211/15/gempa-cianjur-bpkh-kirim-bantuan-senilai-rp22-m-1669410713
+[140] https://nasional.kompas.com/read/2022/12/09/20500001/kalla-sebut-china-thailand-dan-korsel-beri-bantuan-untuk-korban-gempa
+[141] https://m.antaranews.com/berita/3281519/kedubes-rusia-salurkan-bantuan-untuk-korban-gempa-cianjur-lewat-pmi
+[142] https://www.straitstimes.com/singapore/s-pore-red-cross-to-give-69k-for-west-java-earthquake-relief-domestic-helpers-offer-to-help
+[143] https://berita.mediacorp.sg/singapura/sg-sumbang-as100000-sokong-usaha-bantu-mangsa-gempa-indonesia-710551
+[144] http://world.kbs.co.kr/service/news_view.htm?lang=i&Seq_Code=68866
+[145] https://m.antaranews.com/berita/3444675/taiwan-donasikan-100-ribu-dolar-as-bagi-korban-gempa-cianjur
+[146] https://www.idntimes.com/news/world/vanny-rahman/taiwan-bantu-renovasi-sekolah-di-cianjur-yang-rusak-akibat-gempa?page=all
+[147] https://www.mpr.go.id/berita/Menerima-Telepon-Ketua-Parlemen-Turki,-Ketua-MPR-RI-Bamsoet:-Turki-Kirim-Bantuan-Kemanusiaan-Bagi-Korban-Gempa-Cianjur
+[148] https://m.antaranews.com/berita/3306471/boeing-gelontorkan-rp4-miliar-bantu-pemulihan-gempa-cianjur
+[149] https://www.care-international.org/news/care-international-begin-supporting-earthquake-affected-families-indonesia
+[150] https://www.tzuchi.or.id/read-berita/tzu-chi-bersama-pemprov-dki-jakarta-bantu-korban-gempa-cianjur/10612
+[151] https://news.detik.com/berita/d-6566144/bnpt-ungkap-kelompok-teroris-jad-galang-dana-lewat-gempa-cianjur

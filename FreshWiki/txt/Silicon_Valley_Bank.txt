@@ -1,0 +1,140 @@
+Silicon_Valley_Bank
+
+Silicon Valley Bank (SVB) is a commercial bank division of First Citizens BancShares. The bank was previously the primary subsidiary of SVB Financial Group, a publicly traded bank holding company that had offices in 15 U.S. states and over a dozen international jurisdictions.As a regional bank in the San Francisco Bay Area, SVB offers services specifically designed to meet the needs of the tech industry, and soon became the largest bank by deposits in Silicon Valley and the preferred bank of almost half of all venture-backed tech startups. In March 2023, after central bank–endorsed interest rate hikes during the 2021–2023 inflation surge, there was a bank run on its deposits, which led to its collapse and seizure on March 10, 2023 by the California Department of Financial Protection and Innovation (DFPI), its regulator. Citing inadequate liquidity and insolvency, state officials at the DFPI appointed the Federal Deposit Insurance Corporation (FDIC) receiver of the bank. This was, at the time, the second-largest bank failure in U.S. history, later surpassed by the collapse of First Republic Bank during the March 2023 United States bank failures.On March 12, 2023, a joint statement was issued by Secretary of the Treasury Janet Yellen, Federal Reserve Chairman Jerome Powell, and FDIC Chairman Martin Gruenberg, stating that all depositors at SVB would be fully protected and would have access to both insured and uninsured deposits starting the following Monday, March 13. The FDIC then established a bridge bank successor, Silicon Valley Bridge Bank, N.A., which quickly assumed ongoing business. On March 27, 2023, First Citizens Bank & Trust Company, a subsidiary of First Citizens BancShares, assumed all customer deposits and acquired all loans of Silicon Valley Bridge Bank from the FDIC and began operating all SVB branches.
+
+# Foundation and early growth
+
+Silicon Valley Bank was founded in 1983 by Wells Fargo executive Bill Biggerstaff and Stanford University professor Robert Medearis to focus on the needs of startup companies. The two former Bank of America managers and tennis buddies came up with the idea over a game of poker in Pajaro Dunes, California. They hired Roger V [25] [26] [2] [27]. Smith, who had previously headed a high-tech lending unit at Wells Fargo, to be the bank's first CEO and president. The bank launched on October 17, 1983, as a wholly owned subsidiary of Silicon Valley Bancshares (now SVB Financial Group) . It lined up 100 initial investors, including NFL quarterback Jim Plunkett, and well-connected former U.S [1] [2]. Representative Pete McCloskey joined its board to give the bank credibility with the venture capital community. The bank's first office was located on North First Street in San Jose [27]. When Silicon Valley Bank was founded, the banking industry did not have a good understanding of startup companies, particularly those that lacked revenue. The bank structured its loans with the understanding that startups do not earn revenue immediately, managing risk based on their business model. The bank connected customers to its extensive venture capital, law, and accounting firm network [2]. Its main strategy was collecting deposits from businesses financed through venture capital . It then expanded into banking and financing venture capitalists, adding services to allow the bank to keep clients as they matured from their startup phase. Initially, startup founders seeking loans from the bank had to pledge about half of their shares as collateral, but the rate later fell to about seven percent, reflecting a low failure rate and founders' tendency to pay off the loans to stay in control of the company [31]. The bank covered losses by selling the shares to interested investors. Eventually, it became common for venture capital firms' term sheets to require startups to create a bank account at Silicon Valley Bank specifically [32]. For its part, the bank prioritized startups that received funding from top-tier venture capital firms, such as Sequoia Capital, New Enterprise Associates, or Kleiner Perkins, as a way to reduce risk. During the 1980s, the bank grew with the local high-tech economy, achieving 21 consecutive quarters of profitability. It went from a loss of $39,000 in 1985 to a profit of $12.3 million in 1991. In 1986, SVB acquired National InterCity Bank of Santa Clara . It opened its first office on the East Coast in 1990, near Boston, to serve the Massachusetts Route 128 tech corridor. [25]. Under Smith's leadership, the bank diversified into the high-risk real estate loan business, which amounted to 50% of its portfolio by the early 1990s. A slump in the California real estate market resulted in a $2.2 million loss for the bank in 1992, and by 1995 the portfolio percentage had fallen to 10%. In 1993, John C. Dean was appointed CEO, with Smith becoming Vice Chairman. The bank added a winery lending business in 1994 [34] [35]. 
+
+# Expansion
+
+The wave of computer technology startups during the dot-com bubble provided an influx of business for the bank, which was noted for its willingness to lend to venture-stage companies that were not yet profitable. Among its approximately 2,000 clients in 1995 were networking innovators Cisco Systems and Bay Networks. That year, the bank moved its headquarters from San Jose to Santa Clara [34]. The holding company's stock price soared through the bubble but fell 50% when the bubble burst [34]. The bank continued to add branches in technology hubs across the country [37]. Ken Wilcox became CEO in 2000  and chose to continue the company's niche focus on technology companies rather than diversifying into a broader commercial bank [7] [38] [43]. SVB formally entered the private banking business in 2002, building on prior experience and relationships with wealthy venture capitalists and entrepreneurs. In 2003, the bank sponsored three high-profile international trade missions to Bangalore and Mumbai, Tel Aviv, and Shanghai and Beijing, bringing along a delegation of two dozen Silicon Valley venture capitalists along to meet with local investors, entrepreneurs, and government officials, as a prelude to opening international offices [40]. It announced an international expansion drive in 2004, with new operations in Bangalore, London, Beijing, and Israel [2]. During the 2007–2008 financial crisis, SVB Financial Group received a $235 million investment from the federal government in exchange for preferred stock and warrants under the Troubled Asset Relief Program (TARP). Over two years, it paid $10 million in dividends to the U.S [42]. Treasury, then used the proceeds of a $300 million stock sale to buy back the government's interest. Greg Becker replaced Wilcox as CEO in April 2011 [43]. SVB partnered with Shanghai Pudong Development Bank (SPDB) in 2012 to create a separate Shanghai-based bank, SPD Silicon Valley Bank, to lend to local technology startups. The new bank, owned 50–50 by the two companies, received approval from Chinese bank regulators to operate in renminbi (RMB), making it one of a handful of American-owned banks permitted to do so [44]. SVB also managed two local yuan-denominated funds for Shanghai's Yangpu District government, and invested in a Hangzhou-based loan guarantee company [45]. In 2015, the bank stated that it served 65% of all U.S. startups. Its new offerings at the time included syndicated loans and foreign currency management, and it stood out as the only U.S. financial institution then working with virtual currency startups. SVB was the finance partner during the launch of Stripe's Atlas platform in February 2016 to help startups register as U.S [37]. corporations. SVB's involvement in financing acquisitions for startups gave it insider information regarding such acquisitions, and in June 2021 Mounir Gad, a former senior vice president and director at the bank, pleaded guilty to violating insider trading laws in 2015 and 2016 when he tipped off a friend about three startup acquisitions. 
+
+# Operations in lead-up to collapse
+
+## Business model
+
+The bank's customers were primarily businesses and people in the technology, life science, healthcare, private equity, venture capital and premium wine industries. It was influential among startups in India, being unusually willing to serve C corporations whose founders lacked Social Security numbers [7] [49] [50]. Despite banking a high-tech sector, the bank was criticized for having old technology and lacking biometric authentication [51]. In December 31, 2022, 56% of its loan portfolio were loans to venture capital firms and private equity firms, secured by their limited partner commitments and used to make investments in private companies, 14% of its loans were mortgages to high-net-worth individuals, and 24% of its loans were to technology and health care companies, including 9% of all loans which were to early and growth-stage startup companies. Silicon Valley Bank required an exclusive relationship of those borrowing from the bank [25]. In February 2023, Forbes listed the bank as #20 of "America's Best Banks" with a 13.8% return on equity [53]. In March 2023, Moody's Investors Service rated the bank's loan portfolio as conservative and high-performing [54] [55]. The bank's overseas subsidiaries held $13.9 billion in deposits [56]. 
+
+## Facilities
+
+The bank was primarily administered from its headquarters in Santa Clara, California and from an office in Tempe, Arizona. The bank's parent, SVB Financial Group, launched sister subsidiaries to SVB which operated investment banking and private banking services from offices in Canada (Toronto), the Cayman Islands (Grand Cayman), China (Beijing, Shanghai, Shenzhen), Hong Kong, India (Bangalore), Ireland, Israel (Tel Aviv), Sweden (Stockholm), Denmark (Copenhagen), Germany (Frankfurt) and other countries of the European Union and commercial banking services from an office in the United Kingdom (London) [7]. The bank's 160,000-square-foot (15,000 m2) headquarters in Santa Clara, which still serves as headquarters for the holding company, has been the longtime anchor tenant of a seven-building office complex called The Quad at Tasman. The bank's lease was scheduled to expire on September 30, 2024 [61]. The bank also operated 17 other branch locations in California and Massachusetts and the holding company operated from a total of 55 offices across the U.S. 
+
+## Affiliations and community involvement
+
+Silicon Valley Bank was a member of the Federal Reserve System, with the bank's CEO serving as a class A member of the Federal Reserve Bank of San Francisco Board of Directors. It was also a member of several trade associations: TechNet, the Silicon Valley Leadership Group, the Bay Area Council, Tech:NYC, the Mid-Size Bank Coalition of America, and the American Bankers Association [62]. As part of its foray into India, it partnered with the non-profit mentoring organization TiE beginning in the late 1990s [63]. The bank founded the nonprofit Silicon Valley Bank Foundation in 1995 to operate its corporate citizenship programs. The foundation was funded entirely through the bank, receiving contributions totaling $100,000 in 1998. The bank sponsored EF Education–Tibco–SVB, a women's professional cycling team, beginning in 2007, becoming a co-title sponsor in 2015 [7]. Since 2002, the bank made more than $2 billion in loans and investments to developers, including $1.6 billion in loans since 2014, to build affordable housing in Silicon Valley and San Francisco, as well as Massachusetts (from its 2021 acquisition of Boston Private). As a legacy of its Boston Private acquisition, it provided free banking services to many nonprofit organizations in San Mateo County, California [65] [66]. 
+
+# Collapse
+
+In 2022, SVB began to incur steep losses following increased interest rates and a major downturn in growth in the tech industry, with the bank heavily concentrated in long-term Treasury bonds. As of December 31, 2022, SVB had mark-to-market accounting unrealized losses in excess of $15 billion for securities held to maturity [68] [69]. In early March of 2023, a combination of factors – including poor risk management and a bank run driven by tech industry investors – caused the bank to collapse [68]. Use of social media was reported to be a factor in both the initial bank run and its aftermath, with those affected by the potential loss of deposits calling for regulators to ensure that uninsured accounts were made whole [70] [71]. Early in the morning of March 10, examiners from the Federal Reserve and the FDIC arrived at the offices of SVB to assess the company's finances. Several hours later, the California Department of Financial Protection and Innovation (DFPI) issued an order taking possession of SVB,  citing inadequate liquidity and insolvency,  and appointed the FDIC as receiver [76] [77] [78]. The FDIC then established a deposit insurance national bank, the Deposit Insurance National Bank of Santa Clara, to re-open the bank's branches the following Monday and enable access to insured deposits [79] [80]. The CEO of Silicon Valley Bank, Greg Becker, was previously on the board of directors at the Federal Reserve Bank of San Francisco, but exited that position [18] [81] [82] [83]. An initial auction of Silicon Valley Bank assets on March 12 attracted a single bid from an undisclosed suitor,  after PNC Financial Services and RBC Bank backed away from making offers [84] [85]. The FDIC rejected this offer and planned to hold a second auction to attract bids from major banks, now that the bank's systemic risk designation allowed the FDIC to insure all deposits [86] [87]. On March 13, 2023, the FDIC announced via press release,  that the FDIC transferred SVB assets to a new bridge bank, Silicon Valley Bridge Bank, N.A., and appointed Tim Mayopoulos as CEO [90]. The new entity, Silicon Valley Bridge Bank, N.A., was FDIC-operated, and all SVB clients became customers of the new bridge bank [89] [90]. The FDIC stated the goal was to provide a new level of protection to SVB clients, including keeping regular banking hours and expected banking activities, like online banking, ATM access to client funds, and check writing [91]. The FDIC added that SVB’s official checks would clear and that loan customers should continue making payments, and clarified that their role was not to protect Silicon Valley Bank shareholders and certain unsecured debt holders. Regulatory filings from December 2022 estimated that more than 85% of deposits were uninsured. The failure of SVB was the largest of any bank since the 2007–2008 financial crisis by assets, and the second-largest in U.S [93]. history behind that of Washington Mutual. SVB's Chinese joint venture, whose chairman is the chairman of Shanghai Pudong Development Bank, said their operations were "sound" as of March 11, 2023 [94]. The UK government announced that it was working on a lifeline for British tech firms affected by the collapse of the Bank and its branch in the United Kingdom as a part of the fallout from the parent bank [46]. 3,000 firms in the UK were believed to be at risk of bankruptcy without a rescue [95]. On March 13, 2023, after a bidding process, it was announced that HSBC UK had agreed to acquire Silicon Valley Bank UK for £1 in a rescue deal, at no cost to the taxpayer and with depositors fully protected [96]. On March 17, 2023, Silicon Valley Bank's former parent company, SVB Financial Group, filed for Chapter 11 bankruptcy. The bankruptcy did not include its remaining subsidiaries, SVB Capital and SVB Securities. Silicon Valley Bridge Bank or SVB Private is also not part of the bankruptcy filing as they are no longer affiliated with SVB Financial Group. The fallout has created what institutional investors and startups have referred to as a large gap in the ecosystem of which the full impact on startups and tech companies is yet to be determined [100] [101]. A subsequent analysis from the Federal Reserve conducted by then-Vice Chair for Supervision Michael Barr revealed described poor oversight and said the bank's collapse highlighted "weaknesses in regulation and supervision that must be addressed," noting how there was potential for damaging contagion. It also outlined possible changes to the banking system's regulatory framework. The New York Times described it as "a rare instance of overt self-criticism from the Fed, and it comes as the aftershocks of Silicon Valley Bank’s collapse continue to shake the American financial system." [103]. On March 26, 2023, the FDIC announced that First Citizens BancShares would acquire the commercial banking business of SVB. As part of the deal, First Citizens purchased around $119 billion in deposits and $72 billion of SVB's loans discounted by $16.5 billion, while around $90 billion of SVB's securities remain in receivership [106] [4] [104]. SVB's 17 branches reopened as "Silicon Valley Bank, a division of First Citizens Bank" the next day, with all SVB depositors becoming depositors of First Citizens [105]. First Citizens was the 30th-largest bank in the United States, in terms of assets, at the end of 2022 [4] [23]. After the acquisition, it is set to enter the top 20. 
+
+# References
+
+# References
+
+[1] https://d18rn0p25nwr6d.cloudfront.net/CIK-0000719739/50318344-2056-4894-b268-d9b7831a1884.pdf#page=5
+[2] https://books.google.com/books?id=cIn0pwKftasC&pg=PA145
+[3] https://www.nytimes.com/2023/03/27/business/silicon-valley-bank-first-citizens.html
+[4] https://www.axios.com/2023/03/27/first-citizens-silicon-valley-bank-sold-fdic
+[5] https://www.hsbc.com/news-and-media/media-releases/2023/hsbc-acquires-silicon-valley-bank-uk-limited
+[6] https://www.bizjournals.com/sanjose/news/2023/03/21/silicon-valley-bank-parent-says-has-no-employees.html
+[7] https://www.sec.gov/ix?doc=%2FArchives%2Fedgar%2Fdata%2F719739%2F000071973923000021%2Fsivb-20221231.htm
+[8] https://www.prnewswire.com/news-releases/silicon-valley-bank-opens-in-canada-300805545.html
+[9] https://www.sec.gov/Archives/edgar/data/719739/000071973923000021/sivb-12312022x10k_ex211.htm
+[10] https://www.theguardian.com/technology/2023/mar/15/silicon-valley-bank-failure-industries-investors-rattled
+[11] https://www.federalreserve.gov/releases/lbr/current/default.htm
+[12] https://nymag.com/intelligencer/2023/03/svb-silicon-valley-bank-federal-reserve-inflation-interest-rates.html
+[13] https://www.vox.com/money/2023/3/14/23640065/silicon-valley-bank-collapse-fdic-interest-rates-federal-reserve
+[14] https://www.wsj.com/articles/feds-mester-says-more-rate-rises-are-needed-amid-inflation-surge-11662559267
+[15] https://web.archive.org/web/20230314185835/https://finance.yahoo.com/news/silicon-valley-bank-committed-one-135059554.html
+[16] https://www.cnbc.com/2023/03/10/silicon-valley-bank-is-shut-down-by-regulators-fdic-to-protect-insured-deposits.html
+[17] https://www.fdic.gov/news/press-releases/2023/pr23019.html
+[18] https://www.fdic.gov/news/press-releases/2023/pr23016.html
+[19] https://news.bloomberglaw.com/bankruptcy-law/silicon-valley-bank-fails-as-fdic-takes-over-appoints-receiver
+[20] https://www.politico.com/news/2023/03/13/the-emergency-bank-rescue-that-almost-didnt-happen-72-hours-00086868
+[21] https://home.treasury.gov/news/press-releases/jy1337
+[22] https://www.reuters.com/article/global-banks-svb-ceo/silicon-valley-bank-conducting-business-as-usual-new-ceo-says-idUKL4N35M0EA
+[23] https://www.cnn.com/2023/03/27/business/fdic-announces-first-citizens-purchase-silicon-valley-bank/index.html
+[24] https://www.sec.gov/ix?doc=/Archives/edgar/data/0000798941/000119312523079743/d488575d8k.htm
+[25] https://www.axios.com/2023/03/11/silicon-valley-bank-rip
+[26] https://books.google.com/books?id=QtoxDwAAQBAJ&pg=PA65
+[27] https://www.mercurynews.com/2023/03/19/from-a-poker-game-to-a-market-jolting-collapse-silicon-valley-banks-four-decade-ride-reflected-techs-booms-and-busts/
+[28] [ERROR retrieving ref link]
+[29] https://www.barrons.com/articles/svb-silicon-valley-bank-closing-history-5b1cd335
+[30] [ERROR retrieving ref link]
+[31] https://www.wsj.com/articles/BL-TEB-4910
+[32] https://books.google.com/books?id=eso8DQAAQBAJ&pg=PT102
+[33] https://www.bizjournals.com/sanjose/news/2023/03/14/silicon-valley-bank-fill-the-void-jpmorgan-chase.html
+[34] https://www.sfgate.com/business/article/High-Tech-Bank-Loves-Startups-Silicon-Valley-3033000.php
+[35] https://www.bizjournals.com/sanjose/blog/techflash/2015/06/ceo-greg-becker-on-silicon-valley-banks-bubble.html
+[36] https://www.thestreet.com/investing/silicon-valley-bank-plays-matchmaker-between-tech-and-wine-13250608
+[37] https://www.nytimes.com/2015/04/02/business/dealbook/silicon-valley-bank-strengthens-its-roots.html
+[38] https://www.bizjournals.com/sanjose/stories/2004/09/13/story7.html
+[39] https://www.bizjournals.com/sanfrancisco/stories/2009/12/14/daily74.html
+[40] https://www.bizjournals.com/sanjose/stories/2003/08/18/smallb4.html
+[41] [ERROR retrieving ref link]
+[42] https://www.sec.gov/Archives/edgar/data/719739/000119312508246921/dex991.htm
+[43] https://www.bizjournals.com/sanfrancisco/stories/2009/12/14/daily74.html
+[44] https://www.theregister.co.uk/2012/08/20/china_silicon_valley_bank_innovate/
+[45] https://www.prnewswire.com/news-releases/silicon-valley-banks-joint-venture-in-china-receives-license-to-transact-in-local-currency-300112575.html
+[46] https://asia.nikkei.com/Business/Finance/Silicon-Valley-Bank-s-China-venture-says-operations-sound
+[47] https://techcrunch.com/2016/02/24/stripe-expands-startup-tools-with-atlas-a-way-for-global-companies-to-incorporate-in-delaware/
+[48] https://www.mercurynews.com/2021/06/30/ex-silicon-valley-bank-vp-charged-with-securities-fraud/
+[49] https://www.latimes.com/business/la-fi-silicon-valley-bank-20150807-story.html
+[50] https://www.geekwire.com/2019/lighter-capital-partners-silicon-valley-bank-offer-pre-vc-startups-debt-capital-banking-services/
+[51] https://www.onmanorama.com/news/business/2023/03/11/Silicon-valley-bank-collapse-usa-indian-startups.html
+[52] https://www.cnbc.com/2023/03/12/former-svb-employee-offers-insight-into-the-banks-failings.html
+[53] https://techcrunch.com/2023/03/10/investor-mark-suster-says-a-handful-of-bad-actors-in-vc-destroyed-silicon-valley-bank/
+[54] https://www.forbes.com/lists/americas-best-banks/
+[55] https://www.forbes.com/companies/svb-financial-group/
+[56] https://www.bizjournals.com/sanjose/news/2023/03/14/private-equity-firms-eye-svb-loans.html
+[57] https://www.bizjournals.com/sanjose/news/2023/03/13/fdic-deposits-silicon-valley-bank-signature-biden.html
+[58] https://www.annualreports.com/HostedData/AnnualReportArchive/s/NASDAQ_SIVB_2007.pdf
+[59] https://www.prnewswire.com/news-releases/silicon-valley-bank-opens-in-canada-300805545.html
+[60] https://www.prnewswire.com/in/news-releases/svb-financial-group-expands-it-and-engineering-team-to-support-growth-of-the-innovation-economy-856506130.html
+[61] https://www.bizjournals.com/sanjose/news/2023/03/12/svb-real-estate-receivership.html
+[62] https://banks.data.fdic.gov/bankfind-suite/bankfind/details/24735
+[63] https://www.svb.com/globalassets/library/uploadedfiles/statement-of-political-activity-2.0-april-2019.pdf#page=2
+[64] https://www.cyclingweekly.com/racing/silicon-valley-bank-collapse-raises-questions-around-future-of-ef-education-tibco-svb
+[65] https://sfstandard.com/housing-development/silicon-valley-bank-collapse-san-franciscos-affordable-housing-limbo/
+[66] https://www.wgbh.org/news/local-news/2023/03/13/housing-industry-in-massachusetts-one-of-many-to-be-impacted-by-silicon-valley-bank-fiasco
+[67] https://sanjosespotlight.com/silicon-valley-bank-collapse-hits-santa-clara-county-san-jose-nonprofits/
+[68] https://www.bloomberg.com/news/articles/2023-03-10/svb-spectacularly-fails-after-unthinkable-heresy-becomes-reality
+[69] https://www.nytimes.com/2023/03/10/business/svb-silicon-valley-bank-explainer.html
+[70] https://www.wsj.com/articles/where-were-the-regulators-as-svb-crashed-35827e1a
+[71] https://www.nytimes.com/2023/03/10/business/silicon-valley-bank-stock.html
+[72] https://fortune.com/2023/03/12/silicon-valley-bank-may-be-victim-of-first-social-media-bank-run-says-one-theory/
+[73] https://www.theatlantic.com/ideas/archive/2023/03/silicon-valley-bank-run-social-media-financial-crisis/673375/
+[74] https://www.law360.com/securities/articles/1585111/svb-flameout-may-spur-gov-t-probes-with-social-media-twist
+[75] https://www.thestreet.com/technology/svb-mark-cuban-and-bill-ackman-used-their-influence-to-corner-regulators
+[76] https://www.bloomberg.com/news/articles/2023-03-10/us-regulators-descend-on-silicon-valley-bank-to-assess-finances
+[77] https://dfpi.ca.gov/wp-content/uploads/sites/337/2023/03/DFPI-Orders-Silicon-Valley-Bank-03102023.pdf
+[78] https://news.bloomberglaw.com/crypto/silicon-valley-bank-collapses-enters-fdic-receivership
+[79] https://dfpi.ca.gov/2023/03/10/california-financial-regulator-takes-possession-of-silicon-valley-bank/
+[80] https://www.cnn.com/2023/03/10/investing/svb-bank/index.html
+[81] https://www.cnbc.com/2023/03/10/silicon-valley-bank-is-shut-down-by-regulators-fdic-to-protect-insured-deposits.html
+[82] https://news.bloomberglaw.com/bankruptcy-law/silicon-valley-bank-fails-as-fdic-takes-over-appoints-receiver
+[83] https://www.wsj.com/articles/svb-financial-pulls-capital-raise-explores-alternatives-including-possible-sale-sources-say-11de7522
+[84] https://www.reuters.com/markets/us/ceo-failed-silicon-valley-bank-no-longer-director-sf-fed-2023-03-10/
+[85] https://www.bizjournals.com/sanjose/news/2023/03/13/fdic-second-auction-silicon-valley-bank.html
+[86] https://www.reuters.com/business/finance/pnc-rbc-interest-svb-cools-regulators-seek-rescue-bids-sources-2023-03-12/
+[87] https://www.nytimes.com/2023/03/14/us/politics/inside-silicon-valley-bank-rescue.html
+[88] https://www.fdic.gov/news/press-releases/2023/pr23019.html
+[89] https://www.reuters.com/business/finance/fdic-names-tim-mayopoulos-ceo-silicon-valley-bank-2023-03-13/
+[90] https://www.fdic.gov/news/press-releases/2023/pr23019.html
+[91] https://www.fdic.gov/resources/resolutions/bank-failures/failed-bank-list/silicon-valley-faq.html
+[92] https://www.natlawreview.com/article/client-alert-silicon-valley-bank-takeover-what-you-need-to-know
+[93] https://time.com/6262009/silicon-valley-bank-deposit-insurance/
+[94] https://www.marketwatch.com/articles/svb-financial-stock-portfolio-outlook-loss-93287f3d
+[95] https://www.theguardian.com/business/2023/mar/12/uk-working-on-cash-lifeline-for-tech-firms-hit-by-silicon-valley-bank-collapse
+[96] https://fortune.com/2023/03/17/inside-operation-yeti-uk-tech-silicon-valley-bank-run-survived-svb-collapse-venture-capital-tech-europe-russ-shaw/
+[97] https://www.theguardian.com/business/2023/mar/13/hsbc-buy-silicon-valley-banks-uk-tech-startups
+[98] https://www.bbc.co.uk/news/business-64937251
+[99] https://www.theguardian.com/business/2023/mar/13/it-was-frantic-the-two-day-scramble-to-save-svb-and-avert-a-banking-crisis
+[100] https://www.reuters.com/business/finance/svb-financial-seeks-bankruptcy-protection-2023-03-17/
+[101] https://www.bizjournals.com/sanjose/news/2023/03/17/svb-financial-seeks-bankruptcy-protection.html
+[102] https://jweekly.com/2023/03/15/inside-a-very-bad-week-israeli-tech-leaders-invested-in-silicon-valley-bank/
+[103] https://www.nytimes.com/2023/04/28/business/economy/fed-silicon-valley-bank-failure-review.html
+[104] https://www.fdic.gov/news/press-releases/2023/pr23023.html
+[105] https://www.wsj.com/articles/first-citizens-acquires-much-of-failed-silicon-valley-bank-5a4545f
+[106] https://www.nytimes.com/2023/03/27/business/silicon-valley-bank-first-citizens.html

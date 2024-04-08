@@ -1,0 +1,963 @@
+{
+  "title": "Cyclone_Mocha",
+  "url": "https://en.wikipedia.org/wiki/Cyclone_Mocha",
+  "summary": "Extremely Severe Cyclonic Storm Mocha was a powerful and deadly tropical cyclone in the North Indian Ocean which affected Myanmar and parts of Bangladesh in May 2023. The second depression and the first cyclonic storm of the 2023 North Indian Ocean cyclone season, Mocha originated from a low-pressure area that was first noted by the India Meteorological Department (IMD) on 8 May. After consolidating into a depression, the storm tracked slowly north-northwestward over the Bay of Bengal, and reached extremely severe cyclonic storm intensity. After undergoing an eyewall replacement cycle, Mocha rapidly strengthened, peaking at Category 5-equivalent intensity on 14 May with winds of 280 km/h (175 mph), tying with Cyclone Fani as the strongest storm on record in the North Indian Ocean in terms of 1-minute sustained winds. Mocha slightly weakened before making landfall, and its conditions quickly became unfavorable. Mocha rapidly weakened once inland and dissipated shortly thereafter.\nThousands of volunteers assisted citizens of Myanmar and Bangladesh in evacuating as the cyclone approached the international border. Evacuations were also ordered for low-lying areas in Sittwe, Pauktaw, Myebon, Maungdaw, and Buthidaung. In Bangladesh, over 500,000 individuals were ordered to be relocated from coastal areas of the country due to the storm's approach. Officials from the military declared the state of Rakhine a natural disaster area. Several villages in Rakhine State were also damaged by the cyclone. The death toll for Cyclone Mocha varies significantly. ASEAN reported a total of 145 deaths, whereas the National Unity Government of Myanmar (NUG) stated that Cyclone Mocha killed at least 463 people, including three indirect deaths in Bangladesh. The storm also injured 719 people and left 101 others missing. It caused about US$1.5 billion of damage in Myanmar.",
+  "content": [
+    {
+      "section_title": "Meteorological history",
+      "section_content": [
+        {
+          "sentence": "On 2 May, the India Meteorological Department (IMD) began monitoring the potential for tropical cyclone development in the Bay of Bengal",
+          "refs": []
+        },
+        {
+          "sentence": "This potential was boosted by the approach of the active phase of the Madden\u2013Julian oscillation, which likewise aided the formation of Cyclone Fabien in the Southern Hemisphere",
+          "refs": []
+        },
+        {
+          "sentence": "By 7 May, converging winds were becoming increasingly conducive for the development of a low-pressure area",
+          "refs": [
+            "https://www.bnionline.net/en/news/over-200000-houses-destroyed-cyclone-damage-estimated-us15-billion-reports-ulaaa"
+          ]
+        },
+        {
+          "sentence": "The following day, both the Joint Typhoon Warning Center (JTWC) and IMD assessed the formation of a weak low-level circulation developed, which was marked as Invest 91B by the former",
+          "refs": [
+            "https://archive.today/20230509233349/https://www.wis-jma.go.jp/d/o/DEMS/Alphanumeric/Warning/Tropical_cyclone/20230502/071000/A_WTIN20DEMS020710_C_RJTD_20230502071517_26.txt"
+          ]
+        },
+        {
+          "sentence": "On 9 May, the IMD upgraded the system to a depression as very intense atmospheric convection consolidated near the center",
+          "refs": [
+            "https://archive.today/20230509234842/https://www.wis-jma.go.jp/d/o/DEMS/Alphanumeric/Warning/Tropical_cyclone/20230507/075000/A_WTIN20DEMS070750_C_RJTD_20230507080217_76.txt",
+            "https://wiki.chlod.net/jtwc/text/2023-05-07-1750-abioweb.txt"
+          ]
+        },
+        {
+          "sentence": "The JTWC issued a Tropical Cyclone Formation Alert on the system",
+          "refs": [
+            "https://archive.today/20230509235734/https://www.wis-jma.go.jp/d/o/DEMS/Alphanumeric/Warning/Tropical_cyclone/20230508/075500/A_WTIN20DEMS080755_C_RJTD_20230508075817_36.txt"
+          ]
+        },
+        {
+          "sentence": "On 10 May, the IMD upgraded the depression to a deep depression, and subsequently to a cyclonic storm on 11 May",
+          "refs": [
+            "https://archive.today/20230510000341/https://www.wis-jma.go.jp/d/o/DEMS/Alphanumeric/Warning/Tropical_cyclone/20230509/162500/A_WTIN20DEMS091625_C_RJTD_20230509162931_15.txt"
+          ]
+        },
+        {
+          "sentence": "It received the name Mocha",
+          "refs": []
+        },
+        {
+          "sentence": "As fragmented rainbands wrapped into the center and thunderstorms continued to burst over the center, the JTWC followed suit in upgrading the system to Tropical Cyclone 01B",
+          "refs": [
+            "https://wiki.chlod.net/jtwc/text/2023-05-09-1400-io9123web.txt",
+            "https://archive.today/20230510210849/https://www.wis-jma.go.jp/d/o/DEMS/Alphanumeric/Warning/Tropical_cyclone/20230510/041500/A_WTIN20DEMS100415_C_RJTD_20230510042102_2.txt"
+          ]
+        },
+        {
+          "sentence": "Located on the periphery of an established upper-level ridge, Mocha curved toward the north over the Bay of Bengal while steadily organizing",
+          "refs": []
+        },
+        {
+          "sentence": "At 12:00 UTC on 11 May, the IMD upgraded the system to a severe cyclonic storm with winds of 90\u00a0km/h (55\u00a0mph) as it developed an intense central dense overcast",
+          "refs": []
+        },
+        {
+          "sentence": "With time, a ragged eye structure formed and occasionally appeared on satellite imagery",
+          "refs": [
+            "https://wiki.chlod.net/jtwc/prog/2023-05-11-0240-io0123prog.txt",
+            "https://wiki.chlod.net/jtwc/prog/2023-05-11-1310-io0123prog.txt"
+          ]
+        },
+        {
+          "sentence": "On 12 May, Mocha became a very severe cyclonic storm as an elongated eye became more readily defined",
+          "refs": [
+            "https://web.archive.org/web/20230511165657/https://mausam.imd.gov.in/backend/assets/cyclone_pdf/TROPICAL_CYCLONE_ADVISORY_NO__5_1200UTC_11_05_2023.pdf"
+          ]
+        },
+        {
+          "sentence": "Around this time, Mocha reached 1-minute sustained winds of 165\u00a0km/h (105\u00a0mph) according to the JTWC, equivalent to Category\u00a02 strength on the Saffir\u2013Simpson hurricane wind scale (SSHWS)",
+          "refs": [
+            "https://wiki.chlod.net/jtwc/prog/2023-05-11-2150-io0123prog.txt",
+            "https://web.archive.org/web/20230512130656/https://www.wis-jma.go.jp/d/o/DEMS/Alphanumeric/Warning/Tropical_cyclone/20230512/044800/A_WTIN01DEMS120448_C_RJTD_20230512045017_89.txt"
+          ]
+        },
+        {
+          "sentence": "While attaining this intensity, the cyclone turned north-northeastward under the influence of an anticyclonic circulation south of Myanmar and a nearby trough",
+          "refs": [
+            "https://wiki.chlod.net/jtwc/prog/2023-05-12-1310-io0123prog.txt"
+          ]
+        },
+        {
+          "sentence": "High ocean heat content over the Bay of Bengal fueled a period of rapid intensification, bringing Mocha to extremely severe cyclonic storm status at 18:00 UTC on 12 May",
+          "refs": [
+            "https://wiki.chlod.net/jtwc/text/2023-05-12-1310-io0123web.txt"
+          ]
+        },
+        {
+          "sentence": "However, this phase was soon interrupted by the onset of an eyewall replacement cycle",
+          "refs": []
+        },
+        {
+          "sentence": "After completing its cycle on 13 May, the eyewall became well-defined, resulting in another period of rapid intensification",
+          "refs": []
+        },
+        {
+          "sentence": "Low vertical wind shear and robust outflow facilitated the strengthening, and Mocha reached 1-minute sustained winds of 240\u00a0km/h (150\u00a0mph), equivalent to Category 4 strength on the SSHWS",
+          "refs": []
+        },
+        {
+          "sentence": "Mocha achieved its peak intensity at 18:00 UTC, when the IMD estimated winds of 215\u00a0km/h (130\u00a0mph), just under super cyclonic storm intensity",
+          "refs": [
+            "https://web.archive.org/web/20230512215503/https://mausam.imd.gov.in/backend/assets/cyclone_pdf/TROPICAL_CYCLONE_ADVISORY_NO__15_1800UTC_12_05_2023.pdf"
+          ]
+        },
+        {
+          "sentence": "Its barometric pressure was assessed at 938\u00a0hPa (27.70\u00a0inHg)",
+          "refs": []
+        },
+        {
+          "sentence": "The JTWC initially estimated 1-minute sustained winds of 260\u00a0km/h (160\u00a0mph) at 00:00 UTC of 14 May, making Mocha a Category 5-equivalent tropical cyclone",
+          "refs": [
+            "https://rsmcnewdelhi.imd.gov.in/download.php?path=uploads/report/26/26_f26e46_Extremely%20Severe%20Cyclonic%20Storm%20MOCHA-A%20Brief%20Report_24May2023_with_annexure.pdf"
+          ]
+        },
+        {
+          "sentence": "However, the agency subsequently revised the estimate to 280\u00a0km/h (175\u00a0mph), tied with Cyclone Fani as the strongest storm on record in the North Indian Ocean, in terms of 1-minute sustained winds",
+          "refs": [
+            "https://wiki.chlod.net/jtwc/prog/2023-05-13-1500-io0123prog.txt"
+          ]
+        },
+        {
+          "sentence": "Mocha was a large storm and had a symmetrical eye about 37\u00a0km (20\u00a0nmi) wide",
+          "refs": []
+        },
+        {
+          "sentence": "Conditions quickly became unfavorable for Mocha upon reaching areas of mid-level wind shear and with dry air beginning to intrude on the northwest side of the core",
+          "refs": [
+            "https://wiki.chlod.net/jtwc/prog/2023-05-13-1500-io0123prog.txt"
+          ]
+        },
+        {
+          "sentence": "The eye rapidly eroded as the cloud tops became significantly warmer",
+          "refs": []
+        },
+        {
+          "sentence": "Mocha made landfall at 07:00 UTC just north of Sittwe, Myanmar, with 3-minute sustained winds of 215\u00a0km/h (135\u00a0mph)",
+          "refs": [
+            "https://wiki.chlod.net/jtwc/prog/2023-05-14-0320-io0123prog.txt"
+          ]
+        },
+        {
+          "sentence": "The JTWC issued its final bulletin on the storm upon landfall and estimated 1-minute sustained winds of 195\u00a0km/h (120\u00a0mph)",
+          "refs": [
+            "http://yaleclimateconnections.org/2023/05/cyclone-mocha-north-indian-oceans-strongest-storm-on-record-hits-myanmar/",
+            "https://apnews.com/article/cyclone-mocha-bangladesh-myanmar-06512b0f496bf85c926f12925ab1ba7e"
+          ]
+        },
+        {
+          "sentence": "Mocha rapidly weakened from Myanmar's rugged terrain as it was downgraded to very severe cyclonic storm intensity at 15:00 UTC",
+          "refs": [
+            "https://apnews.com/article/cyclone-mocha-bangladesh-myanmar-06512b0f496bf85c926f12925ab1ba7e"
+          ]
+        },
+        {
+          "sentence": "Wind shear also increased and contributed to the weakening",
+          "refs": []
+        },
+        {
+          "sentence": "The vorticity in the atmosphere, poleward outflow, and convergence would still maintain Mocha's intensity as a cyclonic storm throughout its deterioration",
+          "refs": [
+            "https://wiki.chlod.net/jtwc/text/2023-05-14-1400-io0123web.txt"
+          ]
+        },
+        {
+          "sentence": "On 15 May, Mocha weakened into a depression at 00:00 UTC as it tracked east-northeastward",
+          "refs": [
+            "https://web.archive.org/web/20230514163929/https://mausam.imd.gov.in/backend/assets/cyclone_pdf/TROPICAL_CYCLONE_ADVISORY_NO__30_1500UTC_14_05_2023.pdf"
+          ]
+        },
+        {
+          "sentence": "The depression was later marked as a low-pressure area by the IMD at 03:00 UTC, as its center was not well-defined, prompting the discontinuation of advisories on Mocha",
+          "refs": [
+            "https://web.archive.org/web/20230515115925/https://mausam.imd.gov.in/backend/assets/cyclone_pdf/TROPICAL_CYCLONE_ADVISORY_NO__31_1800UTC_14_05_2023.pdf"
+          ]
+        }
+      ],
+      "subsections": []
+    },
+    {
+      "section_title": "Preparations",
+      "section_content": [],
+      "subsections": [
+        {
+          "section_title": "Myanmar",
+          "section_content": [
+            {
+              "sentence": "The state of Rakhine was declared a natural disaster area by military officials",
+              "refs": []
+            },
+            {
+              "sentence": "Communications were cut off from Sittwe",
+              "refs": [
+                "https://www.accuweather.com/en/hurricane/deadly-cyclone-mocha-displaces-thousands-in-bangladesh-myanmar/1527027"
+              ]
+            },
+            {
+              "sentence": "Min Aung Hlaing, Myanmar's junta leader, visited Sittwe to assess the\u00a0damage and provide donations to residents",
+              "refs": [
+                "https://www.bbc.com/news/world-asia-65595693"
+              ]
+            },
+            {
+              "sentence": "Storm damage to communications and road infrastructure, as well as ongoing limitations imposed by Myanmar's military government, made it difficult to obtain information and send help to the affected area, according to non-governmental organizations",
+              "refs": [
+                "https://sports.yahoo.com/myanmar-port-city-cut-off-051103190.html"
+              ]
+            },
+            {
+              "sentence": "The United Nations said that 16 million people were affected by the storm, of which according to UNOCHA, 5.1\u00a0million of them live in northwestern Rakhine State",
+              "refs": [
+                "https://www.cnn.com/2023/05/16/asia/cyclone-mocha-death-toll-loss-of-life-intl-hnk/index.html"
+              ]
+            },
+            {
+              "sentence": "Malteser International pledged \u20ac100,000 and distributed relief goods on 15 May for those affected",
+              "refs": []
+            },
+            {
+              "sentence": "The United States provided $250,000 to Bangladesh and Rohingya refugees on 17 May",
+              "refs": [
+                "https://burmese.voanews.com/a/un-officials-on-impact-of-cyclone-in-myanmar/7096886.html"
+              ]
+            },
+            {
+              "sentence": "India launched operation Karuna to support Myanmar",
+              "refs": [
+                "https://reliefweb.int/report/myanmar/cyclone-mocha-myanmarbangladesh-malteser-international-provides-eur-100000-emergency-relief-and-distributes-relief-goods"
+              ]
+            },
+            {
+              "sentence": "On 23\u00a0May, a supplemental US$122\u00a0million Flash Appeal was launched by UNOCHA targeting the needs of 500,000 storm victims",
+              "refs": []
+            },
+            {
+              "sentence": "This supplemented an existing humanitarian response plan with a target of 1.1\u00a0million people and cost of US$212\u00a0million",
+              "refs": []
+            },
+            {
+              "sentence": "By mid-June, UN-led humanitarian efforts provided over 110,000 people with shelter and more than 300,000 with food",
+              "refs": [
+                "https://newsonair.gov.in/News?title=Cyclone-Mocha%3A-Indian-Navy-ships-carrying-relief-material-reach-Yangon-under-Operation-Karuna&id=461113"
+              ]
+            },
+            {
+              "sentence": "On 12 June, Myanmar's State Administration Council suspended UN humanitarian aid",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Bangladesh",
+          "section_content": [
+            {
+              "sentence": "At least 2,522 houses in Cox's Bazar were destroyed, with another 10,469 others damaged",
+              "refs": []
+            },
+            {
+              "sentence": "On St",
+              "refs": [
+                "https://myanmar-now.org/en/news/hundreds-feared-dead-after-cyclone-mocha-hits-western-myanmars-rohingya-idp-camps/"
+              ]
+            },
+            {
+              "sentence": "Martin's Island, 700 houses were destroyed  and at least 12 people were injured including one in critical condition",
+              "refs": [
+                "https://myanmar-now.org/en/news/hundreds-feared-dead-after-cyclone-mocha-hits-western-myanmars-rohingya-idp-camps/"
+              ]
+            },
+            {
+              "sentence": "The cyclone impact were less than initially feared as the storm surge was less than anticipated",
+              "refs": []
+            },
+            {
+              "sentence": "500 houses were destroyed in Teknaf",
+              "refs": [
+                "https://bangla.thedailystar.net/environment/cyclone-mocha/news-478671"
+              ]
+            },
+            {
+              "sentence": "Three people died of stroke while attempting to recover their salt farm on Maheshkhali Island",
+              "refs": [
+                "https://myanmar-now.org/en/news/hundreds-feared-dead-after-cyclone-mocha-hits-western-myanmars-rohingya-idp-camps/"
+              ]
+            },
+            {
+              "sentence": "There and in other upazilas, between 50 and 60 houses were damaged",
+              "refs": [
+                "https://apnews.com/article/cyclone-mocha-bangladesh-myanmar-06512b0f496bf85c926f12925ab1ba7e"
+              ]
+            },
+            {
+              "sentence": "Agricultural damage in Cox's Bazar District reached \u09f3115\u00a0million (US$1.07\u00a0million)",
+              "refs": [
+                "https://myanmar-now.org/en/news/hundreds-feared-dead-after-cyclone-mocha-hits-western-myanmars-rohingya-idp-camps/"
+              ]
+            },
+            {
+              "sentence": "Mocha's Gale-force winds began to blow in Bangladesh, accompanied by heavy rainfall",
+              "refs": [
+                "https://www.bhorerkagoj.com/2023/05/15/%E0%A6%AE%E0%A6%B9%E0%A7%87%E0%A6%B6%E0%A6%96%E0%A6%BE%E0%A6%B2%E0%A7%80%E0%A6%A4%E0%A7%87-%E0%A6%98%E0%A7%82%E0%A6%B0%E0%A7%8D%E0%A6%A3%E0%A6%BF%E0%A6%9D%E0%A6%A1%E0%A6%BC%E0%A7%87-%E0%A7%A9/"
+              ]
+            },
+            {
+              "sentence": "Heavy rains in Bangladesh, according to officials, caused damage in several\u00a0regions",
+              "refs": [
+                "https://abcnews.go.com/Technology/wireStory/bangladesh-myanmar-bracing-cyclone-mocha-set-make-landfall-99312758"
+              ]
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "India",
+          "section_content": [
+            {
+              "sentence": "The India Meteorological Department (IMD) said that the southeast Bay of Bengal region of Tripura, Mizoram, Nagaland, southern Assam, and portions of Manipur were expected to receive \"heavy\" to \"very heavy\" rainfall as a result of Cyclone Mocha",
+              "refs": []
+            },
+            {
+              "sentence": "The state governments of Tripura, Mizoram, Nagaland, Manipur, and Assam also requested that the disaster management and all other relevant authorities take preventative measures to minimize casualties and property damage",
+              "refs": [
+                "https://www.manilatimes.net/2023/05/14/world/hundreds-of-thousands-flee-as-cyclone-thunders-towards-myanmar-bangladesh/1891435"
+              ]
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "China",
+          "section_content": [
+            {
+              "sentence": "The National Meteorological Centre (NMC) of the China Meteorological Administration (CMA) said that due to there was a risk of flash flooding, mudslides and landslides in the southwestern provinces of Yunnan and Tibet especially in the Hengduan and Eastern Himalayan Mountain ranges",
+              "refs": []
+            },
+            {
+              "sentence": "In response, the State Flood Control and Drought Relief headquarters activated a Level IV response, the lowest level of response to flooding",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        }
+      ]
+    },
+    {
+      "section_title": "Impact",
+      "section_content": [],
+      "subsections": [
+        {
+          "section_title": "Myanmar",
+          "section_content": [
+            {
+              "sentence": "The state of Rakhine was declared a natural disaster area by military officials",
+              "refs": []
+            },
+            {
+              "sentence": "Communications were cut off from Sittwe",
+              "refs": [
+                "https://www.accuweather.com/en/hurricane/deadly-cyclone-mocha-displaces-thousands-in-bangladesh-myanmar/1527027"
+              ]
+            },
+            {
+              "sentence": "Min Aung Hlaing, Myanmar's junta leader, visited Sittwe to assess the\u00a0damage and provide donations to residents",
+              "refs": [
+                "https://www.bbc.com/news/world-asia-65595693"
+              ]
+            },
+            {
+              "sentence": "Storm damage to communications and road infrastructure, as well as ongoing limitations imposed by Myanmar's military government, made it difficult to obtain information and send help to the affected area, according to non-governmental organizations",
+              "refs": [
+                "https://sports.yahoo.com/myanmar-port-city-cut-off-051103190.html"
+              ]
+            },
+            {
+              "sentence": "The United Nations said that 16 million people were affected by the storm, of which according to UNOCHA, 5.1\u00a0million of them live in northwestern Rakhine State",
+              "refs": [
+                "https://www.cnn.com/2023/05/16/asia/cyclone-mocha-death-toll-loss-of-life-intl-hnk/index.html"
+              ]
+            },
+            {
+              "sentence": "Malteser International pledged \u20ac100,000 and distributed relief goods on 15 May for those affected",
+              "refs": []
+            },
+            {
+              "sentence": "The United States provided $250,000 to Bangladesh and Rohingya refugees on 17 May",
+              "refs": [
+                "https://burmese.voanews.com/a/un-officials-on-impact-of-cyclone-in-myanmar/7096886.html"
+              ]
+            },
+            {
+              "sentence": "India launched operation Karuna to support Myanmar",
+              "refs": [
+                "https://reliefweb.int/report/myanmar/cyclone-mocha-myanmarbangladesh-malteser-international-provides-eur-100000-emergency-relief-and-distributes-relief-goods"
+              ]
+            },
+            {
+              "sentence": "On 23\u00a0May, a supplemental US$122\u00a0million Flash Appeal was launched by UNOCHA targeting the needs of 500,000 storm victims",
+              "refs": []
+            },
+            {
+              "sentence": "This supplemented an existing humanitarian response plan with a target of 1.1\u00a0million people and cost of US$212\u00a0million",
+              "refs": []
+            },
+            {
+              "sentence": "By mid-June, UN-led humanitarian efforts provided over 110,000 people with shelter and more than 300,000 with food",
+              "refs": [
+                "https://newsonair.gov.in/News?title=Cyclone-Mocha%3A-Indian-Navy-ships-carrying-relief-material-reach-Yangon-under-Operation-Karuna&id=461113"
+              ]
+            },
+            {
+              "sentence": "On 12 June, Myanmar's State Administration Council suspended UN humanitarian aid",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Bangladesh",
+          "section_content": [
+            {
+              "sentence": "At least 2,522 houses in Cox's Bazar were destroyed, with another 10,469 others damaged",
+              "refs": []
+            },
+            {
+              "sentence": "On St",
+              "refs": [
+                "https://myanmar-now.org/en/news/hundreds-feared-dead-after-cyclone-mocha-hits-western-myanmars-rohingya-idp-camps/"
+              ]
+            },
+            {
+              "sentence": "Martin's Island, 700 houses were destroyed  and at least 12 people were injured including one in critical condition",
+              "refs": [
+                "https://myanmar-now.org/en/news/hundreds-feared-dead-after-cyclone-mocha-hits-western-myanmars-rohingya-idp-camps/"
+              ]
+            },
+            {
+              "sentence": "The cyclone impact were less than initially feared as the storm surge was less than anticipated",
+              "refs": []
+            },
+            {
+              "sentence": "500 houses were destroyed in Teknaf",
+              "refs": [
+                "https://bangla.thedailystar.net/environment/cyclone-mocha/news-478671"
+              ]
+            },
+            {
+              "sentence": "Three people died of stroke while attempting to recover their salt farm on Maheshkhali Island",
+              "refs": [
+                "https://myanmar-now.org/en/news/hundreds-feared-dead-after-cyclone-mocha-hits-western-myanmars-rohingya-idp-camps/"
+              ]
+            },
+            {
+              "sentence": "There and in other upazilas, between 50 and 60 houses were damaged",
+              "refs": [
+                "https://apnews.com/article/cyclone-mocha-bangladesh-myanmar-06512b0f496bf85c926f12925ab1ba7e"
+              ]
+            },
+            {
+              "sentence": "Agricultural damage in Cox's Bazar District reached \u09f3115\u00a0million (US$1.07\u00a0million)",
+              "refs": [
+                "https://myanmar-now.org/en/news/hundreds-feared-dead-after-cyclone-mocha-hits-western-myanmars-rohingya-idp-camps/"
+              ]
+            },
+            {
+              "sentence": "Mocha's Gale-force winds began to blow in Bangladesh, accompanied by heavy rainfall",
+              "refs": [
+                "https://www.bhorerkagoj.com/2023/05/15/%E0%A6%AE%E0%A6%B9%E0%A7%87%E0%A6%B6%E0%A6%96%E0%A6%BE%E0%A6%B2%E0%A7%80%E0%A6%A4%E0%A7%87-%E0%A6%98%E0%A7%82%E0%A6%B0%E0%A7%8D%E0%A6%A3%E0%A6%BF%E0%A6%9D%E0%A6%A1%E0%A6%BC%E0%A7%87-%E0%A7%A9/"
+              ]
+            },
+            {
+              "sentence": "Heavy rains in Bangladesh, according to officials, caused damage in several\u00a0regions",
+              "refs": [
+                "https://abcnews.go.com/Technology/wireStory/bangladesh-myanmar-bracing-cyclone-mocha-set-make-landfall-99312758"
+              ]
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Sri Lanka",
+          "section_content": [
+            {
+              "sentence": "Although the impact of the cyclone on Sri Lanka was significantly reduced by its landfall between Bangladesh and Myanmar, seven people were injured,  another seven were reported missing, and nearly 2,000 people have been affected in Southern Sri Lanka due to the cyclonic storm's indirect influence",
+              "refs": [
+                "https://www.nytimes.com/article/cyclone-mocha-bangladesh-myanmar.html"
+              ]
+            },
+            {
+              "sentence": "The Sri Lanka Navy (SLN) has deployed approximately 30 relief teams to assist those affected by potential floods",
+              "refs": [
+                "https://www.siasat.com/cyclone-mocha-nearly-2000-affected-in-sri-lanka-2590180/"
+              ]
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Elsewhere",
+          "section_content": [
+            {
+              "sentence": "In India, the state of Mizoram, at least 154 houses were destroyed or severely damaged and 82 others and eight refugee camps were partially damaged",
+              "refs": []
+            },
+            {
+              "sentence": "A total of 5,749 people in more than 50 villages were affected by Mocha",
+              "refs": []
+            },
+            {
+              "sentence": "The city of Kolkata experienced intense rainfall",
+              "refs": [
+                "https://www.livemint.com/news/world/cyclone-mocha-live-updates-mynamar-weather-stormvideo-bay-of-bengal-next-cyclonebangladesh-11684120289509.html",
+                "https://www.business-standard.com/world-news/cyclone-mocha-nearly-2-000-people-affected-in-southern-sri-lanka-123051500710_1.html"
+              ]
+            },
+            {
+              "sentence": "In China, blizzards were reported in the northwestern part of Yunnan, arising from the collision of moist air from Mocha's remnants with cold wintery air",
+              "refs": [
+                "https://www.timesofindia.com/city/guwahati/236-homes-8-mizoram-refugee-camps-damaged-due-to-mocha-offshoot/articleshow/100262134.cms"
+              ]
+            },
+            {
+              "sentence": "Due to the presence of cold air and plenty of moisture from Mocha, snow was able to accumulate, covering roads and other structures",
+              "refs": [
+                "https://news.abplive.com/news/india/cyclone-mocha-230-houses-in-mizoram-destroyed-heavy-rain-lashes-kolkata-1602557"
+              ]
+            }
+          ],
+          "subsections": []
+        }
+      ]
+    },
+    {
+      "section_title": "Aftermath",
+      "section_content": [],
+      "subsections": [
+        {
+          "section_title": "Myanmar",
+          "section_content": [
+            {
+              "sentence": "The state of Rakhine was declared a natural disaster area by military officials",
+              "refs": []
+            },
+            {
+              "sentence": "Communications were cut off from Sittwe",
+              "refs": [
+                "https://www.accuweather.com/en/hurricane/deadly-cyclone-mocha-displaces-thousands-in-bangladesh-myanmar/1527027"
+              ]
+            },
+            {
+              "sentence": "Min Aung Hlaing, Myanmar's junta leader, visited Sittwe to assess the\u00a0damage and provide donations to residents",
+              "refs": [
+                "https://www.bbc.com/news/world-asia-65595693"
+              ]
+            },
+            {
+              "sentence": "Storm damage to communications and road infrastructure, as well as ongoing limitations imposed by Myanmar's military government, made it difficult to obtain information and send help to the affected area, according to non-governmental organizations",
+              "refs": [
+                "https://sports.yahoo.com/myanmar-port-city-cut-off-051103190.html"
+              ]
+            },
+            {
+              "sentence": "The United Nations said that 16 million people were affected by the storm, of which according to UNOCHA, 5.1\u00a0million of them live in northwestern Rakhine State",
+              "refs": [
+                "https://www.cnn.com/2023/05/16/asia/cyclone-mocha-death-toll-loss-of-life-intl-hnk/index.html"
+              ]
+            },
+            {
+              "sentence": "Malteser International pledged \u20ac100,000 and distributed relief goods on 15 May for those affected",
+              "refs": []
+            },
+            {
+              "sentence": "The United States provided $250,000 to Bangladesh and Rohingya refugees on 17 May",
+              "refs": [
+                "https://burmese.voanews.com/a/un-officials-on-impact-of-cyclone-in-myanmar/7096886.html"
+              ]
+            },
+            {
+              "sentence": "India launched operation Karuna to support Myanmar",
+              "refs": [
+                "https://reliefweb.int/report/myanmar/cyclone-mocha-myanmarbangladesh-malteser-international-provides-eur-100000-emergency-relief-and-distributes-relief-goods"
+              ]
+            },
+            {
+              "sentence": "On 23\u00a0May, a supplemental US$122\u00a0million Flash Appeal was launched by UNOCHA targeting the needs of 500,000 storm victims",
+              "refs": []
+            },
+            {
+              "sentence": "This supplemented an existing humanitarian response plan with a target of 1.1\u00a0million people and cost of US$212\u00a0million",
+              "refs": []
+            },
+            {
+              "sentence": "By mid-June, UN-led humanitarian efforts provided over 110,000 people with shelter and more than 300,000 with food",
+              "refs": [
+                "https://newsonair.gov.in/News?title=Cyclone-Mocha%3A-Indian-Navy-ships-carrying-relief-material-reach-Yangon-under-Operation-Karuna&id=461113"
+              ]
+            },
+            {
+              "sentence": "On 12 June, Myanmar's State Administration Council suspended UN humanitarian aid",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        }
+      ]
+    },
+    {
+      "section_title": "See also",
+      "section_content": [],
+      "subsections": []
+    },
+    {
+      "section_title": "Notes",
+      "section_content": [],
+      "subsections": []
+    },
+    {
+      "section_title": "References",
+      "section_content": [],
+      "subsections": []
+    },
+    {
+      "section_title": "External links",
+      "section_content": [],
+      "subsections": []
+    }
+  ],
+  "references": {
+    "8": "[ERROR retrieving ref link]",
+    "1": "https://rsmcnewdelhi.imd.gov.in/download.php?path=uploads/report/26/26_f26e46_Extremely%20Severe%20Cyclonic%20Storm%20MOCHA-A%20Brief%20Report_24May2023_with_annexure.pdf",
+    "2": "https://www.voanews.com/a/cyclone-mocha-death-toll-rises-to-41-in-myanmar-s-rakhine-state/7095286.html",
+    "3": "https://www.livemint.com/news/world/cyclone-mocha-live-updates-mynamar-weather-stormvideo-bay-of-bengal-next-cyclonebangladesh-11684120289509.html",
+    "4": "https://www.thejournal.ie/five-dead-cyclone-mocha-thejournal-ie-6068418-May2023/",
+    "5": "https://www.channelnewsasia.com/asia/cyclone-mocha-death-toll-rises-81-myanmar-3493731",
+    "6": "https://www.rfa.org/english/news/myanmar/mocha-rakhine-rohingya-05172023160638.html",
+    "7": "https://www.theweek.in/news/world/2023/05/11/the-brewing-of-mocha-how-cyclone-mocha-got-its-name.html",
+    "9": "https://web.archive.org/web/20230514014644/https://www.barrons.com/news/cyclone-mocha-heads-for-myanmar-bangladesh-1af43ee8",
+    "10": "https://ahacentre.org/situation-update/situation-update-no-8-tropical-cyclone-mocha-myanmar-26-may-2023/",
+    "11": "https://www.cnbctv18.com/environment/cyclone-mocha-myanmar-government-claims-435-dead-appeals-for-international-aid-16688751.htm/",
+    "12": "https://www.bnionline.net/en/news/over-200000-houses-destroyed-cyclone-damage-estimated-us15-billion-reports-ulaaa",
+    "13": "https://archive.today/20230509233349/https://www.wis-jma.go.jp/d/o/DEMS/Alphanumeric/Warning/Tropical_cyclone/20230502/071000/A_WTIN20DEMS020710_C_RJTD_20230502071517_26.txt",
+    "14": "https://archive.today/20230509234842/https://www.wis-jma.go.jp/d/o/DEMS/Alphanumeric/Warning/Tropical_cyclone/20230507/075000/A_WTIN20DEMS070750_C_RJTD_20230507080217_76.txt",
+    "15": "https://wiki.chlod.net/jtwc/text/2023-05-07-1750-abioweb.txt",
+    "16": "https://archive.today/20230509235734/https://www.wis-jma.go.jp/d/o/DEMS/Alphanumeric/Warning/Tropical_cyclone/20230508/075500/A_WTIN20DEMS080755_C_RJTD_20230508075817_36.txt",
+    "17": "https://archive.today/20230510000341/https://www.wis-jma.go.jp/d/o/DEMS/Alphanumeric/Warning/Tropical_cyclone/20230509/162500/A_WTIN20DEMS091625_C_RJTD_20230509162931_15.txt",
+    "18": "https://wiki.chlod.net/jtwc/text/2023-05-09-1400-io9123web.txt",
+    "19": "https://archive.today/20230510210849/https://www.wis-jma.go.jp/d/o/DEMS/Alphanumeric/Warning/Tropical_cyclone/20230510/041500/A_WTIN20DEMS100415_C_RJTD_20230510042102_2.txt",
+    "20": "https://web.archive.org/web/20230511144726/https://www.wis-jma.go.jp/d/o/DEMS/Alphanumeric/Warning/Tropical_cyclone/20230511/032000/A_WTIN31DEMS110320_C_RJTD_20230511032216_50.txt",
+    "21": "https://wiki.chlod.net/jtwc/prog/2023-05-11-0240-io0123prog.txt",
+    "22": "https://wiki.chlod.net/jtwc/prog/2023-05-11-1310-io0123prog.txt",
+    "23": "https://web.archive.org/web/20230511165657/https://mausam.imd.gov.in/backend/assets/cyclone_pdf/TROPICAL_CYCLONE_ADVISORY_NO__5_1200UTC_11_05_2023.pdf",
+    "24": "https://wiki.chlod.net/jtwc/prog/2023-05-11-2150-io0123prog.txt",
+    "25": "https://web.archive.org/web/20230512130656/https://www.wis-jma.go.jp/d/o/DEMS/Alphanumeric/Warning/Tropical_cyclone/20230512/044800/A_WTIN01DEMS120448_C_RJTD_20230512045017_89.txt",
+    "26": "https://wiki.chlod.net/jtwc/prog/2023-05-12-1310-io0123prog.txt",
+    "27": "https://wiki.chlod.net/jtwc/text/2023-05-12-1310-io0123web.txt",
+    "28": "https://web.archive.org/web/20230512154316/https://mausam.imd.gov.in/backend/assets/cyclone_pdf/TROPICAL_CYCLONE_ADVISORY_NO__12_0900UTC_12_05_2023.pdf",
+    "29": "https://wiki.chlod.net/jtwc/prog/2023-05-12-2040-io0123prog.txt",
+    "30": "https://web.archive.org/web/20230512215503/https://mausam.imd.gov.in/backend/assets/cyclone_pdf/TROPICAL_CYCLONE_ADVISORY_NO__15_1800UTC_12_05_2023.pdf",
+    "31": "https://wiki.chlod.net/jtwc/prog/2023-05-13-1500-io0123prog.txt",
+    "32": "https://wiki.chlod.net/jtwc/prog/2023-05-14-0320-io0123prog.txt",
+    "33": "https://wiki.chlod.net/jtwc/prog/2023-05-14-0750-io0123prog.txt",
+    "34": "http://yaleclimateconnections.org/2023/05/cyclone-mocha-north-indian-oceans-strongest-storm-on-record-hits-myanmar/",
+    "35": "https://apnews.com/article/cyclone-mocha-bangladesh-myanmar-06512b0f496bf85c926f12925ab1ba7e",
+    "36": "https://wiki.chlod.net/jtwc/text/2023-05-14-1400-io0123web.txt",
+    "37": "https://web.archive.org/web/20230514163929/https://mausam.imd.gov.in/backend/assets/cyclone_pdf/TROPICAL_CYCLONE_ADVISORY_NO__30_1500UTC_14_05_2023.pdf",
+    "38": "https://web.archive.org/web/20230515115925/https://mausam.imd.gov.in/backend/assets/cyclone_pdf/TROPICAL_CYCLONE_ADVISORY_NO__31_1800UTC_14_05_2023.pdf",
+    "39": "https://web.archive.org/web/20230515120506/https://mausam.imd.gov.in/backend/assets/cyclone_pdf/TROPICAL_CYCLONE_ADVISORY_NO__33_0000UTC_15_05_2023.pdf",
+    "40": "https://web.archive.org/web/20230515120939/https://mausam.imd.gov.in/backend/assets/cyclone_pdf/TROPICAL_CYCLONE_ADVISORY_NO__34_0300UTC_15_05_2023.pdf",
+    "41": "https://reliefweb.int/report/myanmar/myanmar-cyclone-mocha-flash-update-1-12-may-2023",
+    "42": "https://web.archive.org/web/20230513224552/https://www.ifrc.org/press-release/myanmar-red-cross-prepares-ahead-landfall-cyclone-mocha",
+    "43": "https://reliefweb.int/attachments/48a4d766-2aea-4157-9fea-0f5d78ca1865/Situation%20Update%20No.%202%20-%20Tropical%20Cyclone%20One%20%28Mocha%29%2C%20Myanmar%20-%20Sunday%2C%2014%20May%202023%2C%202200HRS%20%28UTC7%29.pdf",
+    "44": "https://www.theguardian.com/world/2023/may/14/thousands-evacuated-as-cyclone-mocha-makes-landfall-in-myanmar",
+    "45": "https://www.reuters.com/world/asia-pacific/cyclone-mocha-heads-bangladesh-myanmar-coasts-threatening-refugees-2023-05-13/",
+    "46": "https://web.archive.org/web/20230513225054/https://www.rappler.com/world/asia-pacific/cyclone-mocha-heads-bangladesh-myanmar-coasts-thousands-flee/",
+    "47": "https://www.theguardian.com/world/2023/may/13/cyclone-mocha-threatens-worlds-largest-refugee-camp-on-myanmar-bangladesh-border",
+    "48": "https://web.archive.org/web/20230513225541/https://www.aljazeera.com/news/2023/5/13/thousands-evacuated-as-cyclone-mocha-nears-myanmar-bangladesh",
+    "49": "https://www.theguardian.com/world/2023/may/14/thousands-evacuated-as-cyclone-mocha-makes-landfall-in-myanmar",
+    "50": "https://www.cnn.com/2023/05/12/asia/cyclone-mocha-bangladesh-myanmar-intl-hnk/index.html",
+    "51": "https://apnews.com/article/cyclone-mocha-bangladesh-myanmar-5c06948384d6afbd7a740a291de6e116",
+    "52": "https://www.bbc.com/news/world-asia-65581169",
+    "53": "https://web.archive.org/web/20230514020644/https://www.cbsnews.com/news/cyclone-mocha-bangladesh-myanmar-thousands-evacuations/",
+    "54": "https://web.archive.org/web/20230513230308/https://edition.cnn.com/2023/05/13/asia/cyclone-mocha-aid-agencies-myanmar-bangladesh-climate-intl-hnk/index.html",
+    "55": "https://web.archive.org/web/20230513230542/https://economictimes.indiatimes.com/news/international/world-news/bangladesh-issues-high-alert-as-approaching-cyclone-mocha-turns-very-dangerous/articleshow/100207806.cms",
+    "56": "https://web.archive.org/web/20230513231112/https://www.indiatoday.in/world/story/cyclone-mocha-heads-to-bangladesh-myanmar-coastal-people-flee-shelter-rainfall-winds-2378923-2023-05-14",
+    "57": "https://www.manilatimes.net/2023/05/14/world/hundreds-of-thousands-flee-as-cyclone-thunders-towards-myanmar-bangladesh/1891435",
+    "58": "https://timesofindia.indiatimes.com/city/kolkata/cyclone-mocha-news-live-updates-severe-storm-west-bengal-digha-imd-ndrf-andaman-island/liveblog/100176252.cms",
+    "59": "https://weather.com/en-IN/india/news/news/2023-05-13-cyclone-mocha-to-dump-very-heavy-rains-over-northeast-india",
+    "60": "https://www.chinadaily.com.cn/a/202305/12/WS645d91a0a310b6054fad28e8.html",
+    "61": "https://www.cma.gov.cn/2011xwzx/2011xqxxw/2011xzytq/202305/t20230514_5504483.html",
+    "62": "https://www.ndtv.com/world-news/cyclone-mocha-death-count-rises-to-60-in-myanmar-4039568",
+    "63": "https://www.rfa.org/burmese/multimedia/mocha-rakhine-sittway-rohingya-05162023163202.html/",
+    "64": "https://www.france24.com/en/live-news/20230519-cyclone-mocha-death-toll-reaches-145-in-myanmar",
+    "65": "https://burma.irrawaddy.com/news/2023/05/15/260074.html",
+    "66": "https://myanmar-now.org/en/news/cyclone-mocha-brings-severe-flooding-to-magway-region/",
+    "67": "https://news.sky.com/story/storm-mocha-bangladesh-and-myanmar-preparing-for-the-worst-ahead-of-cyclone-12880502",
+    "68": "https://myanmar-now.org/mm/news/36909/",
+    "69": "https://myanmar-now.org/en/news/cyclone-mocha-leaves-trail-of-destruction-in-western-myanmar/",
+    "70": "https://myanmar-now.org/mm/news/36490/",
+    "71": "https://www.bbc.com/burmese/articles/crg310rxve0o",
+    "72": "https://burmese.dvb.no/archives/593328",
+    "73": "https://reliefweb.int/attachments/3a275fe0-64f7-4b4f-93b8-44d0d2a15c56/Myanmar%20--%20Cyclone%20Mocha%20--%20Flash%20Update%20%233%20%28as%20of%2014%20May%202023%29.pdf",
+    "74": "https://www.reuters.com/world/asia-pacific/powerful-cyclone-barrels-towards-myanmar-bangladesh-400000-evacuated-2023-05-14/",
+    "75": "https://abcnews.go.com/Technology/wireStory/bangladesh-myanmar-bracing-cyclone-mocha-set-make-landfall-99312758",
+    "76": "https://www.bbc.com/news/world-asia-65587321",
+    "77": "https://burma.irrawaddy.com/news/2023/05/15/260086.html",
+    "78": "https://reliefweb.int/map/myanmar/myanmar-probable-flood-inundated-area-rakhine-state-15-may-2023",
+    "79": "https://reliefweb.int/report/myanmar/unicef-myanmar-humanitarian-situation-report-no-3-cyclone-mocha-16-may-2023",
+    "80": "https://www.reuters.com/world/asia-pacific/many-rohingya-muslims-killed-after-cyclone-hit-western-myanmar-residents-ngo-2023-05-16/",
+    "81": "https://myanmar-now.org/en/news/hundreds-feared-dead-after-cyclone-mocha-hits-western-myanmars-rohingya-idp-camps/",
+    "82": "https://bangla.thedailystar.net/environment/cyclone-mocha/news-478671",
+    "83": "https://apnews.com/article/cyclone-mocha-bangladesh-myanmar-06512b0f496bf85c926f12925ab1ba7e",
+    "84": "https://www.bhorerkagoj.com/2023/05/15/%E0%A6%AE%E0%A6%B9%E0%A7%87%E0%A6%B6%E0%A6%96%E0%A6%BE%E0%A6%B2%E0%A7%80%E0%A6%A4%E0%A7%87-%E0%A6%98%E0%A7%82%E0%A6%B0%E0%A7%8D%E0%A6%A3%E0%A6%BF%E0%A6%9D%E0%A6%A1%E0%A6%BC%E0%A7%87-%E0%A7%A9/",
+    "85": "https://www.tbsnews.net/bangladesh/st-martins-islanders-struggle-rebuild-after-mocha-632426",
+    "86": "https://www.nytimes.com/article/cyclone-mocha-bangladesh-myanmar.html",
+    "87": "https://www.siasat.com/cyclone-mocha-nearly-2000-affected-in-sri-lanka-2590180/",
+    "88": "https://www.sundayobserver.lk/2023/05/16/news/effects-cyclonic-storm-%E2%80%98mocha%E2%80%99-sri-lanka-reduced",
+    "89": "https://www.business-standard.com/world-news/cyclone-mocha-nearly-2-000-people-affected-in-southern-sri-lanka-123051500710_1.html",
+    "90": "https://www.timesofindia.com/city/guwahati/236-homes-8-mizoram-refugee-camps-damaged-due-to-mocha-offshoot/articleshow/100262134.cms",
+    "91": "https://news.abplive.com/news/india/cyclone-mocha-230-houses-in-mizoram-destroyed-heavy-rain-lashes-kolkata-1602557",
+    "92": "https://www.accuweather.com/en/hurricane/deadly-cyclone-mocha-displaces-thousands-in-bangladesh-myanmar/1527027",
+    "93": "https://www.bbc.com/news/world-asia-65595693",
+    "94": "https://sports.yahoo.com/myanmar-port-city-cut-off-051103190.html",
+    "95": "https://www.cnn.com/2023/05/16/asia/cyclone-mocha-death-toll-loss-of-life-intl-hnk/index.html",
+    "96": "https://www.reuters.com/world/asia-pacific/many-rohingya-muslims-killed-after-cyclone-hit-western-myanmar-residents-ngo-2023-05-16/",
+    "97": "https://burmese.voanews.com/a/un-officials-on-impact-of-cyclone-in-myanmar/7096886.html",
+    "98": "https://reliefweb.int/report/myanmar/cyclone-mocha-myanmarbangladesh-malteser-international-provides-eur-100000-emergency-relief-and-distributes-relief-goods",
+    "99": "https://reliefweb.int/report/bangladesh/united-states-provides-emergency-assistance-cyclone-mocha-recovery",
+    "100": "https://newsonair.gov.in/News?title=Cyclone-Mocha%3A-Indian-Navy-ships-carrying-relief-material-reach-Yangon-under-Operation-Karuna&id=461113",
+    "101": "https://reliefweb.int/attachments/d2546d5f-a93c-4328-a059-54d971ac66ce/Myanmar%20Flash%20Appeal%20-%20Cyclone%20Mocha%20-%2023%20May%202023.pdf",
+    "102": "https://reliefweb.int/attachments/88264d9e-9bcc-4ec6-8846-7738131b411c/Press%20Release-%20Cyclone%20Access_12June-FINAL.pdf"
+  },
+  "spicy_entities": {
+    "storm mocha": "PERSON",
+    "the north indian ocean": "LOC",
+    "myanmar": "GPE",
+    "bangladesh": "GPE",
+    "may 2023": "DATE",
+    "second": "ORDINAL",
+    "first": "ORDINAL",
+    "2023": "CARDINAL",
+    "north indian ocean": "EVENT",
+    "mocha": "PERSON",
+    "the india meteorological department": "ORG",
+    "imd": "ORG",
+    "8 may": "DATE",
+    "the bay of bengal": "LOC",
+    "5": "CARDINAL",
+    "14 may": "DATE",
+    "280 km": "QUANTITY",
+    "175 mph": "QUANTITY",
+    "cyclone fani": "PERSON",
+    "1-minute": "TIME",
+    "thousands": "CARDINAL",
+    "sittwe": "PERSON",
+    "pauktaw": "PERSON",
+    "buthidaung": "GPE",
+    "over 500,000": "CARDINAL",
+    "rakhine": "PERSON",
+    "rakhine state": "PERSON",
+    "cyclone mocha": "PERSON",
+    "asean": "ORG",
+    "145": "CARDINAL",
+    "the national unity government of myanmar": "ORG",
+    "nug": "ORG",
+    "at least 463": "CARDINAL",
+    "three": "CARDINAL",
+    "719": "CARDINAL",
+    "101": "CARDINAL",
+    "about us$1.5 billion": "MONEY",
+    "2 may": "DATE",
+    "madden": "GPE",
+    "julian": "NORP",
+    "cyclone fabien": "ORG",
+    "the southern hemisphere": "LOC",
+    "7 may": "DATE",
+    "9 may": "DATE",
+    "jtwc": "ORG",
+    "10 may": "DATE",
+    "11 may": "DATE",
+    "12:00 utc": "TIME",
+    "90\u00a0km": "QUANTITY",
+    "55\u00a0mph": "QUANTITY",
+    "12 may": "DATE",
+    "165\u00a0km": "QUANTITY",
+    "105\u00a0mph": "QUANTITY",
+    "category\u00a02": "PRODUCT",
+    "the saffir\u2013simpson": "FAC",
+    "18:00 utc": "TIME",
+    "13 may": "DATE",
+    "240\u00a0km": "QUANTITY",
+    "150\u00a0mph": "QUANTITY",
+    "sshws": "ORG",
+    "215\u00a0km": "QUANTITY",
+    "130\u00a0mph": "QUANTITY",
+    "938": "CARDINAL",
+    "27.70\u00a0inhg": "MONEY",
+    "260\u00a0km": "QUANTITY",
+    "160\u00a0mph": "QUANTITY",
+    "mocha a category": "PERSON",
+    "280\u00a0km": "QUANTITY",
+    "175\u00a0mph": "QUANTITY",
+    "about 37\u00a0km": "QUANTITY",
+    "20": "CARDINAL",
+    "3-minute": "TIME",
+    "135\u00a0mph": "QUANTITY",
+    "195\u00a0km": "QUANTITY",
+    "120\u00a0mph": "QUANTITY",
+    "15 may": "DATE",
+    "utc": "ORG",
+    "aung hlaing": "PERSON",
+    "the united nations": "ORG",
+    "16 million": "CARDINAL",
+    "unocha": "ORG",
+    "5.1\u00a0million": "CARDINAL",
+    "malteser international": "ORG",
+    "100,000": "MONEY",
+    "the united states": "GPE",
+    "250,000": "MONEY",
+    "rohingya": "ORG",
+    "17 may": "DATE",
+    "india": "GPE",
+    "karuna": "LOC",
+    "23\u00a0may": "DATE",
+    "us$122\u00a0million": "MONEY",
+    "flash appeal": "PERSON",
+    "500,000": "CARDINAL",
+    "1.1\u00a0million": "CARDINAL",
+    "us$212\u00a0million": "MONEY",
+    "mid-june": "DATE",
+    "un": "ORG",
+    "over 110,000": "CARDINAL",
+    "more than 300,000": "CARDINAL",
+    "12 june": "DATE",
+    "state administration council": "ORG",
+    "at least 2,522": "CARDINAL",
+    "cox's bazar": "ORG",
+    "10,469": "CARDINAL",
+    "martin": "PERSON",
+    "island": "GPE",
+    "700": "CARDINAL",
+    "at least 12": "CARDINAL",
+    "one": "CARDINAL",
+    "500": "CARDINAL",
+    "teknaf": "GPE",
+    "maheshkhali island": "LOC",
+    "between 50 and 60": "CARDINAL",
+    "cox's bazar district": "ORG",
+    "bengal": "GPE",
+    "tripura": "GPE",
+    "nagaland": "GPE",
+    "manipur": "GPE",
+    "assam": "PERSON",
+    "china": "GPE",
+    "the national meteorological centre": "ORG",
+    "the china meteorological administration": "ORG",
+    "cma": "ORG",
+    "yunnan": "GPE",
+    "tibet": "GPE",
+    "hengduan": "NORP",
+    "eastern himalayan mountain": "LOC",
+    "the state flood control and drought relief": "ORG",
+    "level": "PERSON",
+    "sri lanka": "GPE",
+    "seven": "CARDINAL",
+    "nearly 2,000": "CARDINAL",
+    "southern sri lanka": "LOC",
+    "the sri lanka navy": "ORG",
+    "sln": "ORG",
+    "approximately 30": "CARDINAL",
+    "mizoram": "GPE",
+    "at least 154": "CARDINAL",
+    "82": "CARDINAL",
+    "eight": "CARDINAL",
+    "5,749": "CARDINAL",
+    "more than 50": "CARDINAL",
+    "kolkata": "PERSON",
+    "aftermath\n\n": "PERSON"
+  },
+  "flair_entities": [
+    "bay of bengal",
+    "mocha",
+    "bazar",
+    "india meteorological department",
+    "maheshkhali island",
+    "nagaland",
+    "united nations",
+    "hengduan",
+    "state administration council",
+    "level iv",
+    "kolkata",
+    "teknaf",
+    "martin's island",
+    "southern sri lanka",
+    "joint typhoon warning center",
+    "china meteorological administration",
+    "sittwe",
+    "invest 91b",
+    "nmc",
+    "china",
+    "buthidaung",
+    "southern hemisphere",
+    "malteser international",
+    "china  the national meteorological centre",
+    "flash appeal",
+    "assam",
+    "sln",
+    "sri lanka",
+    "un",
+    "sri lanka navy",
+    "un-led",
+    "rakhine",
+    "mizoram",
+    "state flood control and drought relief",
+    "north indian ocean",
+    "cyclone mocha",
+    "eastern himalayan mountain",
+    "sshws",
+    "cox",
+    "yunnan",
+    "madden\u2013julian oscillation",
+    "min aung hlaing",
+    "myanmar",
+    "rakhine state",
+    "tropical cyclone 01b",
+    "rohingya",
+    "bazar district",
+    "national unity government of myanmar",
+    "maungdaw",
+    "tibet",
+    "saffir\u2013simpson",
+    "cyclone fani",
+    "mocha  extremely severe cyclonic storm mocha",
+    "bangladesh",
+    "unocha",
+    "us",
+    "cma",
+    "myebon",
+    "pauktaw",
+    "tropical cyclone formation alert",
+    "cyclone fabien",
+    "manipur",
+    "tripura",
+    "utc",
+    "asean",
+    "nug",
+    "karuna",
+    "imd",
+    "jtwc",
+    "united states",
+    "india"
+  ]
+}

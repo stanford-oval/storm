@@ -1,0 +1,73 @@
+Febrile_seizure
+
+A febrile seizure, also known as a fever fit or febrile convulsion, is a seizure associated with a high body temperature but without any serious underlying health issue. They most commonly occur in children between the ages of 6 months and 5 years. Most seizures are less than five minutes in duration, and the child is completely back to normal within an hour of the event. There are two types: simple febrile seizures and complex febrile seizures. Simple febrile seizures involve an otherwise healthy child who has at most one tonic-clonic seizure lasting less than 15 minutes in a 24-hour period. Complex febrile seizures have focal symptoms, last longer than 15 minutes, or occur more than once within 24 hours. About 80% are classified as simple febrile seizures.Febrile seizures are triggered by fever, typically due to a viral infection. They may run in families. The underlying mechanism is not fully known, but it is thought to involve genetics, environmental factors, brain immaturity, and inflammatory mediators. The diagnosis involves verifying that there is not an infection of the brain, there are no metabolic problems, and there have not been prior seizures that have occurred without a fever. Blood testing, imaging of the brain, or an electroencephalogram (EEG) is typically not needed. Examination to determine the source of the fever is recommended. In otherwise healthy-looking children a lumbar puncture is not necessarily required.Neither anti-seizure medication nor anti-fever medication are recommended in an effort to prevent further simple febrile seizures. In the few cases that last greater than 5 minutes, a benzodiazepine such as lorazepam or midazolam may be used. Efforts to rapidly cool during a seizure is not recommended.Febrile seizures affect 2–10% of children. They are more common in boys than girls. After a single febrile seizure there is an approximately 35% chance of having another one during childhood. Outcomes are generally excellent with similar academic achievements to other children and no change in the risk of death for those with simple seizures. There is tentative evidence that affected children have a slightly increased risk of epilepsy at 2% compared to the general population.
+
+# Signs and symptoms
+
+Signs and symptoms depend on if the febrile seizure is simple versus complex. In general, the child's temperature is greater than 38 °C (100.4 °F),  although most have a fever of 39 °C (102.2 °F) or higher [4]. Most febrile seizures will occur during the first 24 hours of developing a fever [6]. Signs of typical seizure activity include loss of consciousness, opened eyes which may be deviated or appear to be looking towards one direction, irregular breathing, increased secretions or foaming at the mouth, and the child may look pale or blue (cyanotic) [6]. They may become incontinent (wet or soil themselves) and may also vomit [4] [6]. 
+
+## Types
+
+There are two types of febrile seizures: simple and complex. Febrile status epilepticus is a subtype of complex febrile seizures that lasts for longer than 30 minutes [5]. It can occur in up to 5% of febrile seizure cases [7]. 
+
+# Causes
+
+Febrile seizures are due to fevers,  usually those greater than 38 °C (100.4 °F) [12]. The cause of the fevers is often a viral illness [16]. The likelihood of a febrile seizure is related to how high the temperature reaches [1]. Some feel that the rate of increase is not important  while others feel the rate of increase is a risk factor [1] [6] [1]. This latter position has not been proven [17]. In children, illnesses that often cause a fever include middle ear infections and viral upper respiratory infections. Other infections associated with febrile seizures include Shigellosis, Salmonellosis, and Roseola [5]. Although the exact mechanism is unknown, it is speculated that these infections may affect the brain directly or via a neurotoxin leading to seizures [5]. There is a small chance of a febrile seizure after certain vaccines. The risk is only slightly increased for a few days after receiving one of the implicated vaccines during the time when the child is likely to develop a fever as a natural immune response [18]. Implicated vaccines include: [6] [18] [6]. It was previously thought that febrile seizures were more likely to occur with the combined MMRV vaccine, but recent studies have found there to be no significant increase. Overall, febrile seizures triggered by vaccines are uncommon [19]. Children who have a genetic predisposition towards febrile seizures are more likely to have one after vaccination [19]. The seizures occur, by definition, without an intracranial infection or metabolic problems. They run in families with reported family history in approximately 33% of people [1]. Several genetic associations have been identified,  including GEFS+ and Dravet Syndrome [1] [6] [15]. Possible modes of inheritance for genetic predisposition to febrile seizures include autosomal dominance with reduced penetrance and polygenic multifactorial inheritance [7]. An association with iron deficiency has also been reported, particularly in the developing world [20] [6]. 
+
+# Mechanism
+
+The exact underlying mechanism of febrile seizures is still unknown, but it is thought to be multi-factorial involving genetic and environmental factors. Speculation includes immaturity of the central nervous system at younger ages, making the brain more vulnerable to the effects of fever [6] [7]. The increased activity of neurons during rapid brain development, may help explain why children, particularly younger than age 3, are prone to febrile seizures, with occurrences decreasing after age 5 [6] [20]. Other proposed mechanisms include the interactions of inflammatory mediators, particularly cytokines, which are released during a fever, causing elevated temperatures in the brain, which may somehow lead to a seizure [6]. Specific cytokines implicated include elevated CSF IL-1β and serum IL-6 [7] [8]. 
+
+# Diagnosis
+
+The diagnosis is made by eliminating more serious causes of seizure and fever: in particular, meningitis and encephalitis. However, in children who are immunized against pneumococcal and Haemophilus influenzae, the risk of bacterial meningitis is low [14]. If a child has recovered and is acting normally, bacterial meningitis is very unlikely, making further procedures such as a lumbar puncture unnecessary [7]. Diagnosis involves gathering a detailed history including the value of highest temperature recorded, timing of seizure and fever, seizure characteristics, time to return to baseline, vaccination history, illness exposures, family history, etc.; and performing a physical exam that looks for signs of infection including meningitis and neurological status. Blood tests, imaging of the brain and an electroencephalogram are generally not needed [6]. However, for complex febrile seizures, EEG and imaging with an MRI of the brain may be helpful [1] [14]. Lumbar puncture is recommended if there are obvious signs and symptoms of meningitis or if there is high clinical suspicion. However, lumbar puncture is an option that may be considered in children younger than 12 months of age since signs and symptoms of meningitis may be atypical, if the child does not return to baseline, or if the child lacks immunization against Haemophilus influenzae and pneumococcal or vaccination status is unknown [14]. Differential diagnosis includes other causes of seizures such as CNS infections (i.e. meningitis, encephalitis), metabolic disturbances (i.e. electrolyte imbalances), CNS trauma, drug use and/or withdrawal, genetic conditions (i.e. GEFS+), FIRES, shivering, febrile delirium, febrile myoclonus, breath holding spells, and convulsive syncope. However, febrile seizures are still the most likely cause of convulsions in children under the age of 5 years old [6]. 
+
+# Prevention
+
+There is no benefit from the use of phenytoin, valproate, ibuprofen, diclofenac, acetaminophen, pyridoxine, or zinc sulfate,. There is no evidence to support administering fever reducing medications such as acetaminophen at the time of a febrile seizure or to prevent the rate of recurrence [9]. Rapid cooling methods such as an ice bath or a cold bath should be avoided as a method to lower the child's temperature, especially during a febrile seizure [24]. There is a decrease of recurrent febrile seizures with intermittent diazepam and phenobarbital but there is a high rate of adverse effects. They are thus not recommended as an effort to prevent further seizures [9]. 
+
+# Treatment
+
+If a child is having a febrile seizure, the following recommendations are made for caregivers: [25]. In those with a single seizure lasting greater than 5 minutes or two consecutive seizures lasting greater than 5 minutes in which the person has not returned to their baseline mental status, defined as status epilepticus, intravenous lorazepam, rectal diazepam, or intranasal midazolam is recommended. Anti-seizure medication are used in status epilepticus in an effort to prevent complications such as injury to the hippocampus or temporal lobe epilepsy [1] [3]. Secondary causes of a seizure should be addressed if present. Questions that may be asked of the caregivers who witnessed the seizure include the length of the seizure, the timing of the day, loss of consciousness, loss of bowel or urinary continence, a period of altered level of consciousness or confusion once the seizure stopped, movement of the eyes to a specific side, recent infections, recent medication usage including antibiotics or fever reducer medications, family history of febrile and afebrile seizures, vaccination and travel history. [citation needed]. Vital signs should be monitored in the emergency department along with observation for 6 hours. Evaluation for the cause of fever should be performed including signs of an infection such as a bulging tympanic membrane (otitis media), red pharynx, enlarged tonsils, enlarged cervical lymph nodes (streptococcal pharyngitis or infectious mononucleosis), and a widespread rash. CNS infections such as meningitis, encephalitis and brain abscesses should be ruled out, along with electrolyte abnormalities [6]. [citation needed]. 
+
+# Prognosis
+
+Long term outcomes are generally good with little risk of neurological problems or epilepsy. Those who have one febrile seizure have an approximately 30- 40% chance of having another one in the next two years, with the risk being greater in those who are younger [1]. Simple febrile seizures do not tend to recur frequently (children tend to outgrow them) and do not make the development of adult epilepsy significantly more likely (about 3–5%) compared with the general public (1%). Children with febrile convulsions are more likely to have a febrile seizure in the future if they were young at their first seizure (less than 18 months old), have a family history of a febrile convulsions in first-degree relatives (a parent or sibling), have a short time between the onset of fever and the seizure, had a low degree of fever before their seizure, or have a seizure history of abnormal neurological signs or developmental delay [27]. Similarly, the prognosis after a complex febrile seizure is excellent, although an increased risk of death has been shown for complex febrile seizures, partly related to underlying conditions. 
+
+# Epidemiology
+
+Febrile seizures happen between the ages of 6 months and 5 years. The peak age for a febrile seizure is 18 months, with the most common age range being 12–30 months of age [1] [3] [29]. They affect between 2-5% of children [30]. They are more common in boys than girls [1] [3] [29]. Febrile seizures can occur in any ethnic group, although there have been higher rates in Guamanians (14%), Japanese (6-9%) and Indians (5-10%) [12] [6]. 
+
+# References
+
+[1] https://pubmed.ncbi.nlm.nih.gov/22335215
+[2] https://doi.org/10.1212%2FCON.0000000000000274
+[3] http://www.ncbi.nlm.nih.gov/books/NBK448123/
+[4] http://www.nhs.uk/Conditions/Febrile-convulsions/Pages/Symptoms.aspx
+[5] https://www.worldcat.org/oclc/952123506
+[6] https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6052913
+[7] https://doi.org/10.1136%2Fbmj.h4240
+[8] https://doi.org/10.1016%2Fj.seizure.2018.04.023
+[9] https://pubmed.ncbi.nlm.nih.gov/34131913
+[10] https://books.google.com/books?id=DbptoZipfKkC&pg=PT419
+[11] https://familydoctor.org/condition/febrile-seizures/
+[12] https://books.google.com/books?id=sV6-ifUGoMYC&pg=PA266
+[13] https://doi.org/10.1016%2Fj.spen.2010.06.004
+[14] https://doi.org/10.1542%2Fpeds.2010-3318
+[15] https://doi.org/10.1016%2Fj.eplepsyres.2005.11.023
+[16] ISBN: 978-0071759052
+[17] https://books.google.com/books?id=TwlXrOBkAS8C&pg=PA661
+[18] https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5395384
+[19] https://doi.org/10.1016%2Fj.vaccine.2015.06.009
+[20] https://doi.org/10.1016%2Fj.disamonth.2016.12.001
+[21] https://doi.org/10.1136%2Farchdischild-2014-306689
+[22] https://doi.org/10.1016%2Fj.seizure.2017.09.009
+[23] https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7142325
+[24] https://doi.org/10.1111%2Fepi.13057
+[25] https://www.ninds.nih.gov/Disorders/Patient-Caregiver-Education/Fact-Sheets/Febrile-Seizures-Fact-Sheet
+[26] https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4772080
+[27] https://doi.org/10.1177%2F08830738020170010601
+[28] https://doi.org/10.1016%2FS0140-6736%2808%2961198-8
+[29] https://pubmed.ncbi.nlm.nih.gov/30199360
+[30] https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1720014
+[31] https://doi.org/10.3928%2F00904481-20131122-09

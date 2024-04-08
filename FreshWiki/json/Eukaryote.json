@@ -1,0 +1,887 @@
+{
+  "title": "Eukaryote",
+  "url": "https://en.wikipedia.org/wiki/Eukaryote",
+  "summary": "The eukaryotes () constitute the domain of Eukarya, organisms whose cells have a membrane-bound nucleus. All animals, plants, fungi, and many unicellular organisms are eukaryotes. They constitute a major group of life forms alongside the two groups of prokaryotes: the Bacteria and the Archaea. Eukaryotes represent a small minority of the number of organisms, but due to their generally much larger size, their collective global biomass is much larger than that of prokaryotes.\nThe eukaryotes seemingly emerged in the Archaea, within the Asgard archaea. This implies that there are only two domains of life, Bacteria and Archaea, with eukaryotes incorporated among the Archaea. Eukaryotes emerged approximately 2.2 billion years ago, during the Proterozoic eon, likely as flagellated cells. The leading evolutionary theory is they were created by symbiogenesis between an anaerobic Asgard archaean and an aerobic proteobacterium, which formed the mitochondria. A second episode of symbiogenesis with a cyanobacterium created the plants, with chloroplasts. The oldest-known eukaryote fossils, multicellular planktonic organisms belonging to the Gabonionta, were discovered in Gabon in 2023, dating back to 2.1 billion years ago.\nEukaryotic cells contain membrane-bound organelles such as the nucleus, the endoplasmic reticulum, and the Golgi apparatus. Eukaryotes may be either unicellular or multicellular. In comparison, prokaryotes are typically unicellular. Unicellular eukaryotes are sometimes called protists. Eukaryotes can reproduce both asexually through mitosis and sexually through meiosis and gamete fusion (fertilization).",
+  "content": [
+    {
+      "section_title": "Diversity",
+      "section_content": [
+        {
+          "sentence": "Eukaryotes are organisms that range from microscopic single cells, such as picozoans under 3 micrometres across,  to animals like the blue whale, weighing up to 190 tonnes and measuring up to 33.6 metres (110\u00a0ft) long,  or plants like the coast redwood, up to 120 metres (390\u00a0ft) tall",
+          "refs": [
+            "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3608682",
+            "https://archive.org/details/guinnessbookofan00wood"
+          ]
+        },
+        {
+          "sentence": "Many eukaryotes are unicellular; the informal grouping called protists includes many of these, with some multicellular forms like the giant kelp up to 200 feet (61\u00a0m) long",
+          "refs": [
+            "http://www.conifers.org/cu/Sequoia.php"
+          ]
+        },
+        {
+          "sentence": "The multicellular eukaryotes include the animals, plants, and fungi, but again, these groups too contain many unicellular species",
+          "refs": [
+            "https://books.google.com/books?id=xuUoiFesSHMC"
+          ]
+        },
+        {
+          "sentence": "Eukaryotic cells are typically much larger than those of prokaryotes\u2014the bacteria and the archaea\u2014having a volume of around 10,000 times greater",
+          "refs": [
+            "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3996474"
+          ]
+        },
+        {
+          "sentence": "Eukaryotes represent a small minority of the number of organisms, but, as many of them are much larger, their collective global biomass (468 gigatons) is far larger than that of prokaryotes (77 gigatons), with plants alone accounting for over 81% of the total biomass of Earth",
+          "refs": [
+            "https://doi.org/10.1016%2Fb978-0-12-384719-5.00174-x",
+            "https://web.archive.org/web/20170809103456/http://protistology.jp/journal/jjp47/JJP47YAMAGUCHI.pdf"
+          ]
+        },
+        {
+          "sentence": "The eukaryotes are a diverse lineage, consisting mainly of microscopic organisms",
+          "refs": []
+        },
+        {
+          "sentence": "Multicellularity in some form has evolved independently at least 25 times within the eukaryotes",
+          "refs": [
+            "https://doi.org/10.1016%2Fj.tree.2019.08.008"
+          ]
+        },
+        {
+          "sentence": "Complex multicellular organisms, not counting the aggregation of amoebae to form slime molds, have evolved within only six eukaryotic lineages: animals, symbiomycotan fungi, brown algae, red algae, green algae, and land plants",
+          "refs": [
+            "https://grosberglab.faculty.ucdavis.edu/wp-content/uploads/sites/453/2017/05/2007-Grosberg-R.-K.-and-R.-R.-Strathmann.pdf",
+            "http://www.producao.usp.br/bitstream/handle/BDPI/45022/339_ftp.pdf?sequence=1&isAllowed=y"
+          ]
+        },
+        {
+          "sentence": "Eukaryotes are grouped by genomic similarities, so that groups often lack visible shared characteristics",
+          "refs": [
+            "https://doi.org/10.1146%2Fannurev-arplant-042110-103809"
+          ]
+        }
+      ],
+      "subsections": []
+    },
+    {
+      "section_title": "Distinguishing features",
+      "section_content": [],
+      "subsections": [
+        {
+          "section_title": "Nucleus",
+          "section_content": [
+            {
+              "sentence": "The defining feature of eukaryotes is that their cells have nuclei",
+              "refs": []
+            },
+            {
+              "sentence": "This gives them their name, from the Greek \u03b5\u1f56 (eu, \"well\" or \"good\") and \u03ba\u03ac\u03c1\u03c5\u03bf\u03bd (karyon, \"nut\" or \"kernel\", here meaning \"nucleus\")",
+              "refs": []
+            },
+            {
+              "sentence": "Eukaryotic cells have a variety of internal membrane-bound structures, called organelles, and a cytoskeleton which defines the cell's organization and shape",
+              "refs": [
+                "https://www.etymonline.com/?term=eukaryotic"
+              ]
+            },
+            {
+              "sentence": "The nucleus stores the cell's DNA, which is divided into linear bundles called chromosomes;  these are separated into two matching sets by a microtubular spindle during nuclear division, in the distinctively eukaryotic process of mitosis",
+              "refs": [
+                "https://doi.org/10.1038%2Fnrg.2016.112"
+              ]
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Biochemistry",
+          "section_content": [
+            {
+              "sentence": "Eukaryotes differ from prokaryotes in multiple ways, with unique biochemical pathways such as sterane synthesis",
+              "refs": []
+            },
+            {
+              "sentence": "The eukaryotic signature proteins have no homology to proteins in other domains of life, but appear to be universal among eukaryotes",
+              "refs": [
+                "https://ui.adsabs.harvard.edu/abs/1999Sci...285.1033B"
+              ]
+            },
+            {
+              "sentence": "They include the proteins of the cytoskeleton, the complex transcription machinery, the membrane-sorting systems, the nuclear pore, and some enzymes in the biochemical pathways",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Internal membranes",
+          "section_content": [
+            {
+              "sentence": "Eukaryote cells include a variety of membrane-bound structures, together forming the endomembrane system",
+              "refs": []
+            },
+            {
+              "sentence": "Simple compartments, called vesicles and vacuoles, can form by budding off other membranes",
+              "refs": [
+                "https://books.google.com/books?id=WfzEgaLibuwC&pg=PA215"
+              ]
+            },
+            {
+              "sentence": "Many cells ingest food and other materials through a process of endocytosis, where the outer membrane invaginates and then pinches off to form a vesicle",
+              "refs": []
+            },
+            {
+              "sentence": "Some cell products can leave in a vesicle through exocytosis",
+              "refs": [
+                "ISBN: 978-0-19-963851-2"
+              ]
+            },
+            {
+              "sentence": "The nucleus is surrounded by a double membrane known as the nuclear envelope, with nuclear pores that allow material to move in and out",
+              "refs": []
+            },
+            {
+              "sentence": "Various tube- and sheet-like extensions of the nuclear membrane form the endoplasmic reticulum, which is involved in protein transport and maturation",
+              "refs": [
+                "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2829960"
+              ]
+            },
+            {
+              "sentence": "It includes the rough endoplasmic reticulum, covered in ribosomes which synthesize proteins; these enter the interior space or lumen",
+              "refs": []
+            },
+            {
+              "sentence": "Subsequently, they generally enter vesicles, which bud off from the smooth endoplasmic reticulum",
+              "refs": []
+            },
+            {
+              "sentence": "In most eukaryotes, these protein-carrying vesicles are released and further modified in stacks of flattened vesicles (cisternae), the Golgi apparatus",
+              "refs": [
+                "http://bscb.org/learning-resources/softcell-e-learning/endoplasmic-reticulum-rough-and-smooth/"
+              ]
+            },
+            {
+              "sentence": "Vesicles may be specialized; for instance, lysosomes contain digestive enzymes that break down biomolecules in the cytoplasm",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Mitochondria",
+          "section_content": [
+            {
+              "sentence": "Mitochondria are organelles in eukaryotic cells",
+              "refs": []
+            },
+            {
+              "sentence": "The mitochondrion is commonly called \"the powerhouse of the cell\",  for its function providing energy by oxidising sugars or fats to produce the energy-storing molecule ATP",
+              "refs": [
+                "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7052475"
+              ]
+            },
+            {
+              "sentence": "Mitochondria have two surrounding membranes, each a phospholipid bilayer; the inner of which is folded into invaginations called cristae where aerobic respiration takes place",
+              "refs": [
+                "https://archive.org/details/fundamentalsofbi00voet_0/page/547",
+                "http://www.madsci.org/posts/archives/2006-05/1146679455.Ev.r.html"
+              ]
+            },
+            {
+              "sentence": "Mitochondria contain their own DNA, which has close structural similarities to bacterial DNA, from which it originated, and which encodes rRNA and tRNA genes that produce RNA which is closer in structure to bacterial RNA than to eukaryote RNA",
+              "refs": []
+            },
+            {
+              "sentence": "Some eukaryotes, such as the metamonads Giardia and Trichomonas, and the amoebozoan Pelomyxa, appear to lack mitochondria, but all contain mitochondrion-derived organelles, like hydrogenosomes or mitosomes, having lost their mitochondria secondarily",
+              "refs": []
+            },
+            {
+              "sentence": "They obtain energy by enzymatic action in the cytoplasm",
+              "refs": [
+                "https://doi.org/10.1016%2Fj.cub.2016.03.053"
+              ]
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Plastids",
+          "section_content": [
+            {
+              "sentence": "Plants and various groups of algae have plastids as well as mitochondria",
+              "refs": []
+            },
+            {
+              "sentence": "Plastids, like mitochondria, have their own DNA and are developed from endosymbionts, in this case cyanobacteria",
+              "refs": []
+            },
+            {
+              "sentence": "They usually take the form of chloroplasts which, like cyanobacteria, contain chlorophyll and produce organic compounds (such as glucose) through photosynthesis",
+              "refs": []
+            },
+            {
+              "sentence": "Others are involved in storing food",
+              "refs": []
+            },
+            {
+              "sentence": "Although plastids probably had a single origin, not all plastid-containing groups are closely related",
+              "refs": []
+            },
+            {
+              "sentence": "Instead, some eukaryotes have obtained them from others through secondary endosymbiosis or ingestion",
+              "refs": []
+            },
+            {
+              "sentence": "The capture and sequestering of photosynthetic cells and chloroplasts, kleptoplasty, occurs in many types of modern eukaryotic organisms",
+              "refs": [
+                "https://doi.org/10.1007%2F978-1-4020-4061-0_4"
+              ]
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Cytoskeletal structures",
+          "section_content": [
+            {
+              "sentence": "The cytoskeleton provides stiffening structure and points of attachment for motor structures that enable the cell to move, change shape, or transport materials",
+              "refs": []
+            },
+            {
+              "sentence": "The motor structures are microfilaments  of actin and actin-binding proteins, including \u03b1-actinin, fimbrin, and filamin are present in submembranous cortical layers and bundles",
+              "refs": []
+            },
+            {
+              "sentence": "Motor proteins of microtubules, dynein and kinesin, and myosin of actin filaments, provide dynamic character of the network",
+              "refs": []
+            },
+            {
+              "sentence": "Many eukaryotes have long slender motile cytoplasmic projections, called flagella, or multiple shorter structures called cilia",
+              "refs": []
+            },
+            {
+              "sentence": "These organelles are variously involved in movement, feeding, and sensation",
+              "refs": []
+            },
+            {
+              "sentence": "They are composed mainly of tubulin, and are entirely distinct from prokaryotic flagella",
+              "refs": []
+            },
+            {
+              "sentence": "They are supported by a bundle of microtubules arising from a centriole, characteristically arranged as nine doublets surrounding two singlets",
+              "refs": []
+            },
+            {
+              "sentence": "Flagella may have hairs (mastigonemes), as in many Stramenopiles",
+              "refs": []
+            },
+            {
+              "sentence": "Their interior is continuous with the cell's cytoplasm",
+              "refs": []
+            },
+            {
+              "sentence": "Centrioles are often present, even in cells and groups that do not have flagella, but conifers and flowering plants have neither",
+              "refs": []
+            },
+            {
+              "sentence": "They generally occur in groups that give rise to various microtubular roots",
+              "refs": []
+            },
+            {
+              "sentence": "These form a primary component of the cytoskeleton, and are often assembled over the course of several cell divisions, with one flagellum retained from the parent and the other derived from it",
+              "refs": []
+            },
+            {
+              "sentence": "Centrioles produce the spindle during nuclear division",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Cell wall",
+          "section_content": [
+            {
+              "sentence": "The cells of plants, algae, fungi and most chromalveolates, but not animals, are surrounded by a cell wall",
+              "refs": []
+            },
+            {
+              "sentence": "This is a layer outside the cell membrane, providing the cell with structural support, protection, and a filtering mechanism",
+              "refs": []
+            },
+            {
+              "sentence": "The cell wall also prevents over-expansion when water enters the cell",
+              "refs": []
+            },
+            {
+              "sentence": "The major polysaccharides making up the primary cell wall of land plants are cellulose, hemicellulose, and pectin",
+              "refs": []
+            },
+            {
+              "sentence": "The cellulose microfibrils are linked together with hemicellulose, embedded in a pectin matrix",
+              "refs": []
+            },
+            {
+              "sentence": "The most common hemicellulose in the primary cell wall is xyloglucan",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Sexual reproduction",
+          "section_content": [
+            {
+              "sentence": "Eukaryotes have a life cycle that involves sexual reproduction, alternating between a haploid phase, where only one copy of each chromosome is present in each cell, and a diploid phase, with two copies of each chromosome in each cell",
+              "refs": []
+            },
+            {
+              "sentence": "The diploid phase is formed by fusion of two haploid gametes, such as eggs and spermatozoa, to form a zygote; this may grow into a body, with its cells dividing by mitosis, and at some stage produce haploid gametes through meiosis, a division that reduces the number of chromosomes and creates genetic variability",
+              "refs": []
+            },
+            {
+              "sentence": "There is considerable variation in this pattern",
+              "refs": [
+                "https://archive.org/details/populationgeneti00hami"
+              ]
+            },
+            {
+              "sentence": "Plants have both haploid and diploid multicellular phases",
+              "refs": []
+            },
+            {
+              "sentence": "Eukaryotes have lower metabolic rates and longer generation times than prokaryotes, because they are larger and therefore have a smaller surface area to volume ratio",
+              "refs": [
+                "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC556298"
+              ]
+            },
+            {
+              "sentence": "The evolution of sexual reproduction may be a primordial characteristic of eukaryotes",
+              "refs": []
+            },
+            {
+              "sentence": "Based on a phylogenetic analysis, Dacks and Roger have proposed that facultative sex was present in the group's common ancestor",
+              "refs": []
+            },
+            {
+              "sentence": "A core set of genes that function in meiosis is present in both Trichomonas vaginalis and Giardia intestinalis, two organisms previously thought to be asexual",
+              "refs": [
+                "https://ui.adsabs.harvard.edu/abs/1999JMolE..48..779D"
+              ]
+            },
+            {
+              "sentence": "Since these two species are descendants of lineages that diverged early from the eukaryotic evolutionary tree, core meiotic genes, and hence sex, were likely present in the common ancestor of eukaryotes",
+              "refs": [
+                "https://doi.org/10.1016%2Fj.cub.2005.01.003",
+                "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2488364"
+              ]
+            },
+            {
+              "sentence": "Species once thought to be asexual, such as Leishmania parasites, have a sexual cycle",
+              "refs": [
+                "https://doi.org/10.1016%2Fj.cub.2005.01.003",
+                "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2488364"
+              ]
+            },
+            {
+              "sentence": "Amoebae, previously regarded as asexual, are anciently sexual; present-day asexual groups likely arose recently",
+              "refs": [
+                "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2729066"
+              ]
+            }
+          ],
+          "subsections": []
+        }
+      ]
+    },
+    {
+      "section_title": "Evolution",
+      "section_content": [],
+      "subsections": [
+        {
+          "section_title": "History of classification",
+          "section_content": [
+            {
+              "sentence": "In antiquity, the two lineages of animals and plants were recognized by Aristotle and Theophrastus",
+              "refs": []
+            },
+            {
+              "sentence": "The lineages were given the taxonomic rank of Kingdom by Linnaeus in the 18th century",
+              "refs": []
+            },
+            {
+              "sentence": "Though he included the fungi with plants with some reservations, it was later realized that they are quite distinct and warrant a separate kingdom",
+              "refs": []
+            },
+            {
+              "sentence": "The various single-cell eukaryotes were originally placed with plants or animals when they became known",
+              "refs": [
+                "[ERROR retrieving ref link]"
+              ]
+            },
+            {
+              "sentence": "In 1818, the German biologist Georg A",
+              "refs": []
+            },
+            {
+              "sentence": "Goldfuss coined the word protozoa to refer to organisms such as ciliates,  and this group was expanded until Ernst Haeckel made it a kingdom encompassing all single-celled eukaryotes, the Protista, in 1866",
+              "refs": [
+                "https://www.biodiversitylibrary.org/item/47614#page/530/mode/1up"
+              ]
+            },
+            {
+              "sentence": "The eukaryotes thus came to be seen as four kingdoms:",
+              "refs": [
+                "https://web.archive.org/web/20110614000656/http://www.im.microbios.org/08december99/03%20Scamardella.pdf",
+                "https://zenodo.org/record/1232387",
+                "https://ui.adsabs.harvard.edu/abs/1969Sci...163..150W"
+              ]
+            },
+            {
+              "sentence": "The protists were at that time thought to be \"primitive forms\", and thus an evolutionary grade, united by their primitive unicellular nature",
+              "refs": []
+            },
+            {
+              "sentence": "Understanding of the oldest branchings in the tree of life only developed substantially with DNA sequencing, leading to a system of domains rather than kingdoms as top level rank being put forward by Carl Woese, Otto Kandler, and Mark Wheelis in 1990, uniting all the eukaryote kingdoms in the domain \"Eucarya\", stating, however, that \"'eukaryotes' will continue to be an acceptable common synonym\"",
+              "refs": [
+                "https://zenodo.org/record/1232387"
+              ]
+            },
+            {
+              "sentence": "In 1996, the evolutionary biologist Lynn Margulis proposed to replace Kingdoms and Domains with \"inclusive\" names to create a \"symbiosis-based phylogeny\", giving the description \"Eukarya (symbiosis-derived nucleated organisms)\"",
+              "refs": [
+                "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC54159",
+                "https://ui.adsabs.harvard.edu/abs/1992Sci...256..622K"
+              ]
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Phylogeny",
+          "section_content": [
+            {
+              "sentence": "By 2014, a rough consensus started to emerge from the phylogenomic studies of the previous two decades",
+              "refs": []
+            },
+            {
+              "sentence": "The majority of eukaryotes can be placed in one of two large clades dubbed Amorphea (similar in composition to the unikont hypothesis) and the Diphoda (formerly bikonts), which includes plants and most algal lineages",
+              "refs": [
+                "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3996474",
+                "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4795036"
+              ]
+            },
+            {
+              "sentence": "A third major grouping, the Excavata, has been abandoned as a formal group as it is paraphyletic",
+              "refs": []
+            },
+            {
+              "sentence": "The proposed phylogeny below includes only one group of excavates (Discoba),  and incorporates the 2021 proposal that picozoans are close relatives of rhodophytes",
+              "refs": [
+                "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6492006",
+                "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5793813"
+              ]
+            },
+            {
+              "sentence": "The Provora are a group of microbial predators discovered in 2022",
+              "refs": [
+                "http://urn.kb.se/resolve?urn=urn:nbn:se:umu:diva-189959"
+              ]
+            },
+            {
+              "sentence": "The Metamonada are hard to place, being sister possibly to Discoba, possibly to Malawimonada",
+              "refs": [
+                "https://ui.adsabs.harvard.edu/abs/2022Natur.612..714T"
+              ]
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Origin of eukaryotes",
+          "section_content": [
+            {
+              "sentence": "The origin of the eukaryotic cell, or eukaryogenesis, is a milestone in the evolution of life, since eukaryotes include all complex cells and almost all multicellular organisms",
+              "refs": []
+            },
+            {
+              "sentence": "The last eukaryotic common ancestor (LECA) is the hypothetical origin of all living eukaryotes,  and was most likely a biological population, not a single individual",
+              "refs": [
+                "https://doi.org/10.1146%2Fannurev-micro-090817-062213"
+              ]
+            },
+            {
+              "sentence": "The LECA is believed to have been a protist with a nucleus, at least one centriole and flagellum, facultatively aerobic mitochondria, sex (meiosis and syngamy), a dormant cyst with a cell wall of chitin and/or cellulose and peroxisomes",
+              "refs": [
+                "https://doi.org/10.1038%2Fs41559-019-0796-3"
+              ]
+            },
+            {
+              "sentence": "An endosymbiotic union between a motile anaerobic archaean and an aerobic alphaproteobacterium gave rise to the LECA and all eukaryotes, with mitochondria",
+              "refs": []
+            },
+            {
+              "sentence": "A second, much later endosymbiosis with a cyanobacterium gave rise to the ancestor of plants, with chloroplasts",
+              "refs": []
+            },
+            {
+              "sentence": "The presence of eukaryotic biomarkers in archaea points towards an archaeal origin",
+              "refs": []
+            },
+            {
+              "sentence": "The genomes of Asgard archaea have plenty of Eukaryotic signature protein genes, which play a crucial role in the development of the cytoskeleton and complex cellular structures characteristic of eukaryotes",
+              "refs": []
+            },
+            {
+              "sentence": "In 2022, cryo-electron tomography demonstrated that Asgard archaea have a complex actin-based cytoskeleton, providing the first direct visual evidence of the archaeal ancestry of eukaryotes",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Fossils",
+          "section_content": [
+            {
+              "sentence": "The timing of the origin of eukaryotes is hard to determine; Knoll (2006) suggests they developed as much as 2.2 billion years ago",
+              "refs": []
+            },
+            {
+              "sentence": "Some acritarchs are known from at least 1.65 billion years ago, and a fossil, Grypania, which may be an alga, is as much as 2.1 billion years old",
+              "refs": []
+            },
+            {
+              "sentence": "The \"problematic\"  fossil Diskagma has been found in paleosols 2.2 billion years old",
+              "refs": [
+                "https://ui.adsabs.harvard.edu/abs/1992Sci...257..232H",
+                "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1578724",
+                "https://ui.adsabs.harvard.edu/abs/2013PreR..235...71R"
+              ]
+            },
+            {
+              "sentence": "Structures proposed to represent \"large colonial organisms\" have been found in the black shales of the Palaeoproterozoic such as the Francevillian B Formation, in Gabon, dubbed the \"Francevillian biota\" which is dated at 2.1 billion years old",
+              "refs": []
+            },
+            {
+              "sentence": "However, the status of  these structures as fossils is contested, with other authors suggesting that they might represent pseudofossils",
+              "refs": [
+                "https://ui.adsabs.harvard.edu/abs/2010Natur.466..100A",
+                "https://doi.org/10.1016%2Fj.epsl.2023.118169"
+              ]
+            },
+            {
+              "sentence": "The oldest fossils than can unambiguously be assigned to eukaryotes are from the Ruyang Group of China, dating to approximately 1.8-1.6 billion years ago",
+              "refs": []
+            },
+            {
+              "sentence": "Fossils that are clearly related to modern groups start appearing an estimated 1.2 billion years ago, in the form of red algae, though recent work suggests the existence of fossilized filamentous algae in the Vindhya basin dating back perhaps to 1.6 to 1.7 billion years ago",
+              "refs": [
+                "https://linkinghub.elsevier.com/retrieve/pii/S0012825223000879"
+              ]
+            },
+            {
+              "sentence": "The presence of steranes, eukaryotic-specific biomarkers, in Australian shales previously indicated that eukaryotes were present in these rocks dated at 2.7 billion years old,   but these Archaean biomarkers have been rebutted as later contaminants",
+              "refs": [
+                "https://ui.adsabs.harvard.edu/abs/1999Sci...285.1033B",
+                "https://www.newscientist.com/channel/life/mg19726421.900-mass-extinctions-the-microbes-strike-back.html"
+              ]
+            },
+            {
+              "sentence": "The oldest valid biomarker records are only around 800 million years old",
+              "refs": [
+                "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4434754"
+              ]
+            },
+            {
+              "sentence": "In contrast, a molecular clock analysis suggests the emergence of sterol biosynthesis as early as 2.3 billion years ago",
+              "refs": [
+                "https://ui.adsabs.harvard.edu/abs/2017Natur.548..578B"
+              ]
+            },
+            {
+              "sentence": "The nature of steranes as eukaryotic biomarkers is further complicated by the production of sterols by some bacteria",
+              "refs": [
+                "https://ui.adsabs.harvard.edu/abs/2017Natur.543..420G"
+              ]
+            },
+            {
+              "sentence": "Whenever their origins, eukaryotes may not have become ecologically dominant until much later; a massive increase in the zinc composition of marine sediments 800\u00a0million years ago has been attributed to the rise of substantial populations of eukaryotes, which preferentially consume and incorporate zinc relative to prokaryotes, approximately a billion years after their origin (at the latest)",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        }
+      ]
+    },
+    {
+      "section_title": "See also",
+      "section_content": [],
+      "subsections": []
+    },
+    {
+      "section_title": "References",
+      "section_content": [],
+      "subsections": []
+    },
+    {
+      "section_title": "External links",
+      "section_content": [],
+      "subsections": []
+    }
+  ],
+  "references": {
+    "1": "https://ui.adsabs.harvard.edu/abs/2022Natur.612..714T",
+    "2": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6492006",
+    "3": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC54159",
+    "4": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC40032",
+    "5": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3608682",
+    "6": "https://archive.org/details/guinnessbookofan00wood",
+    "7": "http://www.conifers.org/cu/Sequoia.php",
+    "8": "https://books.google.com/books?id=xuUoiFesSHMC",
+    "9": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3996474",
+    "10": "https://doi.org/10.1016%2Fb978-0-12-384719-5.00174-x",
+    "11": "https://web.archive.org/web/20170809103456/http://protistology.jp/journal/jjp47/JJP47YAMAGUCHI.pdf",
+    "12": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6016768",
+    "13": "https://doi.org/10.1016%2Fj.tree.2019.08.008",
+    "14": "https://grosberglab.faculty.ucdavis.edu/wp-content/uploads/sites/453/2017/05/2007-Grosberg-R.-K.-and-R.-R.-Strathmann.pdf",
+    "15": "http://www.producao.usp.br/bitstream/handle/BDPI/45022/339_ftp.pdf?sequence=1&isAllowed=y",
+    "16": "https://doi.org/10.1146%2Fannurev-arplant-042110-103809",
+    "17": "https://www.etymonline.com/?term=eukaryotic",
+    "18": "https://doi.org/10.1038%2Fnrg.2016.112",
+    "19": "https://www.sciencedirect.com/topics/neuroscience/mitosis",
+    "20": "https://ui.adsabs.harvard.edu/abs/1999Sci...285.1033B",
+    "21": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC122206",
+    "22": "https://books.google.com/books?id=WfzEgaLibuwC&pg=PA215",
+    "23": "ISBN: 978-0-19-963851-2",
+    "24": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7152905",
+    "25": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2829960",
+    "26": "http://bscb.org/learning-resources/softcell-e-learning/endoplasmic-reticulum-rough-and-smooth/",
+    "27": "https://web.archive.org/web/20171113060218/http://bscb.org/learning-resources/softcell-e-learning/golgi-apparatus/",
+    "28": "https://web.archive.org/web/20171113060214/http://bscb.org/learning-resources/softcell-e-learning/lysosome/",
+    "29": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7052475",
+    "30": "https://archive.org/details/fundamentalsofbi00voet_0/page/547",
+    "31": "http://www.madsci.org/posts/archives/2006-05/1146679455.Ev.r.html",
+    "32": "https://doi.org/10.1016%2Fj.bbamcr.2008.06.013",
+    "33": "https://archive.org/details/molecularbiology0004unse/page/1154",
+    "34": "https://doi.org/10.1016%2Fj.cub.2016.03.053",
+    "35": "https://web.archive.org/web/20190217214255/https://www.iflscience.com/plants-and-animals/first-eukaryote-found-lack-mitochondria/",
+    "36": "https://doi.org/10.1007%2F978-1-4020-4061-0_4",
+    "37": "https://ui.adsabs.harvard.edu/abs/2008EnvMi..10.2411M",
+    "38": "https://doi.org/10.1111%2Fbrv.12340",
+    "39": "https://www.ncbi.nlm.nih.gov/books/NBK26888/",
+    "40": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5932582",
+    "41": "https://doi.org/10.1099%2Fmic.0.25948-0",
+    "42": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1540183",
+    "43": "https://doi.org/10.1016%2FS0074-7696%2808%2961714-3",
+    "44": "ISBN: 978-0-19-511183-5",
+    "45": "https://doi.org/10.1093%2Fjxb%2F40.1.1",
+    "46": "https://archive.org/details/populationgeneti00hami",
+    "47": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC556298",
+    "48": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3152533",
+    "49": "https://ui.adsabs.harvard.edu/abs/1999JMolE..48..779D",
+    "50": "https://doi.org/10.1016%2Fj.cub.2005.01.003",
+    "51": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2488364",
+    "52": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2729066",
+    "53": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3107637",
+    "54": "[ERROR retrieving ref link]",
+    "55": "https://www.biodiversitylibrary.org/item/47614#page/530/mode/1up",
+    "56": "https://web.archive.org/web/20110614000656/http://www.im.microbios.org/08december99/03%20Scamardella.pdf",
+    "57": "https://zenodo.org/record/1232387",
+    "58": "https://ui.adsabs.harvard.edu/abs/1969Sci...163..150W",
+    "59": "https://ui.adsabs.harvard.edu/abs/1992Sci...256..622K",
+    "60": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4795036",
+    "61": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5793813",
+    "62": "http://urn.kb.se/resolve?urn=urn:nbn:se:umu:diva-189959",
+    "63": "https://books.google.com/books?id=m3oFebknu1cC&pg=PA326",
+    "64": "https://doi.org/10.1146%2Fannurev-micro-090817-062213",
+    "65": "https://doi.org/10.1038%2Fs41559-019-0796-3",
+    "66": "https://doi.org/10.1016%2Fj.cub.2020.03.052",
+    "67": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7994803",
+    "68": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3791482",
+    "69": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9834061",
+    "70": "https://ui.adsabs.harvard.edu/abs/1992Sci...257..232H",
+    "71": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1578724",
+    "72": "https://ui.adsabs.harvard.edu/abs/2013PreR..235...71R",
+    "73": "https://ui.adsabs.harvard.edu/abs/2010Natur.466..100A",
+    "74": "https://doi.org/10.1016%2Fj.epsl.2023.118169",
+    "75": "https://linkinghub.elsevier.com/retrieve/pii/S0012825223000879",
+    "76": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2683128",
+    "77": "https://www.newscientist.com/channel/life/mg19726421.900-mass-extinctions-the-microbes-strike-back.html",
+    "78": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4434754",
+    "79": "https://ui.adsabs.harvard.edu/abs/2017Natur.548..578B",
+    "80": "https://ui.adsabs.harvard.edu/abs/2017Natur.543..420G",
+    "81": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4919349",
+    "82": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8237579",
+    "83": "https://doi.org/10.1111%2Fgbi.12289"
+  },
+  "spicy_entities": {
+    "eukarya": "NORP",
+    "two": "CARDINAL",
+    "bacteria": "PERSON",
+    "archaea": "PERSON",
+    "asgard": "FAC",
+    "only two": "CARDINAL",
+    "approximately 2.2 billion": "MONEY",
+    "years ago": "DATE",
+    "second": "ORDINAL",
+    "gabonionta": "PERSON",
+    "gabon": "GPE",
+    "2023": "DATE",
+    "2.1 billion": "MONEY",
+    "3": "CARDINAL",
+    "190 tonnes": "QUANTITY",
+    "33.6 metres": "QUANTITY",
+    "120 metres": "QUANTITY",
+    "390\u00a0ft": "QUANTITY",
+    "up to 200 feet": "QUANTITY",
+    "61": "CARDINAL",
+    "around 10,000": "CARDINAL",
+    "468": "CARDINAL",
+    "77": "CARDINAL",
+    "over 81%": "PERCENT",
+    "earth": "LOC",
+    "at least 25": "CARDINAL",
+    "symbiomycotan fungi": "PERSON",
+    "brown algae": "PERSON",
+    "red algae": "GPE",
+    "green algae": "GPE",
+    "nucleus": "PERSON",
+    "the greek \u03b5\u1f56 (eu": "ORG",
+    "linear": "ORG",
+    "internal": "ORG",
+    "eukaryote": "PERSON",
+    "mitochondria": "ORG",
+    "rna": "ORG",
+    "giardia": "ORG",
+    "trichomonas": "ORG",
+    "pelomyxa": "ORG",
+    "plastids": "GPE",
+    "cyanobacteria": "GPE",
+    "microtubules": "GPE",
+    "kinesin": "GPE",
+    "cytoplasmic": "ORG",
+    "nine": "CARDINAL",
+    "stramenopiles": "ORG",
+    "pectin": "ORG",
+    "only one": "CARDINAL",
+    "dacks": "PRODUCT",
+    "roger": "PERSON",
+    "leishmania": "ORG",
+    "amoebae": "NORP",
+    "aristotle": "PERSON",
+    "theophrastus": "ORG",
+    "kingdom by linnaeus": "ORG",
+    "the 18th century": "DATE",
+    "1818": "DATE",
+    "german": "NORP",
+    "georg a. goldfuss": "PERSON",
+    "ernst haeckel": "PERSON",
+    "protista": "LOC",
+    "1866": "DATE",
+    "four": "CARDINAL",
+    "carl woese": "PERSON",
+    "otto kandler": "PERSON",
+    "mark wheelis": "PERSON",
+    "1990": "DATE",
+    "1996": "DATE",
+    "lynn margulis": "PERSON",
+    "kingdoms": "PERSON",
+    "2014": "DATE",
+    "the previous two decades": "DATE",
+    "one": "CARDINAL",
+    "amorphea": "PERSON",
+    "diphoda": "LOC",
+    "third": "ORDINAL",
+    "excavata": "PERSON",
+    "discoba": "PERSON",
+    "2021": "DATE",
+    "provora": "ORG",
+    "2022": "DATE",
+    "metamonada": "ORG",
+    "malawimonada": "GPE",
+    "leca": "ORG",
+    "at least one": "CARDINAL",
+    "eukaryotic": "ORG",
+    "cytoskeleton": "ORG",
+    "first": "ORDINAL",
+    "knoll": "ORG",
+    "2006": "DATE",
+    "as much as 2.2 billion": "MONEY",
+    "at least 1.65 billion": "MONEY",
+    "grypania": "GPE",
+    "as much as 2.1 billion": "MONEY",
+    "2.2 billion": "MONEY",
+    "years old": "DATE",
+    "palaeoproterozoic": "PERSON",
+    "francevillian": "NORP",
+    "the ruyang group of china": "ORG",
+    "1.8-1.6": "QUANTITY",
+    "billion years ago": "DATE",
+    "an estimated 1.2 billion years ago": "MONEY",
+    "vindhya": "NORP",
+    "1.6 to 1.7 billion": "QUANTITY",
+    "australian": "NORP",
+    "2.7 billion": "MONEY",
+    "archaean": "NORP",
+    "800\u00a0million": "MONEY"
+  },
+  "flair_entities": [
+    "bacteria",
+    "flagella",
+    "roger",
+    "theophrastus",
+    "palaeoproterozoic",
+    "giardia",
+    "domains",
+    "atp",
+    "grypania",
+    "archaean",
+    "knoll",
+    "metamonada",
+    "georg a",
+    "trichomonas",
+    "eukaryotes",
+    "excavata",
+    "china",
+    "ernst haeckel",
+    "plastids  plants",
+    "aristotle",
+    "protista",
+    "lynn margulis",
+    "provora",
+    "german",
+    "asgard",
+    "dna",
+    "gabon",
+    "otto kandler",
+    "malawimonada",
+    "archaea",
+    "diphoda",
+    "leca",
+    "greek",
+    "amorphea",
+    "diskagma",
+    "unicellular",
+    "pelomyxa",
+    "kingdoms",
+    "ruyang group",
+    "eukarya",
+    "dacks",
+    "kingdom",
+    "australian",
+    "francevillian b formation",
+    "goldfuss",
+    "amoebae",
+    "eucarya",
+    "discoba",
+    "vindhya",
+    "leishmania",
+    "carl woese",
+    "gabonionta",
+    "stramenopiles",
+    "mark wheelis",
+    "linnaeus",
+    "earth"
+  ]
+}

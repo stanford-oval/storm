@@ -1,0 +1,105 @@
+OceanGate
+
+OceanGate Inc. is an American privately owned company based in Everett, Washington, that provided crewed submersibles for tourism, industry, research, and exploration. The company was founded in 2009 by Stockton Rush and Guillermo Söhnlein.
+The company acquired a submersible vessel, Antipodes, and later built two of its own: Cyclops 1 and Titan. In 2021, OceanGate began taking paying tourists in Titan to visit the wreck of the Titanic. As of 2022, the price to be a passenger on an OceanGate expedition to the Titanic shipwreck was US$250,000 per person.On June 18, 2023, Titan imploded during a voyage to the Titanic wreck site, killing all five occupants on board, including Rush. An international search and rescue operation was launched, and on June 22 the wreckage was found on the seabed about 500 meters (1,600 ft) from the Titanic wreck site. On July 6, OceanGate suspended all operations.
+
+# Background
+
+Stockton Rush had an interest in aviation and space travel as a child, and obtained a commercial pilot's license when he was 18. As an adult, his interests pivoted to undersea exploration [6]. Rush had built his fortune by investing his inheritance in tech companies and decided to purchase a submarine. He discovered that he was unable to, as there were fewer than 100 privately owned submarines worldwide. He instead built one from plans in 2006, a Kittredge K-350, which he named Suds [6] [16]. Rush's experience and research led him to believe that he had discovered an unmet business opportunity to expand the market of private ocean exploration. He believed that this industry had been held back by two principal factors: submersibles having an unwarranted reputation as dangerous vehicles, due to their use as ferries for commercial divers, and rigid government regulations that inhibited innovation within the industry. In 2019 Rush expressed the view that the Passenger Vessel Safety Act of 1993 "needlessly prioritized passenger safety over commercial innovation",  building on earlier assertions, including statements on the OceanGate website, which noted in 2011 that "since 1974, there has not been a serious injury or fatality on an ABS certified passenger submersible",  and an address before The Explorers Club in 2017, where he called submersibles "the safest vehicles on the planet" [6] [10]. Non-certified vehicles were more dangerous, as demonstrated by at least one fatality involving a homemade submersible in 1990 [11]. He later commissioned a marketing study that concluded there was sufficient demand for underwater ocean tourism, which would in turn support the development of new, deep-diving submersibles that would enable lucrative commercial ventures including resource mining and disaster mitigation. The underwater tourism industry began in 1986 when Atlantis Adventures (now Atlantis Submarines) began providing submersible tours of the coral reefs near Grand Cayman Island [11] [16]. In 2003, more than two million passengers collectively paid US$150 million to ride underwater in submersibles, although these were generally operated at shallow depths. 
+
+# History
+
+## 2009–2013: Founding and acquisition of Antipodes
+
+OceanGate was founded by Guillermo Söhnlein and Stockton Rush in Seattle in 2009. According to Söhnlein, the company was founded with the intention of creating a small fleet of 5-person commercial submersibles that could be leased by any organization or group of individuals [14] [15] [16] [17]. In 2023 he told Sky News, "The whole intent was to create these worked subs. And in that way, as our tagline was in the early days, 'Open the oceans for all of humanity.'" [18]. The company's first submersible was Antipodes, a used 5-person vessel with a steel hull. Between 2010 and 2013 the company carried out an estimated 130 dives with Antipodes. The company's business model involved renting its submersible out for hire to researchers and transporting tourists, who the company referred to as "citizen scientists" for underwater excursions. Söhnlein estimated in 2012 that passengers typically paid between $7,500 and $40,000 per person per excursion depending on the trip. OceanGate's first tourist excursion was conducted in 2010 when the company began transporting its first paying customers. The company transported tourist groups to Catalina Island off the coast of California. To improve the tourist experience, the company began bringing expert guides aboard the dives. According to Rush, "People would ask me about a fish, and I wouldn't know anything about it." The company first brought marine biologists on as expert guides and according to Rush "The difference was night and day. Their excitement permeated the sub." [6]. In 2010 OceanGate worked with the University of Washington for the first time. The university utilized Antipodes to conduct trials of novel sonar equipment and robotic arms. In 2011 Antipodes was used to survey and map the wreckage of the SS Governor, a ship that had sunk in Puget Sound in 1921. In 2012 and 2013 OceanGate operated for a year in Miami, Florida. Collaborating with Miami-Dade Artificial Reefs Program, researchers aboard Antipodes investigated the spread of lionfish. 
+
+## 2013–2016: Construction of Cyclops and Söhnlein's departure
+
+In 2013 the company pivoted to designing its own submersibles with unique designs that were more cost effective. Söhnlein left the company that same year, saying that OceanGate had transitioned from its initial phase to Rush's specialty of engineering. Söhnlein retained a minority stake. OceanGate worked on the design of its first custom-built submersible Cyclops, later called Cyclops 1, in collaboration with the University of Washington and Boeing. The hull was planned to be a carbon fiber hull, but OceanGate instead acquired a 12-year-old vessel Lula from a company in Azores [24] [25]. It extracted the cylindrical steel hull of the Lula and used it to create Cyclops 1. Cyclops was unveiled in 2015 [20] [26]. The same year, the company moved its headquarters to the Port of Everett's Waterfront Center office space in Everett, Washington [27]. 
+
+## 2016–2023: Expansion of fleet and dives to the Titanic
+
+OceanGate ordered the first titanium components for Cyclops 2 in December 2016,  and let a contract to Spencer Composites in January 2017 to design and build the cylindrical carbon fiber hull [30]. In March 2018, Cyclops 2 was renamed to Titan;  Rush described it as "an amazing engineering feat" during its launch in 2018 [31] [32]. Testing of Titan to its maximum intended depth of 4,000 m (13,000 ft) occurred in 2018 and 2019 [33]. In 2019, OceanGate said they were planning to develop the successor Cyclops 3 and Cyclops 4 submersibles with a targeted maximum depth of 6,000 m (20,000 ft),  and in early 2020 announced that the development and manufacturing of the hulls would be performed at NASA's Marshall Space Flight Center in Huntsville, Alabama [34]. The submersibles would be funded through a new round of investments by "100% insiders" totaling $18.1 million, as announced in January 2020 [35]. NASA's participation was under a Space Act Agreement intended to further "deep-space exploration goals" and "improve materials and manufacturing for American industry" according to John Vickers [36]. In spring 2020, during the COVID-19 pandemic, OceanGate applied for, and received, a PPP loan for approx [37]. $450,000, based on 22 jobs. In 2021 and 2022, OceanGate conducted dives to the Titanic aboard its submersible Titan.. 
+
+## 2023: Implosion of Titan and death of Rush
+
+Titan imploded during an expedition to the Titanic in June 2023, killing all five occupants including CEO Stockton Rush. After a four-day search and rescue operation by an international team led by the United States Coast Guard, U.S. Navy, and Canadian Coast Guard,  a debris field was discovered containing parts of Titan, about 500 metres (1,600 ft) from the bow of the Titanic [39]. Upon news of the fate of Titan, the company closed its Everett office indefinitely. Shortly after the implosion, its subsidiary OceanGate Expeditions also suspended operations [41]. From July 2023, OceanGate's websites defaulted to a message advising: "OceanGate has suspended all exploration and commercial operations." [42] [43]. 
+
+# Submersibles
+
+OceanGate owned three submersibles. The Cyclops 1 and Titan submersibles were launched and recovered from a dry dock-like "Launch and Recovery Platform" that could be towed behind a commercial vessel. Once the platform and submersible reach the target location, the platform's flotation tanks are flooded and it sinks below the surface turbulence to a depth of 9 m (30 ft) [44]. The submersible then lifts off for its underwater mission [45]. Upon the submersible's return to the platform, the flotation tanks are pumped out and the platform can be taken back into tow or brought aboard the host vessel. That allows OceanGate to use vessels without human-rated cranes. The platform is approximately 11 m (35 ft) long and 4.6 m (15 ft) wide and can lift up to 9,100 kg (20,000 lb);  it is based on a concept developed by the Hawaii Undersea Research Laboratory [46] [47]. 
+
+## Antipodes
+
+Antipodes is a steel-hulled submersible capable of reaching depths of 300 meters (1,000 ft), acquired by OceanGate in 2010. OceanGate transported its first paying customers in the vessel in 2010 off the coast of Catalina Island in California [48]. The submersible was later contracted to expeditions to explore corals, lionfish populations in Florida, and a former oil rig in the Gulf of Mexico. By 2013 OceanGate had made over 130 dives with the vessel [6]. 
+
+## Cyclops 1
+
+In March 2015, OceanGate unveiled the Cyclops 1, a 5-person steel-hulled submersible capable of diving up to 500 meters (1,640 ft) under water. It measures approximately 6.7 m (22 feet) long and 2.7 m (9 feet) wide, and weighs about 9,100 kg (20,000 pounds). Its name was inspired by its strengthened acrylic window [27]. The submersible is steered by a modified wireless game controller, and the vessel has a battery life of up to eight hours. The vessel has been used for various commercial and academic expeditions [50] [51]. OceanGate created Cyclops 1 in collaboration with the University of Washington's Applied Physics Laboratory; Boeing worked with OceanGate and the University of Washington for initial design analysis. In the initial design, the hull was to be made of carbon fiber, but this idea was scrapped in favor of a steel hull [25] [24]. OceanGate acquired the steel hull for Cyclops 1 in 2013, after it had been used for 12 years, and fitted it with a new interior, underwater sensors, and gamepad pilot control system. In June 2016 Cyclops 1 was used to survey the wreck of SS Andrea Doria 73 m (240 feet) below the surface. The survey data were intended to build a computer model of the wreck and its surroundings to improve navigation. In 2019 the craft was used to transport researchers to the bottom of Puget Sound to conduct marine biology surveys [30]. 
+
+## Titan
+
+Titan (known as Cyclops 2 until 2018) was the second submersible designed and built by OceanGate, the first privately-owned submersible with an intended maximum depth of 4,000 m (13,000 ft). It also was the first completed crewed submersible that used a hull constructed of titanium and carbon fiber composite materials, as most other human-carrying submersibles are designed with an all-metal pressure vessel [53]. On June 18, 2023, OceanGate lost contact with Titan during its dive to the Titanic. Loss of contact had occurred multiple times during previous test and tour dives, so OceanGate did not alert authorities until the submersible was overdue for its return. A massive international search and rescue operation ensued and ended on June 22, 2023 when debris from Titan was discovered about 500 meters (1,600 ft) in front of the bow of Titanic, revealing that the submersible had catastrophically imploded.. 
+
+# Associated entities
+
+At the time of Titan's implosion OceanGate had three associated entities: its main headquarters in Everett, Washington; a subsidiary located in the Bahamas named Argus Expeditions Ltd (which trades as OceanGate Expeditions);  and an independent nonprofit organization known as the OceanGate Foundation which provides financial support to scientists who participate in missions [54]. Documents filed with the State of Washington list Stockton Rush as the treasurer of the nonprofit and his wife Wendy Rush as the director and president. 
+
+# References
+
+[1] https://www.saltwire.com/atlantic-canada/lifestyles/citizen-scientists-pay-250k-to-work-titanic-expedition-at-depths-of-12500-feet-in-the-north-atlantic-ocean-100659359/
+[2] https://www.nytimes.com/live/2023/06/22/us/titanic-missing-submarine
+[3] https://www.cbsnews.com/news/who-is-on-missing-titanic-submarine-passengers-hamish-harding-shahzada-dawood/
+[4] https://news.sky.com/story/oceangate-firm-that-owned-the-submersible-titan-suspends-commercial-operations-12916373
+[5] https://www.independent.co.uk/news/world/americas/oceangate-ceases-operations-titanic-sub-implosion-b2370778.html
+[6] https://www.smithsonianmag.com/innovation/worlds-first-deep-diving-submarine-plans-tourists-see-titanic-180972179/
+[7] https://www.reuters.com/world/titanic-sub-firms-late-ceo-was-committed-safety-says-co-founder-2023-06-23/
+[8] https://web.archive.org/web/20110830131942/http://www.opentheoceans.com/mannedsubmersibles.htm
+[9] https://web.archive.org/web/20230619195820/https://oceangate.com/news-and-media/blog/2020-0618-meet-the-pilots-series-stockton-rush.html
+[10] https://web.archive.org/web/20111008001125/http://www.opentheoceans.com/safety.htm
+[11] https://www.popsci.com/deep-sea-tourism/
+[12] https://www.latimes.com/style/la-os-sub6apr06-story.html
+[13] https://www.reuters.com/world/titanic-sub-firms-late-ceo-was-committed-safety-says-co-founder-2023-06-23/
+[14] https://www.nbcnews.com/science/science-news/cyclops-submersible-brings-deep-water-exploration-21st-century-n321726
+[15] https://www.insider.com/oceangate-cofounder-passengers-can-survive-after-oxygen-cut-off-time-2023-6
+[16] https://www.reuters.com/world/titanic-sub-firms-late-ceo-was-committed-safety-says-co-founder-2023-06-23/
+[17] https://www.youtube.com/watch?v=ApoO-EBeM0E&t=15s
+[18] https://www.youtube.com/watch?v=pM5cs85lsZc&t=442s
+[19] http://www.miamitodaynews.com/news/120705/story2.shtml
+[20] https://www.seattletimes.com/business/company-plans-carbon-fiber-sub-to-dive-deeply-cheaply/
+[21] https://web.archive.org/web/20120802000124/http://www.king5.com/news/environment/Puget-Sound-Wreck-Helps-Prevent-Oil-Spill-124522229.html
+[22] https://www.staugustine.com/story/news/2023/06/21/titanic-missing-submarine-oceangate-led-south-florida-lionfish-search/70341746007/
+[23] https://www.nytimes.com/2023/06/23/us/stockton-rush-oceangate-titanic-sub.html
+[24] https://apl.uw.edu/project/project.php?id=oceangate
+[25] https://www.washington.edu/news/2013/10/08/uw-local-company-building-innovative-deep-sea-manned-submarine/
+[26] https://www.prnewswire.com/news-releases/oceangate-inc-transforms-lula-500-meter-submersible-to-cyclops-500-prototype-245362561.html
+[27] https://www.geekwire.com/2023/steer-oceangate-submersible/
+[28] https://www.heraldnet.com/business/submarine-firm-will-move-to-everett-waterfront/
+[29] https://www.heraldnet.com/news/oceangates-neighbors-used-to-privacy-thrust-into-the-spotlight/
+[30] https://www.geekwire.com/2016/oceangate-submersible-cyclops-2-construction/
+[31] https://www.compositesworld.com/articles/composite-submersibles-under-pressure-in-deep-deep-waters
+[32] https://www.jacksonville.com/story/news/2023/06/21/winter-park-florida-couple-sues-oceangate-ceo-for-titanic-trip/70340794007/
+[33] https://www.youtube.com/watch?v=Q0D-0I5DcVY
+[34] https://web.archive.org/web/20230620191805/https://oceangate.com/news-and-media/press-releases/2019-1029-oceangate-to-build-two-new-submersibles.html
+[35] https://web.archive.org/web/20230620191808/https://oceangate.com/news-and-media/press-releases/2020-0226-nasa-and-oceangate-enter-into-an-agreement-to-collaborate.html
+[36] https://www.geekwire.com/2020/oceangate-raises-18m-build-bigger-submersible-fleet-get-set-titanic-trips/
+[37] https://www.geekwire.com/2020/oceangate-nasa-teaming-build-better-carbon-fiber-pressure-vessels/
+[38] https://projects.propublica.org/coronavirus/bailouts/loans/oceangate-inc-2458707102
+[39] https://www.news.uscg.mil/Press-Releases/Article/3433572/unified-command-established-for-missing-submersible-from-polar-prince/
+[40] https://www.cnn.com/americas/live-news/titanic-submersible-missing-search-06-20-23/h_986e7fa7d849e30d0b1b92c7e8114947
+[41] https://www.seattletimes.com/seattle-news/oceangate-office-in-everett-closed-indefinitely-following-ceo-death/
+[42] https://www.wsj.com/articles/oceangate-suspends-all-operations-after-titan-submersible-implosion-that-killed-5-a1b0dd26
+[43] https://archive.today/20230714135941/https://www.insider.com/oceangate-take-down-website-social-media-suspend-commercial-operations-2023-7
+[44] https://patents.google.com/patent/US9381980B1
+[45] http://wayback.archive-it.org/all/20230626154954/https://oceangate.com/pdf/oceangate%2Dtitan%2Dspecs%2Dlr.pdf
+[46] https://web.archive.org/web/20230622111402/https://oceangate.com/pdf/oceangate-cyclops1-specs.pdf
+[47] https://web.archive.org/web/20230622104102/https://oceangate.com/our-subs/launch-recovery-platform.html
+[48] https://www.geekwire.com/2017/inside-submarine-factory-oceangate-builds-craft-visit-titanic-shipwreck/
+[49] https://www.nytimes.com/2023/06/19/us/oceangate-lost-submarine-titanic.html
+[50] https://www.economist.com/science-and-technology/2015/03/19/an-ambassador-to-neptunes-kingdom
+[51] https://web.archive.org/web/20220816133112/https://xconomy.com/seattle/2015/03/09/oceangate-unveils-cyclops-sub-to-help-businesses-researchers-go-deep/
+[52] https://media.newyorker.com/photos/649df383ada160419b41d7d6/master/w_1600,c_limit/Taub-OceanGate-4.jpg
+[53] https://www.bloomberg.com/news/features/2017-09-07/it-s-brutal-to-get-to-the-ocean-s-depths-this-minisub-will-take-you-there
+[54] https://oceangateexpeditions.com/about-us/our-story/
+[55] https://web.archive.org/web/20230626193723/https://www.rollingstone.com/culture/culture-features/oceangate-titanic-regulation-finances-1234778293/
+[56] https://www.vice.com/en/article/qjvjdb/it-is-a-huge-vast-opportunity-how-oceangate-went-from-disruptive-startup-to-catastrophic-deepsea-failure

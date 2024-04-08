@@ -1,0 +1,717 @@
+{
+  "title": "Threads_(social_network)",
+  "url": "https://en.wikipedia.org/wiki/Threads_(social_network)",
+  "summary": "Threads  is an online social media and social networking service operated by Meta Platforms. The app offers users the ability to post and share text, images, and videos, as well as interact with other users' posts through replies, reposts, and likes. Closely linked to Meta platform Instagram and additionally requiring users to both have an Instagram account and use Threads under the same Instagram handle, the functionality of Threads is similar to X (formerly known as Twitter). The application is available on iOS and Android devices; the web version offers limited functionality and requires a mobile app install first. It is the fastest-growing consumer software application in history, gaining over 100 million users in its first five days, surpassing the record previously set by ChatGPT. Its early success was not sustained and the user base of the app plummeted more than 80% to 8 million daily active users by the end of July.After Elon Musk's acquisition of Twitter in October 2022, Meta employees explored the concept of introducing text-based functionality to Instagram. This feature, known as Instagram Notes, was rolled out in December 2022. The company subsequently began developing a separate app focused on text-based posts. Development on Threads\u2014internally known as \"Project 92\"\u2014commenced in January 2023, with the platform officially launching on July 5, 2023. Threads immediately became available in 100 countries (out of 193 UN member states), but has delayed its launch in the European Union as it waits for regulatory clarity from the European Commission regarding the service's data collection policies.",
+  "content": [
+    {
+      "section_title": "History",
+      "section_content": [],
+      "subsections": [
+        {
+          "section_title": "Predecessor",
+          "section_content": [
+            {
+              "sentence": "In October 2019, Threads was introduced as a separate app available for Android and iOS",
+              "refs": []
+            },
+            {
+              "sentence": "This app's functionality resembled that of Snapchat, allowing users to communicate through messaging and video chats",
+              "refs": []
+            },
+            {
+              "sentence": "It was integrated with Instagram's \"Close friends\" feature, so that users could send images, photos, and texts privately to others, and was embedded with Instagram's photo editing system",
+              "refs": [
+                "https://edition.cnn.com/2019/10/03/tech/instagram-app-threads/index.html"
+              ]
+            },
+            {
+              "sentence": "Instagram discontinued this version of Threads in December 2021,  mainly due to most of its features being rolled out on Instagram, as well as low usage compared to other social media applications",
+              "refs": [
+                "https://www.digitalinformationworld.com/2019/10/instagram-threads-app-connect-with-close-friends-more-conveniently.html",
+                "https://variety.com/2019/digital/news/instagram-threads-messaging-app-1203357224/",
+                "https://9to5mac.com/2021/11/17/instagram-discontinuing-its-threads-direct-messaging-app-next-month/"
+              ]
+            },
+            {
+              "sentence": "Approximately 220,000 users globally downloaded the original Threads app, less than 0.1% of Instagram's monthly active users",
+              "refs": [
+                "https://techcrunch.com/2021/11/17/instagram-will-shut-down-its-companion-app-threads-by-year-end/"
+              ]
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Development and announcement",
+          "section_content": [
+            {
+              "sentence": "On April 14, 2022, business magnate Elon Musk attempted a takeover of the social media platform Twitter",
+              "refs": []
+            },
+            {
+              "sentence": "On October 27, Musk acquired the company for US$44 billion in an agreement with the company's board",
+              "refs": [
+                "https://www.washingtonpost.com/technology/2022/04/14/elon-musk-twitter-takeover-bid/?itid=lk_inline_manual_2"
+              ]
+            },
+            {
+              "sentence": "As Twitter's owner and CEO, Musk implemented several changes to the platform, including monetizing the platform's application programming interface (API); his views and policy changes concerned many advertisers, some of whom left the platform",
+              "refs": [
+                "https://www.nytimes.com/2022/10/27/technology/elon-musk-twitter-deal-complete.html"
+              ]
+            },
+            {
+              "sentence": "In November 2022, Meta employees started discussing the possibility of creating a separate app for Instagram Notes, an upcoming text-based feature designed for Instagram",
+              "refs": [
+                "https://www.washingtonpost.com/technology/2023/04/15/twitter-musk-bid-anniversary/"
+              ]
+            },
+            {
+              "sentence": "That month, Meta Platforms CEO Mark Zuckerberg\u2014seeking to take advantage of the situation\u2014discussed Twitter-like features the company could add to Instagram with the service's head, Adam Mosseri",
+              "refs": [
+                "https://www.nytimes.com/2022/12/07/technology/twitter-rivals-alternative-platforms.html"
+              ]
+            },
+            {
+              "sentence": "At the end of the discussion, Mosseri agreed to building a separate app with a planned release date of January 2023",
+              "refs": []
+            },
+            {
+              "sentence": "Amid several layoffs at Meta Platforms, Mosseri and product leader Connor Hayes assembled a team comprising two product managers, two designers, and dozens of engineers from Messenger, Facebook, and Instagram, growing to fifty-six people by the app's launch",
+              "refs": []
+            },
+            {
+              "sentence": "The team favored agility, opting to build features, such as searching for content, later",
+              "refs": []
+            },
+            {
+              "sentence": "Development began that January under the codename \"P92\"",
+              "refs": [
+                "https://www.washingtonpost.com/technology/2023/07/29/meta-threads-mark-zuckerberg-rival-twitter-musk/"
+              ]
+            },
+            {
+              "sentence": "Moneycontrol obtained information about the app in March, and The Verge published details from an internal company-wide meeting in June",
+              "refs": []
+            },
+            {
+              "sentence": "The project, referred to as \"Project 92\", was described by chief product officer Chris Cox as the company's response to Twitter",
+              "refs": []
+            },
+            {
+              "sentence": "Meta Platforms had reportedly secured commitments from some celebrities and was in talks with Oprah Winfrey and the Dalai Lama",
+              "refs": []
+            },
+            {
+              "sentence": "In July, developer Alessandro Paluzzi tweeted about the release of Project 92 on the Google App Store under the name Threads and shared several screenshots of its features; the app was taken down shortly after",
+              "refs": []
+            },
+            {
+              "sentence": "On July 3, Threads appeared on the Apple App Store with a release date set for July 6",
+              "refs": [
+                "https://www.theverge.com/2023/7/1/23781271/instagram-threads-twitter-leak-android-google-play"
+              ]
+            },
+            {
+              "sentence": "Additionally, a website for the app featured a countdown clock leading up to the service's launch",
+              "refs": [
+                "https://www.nytimes.com/2023/07/03/technology/meta-app-twitter.html"
+              ]
+            },
+            {
+              "sentence": "Mosseri intended to release the app a week later, but pushed the release date after Musk implemented a rate limit on the number of tweets users could read",
+              "refs": []
+            },
+            {
+              "sentence": "The countdown expired on July 5 at 7:00\u00a0p.m",
+              "refs": []
+            },
+            {
+              "sentence": "EDT after pushing the release date several hours further to account for international app stores,   and Threads officially launched in one hundred countries",
+              "refs": [
+                "https://www.theverge.com/2023/7/5/23784873/instagram-threads-launch-twitter-meta-countdown-7pm",
+                "https://www.washingtonpost.com/technology/2023/07/29/meta-threads-mark-zuckerberg-rival-twitter-musk/"
+              ]
+            },
+            {
+              "sentence": "Meta Platforms is currently awaiting regulatory clarification from the European Commission due to concerns and uncertainties regarding the service's data collection policies",
+              "refs": [
+                "https://www.theguardian.com/technology/2023/jul/06/meta-launches-twitter-rival-threads-in-100-countries"
+              ]
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Launch",
+          "section_content": [
+            {
+              "sentence": "Within a day of its launch, Threads garnered thirty million users, surpassing the previous record set by ChatGPT and making it the fastest-growing platform in history",
+              "refs": []
+            },
+            {
+              "sentence": "On the same day, lawyers representing Twitter threatened legal action against Meta Platforms, alleging that the company had used trade secrets to develop the Threads app",
+              "refs": [
+                "https://www.nytimes.com/2023/07/06/technology/threads-downloads-twitter.html"
+              ]
+            },
+            {
+              "sentence": "Since its release, Threads has been colloquially nicknamed \"The Twitter Killer\"",
+              "refs": [
+                "https://www.nytimes.com/2023/07/06/technology/threads-downloads-twitter.html"
+              ]
+            },
+            {
+              "sentence": "After the launch, Mark Zuckerberg broke his 11-year silence on Twitter",
+              "refs": [
+                "https://dx.doi.org/10.1787/888933496787"
+              ]
+            },
+            {
+              "sentence": "He posted a spiderman meme to signify the similarity between Twitter and Threads",
+              "refs": []
+            },
+            {
+              "sentence": "On August 22, 2023, Meta launched the web version of the Threads app",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        }
+      ]
+    },
+    {
+      "section_title": "Appearance and features",
+      "section_content": [
+        {
+          "sentence": "Designed as a platform for real-time conversations and sharing, Threads aims to provide users with a similar experience to Twitter",
+          "refs": []
+        },
+        {
+          "sentence": "Threads prioritizes public dialogues over private communications, commonly known as microblogging, and is closely linked to Instagram, its sister social networking service",
+          "refs": []
+        },
+        {
+          "sentence": "Accompanied by the launch of Threads, Meta announced their vision for the app to be a \"positive and creative space to express your ideas\"",
+          "refs": [
+            "https://www.nytimes.com/2023/07/03/technology/meta-app-twitter.html"
+          ]
+        },
+        {
+          "sentence": "Users can create posts consisting of up to 500 characters of text or 5 minutes of video content (compared to Twitter's 280 characters of text and 2 minutes 20 seconds of video content for non-paying users)",
+          "refs": [
+            "https://about.fb.com/news/2023/07/introducing-threads-new-app-text-sharing/"
+          ]
+        },
+        {
+          "sentence": "However, Threads lacks other common social media features, such as hashtags, trending stories, and direct messaging",
+          "refs": [
+            "https://www.theguardian.com/technology/2023/jul/06/meta-launches-twitter-rival-threads-in-100-countries",
+            "https://www.bbc.com/news/technology-66153244"
+          ]
+        },
+        {
+          "sentence": "In response to user feedback, Threads will introduce a new home feed for posts along with several updates to the social media app",
+          "refs": []
+        },
+        {
+          "sentence": "These changes will include the capability to edit posts, translation into multiple languages and an improved user interface for switching between different Threads accounts",
+          "refs": []
+        },
+        {
+          "sentence": "Threads has also introduced a reposting feature which is visible on each users' profile tab and in their following feed",
+          "refs": []
+        },
+        {
+          "sentence": "Threads has the same community guidelines as Instagram,  which bans content such as nudity, sexual intercourse and recreational drugs.",
+          "refs": [
+            "https://help.instagram.com/769983657850450"
+          ]
+        }
+      ],
+      "subsections": [
+        {
+          "section_title": "Account integration with Instagram",
+          "section_content": [
+            {
+              "sentence": "Threads accounts are closely integrated with Instagram accounts",
+              "refs": []
+            },
+            {
+              "sentence": "By default, Threads and Instagram accounts share the same username, profile picture, and display name, although the profile picture and display name can be customized",
+              "refs": []
+            },
+            {
+              "sentence": "Users can choose which accounts they follow on Instagram will carry over to Threads, either with the other person's Threads account already created or set to automatically follow them once an account is created",
+              "refs": []
+            },
+            {
+              "sentence": "As of August 2023, if a user decides to terminate their Threads account, they must delete their associated Instagram account as well",
+              "refs": [
+                "https://www.nbcnews.com/tech/internet/instagram-threads-meta-twitter-competitor-what-to-know-rcna92689"
+              ]
+            },
+            {
+              "sentence": "Adam Mosseri, the CEO of Instagram, has acknowledged this limitation and stated that they are exploring options for a user to delete only their Threads account",
+              "refs": [
+                "https://www.independent.co.uk/tech/instagram-threads-delete-account-meta-twitter-b2370698.html"
+              ]
+            },
+            {
+              "sentence": "Users are required to have an Instagram account to use Threads",
+              "refs": []
+            },
+            {
+              "sentence": "Threads is a companion app to Instagram, and it uses Instagram to authenticate the user's identity and connect with their network",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Device compatibility",
+          "section_content": [
+            {
+              "sentence": "Threads is available on mobile clients for Apple's iOS and Google's Android platforms",
+              "refs": []
+            },
+            {
+              "sentence": "Threads is now available on web browsers, as it has recently expanded to have a web interface",
+              "refs": [
+                "https://web.archive.org/web/20230705231129/https://www.nytimes.com/2023/07/05/technology/threads-app-meta-twitter-killer.html"
+              ]
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "International availability",
+          "section_content": [
+            {
+              "sentence": "Threads is currently unavailable in the European Union",
+              "refs": []
+            },
+            {
+              "sentence": "Meta is also blocking access to Threads to EU-based users, even if the user uses a VPN to bypass the blocking",
+              "refs": [
+                "https://www.cnbc.com/2023/07/06/metas-threads-not-available-in-the-eu-due-to-legal-complexity.html"
+              ]
+            },
+            {
+              "sentence": "In Iran, the government has blocked Threads, adding it to the extensive list of censored social media platforms in the country",
+              "refs": [
+                "https://techcrunch.com/2023/07/14/meta-is-blocking-eu-based-users-from-accessing-threads-via-vpn/"
+              ]
+            },
+            {
+              "sentence": "Despite being subject to censorship by the Great Firewall in China, Threads reached the top four free social apps on the Chinese iOS Apple App Store",
+              "refs": [
+                "https://www.voanews.com/a/iran-blocks-public-access-to-threads-app-raisi-s-account-created-/7171860.html"
+              ]
+            },
+            {
+              "sentence": "Russia blocked Threads one day after its launch",
+              "refs": [
+                "https://www.scmp.com/tech/big-tech/article/3226962/metas-twitter-rival-threads-tops-chinas-app-store-despite-great-firewall-censorship"
+              ]
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Advertising",
+          "section_content": [
+            {
+              "sentence": "Threads does not currently contain ads; however, ads are planned to be implemented in future",
+              "refs": []
+            },
+            {
+              "sentence": "Meta CEO Mark Zuckerberg stated that monetization would not take place until the app had \"hundreds of millions\" of users",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        }
+      ]
+    },
+    {
+      "section_title": "Userbase",
+      "section_content": [
+        {
+          "sentence": "Since its launch, Threads has grown rapidly, reaching 100\u00a0million users after 5 days",
+          "refs": []
+        },
+        {
+          "sentence": "Third-party observers claim that the number of daily active users has dropped by 20% since the initial 5 days,  and that there has been a 50% reduction in user engagement",
+          "refs": [
+            "https://www.theverge.com/2023/7/10/23787453/meta-instagram-threads-100-million-users-milestone",
+            "https://www.forbes.com/sites/siladityaray/2023/07/10/with-100-million-users-in-five-days-threads-is-the-fastest-growing-app-in-history/",
+            "https://www.cnbc.com/2023/07/13/meta-threads-engagement-has-dropped-off-sensor-tower-similarweb.html"
+          ]
+        },
+        {
+          "sentence": "Moreover, the average time spent on the app is said to have decreased from the July 6 peak of around twenty minutes per user to eight minutes on July 10, four minutes on July 21, and just under three minutes on August 1",
+          "refs": [
+            "https://www.proactiveinvestors.co.uk/companies/news/1020733/threads-engagement-plunges-while-twitter-launches-revenue-sharing-model-1020733.html"
+          ]
+        },
+        {
+          "sentence": "*estimated",
+          "refs": []
+        }
+      ],
+      "subsections": [
+        {
+          "section_title": "Decline in the months after launch",
+          "section_content": [
+            {
+              "sentence": "When Threads reached about 105 million users on July 11, 2023, Meta stopped disclosing its numbers of users; subsequent numbers have been approximated through sampling of follower counts",
+              "refs": []
+            },
+            {
+              "sentence": "Despite the initial growth in sign-ups, the number of daily active users on the platform fell by 70% by July 17, down from its peak on July 7",
+              "refs": [
+                "https://www.quiverquant.com/threadstracker/"
+              ]
+            },
+            {
+              "sentence": "Recent [when?] [needs update] developments indicate that Threads is facing challenges in retaining users and is considering the addition of \"retention-driving hooks\"",
+              "refs": [
+                "https://www.wsj.com/articles/threads-user-engagement-continues-to-drop-adding-urgency-for-new-features-8ed2f384"
+              ]
+            },
+            {
+              "sentence": "By mid-August, the daily number of users on Threads had fallen by over 80%",
+              "refs": [
+                "https://www.cnn.com/2023/08/03/tech/threads-user-count-falls/index.html"
+              ]
+            },
+            {
+              "sentence": "The number of daily Android users had also fallen by 79% from 49.3 million to 10.3 million",
+              "refs": []
+            },
+            {
+              "sentence": "Meta CEO Mark Zuckerberg claims that the eventual decrease in users was 'normal', and said he anticipated retention to improve as new features were added to the platform",
+              "refs": [
+                "https://amp.theguardian.com/technology/2023/aug/14/threads-app-slump-daily-active-users-twitter-competition",
+                "https://www.similarweb.com/blog/insights/social-media-news/threads-first-month/"
+              ]
+            }
+          ],
+          "subsections": []
+        }
+      ]
+    },
+    {
+      "section_title": "Responses",
+      "section_content": [],
+      "subsections": [
+        {
+          "section_title": "Intellectual property dispute",
+          "section_content": [
+            {
+              "sentence": "On the day of Threads' launch, Twitter issued a legal threat against it claiming that it infringes on Twitter's intellectual property rights",
+              "refs": []
+            },
+            {
+              "sentence": "In a letter directed to Meta's CEO, Twitter's lawyer alleged that Meta recruited numerous former Twitter employees who had access to Twitter's trade secrets and confidential information",
+              "refs": []
+            },
+            {
+              "sentence": "Meta has denied these allegations, asserting that no former Twitter employees are involved in the Threads engineering team",
+              "refs": [
+                "https://edition.cnn.com/2023/07/06/tech/twitter-meta-threads-legal-threat"
+              ]
+            },
+            {
+              "sentence": "Twitter also asked Meta to honor its robots.txt file and not crawl or scrape its data",
+              "refs": [
+                "https://www.npr.org/2023/07/07/1186367564/threads-meta-twitter-lawsuit"
+              ]
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "Data privacy",
+          "section_content": [
+            {
+              "sentence": "The data collection policies of Threads have garnered criticism, with experts raising concerns over the amount of private data collected by the app, as well as previous controversies surrounding Meta's use of user data",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        },
+        {
+          "section_title": "State media",
+          "section_content": [
+            {
+              "sentence": "Threads does not label state media accounts which, according to The Wall Street Journal, has raised concerns of Russian and Chinese government propaganda and disinformation on the platform",
+              "refs": []
+            }
+          ],
+          "subsections": []
+        }
+      ]
+    },
+    {
+      "section_title": "See also",
+      "section_content": [],
+      "subsections": []
+    },
+    {
+      "section_title": "References",
+      "section_content": [],
+      "subsections": []
+    },
+    {
+      "section_title": "Further reading",
+      "section_content": [],
+      "subsections": []
+    },
+    {
+      "section_title": "External links",
+      "section_content": [],
+      "subsections": []
+    }
+  ],
+  "references": {
+    "1": "https://wired.me/business/social-media/instagram-wants-to-take-over-twitter-with-threads/",
+    "2": "https://www.theguardian.com/technology/2023/jul/06/meta-launches-twitter-rival-threads-in-100-countries",
+    "3": "https://www.theguardian.com/media/2023/jul/05/meta-delays-eu-launch-of-twitter-rival-threads-amid-uncertainty-over-personal-data-use",
+    "4": "https://archive.today/20231025143521/https://www.businessinsider.com/threads-users-grow-mark-zuckerberg-pours-gasoline-x-users-decline-2023-10",
+    "5": "https://www.thewrap.com/meta-threads-90-million-signups-four-days/",
+    "6": "https://www.nytimes.com/2023/07/06/technology/threads-downloads-twitter.html",
+    "7": "https://www.forbes.com/sites/siladityaray/2023/07/10/with-100-million-users-in-five-days-threads-is-the-fastest-growing-app-in-history/",
+    "8": "https://www.businessinsider.com/threads-meta-app-decrease-daily-active-users-mark-zuckerberg-2023-8",
+    "9": "https://www.ft.com/content/7d65a0f9-9448-4c9c-a103-8b250d2c4ffd",
+    "10": "https://fortune.com/2023/08/04/threads-traffic-spiral-down-82-percent-launch-month-mark-zuckerberg/",
+    "11": "https://techcrunch.com/2022/12/13/instagram-now-supports-text-updates-with-launch-of-notes-adds-other-new-sharing-features/",
+    "12": "https://edition.cnn.com/2023/07/05/tech/meta-twitter-threads-app-instagram",
+    "13": "https://edition.cnn.com/2019/10/03/tech/instagram-app-threads/index.html",
+    "14": "https://www.digitalinformationworld.com/2019/10/instagram-threads-app-connect-with-close-friends-more-conveniently.html",
+    "15": "https://variety.com/2019/digital/news/instagram-threads-messaging-app-1203357224/",
+    "16": "https://9to5mac.com/2021/11/17/instagram-discontinuing-its-threads-direct-messaging-app-next-month/",
+    "17": "https://techcrunch.com/2021/11/17/instagram-will-shut-down-its-companion-app-threads-by-year-end/",
+    "18": "https://www.businessinsider.com/instagram-threads-app-sees-low-downloads-compared-to-igtv-boomerang-2019-10",
+    "19": "https://www.washingtonpost.com/technology/2022/04/14/elon-musk-twitter-takeover-bid/?itid=lk_inline_manual_2",
+    "20": "https://www.nytimes.com/2022/10/27/technology/elon-musk-twitter-deal-complete.html",
+    "21": "https://www.washingtonpost.com/technology/2023/04/15/twitter-musk-bid-anniversary/",
+    "22": "https://www.nytimes.com/2022/12/07/technology/twitter-rivals-alternative-platforms.html",
+    "23": "https://www.washingtonpost.com/technology/2023/07/29/meta-threads-mark-zuckerberg-rival-twitter-musk/",
+    "24": "https://www.theverge.com/2023/6/8/23754304/instagram-meta-twitter-competitor-threads-activitypub",
+    "25": "https://www.theverge.com/2023/7/1/23781271/instagram-threads-twitter-leak-android-google-play",
+    "26": "https://www.nytimes.com/2023/07/03/technology/meta-app-twitter.html",
+    "27": "https://www.theverge.com/2023/7/5/23784873/instagram-threads-launch-twitter-meta-countdown-7pm",
+    "28": "https://dx.doi.org/10.1787/888933496787",
+    "29": "https://in.mashable.com/tech/55800/mark-zuckerberg-breaks-twitter-silence-with-playful-jab-at-elon-musk-in-first-tweet-in-11-years",
+    "30": "https://www.theguardian.com/technology/2023/aug/22/meta-launches-web-version-of-flagging-threads-app",
+    "31": "https://about.fb.com/news/2023/07/introducing-threads-new-app-text-sharing/",
+    "32": "https://www.bbc.com/news/technology-66153244",
+    "33": "https://www.bbc.com/news/technology-66155433",
+    "34": "https://www.searchenginejournal.com/threads-adds-reposts-to-profiles-and-following-feed/494129/",
+    "35": "https://help.instagram.com/769983657850450",
+    "36": "https://www.nbcnews.com/tech/internet/instagram-threads-meta-twitter-competitor-what-to-know-rcna92689",
+    "37": "https://www.independent.co.uk/tech/instagram-threads-delete-account-meta-twitter-b2370698.html",
+    "38": "https://www.engadget.com/meta-is-working-to-stop-deleted-threads-accounts-from-nuking-instagram-too-094423213.html",
+    "39": "https://web.archive.org/web/20230705231129/https://www.nytimes.com/2023/07/05/technology/threads-app-meta-twitter-killer.html",
+    "40": "https://www.searchenginejournal.com/threads-by-instagram-expands-to-web-browsers-this-week/494471/",
+    "41": "https://www.cnbc.com/2023/07/06/metas-threads-not-available-in-the-eu-due-to-legal-complexity.html",
+    "42": "https://techcrunch.com/2023/07/14/meta-is-blocking-eu-based-users-from-accessing-threads-via-vpn/",
+    "43": "https://www.voanews.com/a/iran-blocks-public-access-to-threads-app-raisi-s-account-created-/7171860.html",
+    "44": "https://www.scmp.com/tech/big-tech/article/3226962/metas-twitter-rival-threads-tops-chinas-app-store-despite-great-firewall-censorship",
+    "45": "https://www.themoscowtimes.com/2023/07/07/russia-blocks-metas-twitter-competitor-app-lawmaker-a81773",
+    "46": "https://www.theverge.com/2023/7/26/23809080/mark-zuckerberg-meta-q2-earnings-threads-one-billion-users",
+    "47": "https://www.theverge.com/2023/7/10/23787453/meta-instagram-threads-100-million-users-milestone",
+    "48": "https://www.forbes.com/sites/siladityaray/2023/07/10/with-100-million-users-in-five-days-threads-is-the-fastest-growing-app-in-history/",
+    "49": "https://www.cnbc.com/2023/07/13/meta-threads-engagement-has-dropped-off-sensor-tower-similarweb.html",
+    "50": "https://www.proactiveinvestors.co.uk/companies/news/1020733/threads-engagement-plunges-while-twitter-launches-revenue-sharing-model-1020733.html",
+    "51": "https://www.forbes.com/sites/willskipworth/2023/07/21/threads-user-engagement-reportedly-plummets-after-explosive-start/",
+    "52": "https://www.namepepper.com/threads-users",
+    "53": "https://www.nytimes.com/2023/07/06/technology/threads-downloads-twitter.html",
+    "54": "https://www.forbes.com/sites/siladityaray/2023/07/06/zuckerberg-says-threads-crossed-5-million-signups-in-first-four-hours-as-musk-rails-against-instagram/",
+    "55": "https://9to5google.com/2023/07/06/meta-threads-20-million-users/",
+    "56": "https://www.cbsnews.com/news/threads-zuckerberg-millions-of-signups-within-days/",
+    "57": "https://www.quiverquant.com/threadstracker/",
+    "58": "https://www.wsj.com/articles/threads-user-engagement-continues-to-drop-adding-urgency-for-new-features-8ed2f384",
+    "59": "https://www.cnn.com/2023/08/03/tech/threads-user-count-falls/index.html",
+    "60": "https://amp.theguardian.com/technology/2023/aug/14/threads-app-slump-daily-active-users-twitter-competition",
+    "61": "https://www.similarweb.com/blog/insights/social-media-news/threads-first-month/",
+    "62": "https://www.bbc.com/news/technology-66336058",
+    "63": "https://edition.cnn.com/2023/07/06/tech/twitter-meta-threads-legal-threat",
+    "64": "https://www.npr.org/2023/07/07/1186367564/threads-meta-twitter-lawsuit",
+    "65": "https://apnews.com/article/threads-twitter-meta-instagram-lawsuit-cloen-f6e993c4597ce15b60cc38fe602b6ce8",
+    "66": "https://www.theregister.com/2023/07/06/twitter_threatens_to_sue_meta/",
+    "67": "https://www.theguardian.com/technology/2023/jul/11/threads-app-privacy-user-data-meta-policy",
+    "68": "https://www.wsj.com/articles/metas-threads-isnt-labeling-propaganda-accounts-from-russia-china-state-media-3f4c6cf8"
+  },
+  "spicy_entities": {
+    "meta platforms": "ORG",
+    "meta": "ORG",
+    "instagram": "ORG",
+    "threads": "GPE",
+    "twitter": "PERSON",
+    "android": "ORG",
+    "first": "ORDINAL",
+    "over 100 million": "CARDINAL",
+    "its first five days": "DATE",
+    "more than 80%": "PERCENT",
+    "8 million": "CARDINAL",
+    "daily": "DATE",
+    "the end of july": "DATE",
+    "elon musk's": "PERSON",
+    "october 2022": "DATE",
+    "instagram notes": "PERSON",
+    "december 2022": "DATE",
+    "january 2023": "DATE",
+    "july 5, 2023": "DATE",
+    "100": "CARDINAL",
+    "193": "CARDINAL",
+    "un": "ORG",
+    "the european union": "ORG",
+    "the european commission": "ORG",
+    "october 2019": "DATE",
+    "december 2021": "DATE",
+    "approximately 220,000": "CARDINAL",
+    "monthly": "DATE",
+    "april 14, 2022": "DATE",
+    "elon musk": "PERSON",
+    "october 27": "DATE",
+    "musk": "PERSON",
+    "us$44 billion": "MONEY",
+    "api": "ORG",
+    "november 2022": "DATE",
+    "that month": "DATE",
+    "mark zuckerberg": "PERSON",
+    "adam mosseri": "PERSON",
+    "mosseri": "NORP",
+    "connor hayes": "PERSON",
+    "two": "CARDINAL",
+    "dozens": "CARDINAL",
+    "messenger": "PERSON",
+    "fifty-six": "CARDINAL",
+    "january": "DATE",
+    "p92": "PRODUCT",
+    "moneycontrol": "ORG",
+    "march": "DATE",
+    "june": "DATE",
+    "chris cox": "PERSON",
+    "oprah winfrey": "PERSON",
+    "july": "DATE",
+    "alessandro paluzzi": "ORG",
+    "project 92": "ORG",
+    "july 3": "DATE",
+    "the apple app store": "ORG",
+    "july 6": "DATE",
+    "a week later": "DATE",
+    "july 5": "DATE",
+    "7:00\u00a0p.m. edt": "TIME",
+    "several hours": "TIME",
+    "one hundred": "CARDINAL",
+    "launch": "NORP",
+    "a day": "DATE",
+    "thirty million": "CARDINAL",
+    "the same day": "DATE",
+    "the twitter killer": "WORK_OF_ART",
+    "11-year": "DATE",
+    "august 22, 2023": "DATE",
+    "appearance": "PERSON",
+    "up to 500": "CARDINAL",
+    "5 minutes": "TIME",
+    "280": "CARDINAL",
+    "2 minutes 20 seconds": "TIME",
+    "august 2023": "DATE",
+    "apple": "ORG",
+    "google": "ORG",
+    "eu": "ORG",
+    "iran": "GPE",
+    "censored social media platforms": "ORG",
+    "the great firewall": "FAC",
+    "china": "GPE",
+    "four": "CARDINAL",
+    "chinese": "NORP",
+    "apple app store": "ORG",
+    "russia": "GPE",
+    "one day": "DATE",
+    "hundreds of millions": "MONEY",
+    "userbase": "GPE",
+    "100\u00a0million": "CARDINAL",
+    "5 days": "DATE",
+    "third": "ORDINAL",
+    "20%": "PERCENT",
+    "the initial 5 days": "DATE",
+    "50%": "PERCENT",
+    "twenty minutes": "TIME",
+    "eight minutes": "TIME",
+    "july 10": "DATE",
+    "four minutes": "TIME",
+    "july 21": "DATE",
+    "just under three minutes": "TIME",
+    "august 1": "DATE",
+    "the months": "DATE",
+    "about 105 million": "CARDINAL",
+    "july 11, 2023": "DATE",
+    "70%": "PERCENT",
+    "july 17": "DATE",
+    "july 7": "DATE",
+    "mid-august": "DATE",
+    "over 80%": "PERCENT",
+    "79%": "PERCENT",
+    "49.3 million": "CARDINAL",
+    "10.3 million": "CARDINAL",
+    "the day": "DATE",
+    "the wall street journal": "ORG",
+    "russian": "NORP"
+  },
+  "flair_entities": [
+    "project 92",
+    "connor hayes",
+    "android",
+    "p92",
+    "apple",
+    "chinese",
+    "the twitter killer",
+    "instagram notes",
+    "the wall street journal",
+    "oprah winfrey",
+    "google",
+    "china",
+    "dalai lama",
+    "meta",
+    "x",
+    "mosseri",
+    "userbase",
+    "eu-based",
+    "un",
+    "great firewall",
+    "iran",
+    "twitter",
+    "meta platforms",
+    "musk",
+    "mark zuckerberg",
+    "european union",
+    "alessandro paluzzi",
+    "threads",
+    "chatgpt",
+    "twitter-like",
+    "elon musk",
+    "threads'",
+    "russia",
+    "the verge",
+    "moneycontrol",
+    "chris cox",
+    "apple app store",
+    "ios",
+    "instagram  threads",
+    "google app store",
+    "adam mosseri",
+    "us",
+    "messenger",
+    "instagram",
+    "russian",
+    "snapchat",
+    "when threads",
+    "facebook",
+    "european commission"
+  ]
+}
