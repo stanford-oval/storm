@@ -35,7 +35,7 @@ Below, we provide a quick start guide to run STORM locally to reproduce our expe
 
 1. Install the required packages.
    ```shell
-   conda create -n storm python=3.9
+   conda create -n storm python=3.11
    conda activate storm
    pip install -r requirements.txt
    ```
