@@ -44,9 +44,9 @@ Below, we provide a quick start guide to run STORM locally to reproduce our expe
     # Set up OpenAI API key.
     OPENAI_API_KEY=<your_openai_api_key>
     # If you are using the API service provided by OpenAI, include the following line:
-    OPENAI_API_TYPE=openai
+    OPENAI_API_TYPE="openai"
     # If you are using the API service provided by Microsoft Azure, include the following lines:
-    OPENAI_API_TYPE=azure
+    OPENAI_API_TYPE="azure"
     AZURE_API_BASE=<your_azure_api_base_url>
     AZURE_API_VERSION=<your_azure_api_version>
     # Set up You.com search API key.
