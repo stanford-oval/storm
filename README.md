@@ -72,7 +72,7 @@ python -m scripts.run_prewriting --input-source file --input-path ../FreshWiki/t
 
 To run the experiment on a single topic:
 ```shell
-python -m scripts.run_prewriting --input-source console --engine gpt-4 --max-conv-turn 5 --max-perspective 5
+python -m scripts.run_prewriting --input-source console --engine gpt-4 --max-conv-turn 5 --max-perspective 5 --do-research
 ```
 - The script will ask you to enter the `Topic` and the `Ground truth url` that will be excluded. If you do not have any url to exclude, leave that field empty.
 
