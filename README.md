@@ -50,7 +50,7 @@ Below, we provide a quick start guide to run STORM locally to reproduce our expe
     AZURE_API_BASE=<your_azure_api_base_url>
     AZURE_API_VERSION=<your_azure_api_version>
     # Set up You.com search API key.
-    YOU_API_KEY=<your_youcom_api_key>
+    YDC_API_KEY=<your_youcom_api_key>
     ```
 
 ## Paper Experiments
