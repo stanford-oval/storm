@@ -1,3 +1,5 @@
+[English](README.md) | [中文](README-zh.md)
+
 # STORM: Synthesis of Topic Outlines through Retrieval and Multi-perspective Question Asking
 
 This repository contains the code for our NAACL 2024 paper [Assisting in Writing Wikipedia-like Articles From Scratch with Large Language Models](https://arxiv.org/abs/2402.14207) by [Yijia Shao](https://cs.stanford.edu/~shaoyj), [Yucheng Jiang](https://yucheng-jiang.github.io/), Theodore A. Kanell, Peter Xu, [Omar Khattab](https://omarkhattab.com/), and [Monica S. Lam](https://suif.stanford.edu/~lam/).
