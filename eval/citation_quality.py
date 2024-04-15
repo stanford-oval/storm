@@ -260,7 +260,7 @@ def extract_url(text):
 
 def expand_citaions(output):
     """
-    Expand citations by folloing rule:
+    Expand citations by following rule:
         1. convert "<sentence 1>. <sentence 2> [2][3]" into "<sentence 1> [2][3]"
         2. "<sentence 1>[1]. <last paragraph senetence>" will be changed to "<sentence 1>[1]. <last paragraph senetence>[1]. "
     """
