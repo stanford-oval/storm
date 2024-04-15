@@ -89,7 +89,7 @@ python -m scripts.run_writing --input-source file --input-path ../FreshWiki/topi
 To run the experiment on a single topic:
 ```shell
 python -m scripts.run_writing --input-source console --engine gpt-4 --do-polish-article --remove-duplicate
-````
+```
 - The script will ask you to enter the `Topic`. Please enter the same topic as the one used in the pre-writing stage.
 
 The generated article will be saved in `{output_dir}/{topic}/storm_gen_article.txt` and the references corresponding to citation index will be saved in `{output_dir}/{topic}/url_to_info.json`. If `--do-polish-article` is set, the polished article will be saved in `{output_dir}/{topic}/storm_gen_article_polished.txt`. 
