@@ -49,8 +49,12 @@ Below, we provide a quick start guide to run STORM locally to reproduce our expe
     OPENAI_API_TYPE="azure"
     AZURE_API_BASE=<your_azure_api_base_url>
     AZURE_API_VERSION=<your_azure_api_version>
-    # Set up You.com search API key.
+    # Setup WEB_SEARCH_API as one of ['DuckDuckGoSearchAPI', 'TavilySearchAPI', 'YouSearchAPI'], using YouSearchAPI as default.
+    WEB_SEARCH_API="YouSearchAPI"
+    # Setup You.com search API key.
     YDC_API_KEY=<your_youcom_api_key>
+    # Setup api.tavily.com search API key.
+    TAVILY_API_KEY=<your_api_tavily_com_key>
     ```
 
 ## Paper Experiments

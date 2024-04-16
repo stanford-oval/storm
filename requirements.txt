@@ -12,3 +12,6 @@ wikipedia==1.4.0
 Wikipedia-API==0.6.0
 rouge-score
 toml
+newspaper
+langchain==0.1.16
+
