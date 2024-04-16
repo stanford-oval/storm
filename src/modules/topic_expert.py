@@ -63,7 +63,7 @@ class TopicExpert(dspy.Module):
         elif web_search_api == "YouSearchAPI":
             self.retrieve = YouSearchAPI(max_results=search_top_k)
         else:
-            raise NotImplementedError(f"Except WEB_SEARCH_API as one of ['DuckDuckGoSearchAPI', 'TavilySearchAPI', 'YouSearchAPI'], but got {web_search_api} instead.")
+            raise NotImplementedError(f"Expected WEB_SEARCH_API must be one of ['DuckDuckGoSearchAPI', 'TavilySearchAPI', 'YouSearchAPI'], but got {web_search_api} instead.")
             
 
     def forward(self, topic: str, question: str, ground_truth_url: str):
