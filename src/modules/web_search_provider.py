@@ -232,7 +232,7 @@ class YouSearchAPI(WebSearchAPIWrapper):
                     if self.is_valid_wikipedia_source(r['url']):
                         authoritative_results.append(r)
                 if 'hits' in results:
-                    collected_results.extend(authoritative_results[:self.k])
+                    collected_results.extend(authoritative_results[:self.max_results])
             except Exception as e:
                 logging.error(f'Error occurs when searching query {query}: {e}')
 
