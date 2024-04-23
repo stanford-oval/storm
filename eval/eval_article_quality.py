@@ -170,7 +170,7 @@ if __name__ == "__main__":
                         help='Directory to store the evaluation results. '
                              'Each article evaluation will be saved as separate file named after {topic_name}.json')
     parser.add_argument('--pred-file-name', help='Name of the article file.')
-    parser.add_argument("--prompt-template-path", default="./prompts/eval_prometheus_no_ref.prompt",
+    parser.add_argument("--prompt-template-path", default="./eval_prometheus_no_ref.prompt",
                         help='path to evaluation prometheus prompt template')
     parser.add_argument("--rubric-path", default="./eval_rubric_5.json", help='path to rubric json file')
 
