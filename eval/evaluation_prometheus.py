@@ -85,8 +85,8 @@ def get_grading_dict(responses,
                      topic,
                      tokenizer,
                      model,
-                     prompt_template_path="./prompts/eval_prometheus_no_ref.prompt",
-                     rubric_path="./prompts/eval_rubric_5.json",
+                     prompt_template_path="./eval_prometheus_no_ref.prompt",
+                     rubric_path="./eval_rubric_5.json",
                      disable_sample=False,
                      temperature=0.01,
                      top_p=0.95,
@@ -165,7 +165,7 @@ if __name__ == "__main__":
     parser.add_argument('-o', '--output_path', required=True, help='Path to save the output JSON file')
     parser.add_argument('-t', "--topic", required=True, help="Topic of the script your going to analyze")
 
-    parser.add_argument("--prompt_template_path", default="./prompts/eval_prometheus_no_ref.prompt",
+    parser.add_argument("--prompt_template_path", default="./eval_prometheus_no_ref.prompt",
                         help='path to evaluation prometheus prompt template')
     parser.add_argument("--rubric_path", default="./prompts/eval_rubric_5.json", help='path to rubric json file')
 
