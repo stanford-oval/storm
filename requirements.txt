@@ -12,4 +12,4 @@ wikipedia==1.4.0
 Wikipedia-API==0.6.0
 rouge-score
 toml
-tqdm==4.66.2
+tqdm==4.66.0
