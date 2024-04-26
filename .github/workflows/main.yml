@@ -1,0 +1,47 @@
+name: Sync Repos
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'README.md'
+
+jobs:
+  sync-repos:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Source Repository
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ secrets.SOURCE }}
+        path: source
+        token: ${{ secrets.PAT }}
+
+    - name: Checkout Destination Repository
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ secrets.DESTINATION }}
+        path: destination
+        token: ${{ secrets.PAT }}
+
+    - name: Copy Source to Destination
+      run: |
+        rm -r destination/src
+        cp -r source/src destination/src
+        cp source/README.md destination/README.md
+
+    - name: Get Timestamp
+      id: get-timestamp
+      run: echo "timestamp=$(TZ='America/Los_Angeles' date +%Y-%m-%d-%H-%M-%S)" >> $GITHUB_OUTPUT
+      
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v4
+      with:
+        token: ${{ secrets.PAT }}
+        path: destination
+        commit-message: Auto-sync-${{ steps.get-timestamp.outputs.timestamp }}
+        title: auto-sync-${{ steps.get-timestamp.outputs.timestamp }}
+        branch: auto-sync-${{ steps.get-timestamp.outputs.timestamp }}
+        delete-branch: true
