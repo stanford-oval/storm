@@ -12,6 +12,11 @@ from dsp.modules.hf import openai_to_hf
 from dsp.modules.hf_client import send_hfvllm_request_v00, send_hftgi_request_v01_wrapped
 from transformers import AutoTokenizer
 
+try:
+    import anthropic
+except ImportError:
+    pass
+
 
 class OpenAIModel(dspy.OpenAI):
     """A wrapper class for dspy.OpenAI."""
@@ -115,7 +120,7 @@ class ClaudeModel(dspy.dsp.modules.lm.LM):
     ):
         super().__init__(model)
         try:
-            from anthropic import Anthropic, RateLimitError
+            from anthropic import Anthropic
         except ImportError as err:
             raise ImportError("Claude requires `pip install anthropic`.") from err
 
@@ -188,7 +193,7 @@ class ClaudeModel(dspy.dsp.modules.lm.LM):
 
     @backoff.on_exception(
         backoff.expo,
-        (RateLimitError,),
+        (anthropic.RateLimitError,),
         max_time=1000,
         max_tries=8,
         on_backoff=backoff_hdlr,
@@ -219,8 +224,11 @@ class ClaudeModel(dspy.dsp.modules.lm.LM):
         for _ in range(n):
             response = self.request(prompt, **kwargs)
             self.log_usage(response)
-            if only_completed and response.stop_reason == "max_tokens":
-                continue
+            # This is the original behavior in dspy/dsp/modules/anthropic.py.
+            # Comment it out because it can cause "IndexError: list index out of range" silently
+            # which is not transparent to developers.
+            # if only_completed and response.stop_reason == "max_tokens":
+            #     continue
             completions = [c.text for c in response.content]
         return completions
 
