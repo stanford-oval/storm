@@ -9,8 +9,13 @@ from interface import KnowledgeCurationModule, Retriever
 from storm_wiki.modules.callback import BaseCallbackHandler
 from storm_wiki.modules.persona_generator import StormPersonaGenerator
 from storm_wiki.modules.storm_dataclass import DialogueTurn, StormInformationTable, StormInformation
-from streamlit.runtime.scriptrunner import add_script_run_ctx
 from utils import ArticleTextProcessing
+
+try:
+    from streamlit.runtime.scriptrunner import add_script_run_ctx
+    streamlit_connection = True
+except ImportError as err:
+    streamlit_connection = False
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -260,9 +265,11 @@ class StormKnowledgeCurationModule(KnowledgeCurationModule):
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
             future_to_persona = {executor.submit(run_conv, persona): persona for persona in considered_personas}
-            # Ensure the logging context is correct when connecting with Streamlit frontend.
-            for t in executor._threads:
-                add_script_run_ctx(t)
+
+            if streamlit_connection:
+                # Ensure the logging context is correct when connecting with Streamlit frontend.
+                for t in executor._threads:
+                    add_script_run_ctx(t)
 
             for future in as_completed(future_to_persona):
                 persona = future_to_persona[future]
