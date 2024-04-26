@@ -72,7 +72,7 @@ Currently, we provide example scripts under [`examples`](examples) to demonstrat
 **To run STORM with `gpt` family models**: Make sure you have set up the OpenAI API key and run the following command.
 
 ```
-python scripts/run_storm_wiki_gpt.py \
+python examples/run_storm_wiki_gpt.py \
     --output_dir $OUTPUT_DIR \
     --do-research \
     --do-generate-outline \
@@ -87,7 +87,7 @@ python scripts/run_storm_wiki_gpt.py \
 **To run STORM with `mistral` family models on local VLLM server**: have a VLLM server running with the `Mistral-7B-Instruct-v0.2` model and run the following command.
 
 ```
-python scripts/run_storm_wiki_mistral.py \
+python examples/run_storm_wiki_mistral.py \
     --url $URL \
     --port $PORT \
     --output_dir $OUTPUT_DIR \
