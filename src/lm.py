@@ -4,7 +4,6 @@ import random
 import threading
 from typing import Optional, Literal, Any
 
-import anthropic
 import backoff
 import dspy
 import requests
@@ -109,14 +108,14 @@ class ClaudeModel(dspy.dsp.modules.lm.LM):
 
     def __init__(
             self,
-            model: str = "claude-3-opus-20240229",
+            model: str,
             api_key: Optional[str] = None,
             api_base: Optional[str] = None,
             **kwargs,
     ):
         super().__init__(model)
         try:
-            from anthropic import Anthropic
+            from anthropic import Anthropic, RateLimitError
         except ImportError as err:
             raise ImportError("Claude requires `pip install anthropic`.") from err
 
@@ -189,7 +188,7 @@ class ClaudeModel(dspy.dsp.modules.lm.LM):
 
     @backoff.on_exception(
         backoff.expo,
-        (anthropic.RateLimitError),
+        (RateLimitError,),
         max_time=1000,
         max_tries=8,
         on_backoff=backoff_hdlr,
