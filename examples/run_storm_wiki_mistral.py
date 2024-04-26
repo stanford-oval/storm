@@ -135,7 +135,7 @@ if __name__ == '__main__':
                         help='Port of the VLLM server.')
     parser.add_argument('--output-dir', type=str, default='./results/mistral_7b',
                         help='Directory to store the outputs.')
-    parser.add_argument('--max_thread_num', type=int, default=3,
+    parser.add_argument('--max-thread-num', type=int, default=3,
                         help='Maximum number of threads to use. The information seeking part and the article generation'
                              'part can speed up by using multiple threads. Consider reducing it if keep getting '
                              '"Exceed rate limit" error when calling LM API.')
