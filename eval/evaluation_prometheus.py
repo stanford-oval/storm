@@ -171,9 +171,9 @@ if __name__ == "__main__":
 
     parser.add_argument('--tokenizer', default="meta-llama/Llama-2-7b-chat-hf")
     parser.add_argument('--model',
-                        choices=["kaist-ai/prometheus-13b-v1.0", "kaist-ai/prometheus-7b-v1.0"],
-                        default="kaist-ai/prometheus-13b-v1.0",
-                        help="Model to use; options are 'kaist-ai/prometheus-13b-v1.0' or 'kaist-ai/prometheus-7b-v1.0'")
+                        choices=["prometheus-eval/prometheus-13b-v1.0", "prometheus-eval/prometheus-7b-v1.0"],
+                        default="prometheus-eval/prometheus-13b-v1.0",
+                        help="Model to use; options are 'prometheus-eval/prometheus-13b-v1.0' or 'prometheus-eval/prometheus-7b-v1.0'")
     parser.add_argument('--disable_sample', action='store_true', help='Whether to disable sampling; default is False')
     parser.add_argument('--temperature', type=float, default=0.01, help='Temperature for generation; default is 0.01')
     parser.add_argument('--top_p', type=float, default=0.95, help='Top P for generation; default is 0.95')

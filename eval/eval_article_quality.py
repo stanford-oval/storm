@@ -176,8 +176,8 @@ if __name__ == "__main__":
 
     parser.add_argument('--tokenizer', default="meta-llama/Llama-2-7b-chat-hf")
     parser.add_argument('--model',
-                        choices=["kaist-ai/prometheus-13b-v1.0", "kaist-ai/prometheus-7b-v1.0"],
-                        default="kaist-ai/prometheus-13b-v1.0",
+                        choices=["prometheus-eval/prometheus-13b-v1.0", "prometheus-eval/prometheus-7b-v1.0"],
+                        default="prometheus-eval/prometheus-13b-v1.0",
                         help="Model to use for rubric evaluation.")
     args = parser.parse_args()
 

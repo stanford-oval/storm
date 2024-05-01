@@ -222,7 +222,7 @@ python eval_article_quality.py --input-path ../FreshWiki/topic_list.csv --gt-dir
 #### Use the Metric Yourself
 The similarity-based metrics (i.e., ROUGE, entity recall, and heading entity recall) are implemented in [eval/metrics.py](eval/metrics.py).
 
-For rubric grading, we use the [prometheus-13b-v1.0](https://huggingface.co/kaist-ai/prometheus-13b-v1.0) introduced in [this paper](https://arxiv.org/abs/2310.08491). [eval/evaluation_prometheus.py](eval/evaluation_prometheus.py) provides the entry point of using the metric.
+For rubric grading, we use the [prometheus-13b-v1.0](https://huggingface.co/prometheus-eval/prometheus-13b-v1.0) introduced in [this paper](https://arxiv.org/abs/2310.08491). [eval/evaluation_prometheus.py](eval/evaluation_prometheus.py) provides the entry point of using the metric.
 
 </details>
 
