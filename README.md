@@ -44,13 +44,19 @@ Based on the separation of the two stages, STORM is implemented in a highly modu
 
 Below, we provide a quick start guide to run STORM locally.
 
-1. Install the required packages.
+1. Clone the git repository.
+   ```shell
+   git clone https://github.com/stanford-oval/storm.git
+   cd storm
+   ```
+   
+2. Install the required packages.
    ```shell
    conda create -n storm python=3.11
    conda activate storm
    pip install -r requirements.txt
    ```
-2. Set up OpenAI API key (if you want to use OpenAI models to power STORM) and [You.com search API](https://api.you.com/) key. Create a file `secrets.toml` under the root directory and add the following content:
+3. Set up OpenAI API key (if you want to use OpenAI models to power STORM) and [You.com search API](https://api.you.com/) key. Create a file `secrets.toml` under the root directory and add the following content:
     ```shell
     # Set up OpenAI API key.
     OPENAI_API_KEY="your_openai_api_key"
@@ -118,7 +124,7 @@ The interface for each module is defined in `src/interface.py`, while their impl
 
 ### Customization of Retriever Module
 
-As a knowledge curation engine, STORM grabs information from the Retriever module. The interface for the Retriever module is defined in [`src/interface.py`]('src/interface.py'). Please consult the interface documentation if you plan to create a new instance or replace the default search engine API. By default, STORM utilizes the You.com search engine API (see `YouRM` in [`src/rm.py`](src/rm.py)).
+As a knowledge curation engine, STORM grabs information from the Retriever module. The interface for the Retriever module is defined in [`src/interface.py`](src/interface.py). Please consult the interface documentation if you plan to create a new instance or replace the default search engine API. By default, STORM utilizes the You.com search engine API (see `YouRM` in [`src/rm.py`](src/rm.py)).
 
 :star2: **PRs for integrating more search engines/retrievers are highly appreciated!**
 
