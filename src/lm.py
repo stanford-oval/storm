@@ -13,9 +13,9 @@ from dsp.modules.hf_client import send_hfvllm_request_v00, send_hftgi_request_v0
 from transformers import AutoTokenizer
 
 try:
-    import anthropic
+    from anthropic import RateLimitError
 except ImportError:
-    pass
+    RateLimitError = None
 
 
 class OpenAIModel(dspy.OpenAI):
@@ -193,7 +193,7 @@ class ClaudeModel(dspy.dsp.modules.lm.LM):
 
     @backoff.on_exception(
         backoff.expo,
-        (anthropic.RateLimitError,),
+        (RateLimitError,),
         max_time=1000,
         max_tries=8,
         on_backoff=backoff_hdlr,
