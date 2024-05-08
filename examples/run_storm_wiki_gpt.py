@@ -48,9 +48,9 @@ def main(args):
     # which is responsible for generating sections with citations.
     conv_simulator_lm = OpenAIModel(model='gpt-3.5-turbo', max_tokens=500, **openai_kwargs)
     question_asker_lm = OpenAIModel(model='gpt-3.5-turbo', max_tokens=500, **openai_kwargs)
-    outline_gen_lm = OpenAIModel(model='gpt-4-0125-preview', max_tokens=400, **openai_kwargs)
-    article_gen_lm = OpenAIModel(model='gpt-4-0125-preview', max_tokens=700, **openai_kwargs)
-    article_polish_lm = OpenAIModel(model='gpt-4-0125-preview', max_tokens=4000, **openai_kwargs)
+    outline_gen_lm = OpenAIModel(model='gpt-4-turbo', max_tokens=400, **openai_kwargs)
+    article_gen_lm = OpenAIModel(model='gpt-4-turbo', max_tokens=700, **openai_kwargs)
+    article_polish_lm = OpenAIModel(model='gpt-4-turbo', max_tokens=4000, **openai_kwargs)
 
     lm_configs.set_conv_simulator_lm(conv_simulator_lm)
     lm_configs.set_question_asker_lm(question_asker_lm)
