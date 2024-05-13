@@ -3,6 +3,7 @@ import os
 from typing import Union, List
 from urllib.parse import urlparse
 
+import dspy
 import storm_wiki.modules.storm_dataclass as storm_dataclass
 from interface import Retriever, Information
 from rm import YouRM
@@ -28,13 +29,14 @@ def is_valid_wikipedia_source(url):
 
 
 class StormRetriever(Retriever):
-    def __init__(self, ydc_api_key=None, k=3):
+    def __init__(self, rm: dspy.Retrieve, k=3):
         super().__init__(search_top_k=k)
-        self.you_rm = YouRM(ydc_api_key=ydc_api_key, k=self.search_top_k, is_valid_source=is_valid_wikipedia_source)
+        self._rm = rm
+        if hasattr(rm, 'is_valid_source'):
+            rm.is_valid_source = is_valid_wikipedia_source
 
     def retrieve(self, query: Union[str, List[str]], exclude_urls: List[str] = []) -> List[Information]:
-        self.you_rm.k = self.search_top_k
-        retrieved_data_list = self.you_rm(query_or_queries=query, exclude_urls=exclude_urls)
+        retrieved_data_list = self._rm(query_or_queries=query, exclude_urls=exclude_urls)
         for data in retrieved_data_list:
             for i in range(len(data['snippets'])):
                 # STORM generate the article with citations. We do not consider multi-hop citations.
