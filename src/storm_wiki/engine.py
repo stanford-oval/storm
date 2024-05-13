@@ -138,12 +138,13 @@ class STORMWikiRunner(Engine):
 
     def __init__(self,
                  args: STORMWikiRunnerArguments,
-                 lm_configs: STORMWikiLMConfigs):
+                 lm_configs: STORMWikiLMConfigs,
+                 rm):
         super().__init__(lm_configs=lm_configs)
         self.args = args
         self.lm_configs = lm_configs
 
-        self.retriever = StormRetriever(k=self.args.retrieve_top_k)
+        self.retriever = StormRetriever(rm=rm, k=self.args.retrieve_top_k)
         storm_persona_generator = StormPersonaGenerator(self.lm_configs.question_asker_lm)
         self.storm_knowledge_curation_module = StormKnowledgeCurationModule(
             retriever=self.retriever,

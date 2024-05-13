@@ -6,6 +6,7 @@
 
 **Latest News** 🔥
 
+- [2024/05] We add Bing Search support in [rm.py](src/rm.py). Test STORM with `GPT-4o` - we now configurate the article generation part in our demo using `GPT-4o` model.
 - [2024/04] We release refactored version of STORM codebase! We define [interface](src/interface.py) for STORM pipeline and reimplement STORM-wiki (check out [`src/storm_wiki`](src/storm_wiki)) to demonstrate how to instantiate the pipeline. We provide API to support customization of different language models and retrieval/search integration.
 
 ## Overview [(Try STORM now!)](https://storm.genie.stanford.edu/)
@@ -78,8 +79,9 @@ Currently, we provide example scripts under [`examples`](examples) to demonstrat
 **To run STORM with `gpt` family models**: Make sure you have set up the OpenAI API key and run the following command.
 
 ```
-python scripts/run_storm_wiki_gpt.py \
+python examples/run_storm_wiki_gpt.py \
     --output_dir $OUTPUT_DIR \
+    --retriever you \
     --do-research \
     --do-generate-outline \
     --do-generate-article \
@@ -93,10 +95,11 @@ python scripts/run_storm_wiki_gpt.py \
 **To run STORM with `mistral` family models on local VLLM server**: have a VLLM server running with the `Mistral-7B-Instruct-v0.2` model and run the following command.
 
 ```
-python scripts/run_storm_wiki_mistral.py \
+python examples/run_storm_wiki_mistral.py \
     --url $URL \
     --port $PORT \
     --output_dir $OUTPUT_DIR \
+    --retriever you \
     --do-research \
     --do-generate-outline \
     --do-generate-article \
@@ -125,6 +128,8 @@ The interface for each module is defined in `src/interface.py`, while their impl
 ### Customization of Retriever Module
 
 As a knowledge curation engine, STORM grabs information from the Retriever module. The interface for the Retriever module is defined in [`src/interface.py`](src/interface.py). Please consult the interface documentation if you plan to create a new instance or replace the default search engine API. By default, STORM utilizes the You.com search engine API (see `YouRM` in [`src/rm.py`](src/rm.py)).
+
+:new: [2024/05] We test STORM with [Bing Search](https://learn.microsoft.com/en-us/bing/search-apis/bing-web-search/reference/endpoints). See `BingSearch` in [`src/rm.py`](src/rm.py) for the configuration and you can specify `--retriever bing` to use Bing Search in our [example scripts](examples).
 
 :star2: **PRs for integrating more search engines/retrievers are highly appreciated!**
 
