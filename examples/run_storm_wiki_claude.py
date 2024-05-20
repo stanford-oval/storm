@@ -2,7 +2,7 @@
 STORM Wiki pipeline powered by Claude family models and You.com search engine.
 You need to set up the following environment variables to run this script:
     - ANTHROPIC_API_KEY: Anthropic API key
-    - YDC_API_KEY: You.com API key
+    - YDC_API_KEY: You.com API key; or, BING_SEARCH_API_KEY: Bing Search API key
 
 Output will be structured as below
 args.output_dir/
@@ -22,6 +22,7 @@ from argparse import ArgumentParser
 
 sys.path.append('./src')
 from lm import ClaudeModel
+from rm import YouRM, BingSearch
 from storm_wiki.engine import STORMWikiRunnerArguments, STORMWikiRunner, STORMWikiLMConfigs
 from utils import load_api_key
 
@@ -36,7 +37,7 @@ def main(args):
     }
 
     # STORM is a LM system so different components can be powered by different models.
-    # For a good balance between cost and quality, you can choose a cheaper/faster model for conv_simulator_lm 
+    # For a good balance between cost and quality, you can choose a cheaper/faster model for conv_simulator_lm
     # which is used to split queries, synthesize answers in the conversation. We recommend using stronger models
     # for outline_gen_lm which is responsible for organizing the collected information, and article_gen_lm
     # which is responsible for generating sections with citations.
@@ -59,7 +60,15 @@ def main(args):
         search_top_k=args.search_top_k,
         max_thread_num=args.max_thread_num,
     )
-    runner = STORMWikiRunner(engine_args, lm_configs)
+
+    # STORM is a knowledge curation system which consumes information from the retrieval module.
+    # Currently, the information source is the Internet and we use search engine API as the retrieval module.
+    if args.retriever == 'bing':
+        rm = BingSearch(bing_search_api=os.getenv('BING_SEARCH_API_KEY'), k=engine_args.search_top_k)
+    elif args.retriever == 'you':
+        rm = YouRM(ydc_api_key=os.getenv('YDC_API_KEY'), k=engine_args.search_top_k)
+
+    runner = STORMWikiRunner(engine_args, lm_configs, rm)
 
     topic = input('Topic: ')
     runner.run(
@@ -82,6 +91,8 @@ if __name__ == '__main__':
                         help='Maximum number of threads to use. The information seeking part and the article generation'
                              'part can speed up by using multiple threads. Consider reducing it if keep getting '
                              '"Exceed rate limit" error when calling LM API.')
+    parser.add_argument('--retriever', type=str, choices=['bing', 'you'],
+                        help='The search engine API to use for retrieving information.')
     # stage of the pipeline
     parser.add_argument('--do-research', action='store_true',
                         help='If True, simulate conversation to research the topic; otherwise, load the results.')
