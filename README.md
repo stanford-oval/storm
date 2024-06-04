@@ -241,7 +241,9 @@ If you have any questions or suggestions, please feel free to open an issue or p
 Contact person: [Yijia Shao](mailto:shaoyj@stanford.edu) and [Yucheng Jiang](mailto:yuchengj@stanford.edu)
 
 ## Acknowledgement
-We would like to thank [Michelle Lam](https://michelle123lam.github.io/) for designing the logo for this project.
+We would like to thank Wikipedia for their excellent open-source content. The FreshWiki dataset is sourced from Wikipedia, licensed under the Creative Commons Attribution-ShareAlike (CC BY-SA) license.
+
+We are very grateful to [Michelle Lam](https://michelle123lam.github.io/) for designing the logo for this project.
 
 ## Citation
 Please cite our paper if you use this code or part of it in your work:
