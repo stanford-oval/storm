@@ -48,24 +48,9 @@ class STORMWikiLMConfigs(LMConfigs):
             'api_provider': openai_type,
             'temperature': temperature,
             'top_p': top_p,
-            'api_base': None,
-            'api_version': None,
+            'api_base': None
         }
-        if openai_type and openai_type == 'azure':
-            openai_kwargs['api_base'] = api_base
-            openai_kwargs['api_version'] = api_version
-
-            self.conv_simulator_lm = OpenAIModel(model='gpt-35-turbo-instruct', engine='gpt-35-turbo-instruct',
-                                                 max_tokens=500, **openai_kwargs)
-            self.question_asker_lm = OpenAIModel(model='gpt-35-turbo', engine='gpt-35-turbo',
-                                                 max_tokens=500, **openai_kwargs)
-            self.outline_gen_lm = OpenAIModel(model='gpt-4', engine='gpt-4',
-                                              max_tokens=400, **openai_kwargs)
-            self.article_gen_lm = OpenAIModel(model='gpt-4', engine='gpt-4',
-                                              max_tokens=700, **openai_kwargs)
-            self.article_polish_lm = OpenAIModel(model='gpt-4-32k', engine='gpt-4-32k',
-                                                 max_tokens=4000, **openai_kwargs)
-        elif openai_type and openai_type == 'openai':
+        if openai_type and openai_type == 'openai':
             self.conv_simulator_lm = OpenAIModel(model='gpt-3.5-turbo-instruct',
                                                  max_tokens=500, **openai_kwargs)
             self.question_asker_lm = OpenAIModel(model='gpt-3.5-turbo',
@@ -73,9 +58,9 @@ class STORMWikiLMConfigs(LMConfigs):
             # 1/12/2024: Update gpt-4 to gpt-4-1106-preview. (Currently keep the original setup when using azure.)
             self.outline_gen_lm = OpenAIModel(model='gpt-4-0125-preview',
                                               max_tokens=400, **openai_kwargs)
-            self.article_gen_lm = OpenAIModel(model='gpt-4-0125-preview',
+            self.article_gen_lm = OpenAIModel(model='gpt-4o-2024-05-13',
                                               max_tokens=700, **openai_kwargs)
-            self.article_polish_lm = OpenAIModel(model='gpt-4-0125-preview',
+            self.article_polish_lm = OpenAIModel(model='gpt-4o-2024-05-13',
                                                  max_tokens=4000, **openai_kwargs)
         else:
             logging.warning('No valid OpenAI API provider is provided. Cannot use default LLM configurations.')
