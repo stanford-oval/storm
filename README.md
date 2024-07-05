@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logo.svg" style="width: 25%; height: auto;">
+</p>
+
 # STORM: Synthesis of Topic Outlines through Retrieval and Multi-perspective Question Asking
 
 <p align="center">
@@ -6,13 +10,14 @@
 
 **Latest News** 🔥
 
-- [2024/05] We add Bing Search support in [rm.py](src/rm.py). Test STORM with `GPT-4o` - we now configurate the article generation part in our demo using `GPT-4o` model.
+- [2024/06] We will present STORM at NAACL 2024! Find us at Poster Session 2 on June 17 or check our [presentation material](assets/storm_naacl2024_slides.pdf). 
+- [2024/05] We add Bing Search support in [rm.py](src/rm.py). Test STORM with `GPT-4o` - we now configure the article generation part in our demo using `GPT-4o` model.
 - [2024/04] We release refactored version of STORM codebase! We define [interface](src/interface.py) for STORM pipeline and reimplement STORM-wiki (check out [`src/storm_wiki`](src/storm_wiki)) to demonstrate how to instantiate the pipeline. We provide API to support customization of different language models and retrieval/search integration.
 
 ## Overview [(Try STORM now!)](https://storm.genie.stanford.edu/)
 
 <p align="center">
-  <img src="assets/overview.png" style="width: 90%; height: auto;">
+  <img src="assets/overview.svg" style="width: 90%; height: auto;">
 </p>
 STORM is a LLM system that writes Wikipedia-like articles from scratch based on Internet search.
 
@@ -235,6 +240,11 @@ For rubric grading, we use the [prometheus-13b-v1.0](https://huggingface.co/prom
 If you have any questions or suggestions, please feel free to open an issue or pull request. We welcome contributions to improve the system and the codebase!
 
 Contact person: [Yijia Shao](mailto:shaoyj@stanford.edu) and [Yucheng Jiang](mailto:yuchengj@stanford.edu)
+
+## Acknowledgement
+We would like to thank Wikipedia for their excellent open-source content. The FreshWiki dataset is sourced from Wikipedia, licensed under the Creative Commons Attribution-ShareAlike (CC BY-SA) license.
+
+We are very grateful to [Michelle Lam](https://michelle123lam.github.io/) for designing the logo for this project.
 
 ## Citation
 Please cite our paper if you use this code or part of it in your work:
