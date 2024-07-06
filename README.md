@@ -79,13 +79,11 @@ Below, we provide a quick start guide to run STORM locally.
 
 ### 2. Running STORM-wiki locally
 
-Currently, we provide example scripts under [`examples`](examples) to demonstrate how you can run STORM using different models.
-
-**To run STORM with `gpt` family models**: Make sure you have set up the OpenAI API key and run the following command.
+**To run STORM with `gpt` family models with default configurations**: Make sure you have set up the OpenAI API key and run the following command.
 
 ```
 python examples/run_storm_wiki_gpt.py \
-    --output_dir $OUTPUT_DIR \
+    --output-dir $OUTPUT_DIR \
     --retriever you \
     --do-research \
     --do-generate-outline \
@@ -97,29 +95,15 @@ python examples/run_storm_wiki_gpt.py \
 - `--do-generate-article`: If True, generate an article for the topic; otherwise, load the results.
 - `--do-polish-article`:  If True, polish the article by adding a summarization section and (optionally) removing duplicate content.
 
-**To run STORM with `mistral` family models on local VLLM server**: have a VLLM server running with the `Mistral-7B-Instruct-v0.2` model and run the following command.
 
-```
-python examples/run_storm_wiki_mistral.py \
-    --url $URL \
-    --port $PORT \
-    --output_dir $OUTPUT_DIR \
-    --retriever you \
-    --do-research \
-    --do-generate-outline \
-    --do-generate-article \
-    --do-polish-article
-```
-- `--url` URL of the VLLM server.
-- `--port` Port of the VLLM server.
+We provide more example scripts under [`examples`](examples) to demonstrate how you can run STORM using your favorite language models or grounding on your own corpus.
 
-  
 
 ## Customize STORM 
 
 ### Customization of the Pipeline
 
-STORM is a knowledge curation engine consisting of 4 modules:
+Besides running scripts in `examples`, you can customize STORM based on your own use case. STORM engine consists of 4 modules:
 
 1. Knowledge Curation Module: Collects a broad coverage of information about the given topic.
 2. Outline Generation Module: Organizes the collected information by generating a hierarchical outline for the curated knowledge.
@@ -132,9 +116,11 @@ The interface for each module is defined in `src/interface.py`, while their impl
 
 ### Customization of Retriever Module
 
-As a knowledge curation engine, STORM grabs information from the Retriever module. The interface for the Retriever module is defined in [`src/interface.py`](src/interface.py). Please consult the interface documentation if you plan to create a new instance or replace the default search engine API. By default, STORM utilizes the You.com search engine API (see `YouRM` in [`src/rm.py`](src/rm.py)).
+As a knowledge curation engine, STORM grabs information from the Retriever module. The Retriever modules are implemented in [`src/rm.py`](src/rm.py). Currently, STORM supports the following retrievers:
 
-:new: [2024/05] We test STORM with [Bing Search](https://learn.microsoft.com/en-us/bing/search-apis/bing-web-search/reference/endpoints). See `BingSearch` in [`src/rm.py`](src/rm.py) for the configuration and you can specify `--retriever bing` to use Bing Search in our [example scripts](examples).
+- `YouRM`: You.com search engine API
+- `BingSearch`: Bing Search API
+- `VectorRM`: a retrieval model that retrieves information from user provide corpus
 
 :star2: **PRs for integrating more search engines/retrievers are highly appreciated!**
 
