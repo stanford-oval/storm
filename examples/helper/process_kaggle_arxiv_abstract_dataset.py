@@ -21,7 +21,7 @@ if __name__ == "__main__":
 
     # Reformat the dataset to match the VectorRM input format.
     df.rename(columns={"abstracts": "content", "titles": "title"}, inplace=True)
-    df['url'] = ['uid_' + str(idx) for idx in range(len(df))]
+    df['url'] = ['uid_' + str(idx) for idx in range(len(df))]  # Ensure the url is unique.
     df['description'] = ''
 
     print(f'The downsampled dataset has {len(df)} samples.')
