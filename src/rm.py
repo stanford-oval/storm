@@ -171,8 +171,8 @@ class VectorRM(dspy.Retrieve):
     To be compatible with STORM, the custom documents should have the following fields:
         - content: The main text content of the document.
         - title: The title of the document.
-        - url: The URL of the document. STORM use url as the unique identifier of the document.
-            If not provided, a random string will be generated as the url.
+        - url: The URL of the document. STORM use url as the unique identifier of the document, so ensure different
+            documents have different urls.
         - description (optional): The description of the document.
     The documents should be stored in a CSV file.
     """

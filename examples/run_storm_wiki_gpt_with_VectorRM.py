@@ -8,13 +8,11 @@ You need to set up the following environment variables to run this script:
 You will also need an existing Qdrant vector store either saved in a folder locally offline or in a server online.
 If not, then you would need a CSV file with documents, and the script is going to create the vector store for you.
 The CSV should be in the following format:
-Content  | Title  |  URL  |  Description
+content  | title  |  url  |  description
 I am a document. | Document 1 | docu-n-112 | A self-explanatory document.
 I am another document. | Document 2 | docu-l-13 | Another self-explanatory document.
 
-Notice that the URL can be an identifier for the document for any internal use.
-The Title, URL, and Description columns are optional. If not provided, the script will use default empty values.
-The content column is crucial and should be provided.
+Notice that the URL will be a unique identifier for the document so ensure different documents have different urls.
 
 Output will be structured as below
 args.output_dir/
