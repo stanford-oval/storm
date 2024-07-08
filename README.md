@@ -5,7 +5,7 @@
 # STORM: Synthesis of Topic Outlines through Retrieval and Multi-perspective Question Asking
 
 <p align="center">
-| <a href="http://storm.genie.stanford.edu"><b>Research preview</b></a> | <a href="https://arxiv.org/abs/2402.14207"><b>Paper</b></a> | <b>Documentation (WIP)</b> |
+| <a href="http://storm.genie.stanford.edu"><b>Research preview</b></a> | <a href="https://arxiv.org/abs/2402.14207"><b>Paper</b></a> | <a href="https://storm-project.stanford.edu/"><b>Website</b></a> |
 
 
 **Latest News** 🔥
