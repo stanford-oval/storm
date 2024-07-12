@@ -232,7 +232,7 @@ Contact person: [Yijia Shao](mailto:shaoyj@stanford.edu) and [Yucheng Jiang](mai
 ## Acknowledgement
 We would like to thank Wikipedia for their excellent open-source content. The FreshWiki dataset is sourced from Wikipedia, licensed under the Creative Commons Attribution-ShareAlike (CC BY-SA) license.
 
-We are very grateful to [Michelle Lam](https://michelle123lam.github.io/) for designing the logo for this project.
+We are very grateful to [Michelle Lam](https://michelle123lam.github.io/) for designing the logo for this project and [Dekun Ma](https://dekun.me) for leading the UI development.
 
 ## Citation
 Please cite our paper if you use this code or part of it in your work:
