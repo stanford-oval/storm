@@ -24,8 +24,7 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/stanford-oval/storm",
     license="MIT License",
-    package_dir={"": "src"},
-    packages=find_packages("src"),
+    packages=find_packages(),
     classifiers=[
         "Development Status :: 3 - Alpha",
         "License :: OSI Approved :: MIT License",
