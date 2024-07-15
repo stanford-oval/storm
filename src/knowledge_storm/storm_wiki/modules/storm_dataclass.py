@@ -4,10 +4,11 @@ from collections import OrderedDict
 from typing import Union, Optional, Any, List, Tuple, Dict
 
 import numpy as np
-from interface import Information, InformationTable, Article, ArticleSectionNode
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
-from utils import ArticleTextProcessing, FileIOHelper
+
+from ...interface import Information, InformationTable, Article, ArticleSectionNode
+from ...utils import ArticleTextProcessing, FileIOHelper
 
 
 class StormInformation(Information):

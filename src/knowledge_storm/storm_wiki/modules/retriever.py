@@ -1,5 +1,15 @@
-{
-  "generally_unreliable": [
+from typing import Union, List
+from urllib.parse import urlparse
+
+import dspy
+
+from .storm_dataclass import StormInformation
+from ...interface import Retriever, Information
+from ...utils import ArticleTextProcessing
+
+# Internet source restrictions according to Wikipedia standard:
+# https://en.wikipedia.org/wiki/Wikipedia:Reliable_sources/Perennial_sources
+GENERALLY_UNRELIABLE = {
     "112_Ukraine",
     "Ad_Fontes_Media",
     "AlterNet",
@@ -139,9 +149,8 @@
     "WordPress.com",
     "Worldometer",
     "YouTube",
-    "ZDNet"
-  ],
-  "deprecated": [
+    "ZDNet"}
+DEPRECATED = {
     "Al_Mayadeen",
     "ANNA_News",
     "Baidu_Baike",
@@ -189,8 +198,8 @@
     "Voltaire_Network",
     "WorldNetDaily",
     "Zero_Hedge"
-  ],
-  "blacklisted": [
+}
+BLACKLISTED = {
     "Advameg",
     "bestgore.com",
     "Breitbart_News",
@@ -210,5 +219,32 @@
     "Swarajya",
     "Veterans_Today",
     "ZoomInfo"
-  ]
 }
+
+
+def is_valid_wikipedia_source(url):
+    parsed_url = urlparse(url)
+    # Check if the URL is from a reliable domain
+    combined_set = GENERALLY_UNRELIABLE | DEPRECATED | BLACKLISTED
+    for domain in combined_set:
+        if domain in parsed_url.netloc:
+            return False
+
+    return True
+
+
+class StormRetriever(Retriever):
+    def __init__(self, rm: dspy.Retrieve, k=3):
+        super().__init__(search_top_k=k)
+        self._rm = rm
+        if hasattr(rm, 'is_valid_source'):
+            rm.is_valid_source = is_valid_wikipedia_source
+
+    def retrieve(self, query: Union[str, List[str]], exclude_urls: List[str] = []) -> List[Information]:
+        retrieved_data_list = self._rm(query_or_queries=query, exclude_urls=exclude_urls)
+        for data in retrieved_data_list:
+            for i in range(len(data['snippets'])):
+                # STORM generate the article with citations. We do not consider multi-hop citations.
+                # Remove citations in the source to avoid confusion.
+                data['snippets'][i] = ArticleTextProcessing.remove_citations(data['snippets'][i])
+        return [StormInformation.from_dict(data) for data in retrieved_data_list]
