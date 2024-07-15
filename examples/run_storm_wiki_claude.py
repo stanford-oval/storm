@@ -17,14 +17,12 @@ args.output_dir/
 """
 
 import os
-import sys
 from argparse import ArgumentParser
 
-sys.path.append('./src')
-from lm import ClaudeModel
-from rm import YouRM, BingSearch
-from storm_wiki.engine import STORMWikiRunnerArguments, STORMWikiRunner, STORMWikiLMConfigs
-from utils import load_api_key
+from knowledge_storm import STORMWikiRunnerArguments, STORMWikiRunner, STORMWikiLMConfigs
+from knowledge_storm.lm import ClaudeModel
+from knowledge_storm.rm import YouRM, BingSearch
+from knowledge_storm.utils import load_api_key
 
 
 def main(args):
