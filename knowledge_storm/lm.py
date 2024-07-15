@@ -109,8 +109,8 @@ class AzureOpenAIModel(dspy.AzureOpenAI):
     """A wrapper class for dspy.AzureOpenAI."""
     def __init__(
             self,
-            api_base: str,
-            api_version: str,
+            api_base: Optional[str] = None,
+            api_version: Optional[str] = None,
             model: str = "gpt-3.5-turbo-instruct",
             api_key: Optional[str] = None,
             model_type: Literal["chat", "text"] = "chat",
@@ -141,8 +141,6 @@ class AzureOpenAIModel(dspy.AzureOpenAI):
         self.completion_tokens = 0
 
         return usage
-
-
 
 
 class ClaudeModel(dspy.dsp.modules.lm.LM):
