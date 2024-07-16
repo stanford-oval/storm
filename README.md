@@ -77,37 +77,30 @@ from knowledge_storm import STORMWikiRunnerArguments, STORMWikiRunner, STORMWiki
 from knowledge_storm.lm import OpenAIModel
 from knowledge_storm.rm import YouRM
 
-
 lm_configs = STORMWikiLMConfigs()
 openai_kwargs = {
     'api_key': os.getenv("OPENAI_API_KEY"),
     'temperature': 1.0,
     'top_p': 0.9,
 }
-
 # STORM is a LM system so different components can be powered by different models to reach a good balance between cost and quality.
 # For a good practice, choose a cheaper/faster model for `conv_simulator_lm` which is used to split queries, synthesize answers in the conversation. Choose a more powerful model for `article_gen_lm` to generate verifiable text with citations.
 gpt_35 = OpenAIModel(model='gpt-3.5-turbo', max_tokens=500, **openai_kwargs)
 gpt_4 = OpenAIModel(model='gpt-4-o', max_tokens=3000, **openai_kwargs)
-
 lm_configs.set_conv_simulator_lm(gpt_35)
 lm_configs.set_question_asker_lm(gpt_35)
 lm_configs.set_outline_gen_lm(gpt_4)
 lm_configs.set_article_gen_lm(gpt_4)
 lm_configs.set_article_polish_lm(gpt_4)
-
-
 # Check out the STORMWikiRunnerArguments class for more configurations.
 engine_args = STORMWikiRunnerArguments(...)
-
 rm = YouRM(ydc_api_key=os.getenv('YDC_API_KEY'), k=engine_args.search_top_k)
-
 runner = STORMWikiRunner(engine_args, lm_configs, rm)
 ```
 
 Currently, our package support:
 - `OpenAIModel`, `AzureOpenAIModel`, `ClaudeModel`, `VLLMClient`, `TGIClient`, `TogetherClient` as language model components
-- `YouRM`, `BingSearch`, `VectorRM` as retrieval components
+- `YouRM`, `BingSearch`, `VectorRM` as retrieval module components
 
 :star2: **PRs for integrating more language models into [knowledge_storm/lm.py](knowledge_storm/lm.py) and search engines/retrievers into [knowledge_storm/rm.py](knowledge_storm/rm.py) are highly appreciated!**
 
@@ -173,8 +166,6 @@ If you have installed the source code, you can customize STORM based on your own
 
 The interface for each module is defined in `knowledge_storm/interface.py`, while their implementations are instantiated in `knowledge_storm/storm_wiki/modules/*`. These modules can be customized according to your specific requirements (e.g., generating sections in bullet point format instead of full paragraphs).
 
-
-Please refer to the scripts in the [`examples`](examples) directory for concrete guidance on customizing the language model used in the pipeline.
 
 ## Replicate NAACL2024 result
 
