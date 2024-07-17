@@ -312,6 +312,7 @@ class VLLMClient(dspy.HFClientVLLM):
             print("Failed to parse JSON response:", response.text)
             raise Exception("Received invalid JSON response from server")
 
+
 class OllamaClient(dspy.OllamaLocal):
     """A wrapper class for dspy.OllamaClient."""
 
