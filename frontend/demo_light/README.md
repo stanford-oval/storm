@@ -15,7 +15,8 @@ This is a minimal user interface for `STORMWikiRunner` which includes the follow
 </p>
 
 ## Setup
-1. Besides the required packages for `STORMWikiRunner`, you need to install additional packages:
+1. Make sure you have installed `knowledge-storm` or set up the source code correctly.
+2. Install additional packages required by the user interface:
     ```bash
     pip install -r requirements.txt
     ```

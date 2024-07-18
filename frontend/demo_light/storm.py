@@ -1,11 +1,7 @@
 import os
-import sys
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 wiki_root_dir = os.path.dirname(os.path.dirname(script_dir))
-
-sys.path.append(os.path.normpath(os.path.join(script_dir, '../../src/storm_wiki')))
-sys.path.append(os.path.normpath(os.path.join(script_dir, '../../src')))
 
 import demo_util
 from pages_util import MyArticles, CreateNewArticle

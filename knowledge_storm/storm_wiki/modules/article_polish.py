@@ -2,9 +2,10 @@ import copy
 from typing import Union
 
 import dspy
-from interface import ArticlePolishingModule
-from storm_wiki.modules.storm_dataclass import StormArticle
-from utils import ArticleTextProcessing
+
+from .storm_dataclass import StormArticle
+from ...interface import ArticlePolishingModule
+from ...utils import ArticleTextProcessing
 
 
 class StormArticlePolishingModule(ArticlePolishingModule):
