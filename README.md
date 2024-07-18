@@ -84,7 +84,8 @@ openai_kwargs = {
     'top_p': 0.9,
 }
 # STORM is a LM system so different components can be powered by different models to reach a good balance between cost and quality.
-# For a good practice, choose a cheaper/faster model for `conv_simulator_lm` which is used to split queries, synthesize answers in the conversation. Choose a more powerful model for `article_gen_lm` to generate verifiable text with citations.
+# For a good practice, choose a cheaper/faster model for `conv_simulator_lm` which is used to split queries, synthesize answers in the conversation.
+# Choose a more powerful model for `article_gen_lm` to generate verifiable text with citations.
 gpt_35 = OpenAIModel(model='gpt-3.5-turbo', max_tokens=500, **openai_kwargs)
 gpt_4 = OpenAIModel(model='gpt-4-o', max_tokens=3000, **openai_kwargs)
 lm_configs.set_conv_simulator_lm(gpt_35)
