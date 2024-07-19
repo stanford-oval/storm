@@ -20,7 +20,7 @@ import os
 from argparse import ArgumentParser
 
 from knowledge_storm import STORMWikiRunnerArguments, STORMWikiRunner, STORMWikiLMConfigs
-from knowledge_storm.llm_base import ClaudeModel
+from knowledge_storm.lm.providers import ClaudeModel
 from knowledge_storm.rm import YouRM, BingSearch
 from knowledge_storm.utils import load_api_key
 
