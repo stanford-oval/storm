@@ -15,7 +15,7 @@ from .modules.persona_generator import StormPersonaGenerator
 from .modules.retriever import StormRetriever
 from .modules.storm_dataclass import StormInformationTable, StormArticle
 from ..interface import Engine, LMConfigs
-from ..lm import OpenAIModel
+from knowledge_storm.lm.providers.openai import OpenAIModel
 from ..utils import FileIOHelper, makeStringRed
 
 
