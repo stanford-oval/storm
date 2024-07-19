@@ -20,6 +20,7 @@ args.output_dir/
 import os
 import sys
 import re
+import logging
 from argparse import ArgumentParser
 
 from knowledge_storm import STORMWikiRunnerArguments, STORMWikiRunner, STORMWikiLMConfigs
@@ -96,16 +97,21 @@ def main(args):
 
     topic = input('Topic: ')
     sanitized_topic = sanitize_topic(topic)
-    runner.run(
-        topic=sanitized_topic,
-        do_research=args.do_research,
-        do_generate_outline=args.do_generate_outline,
-        do_generate_article=args.do_generate_article,
-        do_polish_article=args.do_polish_article,
-        remove_duplicate=args.remove_duplicate,
-    )
-    runner.post_run()
-    runner.summary()
+
+    try:
+        runner.run(
+            topic=sanitized_topic,
+            do_research=args.do_research,
+            do_generate_outline=args.do_generate_outline,
+            do_generate_article=args.do_generate_article,
+            do_polish_article=args.do_polish_article,
+            remove_duplicate=args.remove_duplicate,
+        )
+        runner.post_run()
+        runner.summary()
+    except Exception as e:
+        logger.exception(f"An error occurred: {str(e)}")
+        raise
 
 
 if __name__ == '__main__':
