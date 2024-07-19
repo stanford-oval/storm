@@ -104,6 +104,7 @@ class OpenAIModel(dspy.OpenAI):
 
         return completions
 
+
 class DeepSeekModel(dspy.OpenAI):
     """A wrapper class for DeepSeek API, compatible with dspy.OpenAI."""
 
