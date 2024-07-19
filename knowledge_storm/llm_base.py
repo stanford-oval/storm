@@ -1,4 +1,4 @@
-# knowledge_storm/lm.py
+# knowledge_storm/llm_base.py
 
 """
 This module provides access to various Large Language Model (LLM) classes
@@ -23,10 +23,7 @@ from .lm.providers import (
     TGIClient, OllamaClient, TogetherClient
 )
 
-# The following lines maintain backwards compatibility with existing code
-# that imports LLM classes directly from this file.
-# For example, code like 'from knowledge_storm.lm import OpenAIModel' will
-# still work as expected.
+# The following lines maintain backwards compatibility
 OpenAIModel = OpenAIModel
 AzureOpenAIModel = AzureOpenAIModel
 ClaudeModel = ClaudeModel
