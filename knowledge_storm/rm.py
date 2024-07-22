@@ -1,6 +1,7 @@
 import logging
 import os
-from typing import Callable, Union, List
+from typing import Callable, Union, List, Dict
+from typing_extensions import Dict
 
 import dspy
 import pandas as pd
@@ -10,7 +11,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_qdrant import Qdrant
 from qdrant_client import QdrantClient, models
 from tqdm import tqdm
-
+import requests
 from .utils import WebPageHelper
 
 
@@ -404,3 +405,69 @@ class VectorRM(dspy.Retrieve):
                 })
 
         return collected_results
+
+class SerperRM(dspy.Retrieve)
+    def __init__(self, serper_search_api_key=None, query_params=None, minibatch=None):
+            super().__init__()
+            if not self.serper_search_api_key and not os.environ.get("SERPER_API_KEY"):
+                        raise RuntimeError(
+                            "You must supply serper_search_api_key or set environment variable SERPER_API_KEY")
+            elif self.serper_search_api_key:
+                self.serper_search_api_key = serper_search_api_key
+            else:
+                self.serper_search_api_key = os.environ["SERPER_API_KEY"]
+            self.base_url = "https://google.serper.dev"
+    def validate_input(self):
+        if(self.query_params.get("type") == None or type(self.query_params.get("type")) != str):
+            raise RuntimeError("A type must be provided.")
+        elif(len(self.query_params.get("gl")) > 2 or self.query_params.get("gl") == None or type(self.query_params.get("gl")) != str):
+            raise RuntimeError("Country code was not provided.")
+        elif(self.query_params.get("hl") == None or type(self.query_params.get("hl")) != str):
+                    raise RuntimeError("Language was not provided.")
+        elif(self.query_params.get("tbs") == None or type(self.query_params.get("tbs")) != str):
+                            raise RuntimeError("Date range was not provided.")
+        elif(self.query_params.get("autocorrect") == None or type(self.query_params.get("autocorrect")) != bool):
+                                    raise RuntimeError("Autocorrect boolean was not provided.")
+        elif(self.query_params.get("results") == None or type(self.query_params.get("results")) != int):
+                                            raise RuntimeError("Number of results returned was not provided.")
+        elif(self.query_params.get("page") == None or type(self.query_params.get("page")) != int):
+                                                    raise RuntimeError("Number of pages to return is not provided.")
+        elif(self.query_params.get("page") == None or type(self.query_params.get("page")) != int):
+                                                            raise RuntimeError("Number of pages to return is not provided.")
+        elif(self.minibatch == None or type(self.query_params) == Dict):
+                                                            raise RuntimeError("Minibatch is enabled, however query_params is a dictionary, will need to be converted to list to be able to be used.")
+    def runner(self):
+        match self.query_params.get("type"):
+            case "search":
+                self.run_process("type")
+            case "images":
+                self.run_process("images")
+            case "videos":
+                self.run_process("videos")
+            case "places":
+                self.run_process("places")
+            case "maps":
+                self.run_process("maps")
+            case "news":
+                self.run_process("news")
+            case "shopping"
+                self.run_process("shopping")
+            case "scholar"
+                self.run_process("scholar")
+            case "patents"
+                self.run_process("patents")
+            case "autocomplete":
+                self.run_process("autocomplete")
+            case ""
+    def run_process(self, process_name=None):
+        print(f"Beginning {process_name} process...")
+        self.search_url = f"{self.base_url}/{process_name}"
+        headers = {
+            "X-API-KEY": self.serper_search_api_key,
+            "Content-Type": "application/json"
+        }
+
+        response = requests.request("POST", self.search_url, headers=headers, data=self.query_params)
+        if response == None:
+            raise RuntimeError(f"Error had occured while running the process {process_name}.\n Error is {response.reason}, had failed with status code {response.status_code}")
+        return response.json()
