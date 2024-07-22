@@ -1,10 +1,11 @@
 from typing import Union, Optional, Tuple
 
 import dspy
-from interface import OutlineGenerationModule
-from storm_wiki.modules.callback import BaseCallbackHandler
-from storm_wiki.modules.storm_dataclass import StormInformationTable, StormArticle
-from utils import ArticleTextProcessing
+
+from .callback import BaseCallbackHandler
+from .storm_dataclass import StormInformationTable, StormArticle
+from ...interface import OutlineGenerationModule
+from ...utils import ArticleTextProcessing
 
 
 class StormOutlineGenerationModule(OutlineGenerationModule):

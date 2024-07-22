@@ -5,13 +5,13 @@ from typing import Callable, Union, List
 import dspy
 import pandas as pd
 import requests
-from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.documents import Document
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_qdrant import Qdrant
 from qdrant_client import QdrantClient, models
 from tqdm import tqdm
 
-from utils import WebPageHelper
+from .utils import WebPageHelper
 
 
 class YouRM(dspy.Retrieve):

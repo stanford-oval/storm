@@ -1,20 +1,22 @@
 import base64
 import datetime
-import io
 import json
 import os
 import re
 from typing import Optional
 
 import markdown
-import pdfkit
 import pytz
 import streamlit as st
-from lm import OpenAIModel
-from rm import YouRM
-from storm_wiki.engine import STORMWikiRunnerArguments, STORMWikiRunner, STORMWikiLMConfigs
-from storm_wiki.modules.callback import BaseCallbackHandler
 
+# If you install the source code instead of the `knowledge-storm` package,
+# Uncomment the following lines:
+# import sys
+# sys.path.append('../../')
+from knowledge_storm import STORMWikiRunnerArguments, STORMWikiRunner, STORMWikiLMConfigs
+from knowledge_storm.lm import OpenAIModel
+from knowledge_storm.rm import YouRM
+from knowledge_storm.storm_wiki.modules.callback import BaseCallbackHandler
 from stoc import stoc
 
 
@@ -527,7 +529,6 @@ def display_article_page(selected_article_name, selected_article_file_path_dict,
 
     if show_main_article:
         _display_main_article(selected_article_file_path_dict)
-
 
 
 class StreamlitCallbackHandler(BaseCallbackHandler):
