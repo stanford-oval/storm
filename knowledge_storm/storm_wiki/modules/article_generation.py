@@ -5,10 +5,11 @@ from concurrent.futures import as_completed
 from typing import List, Union
 
 import dspy
-from interface import ArticleGenerationModule
-from storm_wiki.modules.callback import BaseCallbackHandler
-from storm_wiki.modules.storm_dataclass import StormInformationTable, StormArticle, StormInformation
-from utils import ArticleTextProcessing
+
+from .callback import BaseCallbackHandler
+from .storm_dataclass import StormInformationTable, StormArticle, StormInformation
+from ...interface import ArticleGenerationModule
+from ...utils import ArticleTextProcessing
 
 
 class StormArticleGenerationModule(ArticleGenerationModule):

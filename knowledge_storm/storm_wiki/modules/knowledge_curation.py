@@ -5,14 +5,16 @@ from concurrent.futures import as_completed
 from typing import Union, List, Tuple, Optional, Dict
 
 import dspy
-from interface import KnowledgeCurationModule, Retriever
-from storm_wiki.modules.callback import BaseCallbackHandler
-from storm_wiki.modules.persona_generator import StormPersonaGenerator
-from storm_wiki.modules.storm_dataclass import DialogueTurn, StormInformationTable, StormInformation
-from utils import ArticleTextProcessing
+
+from .callback import BaseCallbackHandler
+from .persona_generator import StormPersonaGenerator
+from .storm_dataclass import DialogueTurn, StormInformationTable, StormInformation
+from ...interface import KnowledgeCurationModule, Retriever
+from ...utils import ArticleTextProcessing
 
 try:
     from streamlit.runtime.scriptrunner import add_script_run_ctx
+
     streamlit_connection = True
 except ImportError as err:
     streamlit_connection = False

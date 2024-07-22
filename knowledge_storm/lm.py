@@ -25,13 +25,10 @@ class OpenAIModel(dspy.OpenAI):
             self,
             model: str = "gpt-3.5-turbo-instruct",
             api_key: Optional[str] = None,
-            api_provider: Literal["openai", "azure"] = "openai",
-            api_base: Optional[str] = None,
             model_type: Literal["chat", "text"] = None,
             **kwargs
     ):
-        super().__init__(model=model, api_key=api_key, api_provider=api_provider, api_base=api_base,
-                         model_type=model_type, **kwargs)
+        super().__init__(model=model, api_key=api_key, model_type=model_type, **kwargs)
         self._token_usage_lock = threading.Lock()
         self.prompt_tokens = 0
         self.completion_tokens = 0
@@ -106,6 +103,133 @@ class OpenAIModel(dspy.OpenAI):
             completions = [c for _, c in scored_completions]
 
         return completions
+
+
+class DeepSeekModel(dspy.OpenAI):
+    """A wrapper class for DeepSeek API, compatible with dspy.OpenAI."""
+
+    def __init__(
+            self,
+            model: str = "deepseek-chat",
+            api_key: Optional[str] = None,
+            api_base: str = "https://api.deepseek.com",
+            **kwargs
+    ):
+        super().__init__(model=model, api_key=api_key, api_base=api_base, **kwargs)
+        self._token_usage_lock = threading.Lock()
+        self.prompt_tokens = 0
+        self.completion_tokens = 0
+        self.model = model
+        self.api_key = api_key or os.getenv("DEEPSEEK_API_KEY")
+        self.api_base = api_base
+        if not self.api_key:
+            raise ValueError("DeepSeek API key must be provided either as an argument or as an environment variable DEEPSEEK_API_KEY")
+
+    def log_usage(self, response):
+        """Log the total tokens from the DeepSeek API response."""
+        usage_data = response.get('usage')
+        if usage_data:
+            with self._token_usage_lock:
+                self.prompt_tokens += usage_data.get('prompt_tokens', 0)
+                self.completion_tokens += usage_data.get('completion_tokens', 0)
+
+    def get_usage_and_reset(self):
+        """Get the total tokens used and reset the token usage."""
+        usage = {
+            self.model:
+                {'prompt_tokens': self.prompt_tokens, 'completion_tokens': self.completion_tokens}
+        }
+        self.prompt_tokens = 0
+        self.completion_tokens = 0
+        return usage
+
+    @backoff.on_exception(
+        backoff.expo,
+        ERRORS,
+        max_time=1000,
+        on_backoff=backoff_hdlr,
+        giveup=giveup_hdlr,
+    )
+    def _create_completion(self, prompt: str, **kwargs):
+        """Create a completion using the DeepSeek API."""
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self.api_key}"
+        }
+        data = {
+            "model": self.model,
+            "messages": [{"role": "user", "content": prompt}],
+            **kwargs
+        }
+        response = requests.post(f"{self.api_base}/v1/chat/completions", headers=headers, json=data)
+        response.raise_for_status()
+        return response.json()
+
+    def __call__(
+            self,
+            prompt: str,
+            only_completed: bool = True,
+            return_sorted: bool = False,
+            **kwargs,
+    ) -> list[dict[str, Any]]:
+        """Call the DeepSeek API to generate completions."""
+        assert only_completed, "for now"
+        assert return_sorted is False, "for now"
+
+        response = self._create_completion(prompt, **kwargs)
+
+        # Log the token usage from the DeepSeek API response.
+        self.log_usage(response)
+
+        choices = response["choices"]
+        completions = [choice["message"]["content"] for choice in choices]
+
+        history = {
+            "prompt": prompt,
+            "response": response,
+            "kwargs": kwargs,
+        }
+        self.history.append(history)
+
+        return completions
+
+
+class AzureOpenAIModel(dspy.AzureOpenAI):
+    """A wrapper class for dspy.AzureOpenAI."""
+    def __init__(
+            self,
+            api_base: Optional[str] = None,
+            api_version: Optional[str] = None,
+            model: str = "gpt-3.5-turbo-instruct",
+            api_key: Optional[str] = None,
+            model_type: Literal["chat", "text"] = "chat",
+            **kwargs,
+    ):
+        super().__init__(
+            api_base=api_base, api_version=api_version, model=model, api_key=api_key, model_type=model_type, **kwargs)
+        self._token_usage_lock = threading.Lock()
+        self.prompt_tokens = 0
+        self.completion_tokens = 0
+
+    def log_usage(self, response):
+        """Log the total tokens from the OpenAI API response.
+        Override log_usage() in dspy.AzureOpenAI for tracking accumulated token usage."""
+        usage_data = response.get('usage')
+        if usage_data:
+            with self._token_usage_lock:
+                self.prompt_tokens += usage_data.get('prompt_tokens', 0)
+                self.completion_tokens += usage_data.get('completion_tokens', 0)
+
+    def get_usage_and_reset(self):
+        """Get the total tokens used and reset the token usage."""
+        usage = {
+            self.kwargs.get('model') or self.kwargs.get('engine'):
+                {'prompt_tokens': self.prompt_tokens, 'completion_tokens': self.completion_tokens}
+        }
+        self.prompt_tokens = 0
+        self.completion_tokens = 0
+
+        return usage
 
 
 class ClaudeModel(dspy.dsp.modules.lm.LM):
@@ -276,6 +400,7 @@ class VLLMClient(dspy.HFClientVLLM):
         except Exception as e:
             print("Failed to parse JSON response:", response.text)
             raise Exception("Received invalid JSON response from server")
+
 
 class OllamaClient(dspy.OllamaLocal):
     """A wrapper class for dspy.OllamaClient."""

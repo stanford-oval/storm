@@ -1,5 +1,6 @@
 import concurrent.futures
 import json
+import logging
 import os
 import pickle
 import re
@@ -10,6 +11,8 @@ import httpx
 import toml
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from trafilatura import extract
+
+logging.getLogger("httpx").setLevel(logging.WARNING)  # Disable INFO logging for httpx.
 
 
 def load_api_key(toml_file_path):
