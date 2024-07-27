@@ -7,3 +7,4 @@ trafilatura
 langchain-huggingface
 qdrant-client
 langchain-qdrant
+numpy==1.26.4
