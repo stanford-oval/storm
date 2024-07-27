@@ -12,14 +12,17 @@ from langchain_qdrant import Qdrant
 from qdrant_client import QdrantClient, models
 from tqdm import tqdm
 import requests
-from .utils import WebPageHelper
+import json
+from utils import WebPageHelper
 
 
 class YouRM(dspy.Retrieve):
     def __init__(self, ydc_api_key=None, k=3, is_valid_source: Callable = None):
         super().__init__(k=k)
         if not ydc_api_key and not os.environ.get("YDC_API_KEY"):
-            raise RuntimeError("You must supply ydc_api_key or set environment variable YDC_API_KEY")
+            raise RuntimeError(
+                "You must supply ydc_api_key or set environment variable YDC_API_KEY"
+            )
         elif ydc_api_key:
             self.ydc_api_key = ydc_api_key
         else:
@@ -36,9 +39,11 @@ class YouRM(dspy.Retrieve):
         usage = self.usage
         self.usage = 0
 
-        return {'YouRM': usage}
+        return {"YouRM": usage}
 
-    def forward(self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []):
+    def forward(
+        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
+    ):
         """Search with You.com for self.k top passages for query or queries
 
         Args:
@@ -64,21 +69,30 @@ class YouRM(dspy.Retrieve):
                 ).json()
 
                 authoritative_results = []
-                for r in results['hits']:
-                    if self.is_valid_source(r['url']) and r['url'] not in exclude_urls:
+                for r in results["hits"]:
+                    if self.is_valid_source(r["url"]) and r["url"] not in exclude_urls:
                         authoritative_results.append(r)
-                if 'hits' in results:
-                    collected_results.extend(authoritative_results[:self.k])
+                if "hits" in results:
+                    collected_results.extend(authoritative_results[: self.k])
             except Exception as e:
-                logging.error(f'Error occurs when searching query {query}: {e}')
+                logging.error(f"Error occurs when searching query {query}: {e}")
 
         return collected_results
 
 
 class BingSearch(dspy.Retrieve):
-    def __init__(self, bing_search_api_key=None, k=3, is_valid_source: Callable = None,
-                 min_char_count: int = 150, snippet_chunk_size: int = 1000, webpage_helper_max_threads=10,
-                 mkt='en-US', language='en', **kwargs):
+    def __init__(
+        self,
+        bing_search_api_key=None,
+        k=3,
+        is_valid_source: Callable = None,
+        min_char_count: int = 150,
+        snippet_chunk_size: int = 1000,
+        webpage_helper_max_threads=10,
+        mkt="en-US",
+        language="en",
+        **kwargs,
+    ):
         """
         Params:
             min_char_count: Minimum character count for the article to be considered valid.
@@ -90,22 +104,18 @@ class BingSearch(dspy.Retrieve):
         super().__init__(k=k)
         if not bing_search_api_key and not os.environ.get("BING_SEARCH_API_KEY"):
             raise RuntimeError(
-                "You must supply bing_search_subscription_key or set environment variable BING_SEARCH_API_KEY")
+                "You must supply bing_search_subscription_key or set environment variable BING_SEARCH_API_KEY"
+            )
         elif bing_search_api_key:
             self.bing_api_key = bing_search_api_key
         else:
             self.bing_api_key = os.environ["BING_SEARCH_API_KEY"]
         self.endpoint = "https://api.bing.microsoft.com/v7.0/search"
-        self.params = {
-            'mkt': mkt,
-            "setLang": language,
-            "count": k,
-            **kwargs
-        }
+        self.params = {"mkt": mkt, "setLang": language, "count": k, **kwargs}
         self.webpage_helper = WebPageHelper(
             min_char_count=min_char_count,
             snippet_chunk_size=snippet_chunk_size,
-            max_thread_num=webpage_helper_max_threads
+            max_thread_num=webpage_helper_max_threads,
         )
         self.usage = 0
 
@@ -119,9 +129,11 @@ class BingSearch(dspy.Retrieve):
         usage = self.usage
         self.usage = 0
 
-        return {'BingSearch': usage}
+        return {"BingSearch": usage}
 
-    def forward(self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []):
+    def forward(
+        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
+    ):
         """Search with Bing for self.k top passages for query or queries
 
         Args:
@@ -145,22 +157,26 @@ class BingSearch(dspy.Retrieve):
         for query in queries:
             try:
                 results = requests.get(
-                    self.endpoint,
-                    headers=headers,
-                    params={**self.params, 'q': query}
+                    self.endpoint, headers=headers, params={**self.params, "q": query}
                 ).json()
 
-                for d in results['webPages']['value']:
-                    if self.is_valid_source(d['url']) and d['url'] not in exclude_urls:
-                        url_to_results[d['url']] = {'url': d['url'], 'title': d['name'], 'description': d['snippet']}
+                for d in results["webPages"]["value"]:
+                    if self.is_valid_source(d["url"]) and d["url"] not in exclude_urls:
+                        url_to_results[d["url"]] = {
+                            "url": d["url"],
+                            "title": d["name"],
+                            "description": d["snippet"],
+                        }
             except Exception as e:
-                logging.error(f'Error occurs when searching query {query}: {e}')
+                logging.error(f"Error occurs when searching query {query}: {e}")
 
-        valid_url_to_snippets = self.webpage_helper.urls_to_snippets(list(url_to_results.keys()))
+        valid_url_to_snippets = self.webpage_helper.urls_to_snippets(
+            list(url_to_results.keys())
+        )
         collected_results = []
         for url in valid_url_to_snippets:
             r = url_to_results[url]
-            r['snippets'] = valid_url_to_snippets[url]['snippets']
+            r["snippets"] = valid_url_to_snippets[url]["snippets"]
             collected_results.append(r)
 
         return collected_results
@@ -178,13 +194,15 @@ class VectorRM(dspy.Retrieve):
     The documents should be stored in a CSV file.
     """
 
-    def __init__(self,
-                 collection_name: str = "my_documents",
-                 embedding_model: str = 'BAAI/bge-m3',
-                 device: str = "mps",
-                 k: int = 3,
-                 chunk_size: int = 500,
-                 chunk_overlap: int = 100):
+    def __init__(
+        self,
+        collection_name: str = "my_documents",
+        embedding_model: str = "BAAI/bge-m3",
+        device: str = "mps",
+        k: int = 3,
+        chunk_size: int = 500,
+        chunk_overlap: int = 100,
+    ):
         """
         Params:
             collection_name: Name of the Qdrant collection.
@@ -200,7 +218,9 @@ class VectorRM(dspy.Retrieve):
         model_kwargs = {"device": device}
         encode_kwargs = {"normalize_embeddings": True}
         self.model = HuggingFaceEmbeddings(
-            model_name=embedding_model, model_kwargs=model_kwargs, encode_kwargs=encode_kwargs
+            model_name=embedding_model,
+            model_kwargs=model_kwargs,
+            encode_kwargs=encode_kwargs,
         )
 
         self.chunk_size = chunk_size
@@ -217,18 +237,24 @@ class VectorRM(dspy.Retrieve):
         if self.client is None:
             raise ValueError("Qdrant client is not initialized.")
         if self.client.collection_exists(collection_name=f"{self.collection_name}"):
-            print(f"Collection {self.collection_name} exists. Loading the collection...")
+            print(
+                f"Collection {self.collection_name} exists. Loading the collection..."
+            )
             self.qdrant = Qdrant(
                 client=self.client,
                 collection_name=self.collection_name,
                 embeddings=self.model,
             )
         else:
-            print(f"Collection {self.collection_name} does not exist. Creating the collection...")
+            print(
+                f"Collection {self.collection_name} does not exist. Creating the collection..."
+            )
             # create the collection
             self.client.create_collection(
                 collection_name=f"{self.collection_name}",
-                vectors_config=models.VectorParams(size=1024, distance=models.Distance.COSINE),
+                vectors_config=models.VectorParams(
+                    size=1024, distance=models.Distance.COSINE
+                ),
             )
             self.qdrant = Qdrant(
                 client=self.client,
@@ -274,13 +300,13 @@ class VectorRM(dspy.Retrieve):
             raise ValueError(f"Error occurs when loading the vector store: {e}")
 
     def update_vector_store(
-            self,
-            file_path: str,
-            content_column: str,
-            title_column: str = "title",
-            url_column: str = "url",
-            desc_column: str = "description",
-            batch_size: int = 64
+        self,
+        file_path: str,
+        content_column: str,
+        title_column: str = "title",
+        url_column: str = "url",
+        desc_column: str = "description",
+        batch_size: int = 64,
     ):
         """
         Takes a CSV file where each row is a document and has columns for content, title, url, and description.
@@ -297,7 +323,7 @@ class VectorRM(dspy.Retrieve):
         if file_path is None:
             raise ValueError("Please provide a file path.")
         # check if the file is a csv file
-        if not file_path.endswith('.csv'):
+        if not file_path.endswith(".csv"):
             raise ValueError(f"Not valid file format. Please provide a csv file.")
         if content_column is None:
             raise ValueError("Please provide the name of the content column.")
@@ -311,7 +337,9 @@ class VectorRM(dspy.Retrieve):
         df = pd.read_csv(file_path)
         # check that content column exists and url column exists
         if content_column not in df.columns:
-            raise ValueError(f"Content column {content_column} not found in the csv file.")
+            raise ValueError(
+                f"Content column {content_column} not found in the csv file."
+            )
         if url_column not in df.columns:
             raise ValueError(f"URL column {url_column} not found in the csv file.")
 
@@ -319,16 +347,17 @@ class VectorRM(dspy.Retrieve):
             Document(
                 page_content=row[content_column],
                 metadata={
-                    "title": row.get(title_column, ''),
+                    "title": row.get(title_column, ""),
                     "url": row[url_column],
-                    "description": row.get(desc_column, ''),
-                }
+                    "description": row.get(desc_column, ""),
+                },
             )
-            for row in df.to_dict(orient='records')
+            for row in df.to_dict(orient="records")
         ]
 
         # split the documents
         from langchain_text_splitters import RecursiveCharacterTextSplitter
+
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=self.chunk_size,
             chunk_overlap=self.chunk_overlap,
@@ -346,7 +375,7 @@ class VectorRM(dspy.Retrieve):
                 " ",
                 "\u200B",  # Zero-width space
                 "",
-            ]
+            ],
         )
         split_documents = text_splitter.split_documents(documents)
 
@@ -364,7 +393,7 @@ class VectorRM(dspy.Retrieve):
         usage = self.usage
         self.usage = 0
 
-        return {'VectorRM': usage}
+        return {"VectorRM": usage}
 
     def get_vector_count(self):
         """
@@ -397,77 +426,130 @@ class VectorRM(dspy.Retrieve):
             related_docs = self.qdrant.similarity_search_with_score(query, k=self.k)
             for i in range(len(related_docs)):
                 doc = related_docs[i][0]
-                collected_results.append({
-                    'description': doc.metadata['description'],
-                    'snippets': [doc.page_content],
-                    'title': doc.metadata['title'],
-                    'url': doc.metadata['url'],
-                })
+                collected_results.append(
+                    {
+                        "description": doc.metadata["description"],
+                        "snippets": [doc.page_content],
+                        "title": doc.metadata["title"],
+                        "url": doc.metadata["url"],
+                    }
+                )
 
         return collected_results
 
-class SerperRM(dspy.Retrieve)
-    def __init__(self, serper_search_api_key=None, query_params=None, minibatch=None):
-            super().__init__()
-            if not self.serper_search_api_key and not os.environ.get("SERPER_API_KEY"):
-                        raise RuntimeError(
-                            "You must supply serper_search_api_key or set environment variable SERPER_API_KEY")
-            elif self.serper_search_api_key:
-                self.serper_search_api_key = serper_search_api_key
-            else:
-                self.serper_search_api_key = os.environ["SERPER_API_KEY"]
-            self.base_url = "https://google.serper.dev"
-    def validate_input(self):
-        if(self.query_params.get("type") == None or type(self.query_params.get("type")) != str):
-            raise RuntimeError("A type must be provided.")
-        elif(len(self.query_params.get("gl")) > 2 or self.query_params.get("gl") == None or type(self.query_params.get("gl")) != str):
-            raise RuntimeError("Country code was not provided.")
-        elif(self.query_params.get("hl") == None or type(self.query_params.get("hl")) != str):
-                    raise RuntimeError("Language was not provided.")
-        elif(self.query_params.get("tbs") == None or type(self.query_params.get("tbs")) != str):
-                            raise RuntimeError("Date range was not provided.")
-        elif(self.query_params.get("autocorrect") == None or type(self.query_params.get("autocorrect")) != bool):
-                                    raise RuntimeError("Autocorrect boolean was not provided.")
-        elif(self.query_params.get("results") == None or type(self.query_params.get("results")) != int):
-                                            raise RuntimeError("Number of results returned was not provided.")
-        elif(self.query_params.get("page") == None or type(self.query_params.get("page")) != int):
-                                                    raise RuntimeError("Number of pages to return is not provided.")
-        elif(self.query_params.get("page") == None or type(self.query_params.get("page")) != int):
-                                                            raise RuntimeError("Number of pages to return is not provided.")
-        elif(self.minibatch == None or type(self.query_params) == Dict):
-                                                            raise RuntimeError("Minibatch is enabled, however query_params is a dictionary, will need to be converted to list to be able to be used.")
-    def runner(self):
-        match self.query_params.get("type"):
-            case "search":
-                self.run_process("type")
-            case "images":
-                self.run_process("images")
-            case "videos":
-                self.run_process("videos")
-            case "places":
-                self.run_process("places")
-            case "maps":
-                self.run_process("maps")
-            case "news":
-                self.run_process("news")
-            case "shopping"
-                self.run_process("shopping")
-            case "scholar"
-                self.run_process("scholar")
-            case "patents"
-                self.run_process("patents")
-            case "autocomplete":
-                self.run_process("autocomplete")
-            case ""
-    def run_process(self, process_name=None):
-        print(f"Beginning {process_name} process...")
-        self.search_url = f"{self.base_url}/{process_name}"
+
+class SerperRM(dspy.Retrieve):
+    """Retrieve information from custom queries using Serper.dev.
+
+    To be compatible with STORM, the results should have the following fields:
+        - snippet: Snippets that will be used for the document
+        - title: The title of the document.
+        - url: The URL of the document. STORM use url as the unique identifier of the document, so ensure different
+            documents have different urls.
+        - description (optional): The description of the document.
+
+    """
+
+    def __init__(self, serper_search_api_key=None, query_params=None):
+        super().__init__()
+        self.usage = 0
+        self.query_params = query_params
+        self.serper_search_api_key = serper_search_api_key
+        if not self.serper_search_api_key and not os.environ.get("SERPER_API_KEY"):
+            raise RuntimeError(
+                "You must supply a serper_search_api_key param or set environment variable SERPER_API_KEY"
+            )
+
+        elif self.serper_search_api_key:
+            self.serper_search_api_key = serper_search_api_key
+
+        else:
+            self.serper_search_api_key = os.environ["SERPER_API_KEY"]
+
+        self.base_url = "https://google.serper.dev"
+
+    def serper_runner(self, query_params):
+        self.search_url = f"{self.base_url}/search"
+
         headers = {
             "X-API-KEY": self.serper_search_api_key,
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         }
 
-        response = requests.request("POST", self.search_url, headers=headers, data=self.query_params)
+        response = requests.request(
+            "POST", self.search_url, headers=headers, json=query_params
+        )
+
         if response == None:
-            raise RuntimeError(f"Error had occured while running the process {process_name}.\n Error is {response.reason}, had failed with status code {response.status_code}")
+            raise RuntimeError(
+                f"Error had occured while running the process {process_name}.\n Error is {response.reason}, had failed with status code {response.status_code}"
+            )
+
         return response.json()
+
+    def get_usage_and_reset(self):
+        usage = self.usage
+        self.usage = 0
+        return {"SerperRM": usage}
+
+    def forward(self, query_or_queries: Union[str, List[str]], exclude_urls: List[str]):
+        """
+        Calls the API and searches for the query passed in.
+
+        Args:
+            query_or_queries (Union[str, List[str]]): The query or queries to search for.
+            exclude_urls (List[str]): Dummy parameter to match the interface. Does not have any effect.
+
+        Returns:
+            a list of Dicts, each dict has keys of 'description', 'snippets' (list of strings), 'title', 'url'
+        """
+        queries = (
+            [query_or_queries]
+            if isinstance(query_or_queries, str)
+            else query_or_queries
+        )
+
+        self.usage += len(queries)
+        self.results = []
+        collected_results = []
+        for query in queries:
+            if query == "Queries:":
+                continue
+            query_params = self.query_params
+            query_params["q"] = query
+            query_params["type"] = "search"
+            self.result = self.serper_runner(query_params)
+            self.results.append(self.result)
+
+        collected_results = []
+
+        for result in self.results:
+            try:
+                organic_results = result.get("organic")
+
+                knowledge_graph = result.get("knowledgeGraph")
+                for organic in organic_results:
+                    snippets = []
+                    snippets.append(organic.get("snippet"))
+                    if knowledge_graph != None:
+                        collected_results.append(
+                            {
+                                "snippets": snippets,
+                                "title": organic.get("title"),
+                                "url": organic.get("link"),
+                                "description": knowledge_graph.get("description"),
+                            }
+                        )
+                    else:
+                        collected_results.append(
+                            {
+                                "snippets": snippets,
+                                "title": result.get("title"),
+                                "url": result.get("link"),
+                                "description": "",
+                            }
+                        )
+            except:
+                continue
+
+        return collected_results

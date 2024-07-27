@@ -1,8 +1,8 @@
 """
-STORM Wiki pipeline powered by Claude family models and You.com search engine.
+STORM Wiki pipeline powered by Claude family models and serper search engine.
 You need to set up the following environment variables to run this script:
     - ANTHROPIC_API_KEY: Anthropic API key
-    - YDC_API_KEY: You.com API key; or, BING_SEARCH_API_KEY: Bing Search API key
+    - SERPER_API_KEY: Serper.dev api key
 
 Output will be structured as below
 args.output_dir/
@@ -25,7 +25,7 @@ from knowledge_storm import (
     STORMWikiLMConfigs,
 )
 from knowledge_storm.lm import ClaudeModel
-from knowledge_storm.rm import YouRM, BingSearch
+from knowledge_storm.rm import SerperRM
 from knowledge_storm.utils import load_api_key
 
 
@@ -72,19 +72,18 @@ def main(args):
         search_top_k=args.search_top_k,
         max_thread_num=args.max_thread_num,
     )
-
-    # STORM is a knowledge curation system which consumes information from the retrieval module.
-    # Currently, the information source is the Internet and we use search engine API as the retrieval module.
-    if args.retriever == "bing":
-        rm = BingSearch(
-            bing_search_api=os.getenv("BING_SEARCH_API_KEY"), k=engine_args.search_top_k
-        )
-    elif args.retriever == "you":
-        rm = YouRM(ydc_api_key=os.getenv("YDC_API_KEY"), k=engine_args.search_top_k)
+    # Documentation to generate the data is available here:
+    # https://serper.dev/playground
+    # Important to note that tbs(date range is hardcoded values).
+    # num is results per pages and is recommended to use in increments of 10(10, 20, etc).
+    # page is how many pages will be searched.
+    # h1 is where the google search will orginate from.
+    topic = input("topic: ")
+    data = {"autocorrect": True, "num": 10, "page": 1}
+    rm = SerperRM(serper_search_api_key=os.getenv("SERPER_API_KEY"), query_params=data)
 
     runner = STORMWikiRunner(engine_args, lm_configs, rm)
 
-    topic = input("Topic: ")
     runner.run(
         topic=topic,
         do_research=args.do_research,
@@ -116,7 +115,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--retriever",
         type=str,
-        choices=["bing", "you"],
+        choices=["bing", "you", "serper"],
         help="The search engine API to use for retrieving information.",
     )
     # stage of the pipeline
