@@ -8,3 +8,4 @@ deprecation==2.1.0
 st-pages==0.4.5
 streamlit-float
 streamlit-option-menu
+knowledge-storm
