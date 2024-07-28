@@ -1,8 +1,8 @@
 """
-STORM Wiki pipeline powered by Mistral-7B-Instruct-v0.2 hosted by VLLM server and You.com search engine.
+STORM Wiki pipeline powered by local model hosted by Ollama server and You.com or Bing search engine.
 You need to set up the following environment variables to run this script:
     - YDC_API_KEY: You.com API key; or, BING_SEARCH_API_KEY: Bing Search API key
-You also need to have a VLLM server running with the Mistral-7B-Instruct-v0.2 model. Specify `--url` and `--port` accordingly.
+You also need to have a Ollama server running with the llama3 model or other. Specify `--url`, `--port` and `--model` accordingly.
 
 Output will be structured as below
 args.output_dir/
@@ -16,32 +16,34 @@ args.output_dir/
         storm_gen_article_polished.txt  # Polished final article (if args.do_polish_article is True)
 """
 import os
+import sys
 from argparse import ArgumentParser
 
 from dspy import Example
 
-from knowledge_storm import STORMWikiRunnerArguments, STORMWikiRunner, STORMWikiLMConfigs
-from knowledge_storm.lm import VLLMClient
-from knowledge_storm.rm import YouRM, BingSearch
-from knowledge_storm.utils import load_api_key
+sys.path.append('./src')
+from lm import OllamaClient
+from rm import YouRM, BingSearch
+from storm_wiki.engine import STORMWikiRunnerArguments, STORMWikiRunner, STORMWikiLMConfigs
+from utils import load_api_key
 
 
 def main(args):
     load_api_key(toml_file_path='secrets.toml')
     lm_configs = STORMWikiLMConfigs()
 
-    mistral_kwargs = {
-        "model": "mistralai/Mistral-7B-Instruct-v0.2",
+    ollama_kwargs = {
+        "model": args.model,
         "port": args.port,
         "url": args.url,
         "stop": ('\n\n---',)  # dspy uses "\n\n---" to separate examples. Open models sometimes generate this.
     }
 
-    conv_simulator_lm = VLLMClient(max_tokens=500, **mistral_kwargs)
-    question_asker_lm = VLLMClient(max_tokens=500, **mistral_kwargs)
-    outline_gen_lm = VLLMClient(max_tokens=400, **mistral_kwargs)
-    article_gen_lm = VLLMClient(max_tokens=700, **mistral_kwargs)
-    article_polish_lm = VLLMClient(max_tokens=4000, **mistral_kwargs)
+    conv_simulator_lm = OllamaClient(max_tokens=500, **ollama_kwargs)
+    question_asker_lm = OllamaClient(max_tokens=500, **ollama_kwargs)
+    outline_gen_lm = OllamaClient(max_tokens=400, **ollama_kwargs)
+    article_gen_lm = OllamaClient(max_tokens=700, **ollama_kwargs)
+    article_polish_lm = OllamaClient(max_tokens=4000, **ollama_kwargs)
 
     lm_configs.set_conv_simulator_lm(conv_simulator_lm)
     lm_configs.set_question_asker_lm(question_asker_lm)
@@ -138,10 +140,12 @@ if __name__ == '__main__':
     parser = ArgumentParser()
     # global arguments
     parser.add_argument('--url', type=str, default='http://localhost',
-                        help='URL of the VLLM server.')
-    parser.add_argument('--port', type=int, default=8000,
-                        help='Port of the VLLM server.')
-    parser.add_argument('--output-dir', type=str, default='./results/mistral_7b',
+                        help='URL of the Ollama server.')
+    parser.add_argument('--port', type=int, default=11434,
+                        help='Port of the Ollama server.')
+    parser.add_argument('--model', type=str, default='llama3:latest',
+                        help='Model of the Ollama server.')
+    parser.add_argument('--output-dir', type=str, default='./results/ollama',
                         help='Directory to store the outputs.')
     parser.add_argument('--max-thread-num', type=int, default=3,
                         help='Maximum number of threads to use. The information seeking part and the article generation'
