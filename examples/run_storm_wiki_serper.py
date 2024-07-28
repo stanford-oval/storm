@@ -101,7 +101,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--output-dir",
         type=str,
-        default="./results/claude",
+        default="./results/serper",
         help="Directory to store the outputs.",
     )
     parser.add_argument(
