@@ -1,0 +1,44 @@
+secrets.toml
+
+# macOS files
+.DS_Store
+.idea
+
+# FastAPI files
+*.db
+.venv
+.env
+DEMO_WORKING_DIR
+*.service
+
+# Node.js files
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# TypeScript files
+*.tsbuildinfo
+/dist/
+
+# Python files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
