@@ -1,7 +1,6 @@
 import os
 import re
 import json
-
 import requests
 from urllib.parse import urlparse
 from typing import Union, List, Dict, Any
@@ -28,7 +27,6 @@ class WebSearchAPIWrapper(dspy.Retrieve):
         self._generate_domain_restriction()
 
     def _generate_domain_restriction(self):
-        """Generate domain restriction from Wikipedia standard."""
         try:
             script_dir = os.path.dirname(os.path.abspath(__file__))
             file_path = os.path.join(
@@ -54,14 +52,8 @@ class WebSearchAPIWrapper(dspy.Retrieve):
                     set(id_str.split("_(")[0] for id_str in processed_ids),
                 )
 
-        except FileNotFoundError:
-            logger.warning(
-                "Wikipedia sources file not found. Domain restrictions will not be applied."
-            )
-        except IOError as e:
-            logger.error(f"Error reading Wikipedia sources file: {e}")
         except Exception as e:
-            logger.error(f"Unexpected error in _generate_domain_restriction: {e}")
+            logger.error(f"Error in _generate_domain_restriction: {e}")
 
     def _is_valid_wikipedia_source(self, url):
         if not url:
@@ -69,7 +61,7 @@ class WebSearchAPIWrapper(dspy.Retrieve):
         parsed_url = urlparse(url)
         if not parsed_url.netloc:
             return False
-        domain = parsed_url.netloc.split(".")[-2]  # Get the domain name
+        domain = parsed_url.netloc.split(".")[-2]
         combined_set = self.generally_unreliable | self.deprecated | self.blacklisted
         return domain not in combined_set
 
@@ -79,57 +71,6 @@ class WebSearchAPIWrapper(dspy.Retrieve):
         if not dspy.settings.rm:
             raise ValueError("No RM is loaded. Please load a Retrieval Model first.")
         return super().forward(query_or_queries, exclude_urls=exclude_urls)
-
-    def _search(self, engine: str, query: str) -> List[Dict[str, Any]]:
-        if engine not in self.search_engines:
-            raise ValueError(f"Unsupported or unavailable search engine: {engine}")
-
-        search_engine = self.search_engines[engine]
-
-        if engine == "duckduckgo":
-            results = search_engine.results(query, max_results=self.max_results)
-        elif engine in ["bing", "yourdm"]:
-            results = search_engine.search(query)
-        elif engine == "searxng":
-            results = self._search_searxng(query)
-        else:
-            raise NotImplementedError(f"Search method for {engine} is not implemented")
-
-        logger.info(
-            f"Raw results from {engine}: {results}"
-        )  # Debug line to log results
-
-        return self._format_results(engine, results)
-
-    def _format_results(
-        self, engine: str, results: List[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
-        formatted_results = []
-        for result in results:
-            logger.info(f"Result from {engine}: {json.dumps(result, indent=2)}")
-
-            if engine in ["bing", "yourdm", "duckduckgo"]:
-                link_key = "link"
-                snippet_key = "snippet"
-            elif engine == "searxng":
-                link_key = "url"
-                snippet_key = "content"
-            else:
-                raise ValueError(f"Unsupported engine: {engine}")
-
-            snippet = result.get(snippet_key, "No snippet available")
-            formatted_result = {
-                "title": result.get("title", ""),
-                "url": result.get(link_key, ""),
-                "snippets": [snippet],
-                "description": snippet,
-            }
-
-            logger.info(f"Formatted result: {json.dumps(formatted_result, indent=2)}")
-
-            formatted_results.append(formatted_result)
-
-        return formatted_results
 
 
 class CombinedSearchAPI(WebSearchAPIWrapper):
@@ -142,37 +83,22 @@ class CombinedSearchAPI(WebSearchAPIWrapper):
         self.searxng_base_url = st.secrets.get(
             "SEARXNG_BASE_URL", "http://localhost:8080"
         )
-
         self.search_engines = self._initialize_search_engines()
 
-    def _search_duckduckgo(self, query: str) -> List[Dict[str, Any]]:
-        ddg_results = self.ddg_search.results(query, max_results=self.max_results)
-        return ddg_results  # Return the raw results
-
-    def _format_results(
-        self, engine: str, results: List[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
-        formatted_results = []
-        for result in results:
-            if engine in ["bing", "yourdm", "duckduckgo"]:
-                link_key = "link"
-                snippet_key = "snippet"
-            elif engine == "searxng":
-                link_key = "url"
-                snippet_key = "content"
-            else:
-                raise ValueError(f"Unsupported engine: {engine}")
-
-            snippet = result.get(snippet_key, "No snippet available")
-            formatted_result = {
-                "title": result.get("title", ""),
-                "url": result.get(link_key, ""),
-                "snippets": [snippet],
-                "description": snippet,
-            }
-            formatted_results.append(formatted_result)
-
-        return formatted_results
+    def _initialize_search_engines(self):
+        search_engines = {
+            "duckduckgo": self.ddg_search,
+            "searxng": self.searxng_base_url,
+        }
+        if "BING_SEARCH_API_KEY" in st.secrets:
+            search_engines["bing"] = BingSearch(
+                bing_search_api=st.secrets["BING_SEARCH_API_KEY"], k=self.max_results
+            )
+        if "YDC_API_KEY" in st.secrets:
+            search_engines["yourdm"] = YouRM(
+                ydc_api_key=st.secrets["YDC_API_KEY"], k=self.max_results
+            )
+        return search_engines
 
     def forward(
         self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
@@ -194,38 +120,10 @@ class CombinedSearchAPI(WebSearchAPIWrapper):
             if r["url"] not in exclude_urls
             and self._is_valid_wikipedia_source(r["url"])
         ]
-        ranked_results = self._rank_results(filtered_results)
+        ranked_results = sorted(
+            filtered_results, key=lambda x: self._calculate_relevance(x), reverse=True
+        )
         return ranked_results[: self.max_results]
-
-    def _initialize_search_engines(self):
-        search_engines = {}
-
-        if "SEARXNG_BASE_URL" in st.secrets:
-            search_engines["searxng"] = self.searxng_base_url
-
-        if "BING_SEARCH_API_KEY" in st.secrets:
-            search_engines["bing"] = BingSearch(
-                bing_search_api=st.secrets["BING_SEARCH_API_KEY"], k=self.max_results
-            )
-
-        if "YDC_API_KEY" in st.secrets:
-            search_engines["yourdm"] = YouRM(
-                ydc_api_key=st.secrets["YDC_API_KEY"], k=self.max_results
-            )
-
-        search_engines["duckduckgo"] = self.ddg_search
-
-        return search_engines
-
-    def _rank_results(self, results: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        return sorted(results, key=lambda x: self._calculate_relevance(x), reverse=True)
-
-    def _calculate_relevance(self, result: Dict[str, Any]) -> float:
-        relevance = 0.0
-        if "wikipedia.org" in result["url"]:
-            relevance += 1.0
-        relevance += len(result.get("snippet", "")) / 1000  # Favor longer snippets
-        return relevance
 
     def _search_with_fallback(self, query: str) -> List[Dict[str, Any]]:
         try:
@@ -252,7 +150,7 @@ class CombinedSearchAPI(WebSearchAPIWrapper):
         search_engine = self.search_engines[engine]
 
         if engine == "duckduckgo":
-            results = self._search_duckduckgo(query)
+            results = search_engine.results(query, max_results=self.max_results)
         elif engine in ["bing", "yourdm"]:
             results = search_engine.search(query)
         elif engine == "searxng":
@@ -265,10 +163,7 @@ class CombinedSearchAPI(WebSearchAPIWrapper):
         return self._format_results(engine, results)
 
     def _search_searxng(self, query: str) -> List[Dict[str, Any]]:
-        params = {
-            "q": query,
-            "format": "json",
-        }
+        params = {"q": query, "format": "json"}
         response = requests.get(self.searxng_base_url + "/search", params=params)
         if response.status_code != 200:
             raise Exception(
@@ -279,5 +174,34 @@ class CombinedSearchAPI(WebSearchAPIWrapper):
         if search_results.get("error"):
             raise Exception(f"SearxNG search error: {search_results['error']}")
 
-        results = search_results.get("results", [])
-        return results  # Return the raw results
+        return search_results.get("results", [])
+
+    def _format_results(
+        self, engine: str, results: List[Dict[str, Any]]
+    ) -> List[Dict[str, Any]]:
+        formatted_results = []
+        for result in results:
+            if engine in ["bing", "yourdm", "duckduckgo"]:
+                link_key, snippet_key = "link", "snippet"
+            elif engine == "searxng":
+                link_key, snippet_key = "url", "content"
+            else:
+                raise ValueError(f"Unsupported engine: {engine}")
+
+            snippet = result.get(snippet_key, "No snippet available")
+            formatted_result = {
+                "title": result.get("title", ""),
+                "url": result.get(link_key, ""),
+                "snippets": [snippet],
+                "description": snippet,
+            }
+            formatted_results.append(formatted_result)
+
+        return formatted_results
+
+    def _calculate_relevance(self, result: Dict[str, Any]) -> float:
+        relevance = 0.0
+        if "wikipedia.org" in result["url"]:
+            relevance += 1.0
+        relevance += len(result.get("snippet", "")) / 1000
+        return relevance

@@ -78,9 +78,7 @@ def test_web_search_wrapper_forward(mock_forward):
 @patch("util.search.load_search_options")
 @patch("util.search.DuckDuckGoSearchAPIWrapper")
 def test_combined_search_api_duckduckgo_success(
-    mock_ddg_wrapper,
-    mock_load_search_options,
-    mock_streamlit_secrets,
+    mock_ddg_wrapper, mock_load_search_options, mock_streamlit_secrets
 ):
     mock_load_search_options.return_value = {
         "primary_engine": "duckduckgo",
@@ -138,9 +136,7 @@ def test_combined_search_api_duckduckgo_failure_searxng_success(
 @patch("util.search.load_search_options")
 @patch("util.search.DuckDuckGoSearchAPIWrapper")
 def test_combined_search_api_multiple_queries(
-    mock_ddg_wrapper,
-    mock_load_search_options,
-    mock_streamlit_secrets,
+    mock_ddg_wrapper, mock_load_search_options, mock_streamlit_secrets
 ):
     mock_load_search_options.return_value = {
         "primary_engine": "duckduckgo",
