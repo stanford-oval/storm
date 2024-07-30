@@ -7,3 +7,4 @@ trafilatura
 langchain-huggingface
 qdrant-client
 langchain-qdrant
+duckduckgo_search

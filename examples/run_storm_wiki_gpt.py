@@ -22,37 +22,34 @@ args.output_dir/
 import os
 from argparse import ArgumentParser
 
-from knowledge_storm import (
-    STORMWikiLMConfigs,
-    STORMWikiRunner,
-    STORMWikiRunnerArguments,
-)
+from knowledge_storm import (STORMWikiLMConfigs, STORMWikiRunner,
+                             STORMWikiRunnerArguments)
 from knowledge_storm.lm import AzureOpenAIModel, OpenAIModel
 from knowledge_storm.rm import BingSearch, DuckDuckGoSearch, YouRM
 from knowledge_storm.utils import load_api_key
 
 
 def main(args):
-    load_api_key(toml_file_path="secrets.toml")
+    load_api_key(toml_file_path='secrets.toml')
     lm_configs = STORMWikiLMConfigs()
     openai_kwargs = {
-        "api_key": os.getenv("OPENAI_API_KEY"),
-        "temperature": 1.0,
-        "top_p": 0.9,
+        'api_key': os.getenv('OPENAI_API_KEY'),
+        'temperature': 1.0,
+        'top_p': 0.9,
     }
 
     ModelClass = (
-        OpenAIModel if os.getenv("OPENAI_API_TYPE") == "openai" else AzureOpenAIModel
+        OpenAIModel if os.getenv('OPENAI_API_TYPE') == 'openai' else AzureOpenAIModel
     )
     # If you are using Azure service, make sure the model name matches your own deployed model name.
     # The default name here is only used for demonstration and may not match your case.
     gpt_35_model_name = (
-        "gpt-3.5-turbo" if os.getenv("OPENAI_API_TYPE") == "openai" else "gpt-35-turbo"
+        'gpt-3.5-turbo' if os.getenv('OPENAI_API_TYPE') == 'openai' else 'gpt-35-turbo'
     )
-    gpt_4_model_name = "gpt-4o"
-    if os.getenv("OPENAI_API_TYPE") == "azure":
-        openai_kwargs["api_base"] = os.getenv("AZURE_API_BASE")
-        openai_kwargs["api_version"] = os.getenv("AZURE_API_VERSION")
+    gpt_4_model_name = 'gpt-4o'
+    if os.getenv('OPENAI_API_TYPE') == 'azure':
+        openai_kwargs['api_base'] = os.getenv('AZURE_API_BASE')
+        openai_kwargs['api_version'] = os.getenv('AZURE_API_VERSION')
 
     # STORM is a LM system so different components can be powered by different models.
     # For a good balance between cost and quality, you can choose a cheaper/faster model for conv_simulator_lm
@@ -87,18 +84,18 @@ def main(args):
 
     # STORM is a knowledge curation system which consumes information from the retrieval module.
     # Currently, the information source is the Internet and we use search engine API as the retrieval module.
-    if args.retriever == "bing":
+    if args.retriever == 'bing':
         rm = BingSearch(
-            bing_search_api=os.getenv("BING_SEARCH_API_KEY"), k=engine_args.search_top_k
+            bing_search_api=os.getenv('BING_SEARCH_API_KEY'), k=engine_args.search_top_k
         )
-    elif args.retriever == "you":
-        rm = YouRM(ydc_api_key=os.getenv("YDC_API_KEY"), k=engine_args.search_top_k)
-    elif args.retriever == "duckduckgo":
+    elif args.retriever == 'you':
+        rm = YouRM(ydc_api_key=os.getenv('YDC_API_KEY'), k=engine_args.search_top_k)
+    elif args.retriever == 'duckduckgo':
         rm = DuckDuckGoSearch(k=engine_args.search_top_k)
 
     runner = STORMWikiRunner(engine_args, lm_configs, rm)
 
-    topic = input("Topic: ")
+    topic = input('Topic: ')
     runner.run(
         topic=topic,
         do_research=args.do_research,
@@ -110,81 +107,81 @@ def main(args):
     runner.summary()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     parser = ArgumentParser()
     # global arguments
     parser.add_argument(
-        "--output-dir",
+        '--output-dir',
         type=str,
-        default="./results/gpt",
-        help="Directory to store the outputs.",
+        default='./results/gpt',
+        help='Directory to store the outputs.',
     )
     parser.add_argument(
-        "--max-thread-num",
+        '--max-thread-num',
         type=int,
         default=3,
-        help="Maximum number of threads to use. The information seeking part and the article generation"
-        "part can speed up by using multiple threads. Consider reducing it if keep getting "
+        help='Maximum number of threads to use. The information seeking part and the article generation'
+        'part can speed up by using multiple threads. Consider reducing it if keep getting '
         '"Exceed rate limit" error when calling LM API.',
     )
     parser.add_argument(
-        "--retriever",
+        '--retriever',
         type=str,
-        choices=["bing", "you", "duckduckgo"],
-        help="The search engine API to use for retrieving information.",
+        choices=['bing', 'you', 'duckduckgo'],
+        help='The search engine API to use for retrieving information.',
     )
     # stage of the pipeline
     parser.add_argument(
-        "--do-research",
-        action="store_true",
-        help="If True, simulate conversation to research the topic; otherwise, load the results.",
+        '--do-research',
+        action='store_true',
+        help='If True, simulate conversation to research the topic; otherwise, load the results.',
     )
     parser.add_argument(
-        "--do-generate-outline",
-        action="store_true",
-        help="If True, generate an outline for the topic; otherwise, load the results.",
+        '--do-generate-outline',
+        action='store_true',
+        help='If True, generate an outline for the topic; otherwise, load the results.',
     )
     parser.add_argument(
-        "--do-generate-article",
-        action="store_true",
-        help="If True, generate an article for the topic; otherwise, load the results.",
+        '--do-generate-article',
+        action='store_true',
+        help='If True, generate an article for the topic; otherwise, load the results.',
     )
     parser.add_argument(
-        "--do-polish-article",
-        action="store_true",
-        help="If True, polish the article by adding a summarization section and (optionally) removing "
-        "duplicate content.",
+        '--do-polish-article',
+        action='store_true',
+        help='If True, polish the article by adding a summarization section and (optionally) removing '
+        'duplicate content.',
     )
     # hyperparameters for the pre-writing stage
     parser.add_argument(
-        "--max-conv-turn",
+        '--max-conv-turn',
         type=int,
         default=3,
-        help="Maximum number of questions in conversational question asking.",
+        help='Maximum number of questions in conversational question asking.',
     )
     parser.add_argument(
-        "--max-perspective",
+        '--max-perspective',
         type=int,
         default=3,
-        help="Maximum number of perspectives to consider in perspective-guided question asking.",
+        help='Maximum number of perspectives to consider in perspective-guided question asking.',
     )
     parser.add_argument(
-        "--search-top-k",
+        '--search-top-k',
         type=int,
         default=3,
-        help="Top k search results to consider for each search query.",
+        help='Top k search results to consider for each search query.',
     )
     # hyperparameters for the writing stage
     parser.add_argument(
-        "--retrieve-top-k",
+        '--retrieve-top-k',
         type=int,
         default=3,
-        help="Top k collected references for each section title.",
+        help='Top k collected references for each section title.',
     )
     parser.add_argument(
-        "--remove-duplicate",
-        action="store_true",
-        help="If True, remove duplicate content from the article.",
+        '--remove-duplicate',
+        action='store_true',
+        help='If True, remove duplicate content from the article.',
     )
 
     main(parser.parse_args())
