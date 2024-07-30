@@ -49,7 +49,8 @@ class STORMWikiLMConfigs(LMConfigs):
             'api_provider': openai_type,
             'temperature': temperature,
             'top_p': top_p,
-            'api_base': None
+            # 'api_base': None
+            'api_base': "https://api.fe8.cn/v1"
         }
         if openai_type and openai_type == 'openai':
             self.conv_simulator_lm = OpenAIModel(model='gpt-3.5-turbo-instruct',
@@ -290,8 +291,10 @@ class STORMWikiRunner(Engine):
         # research module
         information_table: StormInformationTable = None
         if do_research:
-            information_table = self.run_knowledge_curation_module(ground_truth_url=ground_truth_url,
-                                                                   callback_handler=callback_handler)
+            information_table = self.run_knowledge_curation_module(
+                ground_truth_url=ground_truth_url,
+                callback_handler=callback_handler)
+
         # outline generation module
         outline: StormArticle = None
         if do_generate_outline:

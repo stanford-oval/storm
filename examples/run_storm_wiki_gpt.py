@@ -19,8 +19,10 @@ args.output_dir/
         storm_gen_article_polished.txt  # Polished final article (if args.do_polish_article is True)
 """
 
-import os
+import os, sys
 from argparse import ArgumentParser
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from knowledge_storm import STORMWikiRunnerArguments, STORMWikiRunner, STORMWikiLMConfigs
 from knowledge_storm.lm import OpenAIModel, AzureOpenAIModel
@@ -35,17 +37,19 @@ def main(args):
         'api_key': os.getenv("OPENAI_API_KEY"),
         'temperature': 1.0,
         'top_p': 0.9,
+        'api_base': os.getenv("OPENAI_API_BASE")
     }
 
     ModelClass = OpenAIModel if os.getenv('OPENAI_API_TYPE') == 'openai' else AzureOpenAIModel
     # If you are using Azure service, make sure the model name matches your own deployed model name.
     # The default name here is only used for demonstration and may not match your case.
     gpt_35_model_name = 'gpt-3.5-turbo' if os.getenv('OPENAI_API_TYPE') == 'openai' else 'gpt-35-turbo'
-    gpt_4_model_name = 'gpt-4o'
+    gpt_4_model_name = 'gpt-4'
     if os.getenv('OPENAI_API_TYPE') == 'azure':
         openai_kwargs['api_base'] = os.getenv('AZURE_API_BASE')
         openai_kwargs['api_version'] = os.getenv('AZURE_API_VERSION')
-
+        # openai_kwargs['deployment_name'] = os.getenv('DEPLOYMENT_NAME')
+    print(openai_kwargs)
     # STORM is a LM system so different components can be powered by different models.
     # For a good balance between cost and quality, you can choose a cheaper/faster model for conv_simulator_lm
     # which is used to split queries, synthesize answers in the conversation. We recommend using stronger models
@@ -80,7 +84,11 @@ def main(args):
 
     runner = STORMWikiRunner(engine_args, lm_configs, rm)
 
-    topic = input('Topic: ')
+    # topic = input('Topic: ')
+    """
+    Large Language Model, Correlation and Causal Inference
+    """
+    topic = "Large Language Model, Correlation and Causal Inference"
     runner.run(
         topic=topic,
         do_research=args.do_research,
