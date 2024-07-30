@@ -20,7 +20,6 @@ langchain-community==0.2.10
 duckduckgo-search==6.2.3
 
 # stracing
-python-dotenv
 arize-phoenix==4.12.0
 
 # tests

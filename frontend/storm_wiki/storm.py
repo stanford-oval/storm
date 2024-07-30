@@ -1,13 +1,10 @@
 import streamlit as st
 import os
-from dotenv import load_dotenv
 
 from util.phoenix_setup import setup_phoenix
 from pages_util import MyArticles, CreateNewArticle, Settings
 from streamlit_option_menu import option_menu
 from util.theme_manager import init_db, load_and_apply_theme, get_option_menu_style
-
-load_dotenv()
 
 # Set page config first
 st.set_page_config(layout="wide")
@@ -47,12 +44,6 @@ def main():
 
     if "first_run" not in st.session_state:
         st.session_state["first_run"] = True
-
-    # set api keys from secrets
-    if st.session_state["first_run"]:
-        for key, value in st.secrets.items():
-            if isinstance(value, str):
-                os.environ[key] = value
 
     # initialize session_state
     if "selected_article_index" not in st.session_state:
