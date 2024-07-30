@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Callable, Union, List
+from typing import Callable, List, Union
 
 import dspy
 import pandas as pd
@@ -13,12 +13,16 @@ from tqdm import tqdm
 
 from .utils import WebPageHelper
 
+DUCKDUCKGO_BACKEND = "api"
+
 
 class YouRM(dspy.Retrieve):
     def __init__(self, ydc_api_key=None, k=3, is_valid_source: Callable = None):
         super().__init__(k=k)
         if not ydc_api_key and not os.environ.get("YDC_API_KEY"):
-            raise RuntimeError("You must supply ydc_api_key or set environment variable YDC_API_KEY")
+            raise RuntimeError(
+                "You must supply ydc_api_key or set environment variable YDC_API_KEY"
+            )
         elif ydc_api_key:
             self.ydc_api_key = ydc_api_key
         else:
@@ -35,9 +39,11 @@ class YouRM(dspy.Retrieve):
         usage = self.usage
         self.usage = 0
 
-        return {'YouRM': usage}
+        return {"YouRM": usage}
 
-    def forward(self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []):
+    def forward(
+        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
+    ):
         """Search with You.com for self.k top passages for query or queries
 
         Args:
@@ -63,21 +69,30 @@ class YouRM(dspy.Retrieve):
                 ).json()
 
                 authoritative_results = []
-                for r in results['hits']:
-                    if self.is_valid_source(r['url']) and r['url'] not in exclude_urls:
+                for r in results["hits"]:
+                    if self.is_valid_source(r["url"]) and r["url"] not in exclude_urls:
                         authoritative_results.append(r)
-                if 'hits' in results:
-                    collected_results.extend(authoritative_results[:self.k])
+                if "hits" in results:
+                    collected_results.extend(authoritative_results[: self.k])
             except Exception as e:
-                logging.error(f'Error occurs when searching query {query}: {e}')
+                logging.error(f"Error occurs when searching query {query}: {e}")
 
         return collected_results
 
 
 class BingSearch(dspy.Retrieve):
-    def __init__(self, bing_search_api_key=None, k=3, is_valid_source: Callable = None,
-                 min_char_count: int = 150, snippet_chunk_size: int = 1000, webpage_helper_max_threads=10,
-                 mkt='en-US', language='en', **kwargs):
+    def __init__(
+        self,
+        bing_search_api_key=None,
+        k=3,
+        is_valid_source: Callable = None,
+        min_char_count: int = 150,
+        snippet_chunk_size: int = 1000,
+        webpage_helper_max_threads=10,
+        mkt="en-US",
+        language="en",
+        **kwargs,
+    ):
         """
         Params:
             min_char_count: Minimum character count for the article to be considered valid.
@@ -89,22 +104,18 @@ class BingSearch(dspy.Retrieve):
         super().__init__(k=k)
         if not bing_search_api_key and not os.environ.get("BING_SEARCH_API_KEY"):
             raise RuntimeError(
-                "You must supply bing_search_subscription_key or set environment variable BING_SEARCH_API_KEY")
+                "You must supply bing_search_subscription_key or set environment variable BING_SEARCH_API_KEY"
+            )
         elif bing_search_api_key:
             self.bing_api_key = bing_search_api_key
         else:
             self.bing_api_key = os.environ["BING_SEARCH_API_KEY"]
         self.endpoint = "https://api.bing.microsoft.com/v7.0/search"
-        self.params = {
-            'mkt': mkt,
-            "setLang": language,
-            "count": k,
-            **kwargs
-        }
+        self.params = {"mkt": mkt, "setLang": language, "count": k, **kwargs}
         self.webpage_helper = WebPageHelper(
             min_char_count=min_char_count,
             snippet_chunk_size=snippet_chunk_size,
-            max_thread_num=webpage_helper_max_threads
+            max_thread_num=webpage_helper_max_threads,
         )
         self.usage = 0
 
@@ -118,9 +129,11 @@ class BingSearch(dspy.Retrieve):
         usage = self.usage
         self.usage = 0
 
-        return {'BingSearch': usage}
+        return {"BingSearch": usage}
 
-    def forward(self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []):
+    def forward(
+        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
+    ):
         """Search with Bing for self.k top passages for query or queries
 
         Args:
@@ -144,22 +157,26 @@ class BingSearch(dspy.Retrieve):
         for query in queries:
             try:
                 results = requests.get(
-                    self.endpoint,
-                    headers=headers,
-                    params={**self.params, 'q': query}
+                    self.endpoint, headers=headers, params={**self.params, "q": query}
                 ).json()
 
-                for d in results['webPages']['value']:
-                    if self.is_valid_source(d['url']) and d['url'] not in exclude_urls:
-                        url_to_results[d['url']] = {'url': d['url'], 'title': d['name'], 'description': d['snippet']}
+                for d in results["webPages"]["value"]:
+                    if self.is_valid_source(d["url"]) and d["url"] not in exclude_urls:
+                        url_to_results[d["url"]] = {
+                            "url": d["url"],
+                            "title": d["name"],
+                            "description": d["snippet"],
+                        }
             except Exception as e:
-                logging.error(f'Error occurs when searching query {query}: {e}')
+                logging.error(f"Error occurs when searching query {query}: {e}")
 
-        valid_url_to_snippets = self.webpage_helper.urls_to_snippets(list(url_to_results.keys()))
+        valid_url_to_snippets = self.webpage_helper.urls_to_snippets(
+            list(url_to_results.keys())
+        )
         collected_results = []
         for url in valid_url_to_snippets:
             r = url_to_results[url]
-            r['snippets'] = valid_url_to_snippets[url]['snippets']
+            r["snippets"] = valid_url_to_snippets[url]["snippets"]
             collected_results.append(r)
 
         return collected_results
@@ -177,13 +194,15 @@ class VectorRM(dspy.Retrieve):
     The documents should be stored in a CSV file.
     """
 
-    def __init__(self,
-                 collection_name: str = "my_documents",
-                 embedding_model: str = 'BAAI/bge-m3',
-                 device: str = "mps",
-                 k: int = 3,
-                 chunk_size: int = 500,
-                 chunk_overlap: int = 100):
+    def __init__(
+        self,
+        collection_name: str = "my_documents",
+        embedding_model: str = "BAAI/bge-m3",
+        device: str = "mps",
+        k: int = 3,
+        chunk_size: int = 500,
+        chunk_overlap: int = 100,
+    ):
         """
         Params:
             collection_name: Name of the Qdrant collection.
@@ -199,7 +218,9 @@ class VectorRM(dspy.Retrieve):
         model_kwargs = {"device": device}
         encode_kwargs = {"normalize_embeddings": True}
         self.model = HuggingFaceEmbeddings(
-            model_name=embedding_model, model_kwargs=model_kwargs, encode_kwargs=encode_kwargs
+            model_name=embedding_model,
+            model_kwargs=model_kwargs,
+            encode_kwargs=encode_kwargs,
         )
 
         self.chunk_size = chunk_size
@@ -216,18 +237,24 @@ class VectorRM(dspy.Retrieve):
         if self.client is None:
             raise ValueError("Qdrant client is not initialized.")
         if self.client.collection_exists(collection_name=f"{self.collection_name}"):
-            print(f"Collection {self.collection_name} exists. Loading the collection...")
+            print(
+                f"Collection {self.collection_name} exists. Loading the collection..."
+            )
             self.qdrant = Qdrant(
                 client=self.client,
                 collection_name=self.collection_name,
                 embeddings=self.model,
             )
         else:
-            print(f"Collection {self.collection_name} does not exist. Creating the collection...")
+            print(
+                f"Collection {self.collection_name} does not exist. Creating the collection..."
+            )
             # create the collection
             self.client.create_collection(
                 collection_name=f"{self.collection_name}",
-                vectors_config=models.VectorParams(size=1024, distance=models.Distance.COSINE),
+                vectors_config=models.VectorParams(
+                    size=1024, distance=models.Distance.COSINE
+                ),
             )
             self.qdrant = Qdrant(
                 client=self.client,
@@ -273,13 +300,13 @@ class VectorRM(dspy.Retrieve):
             raise ValueError(f"Error occurs when loading the vector store: {e}")
 
     def update_vector_store(
-            self,
-            file_path: str,
-            content_column: str,
-            title_column: str = "title",
-            url_column: str = "url",
-            desc_column: str = "description",
-            batch_size: int = 64
+        self,
+        file_path: str,
+        content_column: str,
+        title_column: str = "title",
+        url_column: str = "url",
+        desc_column: str = "description",
+        batch_size: int = 64,
     ):
         """
         Takes a CSV file where each row is a document and has columns for content, title, url, and description.
@@ -296,7 +323,7 @@ class VectorRM(dspy.Retrieve):
         if file_path is None:
             raise ValueError("Please provide a file path.")
         # check if the file is a csv file
-        if not file_path.endswith('.csv'):
+        if not file_path.endswith(".csv"):
             raise ValueError(f"Not valid file format. Please provide a csv file.")
         if content_column is None:
             raise ValueError("Please provide the name of the content column.")
@@ -310,7 +337,9 @@ class VectorRM(dspy.Retrieve):
         df = pd.read_csv(file_path)
         # check that content column exists and url column exists
         if content_column not in df.columns:
-            raise ValueError(f"Content column {content_column} not found in the csv file.")
+            raise ValueError(
+                f"Content column {content_column} not found in the csv file."
+            )
         if url_column not in df.columns:
             raise ValueError(f"URL column {url_column} not found in the csv file.")
 
@@ -318,16 +347,17 @@ class VectorRM(dspy.Retrieve):
             Document(
                 page_content=row[content_column],
                 metadata={
-                    "title": row.get(title_column, ''),
+                    "title": row.get(title_column, ""),
                     "url": row[url_column],
-                    "description": row.get(desc_column, ''),
-                }
+                    "description": row.get(desc_column, ""),
+                },
             )
-            for row in df.to_dict(orient='records')
+            for row in df.to_dict(orient="records")
         ]
 
         # split the documents
         from langchain_text_splitters import RecursiveCharacterTextSplitter
+
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=self.chunk_size,
             chunk_overlap=self.chunk_overlap,
@@ -345,7 +375,7 @@ class VectorRM(dspy.Retrieve):
                 " ",
                 "\u200B",  # Zero-width space
                 "",
-            ]
+            ],
         )
         split_documents = text_splitter.split_documents(documents)
 
@@ -363,7 +393,7 @@ class VectorRM(dspy.Retrieve):
         usage = self.usage
         self.usage = 0
 
-        return {'VectorRM': usage}
+        return {"VectorRM": usage}
 
     def get_vector_count(self):
         """
@@ -396,11 +426,116 @@ class VectorRM(dspy.Retrieve):
             related_docs = self.qdrant.similarity_search_with_score(query, k=self.k)
             for i in range(len(related_docs)):
                 doc = related_docs[i][0]
-                collected_results.append({
-                    'description': doc.metadata['description'],
-                    'snippets': [doc.page_content],
-                    'title': doc.metadata['title'],
-                    'url': doc.metadata['url'],
-                })
+                collected_results.append(
+                    {
+                        "description": doc.metadata["description"],
+                        "snippets": [doc.page_content],
+                        "title": doc.metadata["title"],
+                        "url": doc.metadata["url"],
+                    }
+                )
+
+        return collected_results
+
+
+class DuckDuckGoSearch(dspy.Retrieve):
+    def __init__(
+        self,
+        openai_api_key=None,
+        k=3,
+        is_valid_source: Callable = None,
+        min_char_count: int = 150,
+        snippet_chunk_size: int = 1000,
+        webpage_helper_max_threads=10,
+        **kwargs,
+    ):
+        """
+        Params:
+            min_char_count: Minimum character count for the article to be considered valid.
+            snippet_chunk_size: Maximum character count for each snippet.
+            webpage_helper_max_threads: Maximum number of threads to use for webpage helper.
+            **kwargs: Additional parameters for the OpenAI API.
+        """
+        super().__init__(k=k)
+
+        self.k = k
+        self.webpage_helper = WebPageHelper(
+            min_char_count=min_char_count,
+            snippet_chunk_size=snippet_chunk_size,
+            max_thread_num=webpage_helper_max_threads,
+        )
+        self.usage = 0
+
+        # If not None, is_valid_source shall be a function that takes a URL and returns a boolean.
+        if is_valid_source:
+            self.is_valid_source = is_valid_source
+        else:
+            self.is_valid_source = lambda x: True
+
+        self.ddgs = DDGS()
+
+    # TODO: this is used in BingSearch and YouRM, consider moving it to a common place.
+    def get_usage_and_reset(self):
+        usage = self.usage
+        self.usage = 0
+        return {"DuckDuckGoSearch": usage}
+
+    # this is the important function that is used by Retriever in the pipeline
+    def forward(
+        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
+    ):
+        """Search with DuckDuckGoSearch for self.k top passages for query or queries
+
+        Args:
+            query_or_queries (Union[str, List[str]]): The query or queries to search for.
+            exclude_urls (List[str]): A list of urls to exclude from the search results.
+
+        Returns:
+            a list of Dicts, each dict has keys of 'description', 'snippets' (list of strings), 'title', 'url'
+        """
+        queries = (
+            [query_or_queries]
+            if isinstance(query_or_queries, str)
+            else query_or_queries
+        )
+        self.usage += len(queries)
+
+        collected_results = []
+
+        for query in queries:
+            #  list of dict
+            results = self.ddgs.text(
+                query, max_results=self.k, backend=DUCKDUCKGO_BACKEND
+            )
+
+            for d in results:
+                # assert d is dict
+                if not isinstance(d, dict):
+                    print(f"Invalid result: {d}")
+                    continue
+
+                try:
+                    # ensure keys are present
+                    url = d.get("href", None)
+                    title = d.get("title", None)
+                    description = d.get("description", title)
+                    snippets = [d.get("body", None)]
+
+                    # raise exception of missing key(s)
+                    if not all([url, title, description, snippets]):
+                        raise ValueError(f"Missing key(s) in result: {d}")
+                    if self.is_valid_source(url) and url not in exclude_urls:
+                        result = {
+                            "url": url,
+                            "title": title,
+                            "description": description,
+                            "snippets": snippets,
+                        }
+                        collected_results.append(result)
+                    else:
+                        print(f"invalid source {url} or url in exclude_urls")
+                except Exception as e:
+                    print(f"Error occurs when processing {result=}: {e}")
+                    logging.error(f"Error occurs when searching query {query}: {e}")
 
         return collected_results
