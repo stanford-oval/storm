@@ -106,11 +106,18 @@ class UIComponents:
             ]
             selected_key = st.selectbox("Select a reference", reference_list)
             citation_val = citation_dict[reference_list.index(selected_key) + 1]
-            citation_val["title"] = citation_val["title"].replace("$", "\\$")
-            st.markdown(f"**Title:** {citation_val['title']}")
-            st.markdown(f"**Url:** {citation_val['url']}")
-            snippets = "\n\n".join(citation_val["snippets"]).replace("$", "\\$")
-            st.markdown(f"**Highlights:**\n\n {snippets}")
+            citation_val["title"] = citation_val.get("title", "").replace("$", "\\$")
+            st.markdown(f"**Title:** {citation_val.get('title', 'No title available')}")
+            st.markdown(f"**Url:** {citation_val.get('url', 'No URL available')}")
+
+            description = citation_val.get(
+                "description", "No description available"
+            ).replace("$", "\\$")
+            st.markdown(f"**Description:**\n\n {description}")
+
+            snippets = citation_val.get("snippets", ["No highlights available"])
+            snippets_text = "\n\n".join(snippets).replace("$", "\\$")
+            st.markdown(f"**Highlights:**\n\n {snippets_text}")
         else:
             st.markdown("**No references available**")
 
@@ -122,11 +129,12 @@ class UIComponents:
                 article_text.find("Write the lead section:")
                 + len("Write the lead section:") :
             ]
-        if article_text[0] == "#":
+        if article_text and article_text[0] == "#":
             article_text = "\n".join(article_text.split("\n")[1:])
-        article_text = DemoTextProcessingHelper.add_inline_citation_link(
-            article_text, citation_dict
-        )
+        if citation_dict:
+            article_text = DemoTextProcessingHelper.add_inline_citation_link(
+                article_text, citation_dict
+            )
         # '$' needs to be changed to '\$' to avoid being interpreted as LaTeX in st.markdown()
         article_text = article_text.replace("$", "\\$")
         UIComponents.from_markdown(article_text, table_content_sidebar)

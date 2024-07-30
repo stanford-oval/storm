@@ -4,9 +4,7 @@ from util.theme_manager import (
     light_themes,
     get_theme_css,
     get_preview_html,
-    get_contrasting_text_color,
     load_and_apply_theme,
-    update_theme_and_rerun,
     save_theme,
     load_theme_from_db as load_theme,
 )
@@ -14,8 +12,36 @@ import sqlite3
 import json
 import subprocess
 
+# Search engine options
+SEARCH_ENGINES = {
+    "searxng": "SEARXNG_BASE_URL",
+    "bing": "BING_SEARCH_API_KEY",
+    "yourdm": "YDC_API_KEY",
+    "duckduckgo": None,
+}
 
-def save_search_options(search_top_k, retrieve_top_k):
+# LLM model options
+LLM_MODELS = {
+    "ollama": "OLLAMA_PORT",
+    "openai": "OPENAI_API_KEY",
+    "anthropic": "ANTHROPIC_API_KEY",
+}
+
+
+def get_available_search_engines():
+    available_engines = {"duckduckgo": None}  # DuckDuckGo is always available
+
+    if "SEARXNG_BASE_URL" in st.secrets:
+        available_engines["searxng"] = "SEARXNG_BASE_URL"
+    if "BING_SEARCH_API_KEY" in st.secrets:
+        available_engines["bing"] = "BING_SEARCH_API_KEY"
+    if "YDC_API_KEY" in st.secrets:
+        available_engines["yourdm"] = "YDC_API_KEY"
+
+    return available_engines
+
+
+def save_search_options(primary_engine, fallback_engine, search_top_k, retrieve_top_k):
     conn = sqlite3.connect("settings.db")
     c = conn.cursor()
     c.execute(
@@ -23,7 +49,12 @@ def save_search_options(search_top_k, retrieve_top_k):
         (
             "search_options",
             json.dumps(
-                {"search_top_k": search_top_k, "retrieve_top_k": retrieve_top_k}
+                {
+                    "primary_engine": primary_engine,
+                    "fallback_engine": fallback_engine,
+                    "search_top_k": search_top_k,
+                    "retrieve_top_k": retrieve_top_k,
+                }
             ),
         ),
     )
@@ -31,7 +62,6 @@ def save_search_options(search_top_k, retrieve_top_k):
     conn.close()
 
 
-# Function to load search options
 def load_search_options():
     conn = sqlite3.connect("settings.db")
     c = conn.cursor()
@@ -41,23 +71,55 @@ def load_search_options():
 
     if result:
         return json.loads(result[0])
-    return {"search_top_k": 3, "retrieve_top_k": 3}
+    return {
+        "primary_engine": "duckduckgo",
+        "fallback_engine": None,
+        "search_top_k": 3,
+        "retrieve_top_k": 3,
+    }
 
 
-def save_ollama_settings(model, url, port, max_tokens):
+def save_llm_settings(primary_model, fallback_model, model_settings):
     conn = sqlite3.connect("settings.db")
     c = conn.cursor()
     c.execute(
         "INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)",
         (
-            "ollama_settings",
+            "llm_settings",
             json.dumps(
-                {"model": model, "url": url, "port": port, "max_tokens": max_tokens}
+                {
+                    "primary_model": primary_model,
+                    "fallback_model": fallback_model,
+                    "model_settings": model_settings,
+                }
             ),
         ),
     )
     conn.commit()
     conn.close()
+
+
+def load_llm_settings():
+    conn = sqlite3.connect("settings.db")
+    c = conn.cursor()
+    c.execute("SELECT value FROM settings WHERE key='llm_settings'")
+    result = c.fetchone()
+    conn.close()
+
+    if result:
+        return json.loads(result[0])
+    return {
+        "primary_model": "ollama",
+        "fallback_model": None,
+        "model_settings": {
+            "ollama": {
+                "model": "jaigouk/hermes-2-theta-llama-3:latest",
+                "max_tokens": 500,
+            },
+            "openai": {"model": "gpt-4o-mini", "max_tokens": 500},
+            "anthropic": {"model": "claude-3-haiku-202403072", "max_tokens": 500},
+        },
+    }
 
 
 def list_downloaded_models():
@@ -75,33 +137,6 @@ def list_downloaded_models():
         return []
 
 
-def load_ollama_settings():
-    conn = sqlite3.connect("settings.db")
-    c = conn.cursor()
-    c.execute("SELECT value FROM settings WHERE key='ollama_settings'")
-    result = c.fetchone()
-    conn.close()
-
-    if result:
-        settings = json.loads(result[0])
-    else:
-        settings = {
-            "model": "jaigouk/hermes-2-theta-llama-3:latest",
-            "url": "http://localhost",
-            "port": 11434,
-            "max_tokens": 2000,
-        }
-
-    # Fetch the list of downloaded models
-    models_list = list_downloaded_models()
-    if settings["model"] not in models_list:
-        models_list.insert(
-            0, settings["model"]
-        )  # Ensure the current model is in the list
-
-    return settings, models_list
-
-
 def settings_page(selected_setting):
     current_theme = load_and_apply_theme()
     st.title("Settings")
@@ -109,6 +144,29 @@ def settings_page(selected_setting):
     if selected_setting == "Search":
         st.header("Search Options Settings")
         search_options = load_search_options()
+
+        primary_engine = st.selectbox(
+            "Primary Search Engine",
+            options=list(SEARCH_ENGINES.keys()),
+            index=list(SEARCH_ENGINES.keys()).index(search_options["primary_engine"]),
+        )
+
+        fallback_engine = st.selectbox(
+            "Fallback Search Engine",
+            options=[None]
+            + [engine for engine in SEARCH_ENGINES.keys() if engine != primary_engine],
+            index=0
+            if search_options["fallback_engine"] is None
+            else (
+                [None]
+                + [
+                    engine
+                    for engine in SEARCH_ENGINES.keys()
+                    if engine != primary_engine
+                ]
+            ).index(search_options["fallback_engine"]),
+        )
+
         search_top_k = st.number_input(
             "Search Top K",
             min_value=1,
@@ -121,9 +179,80 @@ def settings_page(selected_setting):
             max_value=100,
             value=search_options["retrieve_top_k"],
         )
+
         if st.button("Save Search Options"):
-            save_search_options(search_top_k, retrieve_top_k)
+            save_search_options(
+                primary_engine, fallback_engine, search_top_k, retrieve_top_k
+            )
             st.success("Search options saved successfully!")
+
+    elif selected_setting == "LLM":
+        st.header("LLM Settings")
+        llm_settings = load_llm_settings()
+
+        primary_model = st.selectbox(
+            "Primary LLM Model",
+            options=list(LLM_MODELS.keys()),
+            index=list(LLM_MODELS.keys()).index(llm_settings["primary_model"]),
+        )
+
+        fallback_model = st.selectbox(
+            "Fallback LLM Model",
+            options=[None]
+            + [model for model in LLM_MODELS.keys() if model != primary_model],
+            index=0
+            if llm_settings["fallback_model"] is None
+            else (
+                [None]
+                + [model for model in LLM_MODELS.keys() if model != primary_model]
+            ).index(llm_settings["fallback_model"]),
+        )
+
+        model_settings = llm_settings["model_settings"]
+
+        st.subheader("Model-specific Settings")
+        for model, env_var in LLM_MODELS.items():
+            st.write(f"{model.capitalize()} Settings")
+            model_settings[model] = model_settings.get(model, {})
+
+            if model == "ollama":
+                downloaded_models = list_downloaded_models()
+                model_settings[model]["model"] = st.selectbox(
+                    "Ollama Model",
+                    options=downloaded_models,
+                    index=downloaded_models.index(
+                        model_settings[model].get(
+                            "model", "jaigouk/hermes-2-theta-llama-3:latest"
+                        )
+                    ),
+                )
+            elif model == "openai":
+                model_settings[model]["model"] = st.selectbox(
+                    "OpenAI Model",
+                    options=["gpt-4o-mini", "gpt-4o"],
+                    index=0
+                    if model_settings[model].get("model") == "gpt-4o-mini"
+                    else 1,
+                )
+            elif model == "anthropic":
+                model_settings[model]["model"] = st.selectbox(
+                    "Anthropic Model",
+                    options=["claude-3-haiku-20240307", "claude-3-5-sonnet-20240620"],
+                    index=0
+                    if model_settings[model].get("model") == "claude-3-haiku-20240307"
+                    else 1,
+                )
+
+            model_settings[model]["max_tokens"] = st.number_input(
+                f"{model.capitalize()} Max Tokens",
+                min_value=1,
+                max_value=10000,
+                value=model_settings[model].get("max_tokens", 500),
+            )
+
+        if st.button("Save LLM Settings"):
+            save_llm_settings(primary_model, fallback_model, model_settings)
+            st.success("LLM settings saved successfully!")
 
     elif selected_setting == "Theme":
         st.header("Theme Settings")
@@ -182,27 +311,5 @@ def settings_page(selected_setting):
             st.success("Theme applied successfully!")
             st.session_state.force_rerun = True
             st.rerun()
-
-    elif selected_setting == "Ollama":
-        st.header("Ollama Settings")
-        ollama_settings, models_list = load_ollama_settings()
-        model = st.selectbox(
-            "Model", models_list, index=models_list.index(ollama_settings["model"])
-        )
-        url = st.text_input("URL", value=ollama_settings["url"])
-        port = st.number_input(
-            "Port", min_value=1, max_value=65535, value=ollama_settings["port"]
-        )
-        max_tokens = st.number_input(
-            "Max Tokens",
-            min_value=1,
-            max_value=10000,
-            value=ollama_settings["max_tokens"],
-        )
-
-        if st.button("Save Ollama Settings"):
-            save_ollama_settings(model, url, port, max_tokens)
-            st.success("Ollama settings saved successfully!")
-
     # Apply the current theme
     st.markdown(get_theme_css(current_theme), unsafe_allow_html=True)

@@ -9,6 +9,12 @@ from util.storm_runner import set_storm_runner, process_search_results
 from util.theme_manager import load_and_apply_theme
 
 
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
 def sanitize_title(title):
     # Remove leading/trailing spaces and replace internal spaces with underscores
     return title.strip().replace(" ", "_")
@@ -127,6 +133,7 @@ def create_new_article_page():
                     raise Exception("STORM runner returned None")
             except Exception as e:
                 st.error(f"Failed to generate the article: {str(e)}")
+                logger.error(f"Error in article generation: {str(e)}", exc_info=True)
                 st.session_state["page3_write_article_state"] = "not started"
                 return  # Exit the function early if there's an error
 

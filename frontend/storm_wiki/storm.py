@@ -1,10 +1,13 @@
 import streamlit as st
 import os
-
+from dotenv import load_dotenv
 from util.phoenix_setup import setup_phoenix
 from pages_util import MyArticles, CreateNewArticle, Settings
 from streamlit_option_menu import option_menu
 from util.theme_manager import init_db, load_and_apply_theme, get_option_menu_style
+
+
+load_dotenv()
 
 # Set page config first
 st.set_page_config(layout="wide")
@@ -81,7 +84,7 @@ def main():
         if menu_selection == "Settings":
             st.markdown("<hr>", unsafe_allow_html=True)
             st.markdown("### Settings Section")
-            settings_options = ["Search", "Theme", "Ollama"]
+            settings_options = ["Search", "Theme", "LLM"]
             selected_setting = option_menu(
                 menu_title=None,
                 options=settings_options,

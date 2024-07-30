@@ -176,7 +176,9 @@ class DemoFileIOHelper:
             citation_dict[index] = {
                 "url": url,
                 "title": search_results["url_to_info"][url]["title"],
-                "snippets": search_results["url_to_info"][url]["snippets"],
+                "snippets": [
+                    search_results["url_to_info"][url]["snippet"]
+                ],  # Change this line
             }
         return citation_dict
 
