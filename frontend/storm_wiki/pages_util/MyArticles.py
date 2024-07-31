@@ -4,6 +4,7 @@ import math
 from util.file_io import FileIOHelper
 from util.ui_components import UIComponents
 from util.theme_manager import load_and_apply_theme, get_my_articles_css
+from pages_util.Settings import load_general_settings  # Add this line
 
 import logging
 
@@ -49,6 +50,9 @@ def display_selected_article():
 
 def display_article_list(page_size):
     current_theme = load_and_apply_theme()
+    general_settings = load_general_settings()
+    num_columns = general_settings.get("num_columns", 3)  # Default to 3 if not set
+
     articles = st.session_state.user_articles
     article_keys = list(articles.keys())
     total_articles = len(article_keys)
@@ -62,14 +66,15 @@ def display_article_list(page_size):
 
     start_idx = current_page * page_size
     end_idx = min(start_idx + page_size, total_articles)
-    # Create a 2-column layout
-    cols = st.columns(2)
+
+    # Create a layout with the specified number of columns
+    cols = st.columns(num_columns)
 
     for i in range(start_idx, end_idx):
         article_key = article_keys[i]
         article_file_path_dict = articles[article_key]
 
-        with cols[i % 2]:
+        with cols[i % num_columns]:
             with st.container():
                 # Article card
                 article_name = article_key.replace("_", " ")

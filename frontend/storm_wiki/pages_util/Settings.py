@@ -29,6 +29,29 @@ LLM_MODELS = {
 }
 
 
+def save_general_settings(num_columns):
+    conn = sqlite3.connect("settings.db")
+    c = conn.cursor()
+    c.execute(
+        "INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)",
+        ("general_settings", json.dumps({"num_columns": num_columns})),
+    )
+    conn.commit()
+    conn.close()
+
+
+def load_general_settings():
+    conn = sqlite3.connect("settings.db")
+    c = conn.cursor()
+    c.execute("SELECT value FROM settings WHERE key='general_settings'")
+    result = c.fetchone()
+    conn.close()
+
+    if result:
+        return json.loads(result[0])
+    return {"num_columns": 3}  # Default value
+
+
 def get_available_search_engines():
     available_engines = {"duckduckgo": None, "arxiv": None}
 
@@ -317,5 +340,21 @@ def settings_page(selected_setting):
             st.success("Theme applied successfully!")
             st.session_state.force_rerun = True
             st.rerun()
+
+    elif selected_setting == "General":
+        st.header("General Settings")
+        general_settings = load_general_settings()
+
+        num_columns = st.number_input(
+            "Number of columns for article display",
+            min_value=1,
+            max_value=6,
+            value=general_settings["num_columns"],
+        )
+
+        if st.button("Save General Settings"):
+            save_general_settings(num_columns)
+            st.success("General settings saved successfully!")
+
     # Apply the current theme
     st.markdown(get_theme_css(current_theme), unsafe_allow_html=True)
