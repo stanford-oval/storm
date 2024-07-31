@@ -30,6 +30,11 @@ LLM_MODELS = {
 
 
 def save_general_settings(num_columns):
+    try:
+        num_columns = int(num_columns)
+    except ValueError:
+        num_columns = 3  # Default to 3 if conversion fails
+
     conn = sqlite3.connect("settings.db")
     c = conn.cursor()
     c.execute(
@@ -343,17 +348,31 @@ def settings_page(selected_setting):
 
     elif selected_setting == "General":
         st.header("General Settings")
+
         general_settings = load_general_settings()
 
+        # Handle the case where num_columns might be a dictionary
+        current_num_columns = general_settings.get("num_columns", 3)
+        if isinstance(current_num_columns, dict):
+            current_num_columns = current_num_columns.get("num_columns", 3)
+
+        try:
+            current_num_columns = int(current_num_columns)
+        except (ValueError, TypeError):
+            current_num_columns = 3  # Default to 3 if conversion fails
+
         num_columns = st.number_input(
-            "Number of columns for article display",
+            "Number of columns in article list",
             min_value=1,
             max_value=6,
-            value=general_settings["num_columns"],
+            value=current_num_columns,
+            step=1,
+            help="Set the number of columns for displaying articles in the My Articles page.",
         )
 
         if st.button("Save General Settings"):
-            save_general_settings(num_columns)
+            general_settings["num_columns"] = num_columns
+            save_general_settings(general_settings)
             st.success("General settings saved successfully!")
 
     # Apply the current theme
