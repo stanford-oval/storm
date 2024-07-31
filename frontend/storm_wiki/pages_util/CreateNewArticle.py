@@ -15,7 +15,8 @@ from pages_util.Settings import (
 
 
 def sanitize_title(title):
-    return title.strip().replace(" ", "_")
+    sanitized = title.strip().replace(" ", "_")
+    return sanitized.rstrip("_")  #
 
 
 def add_date_to_file(file_path):
@@ -29,9 +30,15 @@ def add_date_to_file(file_path):
 def create_new_article_page():
     load_and_apply_theme()
 
-    # Initialize session state
+    # Initialize session state variables
     if "page3_write_article_state" not in st.session_state:
         st.session_state["page3_write_article_state"] = "not started"
+
+    if "page3_current_working_dir" not in st.session_state:
+        st.session_state["page3_current_working_dir"] = FileIOHelper.get_output_dir()
+
+    if "page3_topic_name_cleaned" not in st.session_state:
+        st.session_state["page3_topic_name_cleaned"] = ""
 
     # Display search options in sidebar if not in completed state
     if st.session_state["page3_write_article_state"] != "completed":
@@ -124,12 +131,11 @@ def create_new_article_page():
                         st.rerun()
 
     if st.session_state["page3_write_article_state"] == "initiated":
-        current_working_dir = FileIOHelper.get_output_dir()
+        current_working_dir = st.session_state["page3_current_working_dir"]
         if not os.path.exists(current_working_dir):
             os.makedirs(current_working_dir)
         if "run_storm" not in st.session_state:
             set_storm_runner()
-        st.session_state["page3_current_working_dir"] = current_working_dir
         st.session_state["page3_write_article_state"] = "pre_writing"
 
     if st.session_state["page3_write_article_state"] == "pre_writing":
@@ -303,18 +309,53 @@ def create_new_article_page():
         )
 
         if not current_article_file_path_dict:
-            st.error(
-                f"No article data found for topic: {st.session_state['page3_topic_name_cleaned']}"
+            # Try with an added underscore
+            alt_topic_name = st.session_state["page3_topic_name_cleaned"] + "_"
+            current_article_file_path_dict = current_working_dir_paths.get(
+                alt_topic_name, {}
             )
-            st.error(
-                f"Current working directory: {st.session_state['page3_current_working_dir']}"
-            )
-            st.error(f"Directory structure: {current_working_dir_paths}")
-        else:
+
+            if not current_article_file_path_dict:
+                st.error(
+                    f"No article data found for topic: {st.session_state['page3_topic_name_cleaned']}"
+                )
+                st.error(
+                    f"Current working directory: {st.session_state['page3_current_working_dir']}"
+                )
+                st.error(f"Directory structure: {current_working_dir_paths}")
+            else:
+                st.warning(
+                    f"Found article data with a trailing underscore in the folder name. This will be fixed in future runs."
+                )
+                # Use the alternative topic name for display
+                st.session_state["page3_topic_name_cleaned"] = alt_topic_name
+
+        if current_article_file_path_dict:
             UIComponents.display_article_page(
-                selected_article_name=st.session_state["page3_topic_name_cleaned"],
+                selected_article_name=st.session_state[
+                    "page3_topic_name_cleaned"
+                ].rstrip("_"),
                 selected_article_file_path_dict=current_article_file_path_dict,
                 show_title=True,
                 show_main_article=True,
                 show_references_in_sidebar=True,
             )
+
+    # Cleanup step: rename folder to remove trailing underscore if present
+    if st.session_state["page3_topic_name_cleaned"]:
+        old_folder_path = os.path.join(
+            st.session_state["page3_current_working_dir"],
+            st.session_state["page3_topic_name_cleaned"],
+        )
+        new_folder_path = os.path.join(
+            st.session_state["page3_current_working_dir"],
+            st.session_state["page3_topic_name_cleaned"].rstrip("_"),
+        )
+        if os.path.exists(old_folder_path) and old_folder_path != new_folder_path:
+            try:
+                os.rename(old_folder_path, new_folder_path)
+                st.session_state["page3_topic_name_cleaned"] = st.session_state[
+                    "page3_topic_name_cleaned"
+                ].rstrip("_")
+            except Exception as e:
+                st.warning(f"Unable to rename folder: {str(e)}")
