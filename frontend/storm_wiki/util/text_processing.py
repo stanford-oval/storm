@@ -1,10 +1,18 @@
 import re
-import markdown
 import pytz
 import datetime
-from .shared_utils import parse
 import os
 import shutil
+import re
+
+
+def parse(text):
+    """
+    Parses the given text.
+    """
+    regex = re.compile(r']:\s+"(.*?)"\s+http')
+    text = regex.sub("]: http", text)
+    return text
 
 
 def convert_txt_to_md(directory):
@@ -36,10 +44,12 @@ class DemoTextProcessingHelper:
         for persona_conversation_data in json_data:
             if ": " in persona_conversation_data["perspective"]:
                 name, description = persona_conversation_data["perspective"].split(
-                    ": ", 1)
+                    ": ", 1
+                )
             elif "- " in persona_conversation_data["perspective"]:
                 name, description = persona_conversation_data["perspective"].split(
-                    "- ", 1)
+                    "- ", 1
+                )
             else:
                 name, description = "", persona_conversation_data["perspective"]
             cur_conversation = []
@@ -152,8 +162,9 @@ class DemoTextProcessingHelper:
         bibliography_list = []
         sorted_url_to_unified_index = dict(
             sorted(
-                url_to_info["url_to_unified_index"].items(),
-                key=lambda item: item[1]))
+                url_to_info["url_to_unified_index"].items(), key=lambda item: item[1]
+            )
+        )
         for url, index in sorted_url_to_unified_index.items():
             title = url_to_info["url_to_info"][url]["title"]
             bibliography_list.append(f"[{index}]: [{title}]({url})")

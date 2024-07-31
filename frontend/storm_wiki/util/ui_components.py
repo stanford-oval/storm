@@ -1,11 +1,7 @@
 import streamlit as st
-from .file_io import DemoFileIOHelper
+from .file_io import FileIOHelper
 from .text_processing import DemoTextProcessingHelper
-
-import os
-import markdown
 from knowledge_storm.storm_wiki.modules.callback import BaseCallbackHandler
-import re
 import unidecode
 import logging
 
@@ -35,7 +31,7 @@ class UIComponents:
                 )
 
             if show_main_article:
-                article_data = DemoFileIOHelper.assemble_article_data(
+                article_data = FileIOHelper.assemble_article_data(
                     selected_article_file_path_dict
                 )
 

@@ -5,10 +5,19 @@ import base64
 import datetime
 import pytz
 from typing import Dict, Any, Optional, List
-from .shared_utils import parse
+from .text_processing import parse
 
 
-class DemoFileIOHelper:
+class FileIOHelper:
+    @staticmethod
+    def get_output_dir():
+        output_dir = os.getenv("STREAMLIT_OUTPUT_DIR")
+        if not output_dir:
+            target_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            output_dir = os.path.join(target_dir, "DEMO_WORKING_DIR")
+        os.makedirs(output_dir, exist_ok=True)
+        return output_dir
+
     @staticmethod
     def read_structure_to_dict(articles_root_path: str) -> Dict[str, Dict[str, str]]:
         articles_dict = {}
@@ -114,7 +123,7 @@ class DemoFileIOHelper:
 
         try:
             # Read the article content
-            article_content = DemoFileIOHelper.read_txt_file(
+            article_content = FileIOHelper.read_txt_file(
                 article_file_path_dict[article_file]
             )
 
@@ -135,18 +144,6 @@ class DemoFileIOHelper:
                 "citation": None,
             }
 
-            # Add citations if available
-            # if "url_to_info.json" in article_file_path_dict:
-            #     try:
-            #         article_data["citations"] = (
-            #             DemoFileIOHelper._construct_citation_dict_from_search_result(
-            #                 DemoFileIOHelper.read_json_file(
-            #                     article_file_path_dict["url_to_info.json"]
-            #                 )
-            #             )
-            #         )
-            #     except json.JSONDecodeError:
-            #         print("Error decoding url_to_info.json")
             if "url_to_info.json" in article_file_path_dict:
                 with open(
                     article_file_path_dict["url_to_info.json"], "r", encoding="utf-8"
@@ -173,7 +170,7 @@ class DemoFileIOHelper:
             # Add conversation log if available
             if "conversation_log.json" in article_file_path_dict:
                 try:
-                    conversation_log = DemoFileIOHelper.read_json_file(
+                    conversation_log = FileIOHelper.read_json_file(
                         article_file_path_dict["conversation_log.json"]
                     )
                     # Map agent numbers to names

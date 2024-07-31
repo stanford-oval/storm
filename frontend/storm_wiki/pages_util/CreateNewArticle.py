@@ -2,9 +2,8 @@ import os
 from datetime import datetime
 import streamlit as st
 from util.ui_components import UIComponents, StreamlitCallbackHandler
-from util.file_io import DemoFileIOHelper
+from util.file_io import FileIOHelper
 from util.text_processing import convert_txt_to_md
-from util.path_utils import get_output_dir
 from util.storm_runner import set_storm_runner, process_search_results
 from util.theme_manager import load_and_apply_theme
 from pages_util.Settings import (
@@ -28,7 +27,7 @@ def add_date_to_file(file_path):
 
 
 def create_new_article_page():
-    current_theme = load_and_apply_theme()
+    load_and_apply_theme()
 
     # Initialize session state
     if "page3_write_article_state" not in st.session_state:
@@ -46,20 +45,20 @@ def create_new_article_page():
             index=list(SEARCH_ENGINES.keys()).index(search_options["primary_engine"]),
         )
 
+        # Create a list of fallback options excluding the primary engine
+        fallback_options = [None] + [
+            engine for engine in SEARCH_ENGINES.keys() if engine != primary_engine
+        ]
+
+        # Check if the current fallback engine is in the fallback options
+        current_fallback = search_options["fallback_engine"]
+        if current_fallback not in fallback_options:
+            current_fallback = None
+
         fallback_engine = st.sidebar.selectbox(
             "Fallback Search Engine",
-            options=[None]
-            + [engine for engine in SEARCH_ENGINES.keys() if engine != primary_engine],
-            index=0
-            if search_options["fallback_engine"] is None
-            else (
-                [None]
-                + [
-                    engine
-                    for engine in SEARCH_ENGINES.keys()
-                    if engine != primary_engine
-                ]
-            ).index(search_options["fallback_engine"]),
+            options=fallback_options,
+            index=fallback_options.index(current_fallback),
         )
 
         search_top_k = st.sidebar.number_input(
@@ -107,7 +106,7 @@ def create_new_article_page():
                     key="page3_purpose",
                     placeholder="Please type here to elaborate on the purpose of writing this article",
                     help="Provide more context or specific areas you want to explore",
-                    height=100,
+                    height=300,
                 )
                 submit_button = st.form_submit_button(
                     label="Research",
@@ -125,7 +124,7 @@ def create_new_article_page():
                         st.rerun()
 
     if st.session_state["page3_write_article_state"] == "initiated":
-        current_working_dir = get_output_dir()
+        current_working_dir = FileIOHelper.get_output_dir()
         if not os.path.exists(current_working_dir):
             os.makedirs(current_working_dir)
         if "run_storm" not in st.session_state:
@@ -204,7 +203,7 @@ def create_new_article_page():
                     )
                     if os.path.exists(conversation_log_path):
                         UIComponents.display_persona_conversations(
-                            DemoFileIOHelper.read_json_file(conversation_log_path)
+                            FileIOHelper.read_json_file(conversation_log_path)
                         )
                     st.session_state["page3_write_article_state"] = "final_writing"
                     status.update(label="brain**STORM**ing complete!", state="complete")
@@ -296,7 +295,7 @@ def create_new_article_page():
         st.sidebar.empty()
 
         # Display the article
-        current_working_dir_paths = DemoFileIOHelper.read_structure_to_dict(
+        current_working_dir_paths = FileIOHelper.read_structure_to_dict(
             st.session_state["page3_current_working_dir"]
         )
         current_article_file_path_dict = current_working_dir_paths.get(

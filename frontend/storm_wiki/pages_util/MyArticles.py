@@ -1,8 +1,7 @@
 import re
 import streamlit as st
 import math
-from util.file_io import DemoFileIOHelper
-from util.path_utils import get_output_dir
+from util.file_io import FileIOHelper
 from util.ui_components import UIComponents
 from util.theme_manager import load_and_apply_theme, get_my_articles_css
 
@@ -77,7 +76,7 @@ def display_article_list(page_size):
                 st.subheader(article_name)
 
                 # Display a preview of the article content
-                article_data = DemoFileIOHelper.assemble_article_data(
+                article_data = FileIOHelper.assemble_article_data(
                     article_file_path_dict
                 )
                 if article_data:
@@ -102,10 +101,8 @@ def my_articles_page():
     st.markdown(get_my_articles_css(current_theme), unsafe_allow_html=True)
 
     if "user_articles" not in st.session_state:
-        local_dir = get_output_dir()
-        st.session_state.user_articles = DemoFileIOHelper.read_structure_to_dict(
-            local_dir
-        )
+        local_dir = FileIOHelper.get_output_dir()
+        st.session_state.user_articles = FileIOHelper.read_structure_to_dict(local_dir)
         logging.info(f"User articles: {st.session_state.user_articles}")
 
     if "page_size" not in st.session_state:
@@ -132,7 +129,7 @@ def my_articles_page():
             f"Selected article file path dict: {selected_article_file_path_dict}"
         )
 
-        article_data = DemoFileIOHelper.assemble_article_data(
+        article_data = FileIOHelper.assemble_article_data(
             selected_article_file_path_dict
         )
         if article_data is None:

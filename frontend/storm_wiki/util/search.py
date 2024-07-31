@@ -9,8 +9,6 @@ import dspy
 import streamlit as st
 from langchain_community.utilities.duckduckgo_search import DuckDuckGoSearchAPIWrapper
 
-# from knowledge_storm.rm import YouRM, BingSearch
-# from knowledge_storm.utils import load_api_key
 from pages_util.Settings import load_search_options
 
 import logging
@@ -19,16 +17,32 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-class WebSearchAPIWrapper(dspy.Retrieve):
-    def __init__(self, max_results=3):
+class CombinedSearchAPI(dspy.Retrieve):
+    def __init__(self, max_results=20):
         super().__init__()
         self.max_results = max_results
+        self.search_options = load_search_options()
+        self.primary_engine = self.search_options["primary_engine"]
+        self.fallback_engine = self.search_options["fallback_engine"]
+        self.ddg_search = DuckDuckGoSearchAPIWrapper()
+        self.searxng_base_url = st.secrets.get(
+            "SEARXNG_BASE_URL", "http://localhost:8080"
+        )
+        self.search_engines = self._initialize_search_engines()
+        self._initialize_domain_restrictions()
+
+    def _initialize_search_engines(self):
+        return {
+            "duckduckgo": self._search_duckduckgo,
+            "searxng": self._search_searxng,
+            "arxiv": self._search_arxiv,
+        }
+
+    def _initialize_domain_restrictions(self):
         self.generally_unreliable = set()
         self.deprecated = set()
         self.blacklisted = set()
-        self._generate_domain_restriction()
 
-    def _generate_domain_restriction(self):
         try:
             script_dir = os.path.dirname(os.path.abspath(__file__))
             file_path = os.path.join(
@@ -59,7 +73,7 @@ class WebSearchAPIWrapper(dspy.Retrieve):
                 )
 
         except Exception as e:
-            logger.error(f"Error in _generate_domain_restriction: {e}")
+            logger.error(f"Error in _initialize_domain_restrictions: {e}")
 
     def _is_valid_wikipedia_source(self, url):
         if not url:
@@ -69,39 +83,9 @@ class WebSearchAPIWrapper(dspy.Retrieve):
             return False
         domain = parsed_url.netloc.split(".")[-2]
         combined_set = self.generally_unreliable | self.deprecated | self.blacklisted
-        return domain not in combined_set
-
-    def forward(
-        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
-    ) -> List[Dict[str, Any]]:
-        if not dspy.settings.rm:
-            raise ValueError("No RM is loaded. Please load a Retrieval Model first.")
-        return super().forward(query_or_queries, exclude_urls=exclude_urls)
-
-
-class CombinedSearchAPI(WebSearchAPIWrapper):
-    def __init__(self, max_results=20):
-        super().__init__(max_results)
-        self.search_options = load_search_options()
-        self.primary_engine = self.search_options["primary_engine"]
-        self.fallback_engine = self.search_options["fallback_engine"]
-        self.ddg_search = DuckDuckGoSearchAPIWrapper()
-        self.searxng_base_url = st.secrets.get(
-            "SEARXNG_BASE_URL", "http://localhost:8080"
-        )
-        self.search_engines = self._initialize_search_engines()
-
-    def _initialize_search_engines(self):
-        search_engines = {
-            "duckduckgo": self._search_duckduckgo,
-            "searxng": self._search_searxng,
-            "arxiv": self._search_arxiv,
-        }
-        # if "BING_SEARCH_API_KEY" in st.secrets:
-        #     search_engines["bing"] = self._search_bing
-        # if "YDC_API_KEY" in st.secrets:
-        #     search_engines["yourdm"] = self._search_yourdm
-        return search_engines
+        return (
+            domain not in combined_set or "wikipedia.org" in url
+        )  # Allow Wikipedia URLs
 
     def forward(
         self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
@@ -123,10 +107,15 @@ class CombinedSearchAPI(WebSearchAPIWrapper):
             if r["url"] not in exclude_urls
             and self._is_valid_wikipedia_source(r["url"])
         ]
-        ranked_results = sorted(
-            filtered_results, key=lambda x: self._calculate_relevance(x), reverse=True
-        )
-        return ranked_results[: self.max_results]
+
+        if filtered_results:
+            ranked_results = sorted(
+                filtered_results, key=self._calculate_relevance, reverse=True
+            )
+            return ranked_results[: self.max_results]
+        else:
+            logger.warning(f"No results found for query: {query_or_queries}")
+            return []
 
     def _search_with_fallback(self, query: str) -> List[Dict[str, Any]]:
         try:
@@ -144,6 +133,7 @@ class CombinedSearchAPI(WebSearchAPIWrapper):
             else:
                 logger.error("No fallback search engine specified or available.")
                 results = []
+
         return results
 
     def _search(self, engine: str, query: str) -> List[Dict[str, Any]]:
@@ -151,21 +141,10 @@ class CombinedSearchAPI(WebSearchAPIWrapper):
             raise ValueError(f"Unsupported or unavailable search engine: {engine}")
 
         search_engine = self.search_engines[engine]
-
-        if engine == "duckduckgo":
-            results = search_engine(query)
-        elif engine == "searxng":
-            results = self._search_searxng(query)
-        elif engine == "arxiv":
-            results = self._search_arxiv(query)
-        else:
-            raise NotImplementedError(f"Search method for {engine} is not implemented")
+        results = search_engine(query)
 
         logger.info(f"Raw results from {engine}: {results}")
-
-        return (
-            results  # No need for _format_results as the results are already formatted
-        )
+        return results
 
     def _search_duckduckgo(self, query: str) -> List[Dict[str, Any]]:
         ddg_results = self.ddg_search.results(query, max_results=self.max_results)
@@ -174,9 +153,31 @@ class CombinedSearchAPI(WebSearchAPIWrapper):
                 "description": result.get("snippet", ""),
                 "snippets": [result.get("snippet", "")],
                 "title": result.get("title", ""),
-                "url": result["link"],
+                "url": result.get("link", ""),
             }
             for result in ddg_results
+        ]
+
+    def _search_searxng(self, query: str) -> List[Dict[str, Any]]:
+        params = {"q": query, "format": "json"}
+        response = requests.get(self.searxng_base_url + "/search", params=params)
+        if response.status_code != 200:
+            raise Exception(
+                f"SearxNG search failed with status code {response.status_code}"
+            )
+
+        search_results = response.json()
+        if search_results.get("error"):
+            raise Exception(f"SearxNG search error: {search_results['error']}")
+
+        return [
+            {
+                "title": result.get("title", ""),
+                "url": result.get("url", ""),
+                "snippets": [result.get("content", "No content available")],
+                "description": result.get("content", "No content available"),
+            }
+            for result in search_results.get("results", [])
         ]
 
     def _search_arxiv(self, query: str) -> List[Dict[str, Any]]:
@@ -212,57 +213,6 @@ class CombinedSearchAPI(WebSearchAPIWrapper):
             )
 
         return results
-
-    def _search_searxng(self, query: str) -> List[Dict[str, Any]]:
-        params = {"q": query, "format": "json"}
-        response = requests.get(self.searxng_base_url + "/search", params=params)
-        if response.status_code != 200:
-            raise Exception(
-                f"SearxNG search failed with status code {response.status_code}"
-            )
-
-        search_results = response.json()
-        if search_results.get("error"):
-            raise Exception(f"SearxNG search error: {search_results['error']}")
-
-        formatted_results = []
-        for result in search_results.get("results", []):
-            formatted_result = {
-                "title": result.get("title", ""),
-                "url": result.get("url", ""),
-                "snippets": [result.get("content", "No content available")],
-                "description": result.get("content", "No content available"),
-            }
-            formatted_results.append(formatted_result)
-
-        return formatted_results
-
-    def _format_results(
-        self, engine: str, results: List[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
-        formatted_results = []
-        for result in results:
-            if engine in ["bing", "yourdm", "duckduckgo"]:
-                link_key, snippet_key = "link", "snippet"
-            elif engine == "searxng":
-                link_key, snippet_key = "url", "content"
-            elif engine == "arxiv":
-                # ArXiv results are already formatted correctly
-                formatted_results.append(result)
-                continue
-            else:
-                raise ValueError(f"Unsupported engine: {engine}")
-
-            snippet = result.get(snippet_key, "No snippet available")
-            formatted_result = {
-                "title": result.get("title", ""),
-                "url": result.get(link_key, ""),
-                "snippets": [snippet],
-                "description": snippet,
-            }
-            formatted_results.append(formatted_result)
-
-        return formatted_results
 
     def _calculate_relevance(self, result: Dict[str, Any]) -> float:
         relevance = 0.0
