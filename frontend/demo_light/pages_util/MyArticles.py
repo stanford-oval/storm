@@ -84,6 +84,4 @@ def my_articles_page():
 
         demo_util.display_article_page(selected_article_name=selected_article_name,
                                        selected_article_file_path_dict=selected_article_file_path_dict,
-                                       show_title=True, show_main_article=True,
-                                       show_feedback_form=False,
-                                       show_qa_panel=False)
+                                       show_title=True, show_main_article=True)
