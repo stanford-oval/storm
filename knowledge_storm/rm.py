@@ -406,29 +406,27 @@ class VectorRM(dspy.Retrieve):
         return collected_results
 
 class SerperRM(dspy.Retrieve):
-    """Retrieve information from custom queries using Serper.dev.
-    """
-
-    """
-        Args:
-            serper_search_api_key str: Api key to run serper, can be found by creating an account on https://serper.dev/
-            query_params (dict or list of dict): paramaters in dictionary or list of dictionaries that has a max size of 100 that will be used to query.
-                values: 
+    """Retrieve information from custom queries using Serper.dev."""
+    
+    def __init__(self, serper_search_api_key=None, query_params=None):
+        """Args:
+            serper_search_api_key str: API key to run serper, can be found by creating an account on https://serper.dev/
+            query_params (dict or list of dict): parameters in dictionary or list of dictionaries that has a max size of 100 that will be used to query.
+                Commonly used fields are as follows (see more information in https://serper.dev/playground):
                     q str: query that will be used with google search
-                    type str: type that will be used for browsing google. Types are search, images, video, maps, places and many more. Refer to the playground for the types.
+                    type str: type that will be used for browsing google. Types are search, images, video, maps, places, etc.
                     gl str: Country that will be focused on for the search
                     location str: Country where the search will originate from. All locates can be found here: https://api.serper.dev/locations.
                     autocorrect bool: Enable autocorrect on the queries while searching, if query is misspelled, will be updated.
                     results int: Max number of results per page.
                     page int: Max number of pages per call.
-                    tbs str: date time range, automically set to any time by default.
-                        qdr:h str: Date time range for past hour.
-                        qdr:d str: Date time range for past 24 hours.
-                        qdr:w str: Date time range for past week.
-                        qdr:m str: Date time range for past month.
-                        qdr:y str: Date time range for past year.
-    """
-    def __init__(self, serper_search_api_key=None, query_params=None):
+                    tbs str: date time range, automatically set to any time by default.
+                    qdr:h str: Date time range for the past hour.
+                    qdr:d str: Date time range for the past 24 hours.
+                    qdr:w str: Date time range for past week.
+                    qdr:m str: Date time range for past month.
+                    qdr:y str: Date time range for past year.
+        """
         super().__init__()
         self.usage = 0
         self.query_params = query_params
@@ -495,9 +493,8 @@ class SerperRM(dspy.Retrieve):
             if query == 'Queries:':
                 continue
             query_params = self.query_params
-            """
-                All paramaters can be found in the playground: https://serper.dev/playground
-            """
+            
+            # All available parameters can be found in the playground: https://serper.dev/playground
             # Sets the json value for query to be the query that is being parsed.
             query_params['q'] = query
 
