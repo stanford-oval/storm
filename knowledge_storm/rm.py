@@ -441,7 +441,6 @@ class VectorRM(dspy.Retrieve):
 class DuckDuckGoSearch(dspy.Retrieve):
     def __init__(
         self,
-        openai_api_key=None,
         k=3,
         is_valid_source: Callable = None,
         min_char_count: int = 150,
