@@ -7,6 +7,9 @@ import markdown
 from knowledge_storm.storm_wiki.modules.callback import BaseCallbackHandler
 import re
 import unidecode
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 class UIComponents:
@@ -18,8 +21,12 @@ class UIComponents:
         show_main_article=True,
         show_feedback_form=False,
         show_qa_panel=False,
+        show_references_in_sidebar=False,
     ):
         try:
+            logging.info(f"Displaying article page for: {selected_article_name}")
+            logging.info(f"Article file path dict: {selected_article_file_path_dict}")
+
             current_theme = st.session_state.current_theme
             if show_title:
                 st.markdown(
@@ -36,16 +43,24 @@ class UIComponents:
                     st.warning("No article data found.")
                     return
 
+                logging.info(f"Article data keys: {article_data.keys()}")
                 UIComponents.display_main_article(
-                    article_data, show_feedback_form, show_qa_panel
+                    article_data,
+                    show_feedback_form,
+                    show_qa_panel,
+                    show_references_in_sidebar,
                 )
         except Exception as e:
             st.error(f"Error displaying article: {str(e)}")
             st.exception(e)
+            logging.exception("Error in display_article_page")
 
     @staticmethod
     def display_main_article(
-        article_data, show_feedback_form=False, show_qa_panel=False
+        article_data,
+        show_feedback_form=False,
+        show_qa_panel=False,
+        show_references_in_sidebar=False,
     ):
         try:
             current_theme = st.session_state.current_theme
@@ -72,7 +87,7 @@ class UIComponents:
             # display reference panel
             if "citations" in article_data:
                 with st.sidebar.expander("**References**", expanded=True):
-                    with st.container(height=800, border=False):
+                    with st.container(height=400, border=False):
                         UIComponents._display_references(
                             citation_dict=article_data.get("citations", {})
                         )
@@ -106,9 +121,12 @@ class UIComponents:
             ]
             selected_key = st.selectbox("Select a reference", reference_list)
             citation_val = citation_dict[reference_list.index(selected_key) + 1]
-            citation_val["title"] = citation_val.get("title", "").replace("$", "\\$")
-            st.markdown(f"**Title:** {citation_val.get('title', 'No title available')}")
-            st.markdown(f"**Url:** {citation_val.get('url', 'No URL available')}")
+
+            title = citation_val.get("title", "No title available").replace("$", "\\$")
+            st.markdown(f"**Title:** {title}")
+
+            url = citation_val.get("url", "No URL available")
+            st.markdown(f"**Url:** {url}")
 
             description = citation_val.get(
                 "description", "No description available"

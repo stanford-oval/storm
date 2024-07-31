@@ -92,6 +92,16 @@ class DemoFileIOHelper:
     def assemble_article_data(
         article_file_path_dict: Dict[str, str],
     ) -> Optional[Dict[str, Any]]:
+        # import logging
+
+        # logging.info(f"Assembling article data for: {article_file_path_dict}")
+        # for key, path in article_file_path_dict.items():
+        #     logging.info(f"Checking file: {path}")
+        #     if os.path.exists(path):
+        #         logging.info(f"File exists: {path}")
+        #     else:
+        #         logging.warning(f"File does not exist: {path}")
+
         if not isinstance(article_file_path_dict, dict):
             raise TypeError("article_file_path_dict must be a dictionary")
 
@@ -126,18 +136,40 @@ class DemoFileIOHelper:
             }
 
             # Add citations if available
+            # if "url_to_info.json" in article_file_path_dict:
+            #     try:
+            #         article_data["citations"] = (
+            #             DemoFileIOHelper._construct_citation_dict_from_search_result(
+            #                 DemoFileIOHelper.read_json_file(
+            #                     article_file_path_dict["url_to_info.json"]
+            #                 )
+            #             )
+            #         )
+            #     except json.JSONDecodeError:
+            #         print("Error decoding url_to_info.json")
             if "url_to_info.json" in article_file_path_dict:
-                try:
-                    article_data["citations"] = (
-                        DemoFileIOHelper._construct_citation_dict_from_search_result(
-                            DemoFileIOHelper.read_json_file(
-                                article_file_path_dict["url_to_info.json"]
-                            )
-                        )
-                    )
-                except json.JSONDecodeError:
-                    print("Error decoding url_to_info.json")
+                with open(
+                    article_file_path_dict["url_to_info.json"], "r", encoding="utf-8"
+                ) as f:
+                    url_info = json.load(f)
 
+                citations = {}
+                url_to_info = url_info.get("url_to_info", {})
+                for i, (url, info) in enumerate(url_to_info.items(), start=1):
+                    # logging.info(f"Processing citation {i}: {url}")
+                    snippets = info.get("snippets", [])
+                    if not snippets and "snippet" in info:
+                        snippets = [info["snippet"]]
+
+                    citation = {
+                        "url": url,
+                        "title": info.get("title", ""),
+                        "description": info.get("description", ""),
+                        "snippets": snippets,
+                    }
+                    citations[i] = citation
+
+                article_data["citations"] = citations
             # Add conversation log if available
             if "conversation_log.json" in article_file_path_dict:
                 try:

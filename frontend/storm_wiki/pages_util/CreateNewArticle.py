@@ -7,16 +7,15 @@ from util.text_processing import convert_txt_to_md
 from util.path_utils import get_output_dir
 from util.storm_runner import set_storm_runner, process_search_results
 from util.theme_manager import load_and_apply_theme
-
-
-import logging
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+from pages_util.Settings import (
+    get_available_search_engines,
+    load_search_options,
+    save_search_options,
+    SEARCH_ENGINES,
+)
 
 
 def sanitize_title(title):
-    # Remove leading/trailing spaces and replace internal spaces with underscores
     return title.strip().replace(" ", "_")
 
 
@@ -31,6 +30,65 @@ def add_date_to_file(file_path):
 def create_new_article_page():
     current_theme = load_and_apply_theme()
 
+    # Initialize session state
+    if "page3_write_article_state" not in st.session_state:
+        st.session_state["page3_write_article_state"] = "not started"
+
+    # Display search options in sidebar if not in completed state
+    if st.session_state["page3_write_article_state"] != "completed":
+        # Add search options in the sidebar
+        st.sidebar.header("Search Options")
+        search_options = load_search_options()
+
+        primary_engine = st.sidebar.selectbox(
+            "Primary Search Engine",
+            options=list(SEARCH_ENGINES.keys()),
+            index=list(SEARCH_ENGINES.keys()).index(search_options["primary_engine"]),
+        )
+
+        fallback_engine = st.sidebar.selectbox(
+            "Fallback Search Engine",
+            options=[None]
+            + [engine for engine in SEARCH_ENGINES.keys() if engine != primary_engine],
+            index=0
+            if search_options["fallback_engine"] is None
+            else (
+                [None]
+                + [
+                    engine
+                    for engine in SEARCH_ENGINES.keys()
+                    if engine != primary_engine
+                ]
+            ).index(search_options["fallback_engine"]),
+        )
+
+        search_top_k = st.sidebar.number_input(
+            "Search Top K",
+            min_value=1,
+            max_value=100,
+            value=search_options["search_top_k"],
+        )
+        retrieve_top_k = st.sidebar.number_input(
+            "Retrieve Top K",
+            min_value=1,
+            max_value=100,
+            value=search_options["retrieve_top_k"],
+        )
+
+        if st.sidebar.button("Save Search Options"):
+            save_search_options(
+                primary_engine, fallback_engine, search_top_k, retrieve_top_k
+            )
+            st.sidebar.success("Search options saved successfully!")
+
+        # Store the current search options in session state
+        st.session_state["current_search_options"] = {
+            "primary_engine": primary_engine,
+            "fallback_engine": fallback_engine,
+            "search_top_k": search_top_k,
+            "retrieve_top_k": retrieve_top_k,
+        }
+
     if "page3_write_article_state" not in st.session_state:
         st.session_state["page3_write_article_state"] = "not started"
 
@@ -44,7 +102,6 @@ def create_new_article_page():
                     placeholder="Enter the topic",
                     help="Enter the main topic or question for your article",
                 )
-
                 st.text_area(
                     "Elaborate on the purpose",
                     key="page3_purpose",
@@ -52,13 +109,11 @@ def create_new_article_page():
                     help="Provide more context or specific areas you want to explore",
                     height=100,
                 )
-
                 submit_button = st.form_submit_button(
                     label="Research",
                     help="Start researching the topic",
                     use_container_width=True,
                 )
-
                 if submit_button:
                     if not st.session_state["page3_topic"].strip():
                         st.warning("Topic could not be empty", icon="⚠️")
@@ -73,7 +128,6 @@ def create_new_article_page():
         current_working_dir = get_output_dir()
         if not os.path.exists(current_working_dir):
             os.makedirs(current_working_dir)
-
         if "run_storm" not in st.session_state:
             set_storm_runner()
         st.session_state["page3_current_working_dir"] = current_working_dir
@@ -114,6 +168,35 @@ def create_new_article_page():
                     callback_handler=callback,
                 )
                 if runner:
+                    # Update search options if the attributes exist
+                    if hasattr(runner, "engine_args"):
+                        runner.engine_args.search_top_k = st.session_state[
+                            "current_search_options"
+                        ]["search_top_k"]
+                        runner.engine_args.retrieve_top_k = st.session_state[
+                            "current_search_options"
+                        ]["retrieve_top_k"]
+                    elif hasattr(runner, "config"):
+                        runner.config.search_top_k = st.session_state[
+                            "current_search_options"
+                        ]["search_top_k"]
+                        runner.config.retrieve_top_k = st.session_state[
+                            "current_search_options"
+                        ]["retrieve_top_k"]
+
+                    # Update the search engine if needed
+                    if hasattr(runner, "rm") and hasattr(
+                        runner.rm, "set_search_engine"
+                    ):
+                        runner.rm.set_search_engine(
+                            primary_engine=st.session_state["current_search_options"][
+                                "primary_engine"
+                            ],
+                            fallback_engine=st.session_state["current_search_options"][
+                                "fallback_engine"
+                            ],
+                        )
+
                     conversation_log_path = os.path.join(
                         st.session_state["page3_current_working_dir"],
                         st.session_state["page3_topic_name_cleaned"],
@@ -126,14 +209,12 @@ def create_new_article_page():
                     st.session_state["page3_write_article_state"] = "final_writing"
                     status.update(label="brain**STORM**ing complete!", state="complete")
                     progress_bar.progress(100)
-
                     # Store the runner in the session state
                     st.session_state["runner"] = runner
                 else:
                     raise Exception("STORM runner returned None")
             except Exception as e:
                 st.error(f"Failed to generate the article: {str(e)}")
-                logger.error(f"Error in article generation: {str(e)}", exc_info=True)
                 st.session_state["page3_write_article_state"] = "not started"
                 return  # Exit the function early if there's an error
 
@@ -211,7 +292,10 @@ def create_new_article_page():
                 st.rerun()
 
     if st.session_state["page3_write_article_state"] == "completed":
-        # display polished article
+        # Clear the sidebar
+        st.sidebar.empty()
+
+        # Display the article
         current_working_dir_paths = DemoFileIOHelper.read_structure_to_dict(
             st.session_state["page3_current_working_dir"]
         )
@@ -233,4 +317,5 @@ def create_new_article_page():
                 selected_article_file_path_dict=current_article_file_path_dict,
                 show_title=True,
                 show_main_article=True,
+                show_references_in_sidebar=True,
             )

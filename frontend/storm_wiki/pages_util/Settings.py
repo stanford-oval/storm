@@ -18,6 +18,7 @@ SEARCH_ENGINES = {
     "bing": "BING_SEARCH_API_KEY",
     "yourdm": "YDC_API_KEY",
     "duckduckgo": None,
+    "arxiv": None,
 }
 
 # LLM model options
@@ -29,7 +30,7 @@ LLM_MODELS = {
 
 
 def get_available_search_engines():
-    available_engines = {"duckduckgo": None}  # DuckDuckGo is always available
+    available_engines = {"duckduckgo": None, "arxiv": None}
 
     if "SEARXNG_BASE_URL" in st.secrets:
         available_engines["searxng"] = "SEARXNG_BASE_URL"
@@ -179,6 +180,11 @@ def settings_page(selected_setting):
             max_value=100,
             value=search_options["retrieve_top_k"],
         )
+
+        if primary_engine == "arxiv" or fallback_engine == "arxiv":
+            st.info(
+                "ArXiv search is available without an API key. It uses the public ArXiv API."
+            )
 
         if st.button("Save Search Options"):
             save_search_options(

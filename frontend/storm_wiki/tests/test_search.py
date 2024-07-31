@@ -36,6 +36,25 @@ def mock_file_content():
 
 
 @pytest.fixture
+def mock_open(monkeypatch, mock_file_content):
+    mock_file = MagicMock(spec=open, read=lambda: mock_file_content)
+    monkeypatch.setattr("builtins.open", lambda *args, **kwargs: mock_file)
+    return mock_file
+
+
+@pytest.fixture
+def mock_load_search_options():
+    with patch("util.search.load_search_options") as mock:
+        mock.return_value = {
+            "primary_engine": "duckduckgo",
+            "fallback_engine": None,
+            "search_top_k": 3,
+            "retrieve_top_k": 3,
+        }
+        yield mock
+
+
+@pytest.fixture
 def web_search_wrapper(tmp_path, mock_file_content):
     html_file = (
         tmp_path / "Wikipedia_Reliable sources_Perennial sources - Wikipedia.html"
@@ -77,30 +96,6 @@ def test_web_search_wrapper_forward(mock_forward):
 
 @patch("util.search.load_search_options")
 @patch("util.search.DuckDuckGoSearchAPIWrapper")
-def test_combined_search_api_duckduckgo_success(
-    mock_ddg_wrapper, mock_load_search_options, mock_streamlit_secrets
-):
-    mock_load_search_options.return_value = {
-        "primary_engine": "duckduckgo",
-        "fallback_engine": None,
-    }
-    mock_ddg_wrapper.return_value.results.return_value = [
-        {
-            "link": "https://example.com",
-            "snippet": "Example snippet",
-            "title": "Example Title",
-        },
-    ]
-    combined_api = CombinedSearchAPI(max_results=1)
-    results = combined_api.forward("test query", [])
-    assert len(results) == 1
-    assert results[0]["url"] == "https://example.com"
-    assert results[0]["snippets"][0] == "Example snippet"
-    assert results[0]["title"] == "Example Title"
-
-
-@patch("util.search.load_search_options")
-@patch("util.search.DuckDuckGoSearchAPIWrapper")
 @patch("requests.get")
 def test_combined_search_api_duckduckgo_failure_searxng_success(
     mock_requests_get,
@@ -131,17 +126,32 @@ def test_combined_search_api_duckduckgo_failure_searxng_success(
     assert results[0]["url"] == "https://example.com"
     assert results[0]["snippets"][0] == "Example content"
     assert results[0]["title"] == "Example Title"
+    assert results[0]["description"] == "Example content"
 
 
-@patch("util.search.load_search_options")
+@patch("util.search.DuckDuckGoSearchAPIWrapper")
+def test_combined_search_api_duckduckgo_success(
+    mock_ddg_wrapper, mock_load_search_options, mock_streamlit_secrets, mock_open
+):
+    mock_ddg_wrapper.return_value.results.return_value = [
+        {
+            "link": "https://example.com",
+            "snippet": "Example snippet",
+            "title": "Example Title",
+        },
+    ]
+    combined_api = CombinedSearchAPI(max_results=1)
+    results = combined_api.forward("test query", [])
+    assert len(results) == 1
+    assert results[0]["url"] == "https://example.com"
+    assert results[0]["snippets"][0] == "Example snippet"
+    assert results[0]["title"] == "Example Title"
+
+
 @patch("util.search.DuckDuckGoSearchAPIWrapper")
 def test_combined_search_api_multiple_queries(
-    mock_ddg_wrapper, mock_load_search_options, mock_streamlit_secrets
+    mock_ddg_wrapper, mock_load_search_options, mock_streamlit_secrets, mock_open
 ):
-    mock_load_search_options.return_value = {
-        "primary_engine": "duckduckgo",
-        "fallback_engine": None,
-    }
     mock_ddg_wrapper.return_value.results.side_effect = [
         [{"link": "https://example1.com", "snippet": "Example 1", "title": "Title 1"}],
         [{"link": "https://example2.com", "snippet": "Example 2", "title": "Title 2"}],

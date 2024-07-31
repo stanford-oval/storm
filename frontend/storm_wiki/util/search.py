@@ -2,13 +2,15 @@ import os
 import re
 import json
 import requests
+import xml.etree.ElementTree as ET
 from urllib.parse import urlparse
 from typing import Union, List, Dict, Any
 import dspy
 import streamlit as st
 from langchain_community.utilities.duckduckgo_search import DuckDuckGoSearchAPIWrapper
-from knowledge_storm.rm import YouRM, BingSearch
-from knowledge_storm.utils import load_api_key
+
+# from knowledge_storm.rm import YouRM, BingSearch
+# from knowledge_storm.utils import load_api_key
 from pages_util.Settings import load_search_options
 
 import logging
@@ -33,6 +35,10 @@ class WebSearchAPIWrapper(dspy.Retrieve):
                 script_dir,
                 "Wikipedia_Reliable sources_Perennial sources - Wikipedia.html",
             )
+
+            if not os.path.exists(file_path):
+                logger.warning(f"File not found: {file_path}")
+                return
 
             with open(file_path, "r", encoding="utf-8") as file:
                 content = file.read()
@@ -87,17 +93,14 @@ class CombinedSearchAPI(WebSearchAPIWrapper):
 
     def _initialize_search_engines(self):
         search_engines = {
-            "duckduckgo": self.ddg_search,
-            "searxng": self.searxng_base_url,
+            "duckduckgo": self._search_duckduckgo,
+            "searxng": self._search_searxng,
+            "arxiv": self._search_arxiv,
         }
-        if "BING_SEARCH_API_KEY" in st.secrets:
-            search_engines["bing"] = BingSearch(
-                bing_search_api=st.secrets["BING_SEARCH_API_KEY"], k=self.max_results
-            )
-        if "YDC_API_KEY" in st.secrets:
-            search_engines["yourdm"] = YouRM(
-                ydc_api_key=st.secrets["YDC_API_KEY"], k=self.max_results
-            )
+        # if "BING_SEARCH_API_KEY" in st.secrets:
+        #     search_engines["bing"] = self._search_bing
+        # if "YDC_API_KEY" in st.secrets:
+        #     search_engines["yourdm"] = self._search_yourdm
         return search_engines
 
     def forward(
@@ -137,10 +140,10 @@ class CombinedSearchAPI(WebSearchAPIWrapper):
                     results = self._search(self.fallback_engine, query)
                 except Exception as e:
                     logger.error(f"{self.fallback_engine} search also failed: {str(e)}")
-                    return []
+                    results = []
             else:
                 logger.error("No fallback search engine specified or available.")
-                return []
+                results = []
         return results
 
     def _search(self, engine: str, query: str) -> List[Dict[str, Any]]:
@@ -150,17 +153,65 @@ class CombinedSearchAPI(WebSearchAPIWrapper):
         search_engine = self.search_engines[engine]
 
         if engine == "duckduckgo":
-            results = search_engine.results(query, max_results=self.max_results)
-        elif engine in ["bing", "yourdm"]:
-            results = search_engine.search(query)
+            results = search_engine(query)
         elif engine == "searxng":
             results = self._search_searxng(query)
+        elif engine == "arxiv":
+            results = self._search_arxiv(query)
         else:
             raise NotImplementedError(f"Search method for {engine} is not implemented")
 
         logger.info(f"Raw results from {engine}: {results}")
 
-        return self._format_results(engine, results)
+        return (
+            results  # No need for _format_results as the results are already formatted
+        )
+
+    def _search_duckduckgo(self, query: str) -> List[Dict[str, Any]]:
+        ddg_results = self.ddg_search.results(query, max_results=self.max_results)
+        return [
+            {
+                "description": result.get("snippet", ""),
+                "snippets": [result.get("snippet", "")],
+                "title": result.get("title", ""),
+                "url": result["link"],
+            }
+            for result in ddg_results
+        ]
+
+    def _search_arxiv(self, query: str) -> List[Dict[str, Any]]:
+        base_url = "http://export.arxiv.org/api/query"
+        params = {
+            "search_query": f"all:{query}",
+            "start": 0,
+            "max_results": self.max_results,
+        }
+
+        response = requests.get(base_url, params=params)
+
+        if response.status_code != 200:
+            raise Exception(
+                f"ArXiv search failed with status code {response.status_code}"
+            )
+
+        root = ET.fromstring(response.content)
+
+        results = []
+        for entry in root.findall("{http://www.w3.org/2005/Atom}entry"):
+            title = entry.find("{http://www.w3.org/2005/Atom}title").text
+            summary = entry.find("{http://www.w3.org/2005/Atom}summary").text
+            url = entry.find("{http://www.w3.org/2005/Atom}id").text
+
+            results.append(
+                {
+                    "title": title,
+                    "url": url,
+                    "snippets": [summary],
+                    "description": summary,
+                }
+            )
+
+        return results
 
     def _search_searxng(self, query: str) -> List[Dict[str, Any]]:
         params = {"q": query, "format": "json"}
@@ -174,7 +225,17 @@ class CombinedSearchAPI(WebSearchAPIWrapper):
         if search_results.get("error"):
             raise Exception(f"SearxNG search error: {search_results['error']}")
 
-        return search_results.get("results", [])
+        formatted_results = []
+        for result in search_results.get("results", []):
+            formatted_result = {
+                "title": result.get("title", ""),
+                "url": result.get("url", ""),
+                "snippets": [result.get("content", "No content available")],
+                "description": result.get("content", "No content available"),
+            }
+            formatted_results.append(formatted_result)
+
+        return formatted_results
 
     def _format_results(
         self, engine: str, results: List[Dict[str, Any]]
@@ -185,6 +246,10 @@ class CombinedSearchAPI(WebSearchAPIWrapper):
                 link_key, snippet_key = "link", "snippet"
             elif engine == "searxng":
                 link_key, snippet_key = "url", "content"
+            elif engine == "arxiv":
+                # ArXiv results are already formatted correctly
+                formatted_results.append(result)
+                continue
             else:
                 raise ValueError(f"Unsupported engine: {engine}")
 
@@ -203,5 +268,9 @@ class CombinedSearchAPI(WebSearchAPIWrapper):
         relevance = 0.0
         if "wikipedia.org" in result["url"]:
             relevance += 1.0
-        relevance += len(result.get("snippet", "")) / 1000
+        elif "arxiv.org" in result["url"]:
+            relevance += (
+                0.8  # Give ArXiv results a slightly lower priority than Wikipedia
+            )
+        relevance += len(result.get("description", "")) / 1000
         return relevance
