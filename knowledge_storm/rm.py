@@ -405,6 +405,7 @@ class VectorRM(dspy.Retrieve):
 
         return collected_results
 
+
 class SerperRM(dspy.Retrieve):
     """Retrieve information from custom queries using Serper.dev."""
 
@@ -550,7 +551,8 @@ class SearXNG(dspy.Retrieve):
             searxng_api_url (str): The URL of the SearXNG API.
             searxng_api_key (str, optional): The API key for the SearXNG API. Defaults to None.
             k (int, optional): The number of top passages to retrieve. Defaults to 3.
-            is_valid_source (Callable, optional): A function that takes a URL and returns a boolean indicating if the source is valid. Defaults to None.
+            is_valid_source (Callable, optional): A function that takes a URL and returns a boolean indicating if the
+            source is valid. Defaults to None.
         """
         super().__init__(k=k)
         if not searxng_api_url:
