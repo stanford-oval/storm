@@ -93,57 +93,20 @@ def display_article_list(page_size, num_columns):
             st.session_state.page_size = new_page_size
             st.session_state.num_columns = new_num_columns
             st.success("Settings saved successfully!")
-            st.rerun()
 
-        # Calculate number of pages
-        num_pages = max(1, (total_articles + new_page_size - 1) // new_page_size)
-
-        # Pagination controls
-        st.write("### Navigation")
-        col1, col2 = st.columns(2)
-
-        with col1:
-            if st.button("← Previous", disabled=(st.session_state.current_page == 1)):
-                st.session_state.current_page = max(
-                    1, st.session_state.current_page - 1
-                )
-                st.rerun()
-
-        with col2:
-            if st.button(
-                "Next →", disabled=(st.session_state.current_page == num_pages)
-            ):
-                st.session_state.current_page = min(
-                    num_pages, st.session_state.current_page + 1
-                )
-                st.rerun()
-
-        new_page = st.number_input(
-            "Page",
-            min_value=1,
-            max_value=num_pages,
-            value=st.session_state.current_page,
-            key="page_number_input",
-        )
-        if new_page != st.session_state.current_page:
-            st.session_state.current_page = new_page
-            st.rerun()
-
-        st.write(f"of {num_pages} pages")
-
-    # Use the new values for display, but don't update session state yet
+    # Use the new values for display
     current_page = st.session_state.current_page - 1  # Convert to 0-indexed
     start_idx = current_page * new_page_size
     end_idx = min(start_idx + new_page_size, total_articles)
 
     # Display articles
-    cols = st.columns(num_columns)
+    cols = st.columns(new_num_columns)
 
     for i in range(start_idx, end_idx):
         article_key = article_keys[i]
         article_file_path_dict = articles[article_key]
 
-        with cols[i % num_columns]:
+        with cols[i % new_num_columns]:
             article_data = FileIOHelper.assemble_article_data(article_file_path_dict)
             short_text = article_data.get("short_text", "") + "..."
 
@@ -152,7 +115,38 @@ def display_article_list(page_size, num_columns):
                 st.markdown(short_text)
                 if st.button("Read More", key=f"read_more_{article_key}"):
                     st.session_state.page2_selected_my_article = article_key
-                    st.rerun()
+                    st.experimental_rerun()
+
+    # Pagination controls
+    st.sidebar.write("### Navigation")
+    col1, col2 = st.sidebar.columns(2)
+
+    num_pages = max(1, (total_articles + new_page_size - 1) // new_page_size)
+
+    with col1:
+        if st.button("← Previous", disabled=(st.session_state.current_page == 1)):
+            st.session_state.current_page = max(1, st.session_state.current_page - 1)
+            st.experimental_rerun()
+
+    with col2:
+        if st.button("Next →", disabled=(st.session_state.current_page == num_pages)):
+            st.session_state.current_page = min(
+                num_pages, st.session_state.current_page + 1
+            )
+            st.experimental_rerun()
+
+    new_page = st.sidebar.number_input(
+        "Page",
+        min_value=1,
+        max_value=num_pages,
+        value=st.session_state.current_page,
+        key="page_number_input",
+    )
+    if new_page != st.session_state.current_page:
+        st.session_state.current_page = new_page
+        st.experimental_rerun()
+
+    st.sidebar.write(f"of {num_pages} pages")
 
     return new_page_size, new_num_columns
 
@@ -172,11 +166,12 @@ def my_articles_page():
             page_size=st.session_state.page_size,
             num_columns=st.session_state.num_columns,
         )
+
         # Update session state if values have changed
-        if (
-            new_page_size != st.session_state.page_size
-            or new_num_columns != st.session_state.num_columns
-        ):
+        if new_page_size != st.session_state.page_size:
             st.session_state.page_size = new_page_size
+            st.experimental_rerun()
+
+        if new_num_columns != st.session_state.num_columns:
             st.session_state.num_columns = new_num_columns
-            st.rerun()
+            # We don't need to rerun here, as the changes are already reflected in the current display

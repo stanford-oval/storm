@@ -5,7 +5,7 @@ import json
 dracula_soft_dark = {
     "primaryColor": "#bf96f9",
     "backgroundColor": "#282a36",
-    "secondaryBackgroundColor": "#44475a",
+    "secondaryBackgroundColor": "#444759",
     "textColor": "#C0C0D0",
     "sidebarBackgroundColor": "#444759",
     "sidebarTextColor": "#C0C0D0",
@@ -17,7 +17,7 @@ tokyo_night = {
     "backgroundColor": "#1a1b26",
     "secondaryBackgroundColor": "#24283b",
     "textColor": "#a9b1d6",
-    "sidebarBackgroundColor": "#16161e",
+    "sidebarBackgroundColor": "#24283b",
     "sidebarTextColor": "#565f89",
     "font": "sans serif",
 }
@@ -27,7 +27,7 @@ github_dark = {
     "backgroundColor": "#0d1117",
     "secondaryBackgroundColor": "#161b22",
     "textColor": "#c9d1d9",
-    "sidebarBackgroundColor": "#090c10",
+    "sidebarBackgroundColor": "#161b22",
     "sidebarTextColor": "#8b949e",
     "font": "sans serif",
 }
@@ -37,7 +37,7 @@ github_light = {
     "backgroundColor": "#ffffff",
     "secondaryBackgroundColor": "#f6f8fa",
     "textColor": "#24292f",
-    "sidebarBackgroundColor": "#f0f2f4",
+    "sidebarBackgroundColor": "#f6f8fa",
     "sidebarTextColor": "#57606a",
     "font": "sans serif",
 }
@@ -123,9 +123,8 @@ def get_contrasting_text_color(hex_color):
 def get_option_menu_style(theme):
     return {
         "container": {
-            "padding": "0.5rem",
+            "padding": "0!important",
             "background-color": theme["sidebarBackgroundColor"],
-            "border-radius": "0px",
         },
         "icon": {"color": theme["sidebarTextColor"], "font-size": "16px"},
         "nav-link": {
@@ -134,11 +133,12 @@ def get_option_menu_style(theme):
             "text-align": "left",
             "margin": "0px",
             "--hover-color": theme["primaryColor"],
-            "background-color": "transparent",
+            "background-color": theme["sidebarBackgroundColor"],
         },
         "nav-link-selected": {
             "background-color": theme["primaryColor"],
-            "color": get_contrasting_text_color(theme["primaryColor"]),
+            "color": theme["backgroundColor"],
+            "font-weight": "bold",
         },
     }
 
