@@ -1,7 +1,7 @@
 import streamlit as st
 from util.file_io import FileIOHelper
 from util.ui_components import UIComponents
-from util.theme_manager import load_and_apply_theme, get_my_articles_css
+from util.theme_manager import load_and_apply_theme
 from pages_util.Settings import load_general_settings, save_general_settings
 
 import logging
@@ -33,31 +33,6 @@ def update_page_size():
     st.session_state.page_size = st.session_state.page_size_select
     st.session_state.current_page = 1
     st.session_state.need_rerun = True
-
-
-def my_articles_page():
-    initialize_session_state()
-    UIComponents.apply_custom_css()
-
-    if "user_articles" not in st.session_state:
-        local_dir = FileIOHelper.get_output_dir()
-        st.session_state.user_articles = FileIOHelper.read_structure_to_dict(local_dir)
-
-    if "page2_selected_my_article" in st.session_state:
-        display_selected_article()
-    else:
-        new_page_size, new_num_columns = display_article_list(
-            page_size=st.session_state.page_size,
-            num_columns=st.session_state.num_columns,
-        )
-        # Update session state if values have changed
-        if (
-            new_page_size != st.session_state.page_size
-            or new_num_columns != st.session_state.num_columns
-        ):
-            st.session_state.page_size = new_page_size
-            st.session_state.num_columns = new_num_columns
-            # We don't need to rerun here, as the changes will be reflected in the next run
 
 
 def display_selected_article():
@@ -162,35 +137,46 @@ def display_article_list(page_size, num_columns):
     end_idx = min(start_idx + new_page_size, total_articles)
 
     # Display articles
-    cols = st.columns(new_num_columns)
+    cols = st.columns(num_columns)
 
     for i in range(start_idx, end_idx):
         article_key = article_keys[i]
         article_file_path_dict = articles[article_key]
 
-        with cols[i % new_num_columns]:
+        with cols[i % num_columns]:
+            article_data = FileIOHelper.assemble_article_data(article_file_path_dict)
+            short_text = article_data.get("short_text", "") + "..."
+
             with st.container():
-                st.markdown('<div class="article-container">', unsafe_allow_html=True)
-
-                st.subheader(article_key.replace("_", " "))
-
-                st.markdown('<div class="article-content">', unsafe_allow_html=True)
-                article_data = FileIOHelper.assemble_article_data(
-                    article_file_path_dict
-                )
-                if article_data:
-                    content_preview = article_data.get("short_text", "")
-                    st.write(content_preview + "...")
-                st.markdown("</div>", unsafe_allow_html=True)
-
-                st.markdown('<div class="button-container">', unsafe_allow_html=True)
-                col1, col2, col3 = st.columns([1, 1, 1])
-                with col3:
-                    if st.button("Read More", key=f"view_{article_key}"):
-                        st.session_state.page2_selected_my_article = article_key
-                        st.rerun()
-                st.markdown("</div>", unsafe_allow_html=True)
-
-                st.markdown("</div>", unsafe_allow_html=True)
+                st.markdown(f"### {article_key.replace('_', ' ')}")
+                st.markdown(short_text)
+                if st.button("Read More", key=f"read_more_{article_key}"):
+                    st.session_state.page2_selected_my_article = article_key
+                    st.rerun()
 
     return new_page_size, new_num_columns
+
+
+def my_articles_page():
+    initialize_session_state()
+    UIComponents.apply_custom_css()
+
+    if "user_articles" not in st.session_state:
+        local_dir = FileIOHelper.get_output_dir()
+        st.session_state.user_articles = FileIOHelper.read_structure_to_dict(local_dir)
+
+    if "page2_selected_my_article" in st.session_state:
+        display_selected_article()
+    else:
+        new_page_size, new_num_columns = display_article_list(
+            page_size=st.session_state.page_size,
+            num_columns=st.session_state.num_columns,
+        )
+        # Update session state if values have changed
+        if (
+            new_page_size != st.session_state.page_size
+            or new_num_columns != st.session_state.num_columns
+        ):
+            st.session_state.page_size = new_page_size
+            st.session_state.num_columns = new_num_columns
+            st.rerun()

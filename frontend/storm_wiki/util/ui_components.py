@@ -256,7 +256,7 @@ class UIComponents:
             [data-testid="stExpander"] {{
                 border-color: {current_theme['primaryColor']} !important;
             }}
-            .stButton > button {{
+            .st-primary-button > button {{
                 width: 100%;
                 font-size: 14px;
                 padding: 5px 10px;
@@ -277,6 +277,17 @@ class UIComponents:
                 font-size: 14px;
                 margin: 0px;
                 padding: 0px;
+            }}
+            /* New style for secondary buttons */
+            button[kind="secondary"],
+            button[data-testid="baseButton-secondary"] {{
+                background-color: {current_theme['sidebarBackgroundColor']} !important;
+                color: {current_theme['primaryColor']} !important;
+                border: 0px;
+            }}
+            /* Ensure button text is always visible */
+            .stButton > button > div > p {{
+                color: inherit !important;
             }}
         </style>
         """

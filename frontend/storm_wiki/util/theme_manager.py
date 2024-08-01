@@ -252,7 +252,7 @@ def get_theme_css(theme):
         color: var(--text-color) !important;
     }}
 
-    /* Ensure text color changes on hover for better contrast */
+    /* Ensure text color zchanges on hover for better contrast */
     .st-emotion-cache-1ppb27g:hover .st-emotion-cache-sy3zga,
     .st-emotion-cache-crpzz5:hover .st-emotion-cache-sy3zga,
     .stSelectbox [data-baseweb="select"] [role="option"]:hover .st-emotion-cache-sy3zga {{
@@ -333,51 +333,4 @@ def get_preview_html(theme):
             <input type="text" placeholder="Input field" style="background-color: {theme['secondaryBackgroundColor']}; color: {theme['textColor']}; border: 1px solid {theme['primaryColor']}; padding: 5px; margin-top: 5px; width: 100%;">
         </div>
     </div>
-    """
-
-
-def get_my_articles_css(theme):
-    return f"""
-    <style>
-    .article-card {{
-        background-color: {theme['sidebarBackgroundColor']};
-        color: {theme['textColor']};
-        border: 1px solid {theme['primaryColor']};
-        border-radius: 5px;
-        padding: 10px;
-        margin-bottom: 10px;
-        height: 100px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        transition: all 0.3s ease;
-    }}
-    .article-card:hover {{
-        background-color: {theme['primaryColor']};
-        color: {theme['backgroundColor']};
-    }}
-    .stButton>button {{
-        width: 100%;
-        height: 100%;
-        white-space: normal;
-        word-wrap: break-word;
-        background-color: transparent;
-        border: none;
-        padding: 0;
-    }}
-    .stButton>button:hover {{
-        background-color: transparent;
-        color: inherit;
-    }}
-    .pagination-container {{
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-top: 20px;
-    }}
-    .pagination-container > div {{
-        margin: 0 10px;
-    }}
-    </style>
     """

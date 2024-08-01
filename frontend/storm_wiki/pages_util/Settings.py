@@ -347,7 +347,7 @@ def settings_page(selected_setting):
             st.rerun()
 
     elif selected_setting == "General":
-        st.header("General Settings")
+        st.header("Display Settings")
 
         general_settings = load_general_settings()
 
@@ -370,10 +370,10 @@ def settings_page(selected_setting):
             help="Set the number of columns for displaying articles in the My Articles page.",
         )
 
-        if st.button("Save General Settings"):
+        if st.button("Save Display Settings"):
             general_settings["num_columns"] = num_columns
             save_general_settings(general_settings)
-            st.success("General settings saved successfully!")
+            st.success("Display settings saved successfully!")
 
     # Apply the current theme
     st.markdown(get_theme_css(current_theme), unsafe_allow_html=True)

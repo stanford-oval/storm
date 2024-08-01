@@ -136,7 +136,7 @@ class FileIOHelper:
             )
 
             # Extract the first 100 characters as short_text
-            short_text = no_title_content[:100]
+            short_text = no_title_content[:150]
 
             article_data = {
                 "article": parsed_article_content,
