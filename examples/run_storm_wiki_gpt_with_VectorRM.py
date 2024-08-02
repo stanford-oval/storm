@@ -30,10 +30,11 @@ import os
 import sys
 from argparse import ArgumentParser
 
+sys.path.append('./')
 from knowledge_storm import STORMWikiRunnerArguments, STORMWikiRunner, STORMWikiLMConfigs
 from knowledge_storm.rm import VectorRM
 from knowledge_storm.lm import OpenAIModel, AzureOpenAIModel
-from knowledge_storm.utils import load_api_key
+from knowledge_storm.utils import load_api_key, VectorStoreManager
 
 
 def main(args):
@@ -83,6 +84,31 @@ def main(args):
         max_thread_num=args.max_thread_num,
     )
 
+    # Create / update the vector store with the documents in the csv file
+    if args.csv_file_path:
+        kwargs = {
+            'file_path': args.csv_file_path,
+            'content_column': 'content',
+            'title_column': 'title',
+            'url_column': 'url',
+            'desc_column': 'description',
+            'batch_size': args.embed_batch_size,
+            'vector_db_mode': args.vector_db_mode,
+            'collection_name': args.collection_name,
+            'device': args.device,
+        }
+        if args.vector_db_mode == 'offline':
+            VectorStoreManager.create_or_update_vector_store(
+                vector_store_path=args.offline_vector_db_dir,
+                **kwargs
+            )
+        elif args.vector_db_mode == 'online':
+            VectorStoreManager.create_or_update_vector_store(
+                url=args.online_vector_db_url,
+                api_key=os.getenv('QDRANT_API_KEY'),
+                **kwargs
+            )
+
     # Setup VectorRM to retrieve information from your own data
     rm = VectorRM(collection_name=args.collection_name, device=args.device, k=engine_args.search_top_k)
 
@@ -91,17 +117,6 @@ def main(args):
         rm.init_offline_vector_db(vector_store_path=args.offline_vector_db_dir)
     elif args.vector_db_mode == 'online':
         rm.init_online_vector_db(url=args.online_vector_db_url, api_key=os.getenv('QDRANT_API_KEY'))
-
-    # Update the vector store with the documents in the csv file
-    if args.csv_file_path:
-        rm.update_vector_store(
-            file_path=args.csv_file_path,
-            content_column='content',
-            title_column='title',
-            url_column='url',
-            desc_column='description',
-            batch_size=args.embed_batch_size
-        )
 
     # Initialize the STORM Wiki Runner
     runner = STORMWikiRunner(engine_args, engine_lm_configs, rm)
