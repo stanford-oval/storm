@@ -93,7 +93,7 @@ def main(args):
         rm.init_online_vector_db(url=args.online_vector_db_url, api_key=os.getenv('QDRANT_API_KEY'))
 
     # Update the vector store with the documents in the csv file
-    if args.update_vector_store:
+    if args.csv_file_path:
         rm.update_vector_store(
             file_path=args.csv_file_path,
             content_column='content',
@@ -139,10 +139,7 @@ if __name__ == "__main__":
                         help='If use offline mode, please provide the directory to store the vector store.')
     parser.add_argument('--online-vector-db-url', type=str,
                         help='If use online mode, please provide the url of the Qdrant server.')
-    parser.add_argument('--update-vector-store', action='store_true',
-                        help='If True, update the vector store with the documents in the csv file; otherwise, '
-                             'use the existing vector store.')
-    parser.add_argument('--csv-file-path', type=str,
+    parser.add_argument('--csv-file-path', type=str, default=None,
                         help='The path of the custom document corpus in CSV format. The CSV file should include '
                              'content, title, url, and description columns.')
     parser.add_argument('--embed-batch-size', type=int, default=64,
