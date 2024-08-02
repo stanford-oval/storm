@@ -5,19 +5,18 @@
 
 ## Features & Changes
 
-- Dracula soft dark color
-- Duckduckgo
-- gpt-4o-mini as a fallback option
-- dotenv for env vars
+
+- themes: dracula soft dark color and other light and dark themes
+- engines: duckduckgo, searxng and arxiv
+- llm: ollama, anthropic
+- users can change search engine before triggering search
+- users can save primary and fallback llm in settings
 - save result files as '*.md'
 - add date to to top of the result file
-- added STORM_TIMEZONE
-- added arize-phoenix to trace. added PHOENIX_COLLECTOR_ENDPOINT
-- added searxng and SEARXNG_BASE_URL env var as a fallback option
-
-![storm](./assets/storm.png)
-
-![storm-article](./assets/storm-article.png)
+- added arize-phoenix to trace.
+- added github ci file to test fallback options for search and llm
+- change number of display columns
+- pagination in sidebar
 
 ## Prerequisites
 

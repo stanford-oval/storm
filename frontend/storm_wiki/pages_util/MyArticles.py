@@ -170,8 +170,8 @@ def my_articles_page():
         # Update session state if values have changed
         if new_page_size != st.session_state.page_size:
             st.session_state.page_size = new_page_size
-            st.experimental_rerun()
+            st.rerun()
 
         if new_num_columns != st.session_state.num_columns:
             st.session_state.num_columns = new_num_columns
-            # We don't need to rerun here, as the changes are already reflected in the current display
+            st.rerun()
