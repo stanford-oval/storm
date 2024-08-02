@@ -40,6 +40,12 @@ def makeStringRed(message):
     return f"\033[91m {message}\033[00m"
 
 class QdrantVectorStoreManager:
+    """
+    This is a helper class to manage the Qdrant vector store. It is related to VectorRM retrieval model in rm.py.
+    It provides methods to create or update the vector store from a CSV file, before you initialize the VectorRM.
+    Use the function create_or_update_vector_store to create or update the vector store, then once you have the
+    vector store, you can initialize the VectorRM with the vector store path or the Qdrant server URL.
+    """
     @staticmethod
     def _check_create_collection(client: QdrantClient, collection_name: str, model: HuggingFaceEmbeddings):
         """
