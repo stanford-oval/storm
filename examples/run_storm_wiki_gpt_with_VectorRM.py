@@ -34,7 +34,7 @@ sys.path.append('./')
 from knowledge_storm import STORMWikiRunnerArguments, STORMWikiRunner, STORMWikiLMConfigs
 from knowledge_storm.rm import VectorRM
 from knowledge_storm.lm import OpenAIModel, AzureOpenAIModel
-from knowledge_storm.utils import load_api_key, VectorStoreManager
+from knowledge_storm.utils import load_api_key, QdrantVectorStoreManager
 
 
 def main(args):
@@ -98,12 +98,12 @@ def main(args):
             'device': args.device,
         }
         if args.vector_db_mode == 'offline':
-            VectorStoreManager.create_or_update_vector_store(
+            QdrantVectorStoreManager.create_or_update_vector_store(
                 vector_store_path=args.offline_vector_db_dir,
                 **kwargs
             )
         elif args.vector_db_mode == 'online':
-            VectorStoreManager.create_or_update_vector_store(
+            QdrantVectorStoreManager.create_or_update_vector_store(
                 url=args.online_vector_db_url,
                 api_key=os.getenv('QDRANT_API_KEY'),
                 **kwargs
