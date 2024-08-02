@@ -54,7 +54,6 @@ By default, STORM is grounded on the Internet using the search engine, but it ca
        --output-dir $OUTPUT_DIR \
        --vector-db-mode offline \
        --offline-vector-db-dir $OFFLINE_VECTOR_DB_DIR \
-       --update-vector-store \
        --csv-file-path $CSV_FILE_PATH \ 
        --device $DEVICE_FOR_EMBEDDING(mps, cuda, cpu) \
        --do-research \
@@ -70,7 +69,6 @@ By default, STORM is grounded on the Internet using the search engine, but it ca
        --output-dir $OUTPUT_DIR \
        --vector-db-mode online \
        --online-vector-db-url $ONLINE_VECTOR_DB_URL \
-       --update-vector-store \
        --csv-file-path $CSV_FILE_PATH \
        --device $DEVICE_FOR_EMBEDDING(mps, cuda, cpu) \
        --do-research \
@@ -94,7 +92,6 @@ By default, STORM is grounded on the Internet using the search engine, but it ca
          --output-dir $OUTPUT_DIR \
          --vector-db-mode offline \
          --offline-vector-db-dir $OFFLINE_VECTOR_DB_DIR \
-         --update-vector-store \
          --csv-file-path $PATH_TO_THE_PROCESSED_CSV \
          --device $DEVICE_FOR_EMBEDDING(mps, cuda, cpu) \
          --do-research \
