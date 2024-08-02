@@ -177,8 +177,8 @@ class VectorRM(dspy.Retrieve):
     """
 
     def __init__(self,
-                 collection_name: str = "my_documents",
-                 embedding_model: str = 'BAAI/bge-m3',
+                 collection_name: str,
+                 embedding_model: str,
                  device: str = "mps",
                  k: int = 3,
                 ):
@@ -191,6 +191,12 @@ class VectorRM(dspy.Retrieve):
         """
         super().__init__(k=k)
         self.usage = 0
+        # check if the collection is provided
+        if not collection_name:
+            raise ValueError("Please provide a collection name.")
+        # check if the embedding model is provided
+        if not embedding_model:
+            raise ValueError("Please provide an embedding model.")
 
         model_kwargs = {"device": device}
         encode_kwargs = {"normalize_embeddings": True}
