@@ -72,6 +72,7 @@ class QdrantVectorStoreManager:
                 collection_name=collection_name,
                 embeddings=model,
             )
+    
     @staticmethod
     def _init_online_vector_db(url: str, api_key: str, collection_name: str, model: HuggingFaceEmbeddings):
         """
@@ -94,6 +95,7 @@ class QdrantVectorStoreManager:
         except Exception as e:
             raise ValueError(f"Error occurs when connecting to the server: {e}")
 
+    @staticmethod
     def _init_offline_vector_db(vector_store_path: str, collection_name: str, model: HuggingFaceEmbeddings):
         """
         Initialize the Qdrant client that is connected to an offline vector store with the given vector store folder path.
@@ -110,8 +112,8 @@ class QdrantVectorStoreManager:
         except Exception as e:
             raise ValueError(f"Error occurs when loading the vector store: {e}")
     
+    @staticmethod
     def create_or_update_vector_store(
-
             vector_db_mode: str,
             file_path: str,
             content_column: str,
