@@ -114,6 +114,7 @@ class QdrantVectorStoreManager:
     
     @staticmethod
     def create_or_update_vector_store(
+            collection_name: str,
             vector_db_mode: str,
             file_path: str,
             content_column: str,
@@ -123,7 +124,6 @@ class QdrantVectorStoreManager:
             batch_size: int = 64,
             chunk_size: int = 500,
             chunk_overlap: int = 100,
-            collection_name: str = "my_documents",
             vector_store_path: str = None,
             url: str =  None,
             qdrant_api_key: str = None,
@@ -150,7 +150,10 @@ class QdrantVectorStoreManager:
             device: Device to run the embeddings model on, can be "mps", "cuda", "cpu".
             qdrant_api_key: API key for the Qdrant server (Only required if the Qdrant server is online).
         """
-
+        # check if the collection name is provided
+        if collection_name is None:
+            raise ValueError("Please provide a collection name.")
+        
         model_kwargs = {"device": device}
         encode_kwargs = {"normalize_embeddings": True}
         model = HuggingFaceEmbeddings(
