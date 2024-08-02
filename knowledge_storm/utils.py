@@ -39,7 +39,7 @@ def load_api_key(toml_file_path):
 def makeStringRed(message):
     return f"\033[91m {message}\033[00m"
 
-class VectorStoreManager:
+class QdrantVectorStoreManager:
     @staticmethod
     def _check_create_collection(client: QdrantClient, collection_name: str, model: HuggingFaceEmbeddings):
         """
@@ -84,7 +84,7 @@ class VectorStoreManager:
 
         try:
             client = QdrantClient(url=url, api_key=api_key)
-            return VectorStoreManager._check_create_collection(client=client, collection_name=collection_name, model=model)
+            return QdrantVectorStoreManager._check_create_collection(client=client, collection_name=collection_name, model=model)
         except Exception as e:
             raise ValueError(f"Error occurs when connecting to the server: {e}")
 
@@ -100,7 +100,7 @@ class VectorStoreManager:
 
         try:
             client = QdrantClient(path=vector_store_path)
-            return VectorStoreManager._check_create_collection(client=client, collection_name=collection_name, model=model)
+            return QdrantVectorStoreManager._check_create_collection(client=client, collection_name=collection_name, model=model)
         except Exception as e:
             raise ValueError(f"Error occurs when loading the vector store: {e}")
     
@@ -162,14 +162,14 @@ class VectorStoreManager:
         # try to initialize the Qdrant client
         qdrant = None
         if vector_db_mode == 'online':
-            qdrant = VectorStoreManager._init_online_vector_db(
+            qdrant = QdrantVectorStoreManager._init_online_vector_db(
                 url=url,
                 api_key=qdrant_api_key,
                 collection_name=collection_name,
                 model=model,
             )
         elif vector_db_mode == 'offline':
-            qdrant = VectorStoreManager._init_offline_vector_db(vector_store_path=vector_store_path, collection_name=collection_name, model=model)
+            qdrant = QdrantVectorStoreManager._init_offline_vector_db(vector_store_path=vector_store_path, collection_name=collection_name, model=model)
         else:
             raise ValueError("Invalid vector_db_mode. Please provide either 'online' or 'offline'.")
         if qdrant is None:
