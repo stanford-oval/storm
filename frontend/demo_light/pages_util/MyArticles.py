@@ -1,87 +1,177 @@
-import os
-
-import demo_util
 import streamlit as st
-from demo_util import DemoFileIOHelper, DemoUIHelper
-from streamlit_card import card
+from util.file_io import FileIOHelper
+from util.ui_components import UIComponents
+from util.theme_manager import load_and_apply_theme
+from pages_util.Settings import load_general_settings, save_general_settings
+
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 
-# set page config and display title
-def my_articles_page():
+def initialize_session_state():
+    if "page_size" not in st.session_state:
+        st.session_state.page_size = 24
+    if "current_page" not in st.session_state:
+        st.session_state.current_page = 1
+    if "num_columns" not in st.session_state:
+        general_settings = load_general_settings()
+        try:
+            if isinstance(general_settings, dict):
+                num_columns = general_settings.get("num_columns", 3)
+                if isinstance(num_columns, dict):
+                    num_columns = num_columns.get("num_columns", 3)
+            else:
+                num_columns = general_settings
+
+            st.session_state.num_columns = int(num_columns)
+        except (ValueError, TypeError):
+            st.session_state.num_columns = 3  # Default to 3 if conversion fails
+
+
+def update_page_size():
+    st.session_state.page_size = st.session_state.page_size_select
+    st.session_state.current_page = 1
+    st.session_state.need_rerun = True
+
+
+def display_selected_article():
+    selected_article_name = st.session_state.page2_selected_my_article
+    selected_article_file_path_dict = st.session_state.user_articles[
+        selected_article_name
+    ]
+
+    UIComponents.display_article_page(
+        selected_article_name,
+        selected_article_file_path_dict,
+        show_title=True,
+        show_main_article=True,
+        show_feedback_form=False,
+        show_qa_panel=False,
+    )
+
+    if st.button("Back to Article List"):
+        del st.session_state.page2_selected_my_article
+        st.rerun()
+
+
+def display_article_list(page_size, num_columns):
+    try:
+        num_columns = int(num_columns)
+    except (ValueError, TypeError):
+        num_columns = 3  # Default to 3 if conversion fails
+
+    articles = st.session_state.user_articles
+    article_keys = list(articles.keys())
+    total_articles = len(article_keys)
+
+    # Sidebar controls
     with st.sidebar:
-        _, return_button_col = st.columns([2, 5])
-        with return_button_col:
-            if st.button("Select another article", disabled="page2_selected_my_article" not in st.session_state):
-                if "page2_selected_my_article" in st.session_state:
-                    del st.session_state["page2_selected_my_article"]
-                st.rerun()
+        st.header("Display Settings")
 
-    # sync my articles
-    if "page2_user_articles_file_path_dict" not in st.session_state:
-        local_dir = os.path.join(demo_util.get_demo_dir(), "DEMO_WORKING_DIR")
-        os.makedirs(local_dir, exist_ok=True)
-        st.session_state["page2_user_articles_file_path_dict"] = DemoFileIOHelper.read_structure_to_dict(local_dir)
+        # Page size select box
+        page_size_options = [12, 24, 36, 48]
+        new_page_size = st.selectbox(
+            "Articles per page",
+            options=page_size_options,
+            index=page_size_options.index(min(page_size, max(page_size_options))),
+            key="page_size_select",
+        )
 
-    # if no feature demo selected, display all featured articles as info cards
-    def article_card_setup(column_to_add, card_title, article_name):
-        with column_to_add:
-            cleaned_article_title = article_name.replace("_", " ")
-            hasClicked = card(title=" / ".join(card_title),
-                              text=article_name.replace("_", " "),
-                              image=DemoFileIOHelper.read_image_as_base64(
-                                  os.path.join(demo_util.get_demo_dir(), "assets", "void.jpg")),
-                              styles=DemoUIHelper.get_article_card_UI_style(boarder_color="#9AD8E1"))
-            if hasClicked:
-                st.session_state["page2_selected_my_article"] = article_name
-                st.rerun()
+        # Number of columns slider
+        new_num_columns = st.slider(
+            "Number of columns",
+            min_value=1,
+            max_value=4,
+            value=num_columns,
+            key="num_columns_slider",
+        )
 
-    if "page2_selected_my_article" not in st.session_state:
-        # display article cards
-        my_article_columns = st.columns(3)
-        if len(st.session_state["page2_user_articles_file_path_dict"]) > 0:
-            # get article names
-            article_names = sorted(list(st.session_state["page2_user_articles_file_path_dict"].keys()))
-            # configure pagination
-            pagination = st.container()
-            bottom_menu = st.columns((1, 4, 1, 1, 1))[1:-1]
-            with bottom_menu[2]:
-                batch_size = st.selectbox("Page Size", options=[24, 48, 72])
-            with bottom_menu[1]:
-                total_pages = (
-                    int(len(article_names) / batch_size) if int(len(article_names) / batch_size) > 0 else 1
-                )
-                current_page = st.number_input(
-                    "Page", min_value=1, max_value=total_pages, step=1
-                )
-            with bottom_menu[0]:
-                st.markdown(f"Page **{current_page}** of **{total_pages}** ")
-            # show article cards
-            with pagination:
-                my_article_count = 0
-                start_index = (current_page - 1) * batch_size
-                end_index = min(current_page * batch_size, len(article_names))
-                for article_name in article_names[start_index: end_index]:
-                    column_to_add = my_article_columns[my_article_count % 3]
-                    my_article_count += 1
-                    article_card_setup(column_to_add=column_to_add,
-                                       card_title=["My Article"],
-                                       article_name=article_name)
-        else:
-            with my_article_columns[0]:
-                hasClicked = card(title="Get started",
-                                  text="Start your first research!",
-                                  image=DemoFileIOHelper.read_image_as_base64(
-                                      os.path.join(demo_util.get_demo_dir(), "assets", "void.jpg")),
-                                  styles=DemoUIHelper.get_article_card_UI_style())
-                if hasClicked:
-                    st.session_state.selected_page = 1
-                    st.session_state["manual_selection_override"] = True
-                    st.session_state["rerun_requested"] = True
-                    st.rerun()
+        # Save settings button
+        if st.button("Save Display Settings"):
+            save_general_settings(new_num_columns)
+            st.session_state.page_size = new_page_size
+            st.session_state.num_columns = new_num_columns
+            st.success("Settings saved successfully!")
+
+    # Use the new values for display
+    current_page = st.session_state.current_page - 1  # Convert to 0-indexed
+    start_idx = current_page * new_page_size
+    end_idx = min(start_idx + new_page_size, total_articles)
+
+    # Display articles
+    cols = st.columns(new_num_columns)
+
+    for i in range(start_idx, end_idx):
+        article_key = article_keys[i]
+        article_file_path_dict = articles[article_key]
+
+        with cols[i % new_num_columns]:
+            article_data = FileIOHelper.assemble_article_data(article_file_path_dict)
+            short_text = article_data.get("short_text", "") + "..."
+
+            with st.container():
+                st.markdown(f"### {article_key.replace('_', ' ')}")
+                st.markdown(short_text)
+                if st.button("Read More", key=f"read_more_{article_key}"):
+                    st.session_state.page2_selected_my_article = article_key
+                    st.experimental_rerun()
+
+    # Pagination controls
+    st.sidebar.write("### Navigation")
+    col1, col2 = st.sidebar.columns(2)
+
+    num_pages = max(1, (total_articles + new_page_size - 1) // new_page_size)
+
+    with col1:
+        if st.button("← Previous", disabled=(st.session_state.current_page == 1)):
+            st.session_state.current_page = max(1, st.session_state.current_page - 1)
+            st.experimental_rerun()
+
+    with col2:
+        if st.button("Next →", disabled=(st.session_state.current_page == num_pages)):
+            st.session_state.current_page = min(
+                num_pages, st.session_state.current_page + 1
+            )
+            st.experimental_rerun()
+
+    new_page = st.sidebar.number_input(
+        "Page",
+        min_value=1,
+        max_value=num_pages,
+        value=st.session_state.current_page,
+        key="page_number_input",
+    )
+    if new_page != st.session_state.current_page:
+        st.session_state.current_page = new_page
+        st.experimental_rerun()
+
+    st.sidebar.write(f"of {num_pages} pages")
+
+    return new_page_size, new_num_columns
+
+
+def my_articles_page():
+    initialize_session_state()
+    UIComponents.apply_custom_css()
+
+    if "user_articles" not in st.session_state:
+        local_dir = FileIOHelper.get_output_dir()
+        st.session_state.user_articles = FileIOHelper.read_structure_to_dict(local_dir)
+
+    if "page2_selected_my_article" in st.session_state:
+        display_selected_article()
     else:
-        selected_article_name = st.session_state["page2_selected_my_article"]
-        selected_article_file_path_dict = st.session_state["page2_user_articles_file_path_dict"][selected_article_name]
+        new_page_size, new_num_columns = display_article_list(
+            page_size=st.session_state.page_size,
+            num_columns=st.session_state.num_columns,
+        )
 
-        demo_util.display_article_page(selected_article_name=selected_article_name,
-                                       selected_article_file_path_dict=selected_article_file_path_dict,
-                                       show_title=True, show_main_article=True)
+        # Update session state if values have changed
+        if new_page_size != st.session_state.page_size:
+            st.session_state.page_size = new_page_size
+            st.rerun()
+
+        if new_num_columns != st.session_state.num_columns:
+            st.session_state.num_columns = new_num_columns
+            st.rerun()

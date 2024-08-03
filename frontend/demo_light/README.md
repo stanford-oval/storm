@@ -1,34 +1,66 @@
-# STORM Minimal User Interface
 
-This is a minimal user interface for `STORMWikiRunner` which includes the following features:
-1. Allowing user to create a new article through the "Create New Article" page.
-2. Showing the intermediate steps of STORMWikiRunner in real-time when creating an article.
-3. Displaying the written article and references side by side.
-4. Allowing user to view previously created articles through the "My Articles" page.
+# STORM wiki
 
-<p align="center">
-  <img src="assets/create_article.jpg" style="width: 70%; height: auto;">
-</p>
+[STORM](https://github.com/stanford-oval/storm) frontend modified.
 
-<p align="center">
-  <img src="assets/article_display.jpg" style="width: 70%; height: auto;">
-</p>
+## Features & Changes
 
-## Setup
-1. Make sure you have installed `knowledge-storm` or set up the source code correctly.
-2. Install additional packages required by the user interface:
-    ```bash
-    pip install -r requirements.txt
-    ```
-2. Make sure you set up the API keys following the instructions in the main README file. Create a copy of `secrets.toml` and place it under `.streamlit/`.
-3. Run the following command to start the user interface:
-    ```bash
-    streamlit run storm.py
-    ```
-   The user interface will create a `DEMO_WORKING_DIR` directory in the current directory to store the outputs.
+
+- themes: dracula soft dark color and other light and dark themes
+- engines: duckduckgo, searxng and arxiv
+- llm: ollama, anthropic
+- users can change search engine before triggering search
+- users can save primary and fallback llm in settings
+- save result files as '*.md'
+- add date to to top of the result file
+- added arize-phoenix to trace.
+- added github ci file to test fallback options for search and llm
+- change number of display columns
+- pagination in sidebar
+
+## Prerequisites
+
+- Python 3.8+
+- `knowledge-storm` package or source code
+- Required API keys (see main STORM repository)
+
+## Installation
+
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/yourusername/storm-minimal-ui.git
+   cd storm-minimal-ui
+   ```
+
+2. Install dependencies:
+   ```sh
+   pip install -r requirements.txt
+   cp .env.example .env
+   cp secrets.toml.example ./.streamlit/secrets.toml
+   ```
+
+   edit .env file
+   ```
+   STREAMLIT_OUTPUT_DIR=DEMO_WORKING_DIR
+   OPENAI_API_KEY=YOUR_OPENAI_KEY
+   STORM_TIMEZONE="America/Los_Angeles"
+   ```
+
+   also update serecets.toml
+
+3. Set up API keys:
+   - Copy `secrets.toml.example` to `.streamlit/secrets.toml`
+   - Add your API keys to `.streamlit/secrets.toml`
+
+## Usage
+
+Run the Streamlit app:
+```sh
+streamlit run storm.py --server.port 8501 --server.address 0.0.0.0
+
+```
 
 ## Customization
 
-You can customize the `STORMWikiRunner` powering the user interface according to [the guidelines](https://github.com/stanford-oval/storm?tab=readme-ov-file#customize-storm) in the main README file.
+Modify `set_storm_runner()` in `demo_util.py` to customize STORMWikiRunner settings. Refer to the [main STORM repository](https://github.com/stanford-oval/storm) for detailed customization options.
 
-The `STORMWikiRunner` is initialized in `set_storm_runner()` in [demo_util.py](demo_util.py). You can change `STORMWikiRunnerArguments`, `STORMWikiLMConfigs`, or use a different retrieval model according to your need.
