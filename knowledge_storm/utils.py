@@ -8,15 +8,15 @@ import sys
 from typing import List, Dict
 
 import httpx
+import pandas as pd
 import toml
-from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_qdrant import Qdrant
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from qdrant_client import QdrantClient, models
-from trafilatura import extract
 from tqdm import tqdm
-import pandas as pd
+from trafilatura import extract
 
 logging.getLogger("httpx").setLevel(logging.WARNING)  # Disable INFO logging for httpx.
 
@@ -39,18 +39,17 @@ def load_api_key(toml_file_path):
 def makeStringRed(message):
     return f"\033[91m {message}\033[00m"
 
+
 class QdrantVectorStoreManager:
     """
-    This is a helper class to manage the Qdrant vector store. It is related to VectorRM retrieval model in rm.py.
-    It provides methods to create or update the vector store from a CSV file, before you initialize the VectorRM.
-    Use the function create_or_update_vector_store to create or update the vector store, then once you have the
-    vector store, you can initialize the VectorRM with the vector store path or the Qdrant server URL.
+    Helper class for managing the Qdrant vector store, can be used with `VectorRM` in rm.py.
+    
+    Before you initialize `VectorRM`, call `create_or_update_vector_store` to create or update the vector store.
+    Once you have the vector store, you can initialize `VectorRM` with the vector store path or the Qdrant server URL.
     """
     @staticmethod
     def _check_create_collection(client: QdrantClient, collection_name: str, model: HuggingFaceEmbeddings):
-        """
-        Check if the Qdrant collection exists and create it if it does not.
-        """
+        """Check if the Qdrant collection exists and create it if it does not."""
         if client is None:
             raise ValueError("Qdrant client is not initialized.")
         if client.collection_exists(collection_name=f"{collection_name}"):
@@ -75,8 +74,7 @@ class QdrantVectorStoreManager:
     
     @staticmethod
     def _init_online_vector_db(url: str, api_key: str, collection_name: str, model: HuggingFaceEmbeddings):
-        """
-        Initialize the Qdrant client that is connected to an online vector store with the given URL and API key.
+        """Initialize the Qdrant client that is connected to an online vector store with the given URL and API key.
 
         Args:
             url (str): URL of the Qdrant server.
@@ -97,8 +95,7 @@ class QdrantVectorStoreManager:
 
     @staticmethod
     def _init_offline_vector_db(vector_store_path: str, collection_name: str, model: HuggingFaceEmbeddings):
-        """
-        Initialize the Qdrant client that is connected to an offline vector store with the given vector store folder path.
+        """Initialize the Qdrant client that is connected to an offline vector store with the given vector store folder path.
 
         Args:
             vector_store_path (str): Path to the vector store.
@@ -131,10 +128,13 @@ class QdrantVectorStoreManager:
             device: str = "mps",
     ):
         """
-        Takes a CSV file where each row is a document and has columns for content, title, url, and description.
-        Then it converts all these documents in the content column to vectors and add them the Qdrant collection.
+        Takes a CSV file and adds each row in the CSV file to the Qdrant collection.
+        
+        This function expects each row of the CSV file as a document.
+        The CSV file should have columns for "content", "title", "URL", and "description".
 
         Args:
+            collection_name: Name of the Qdrant collection.
             vector_store_path (str): Path to the directory where the vector store is stored or will be stored. 
             vector_db_mode (str): Mode of the Qdrant vector store (offline or online).
             file_path (str): Path to the CSV file.
@@ -145,7 +145,6 @@ class QdrantVectorStoreManager:
             batch_size (int): Batch size for adding documents to the collection.
             chunk_size: Size of each chunk if you need to build the vector store from documents.
             chunk_overlap: Overlap between chunks if you need to build the vector store from documents.
-            collection_name: Name of the Qdrant collection.
             embedding_model: Name of the Hugging Face embedding model.
             device: Device to run the embeddings model on, can be "mps", "cuda", "cpu".
             qdrant_api_key: API key for the Qdrant server (Only required if the Qdrant server is online).
