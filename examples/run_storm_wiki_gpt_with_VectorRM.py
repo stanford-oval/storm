@@ -95,6 +95,7 @@ def main(args):
             'batch_size': args.embed_batch_size,
             'vector_db_mode': args.vector_db_mode,
             'collection_name': args.collection_name,
+            'embedding_model': args.embedding_model,
             'device': args.device,
         }
         if args.vector_db_mode == 'offline':
@@ -110,7 +111,7 @@ def main(args):
             )
 
     # Setup VectorRM to retrieve information from your own data
-    rm = VectorRM(collection_name=args.collection_name, device=args.device, k=engine_args.search_top_k)
+    rm = VectorRM(collection_name=args.collection_name, embedding_model=args.embedding_model, device=args.device, k=engine_args.search_top_k)
 
     # initialize the vector store, either online (store the db on Qdrant server) or offline (store the db locally):
     if args.vector_db_mode == 'offline':
@@ -145,6 +146,8 @@ if __name__ == "__main__":
                              '"Exceed rate limit" error when calling LM API.')
     # provide local corpus and set up vector db
     parser.add_argument('--collection-name', type=str, default="my_documents",
+                        help='The collection name for vector store.')
+    parser.add_argument('--embedding_model', type=str, default="BAAI/bge-m3",
                         help='The collection name for vector store.')
     parser.add_argument('--device', type=str, default="mps",
                         help='The device used to run the retrieval model (mps, cuda, cpu, etc).')
