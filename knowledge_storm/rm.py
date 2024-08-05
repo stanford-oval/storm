@@ -432,8 +432,8 @@ class SerperRM(dspy.Retrieve):
                         collected_results.append(
                             {
                                 'snippets': snippets,
-                                'title': result.get('title'),
-                                'url': result.get('link'),
+                                'title': organic.get('title'),
+                                'url': organic.get('link'),
                                 'description': '',
                             }
                         )
