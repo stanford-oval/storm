@@ -100,7 +100,7 @@ runner = STORMWikiRunner(engine_args, lm_configs, rm)
 ```
 
 Currently, our package support:
-- `OpenAIModel`, `AzureOpenAIModel`, `ClaudeModel`, `VLLMClient`, `TGIClient`, `TogetherClient`, `OllamaClient` as language model components
+- `OpenAIModel`, `AzureOpenAIModel`, `ClaudeModel`, `VLLMClient`, `TGIClient`, `TogetherClient`, `OllamaClient`, `GoogleModel` as language model components
 - `YouRM`, `BingSearch`, `VectorRM` as retrieval module components
 
 :star2: **PRs for integrating more language models into [knowledge_storm/lm.py](knowledge_storm/lm.py) and search engines/retrievers into [knowledge_storm/rm.py](knowledge_storm/rm.py) are highly appreciated!**
