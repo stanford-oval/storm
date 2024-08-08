@@ -123,7 +123,7 @@ if __name__ == '__main__':
                         help='Maximum number of threads to use. The information seeking part and the article generation'
                              'part can speed up by using multiple threads. Consider reducing it if keep getting '
                              '"Exceed rate limit" error when calling LM API.')
-    parser.add_argument('--retriever', type=str, choices=['bing', 'you'], required=True,
+    parser.add_argument('--retriever', type=str, choices=['bing', 'you', 'brave'], required=True,
                         help='The search engine API to use for retrieving information.')
     parser.add_argument('--model', type=str, choices=['deepseek-chat', 'deepseek-coder'], default='deepseek-chat',
                         help='DeepSeek model to use. "deepseek-chat" for general tasks, "deepseek-coder" for coding tasks.')
