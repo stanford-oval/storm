@@ -498,7 +498,7 @@ class BraveRM(dspy.Retrieve):
                 results = response.get('web', {}).get('results', [])
 
                 for result in results:
-                    collected_results.extend(
+                    collected_results.append(
                         {
                             'snippets': result.get('extra_snippets', []),
                             'title': result.get('title'),

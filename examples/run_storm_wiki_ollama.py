@@ -23,7 +23,7 @@ from dspy import Example
 
 sys.path.append('./src')
 from lm import OllamaClient
-from rm import YouRM, BingSearch
+from rm import YouRM, BingSearch, BraveRM
 from storm_wiki.engine import STORMWikiRunnerArguments, STORMWikiRunner, STORMWikiLMConfigs
 from utils import load_api_key
 
@@ -65,6 +65,8 @@ def main(args):
         rm = BingSearch(bing_search_api=os.getenv('BING_SEARCH_API_KEY'), k=engine_args.search_top_k)
     elif args.retriever == 'you':
         rm = YouRM(ydc_api_key=os.getenv('YDC_API_KEY'), k=engine_args.search_top_k)
+    elif args.retriever == 'brave':
+        rm = BraveRM(brave_search_api_key=os.getenv('BRAVE_API_KEY'), k=engine_args.search_top_k)
 
     runner = STORMWikiRunner(engine_args, lm_configs, rm)
 
