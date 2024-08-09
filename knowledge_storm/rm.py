@@ -3,7 +3,6 @@ import os
 from typing import Callable, Union, List
 
 import dspy
-import pandas as pd
 import requests
 
 from langchain_huggingface import HuggingFaceEmbeddings
