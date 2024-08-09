@@ -21,7 +21,7 @@ from argparse import ArgumentParser
 
 from knowledge_storm import STORMWikiRunnerArguments, STORMWikiRunner, STORMWikiLMConfigs
 from knowledge_storm.lm import GoogleModel
-from knowledge_storm.rm import YouRM, BingSearch
+from knowledge_storm.rm import YouRM, BingSearch, BraveRM
 from knowledge_storm.utils import load_api_key
 
 
@@ -67,6 +67,8 @@ def main(args):
         rm = BingSearch(bing_search_api=os.getenv('BING_SEARCH_API_KEY'), k=engine_args.search_top_k)
     elif args.retriever == 'you':
         rm = YouRM(ydc_api_key=os.getenv('YDC_API_KEY'), k=engine_args.search_top_k)
+    elif args.retriever == 'brave':
+        rm = BraveRM(brave_search_api_key=os.getenv('BRAVE_API_KEY'), k=engine_args.search_top_k)
 
     runner = STORMWikiRunner(engine_args, lm_configs, rm)
 
@@ -91,7 +93,7 @@ if __name__ == '__main__':
                         help='Maximum number of threads to use. The information seeking part and the article generation'
                              'part can speed up by using multiple threads. Consider reducing it if keep getting '
                              '"Exceed rate limit" error when calling LM API.')
-    parser.add_argument('--retriever', type=str, choices=['bing', 'you'],
+    parser.add_argument('--retriever', type=str, choices=['bing', 'you', 'brave'],
                         help='The search engine API to use for retrieving information.')
     # stage of the pipeline
     parser.add_argument('--do-research', action='store_true',

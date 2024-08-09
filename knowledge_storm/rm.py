@@ -307,9 +307,10 @@ class VectorRM(dspy.Retrieve):
 
         return collected_results
 
+
 class SerperRM(dspy.Retrieve):
     """Retrieve information from custom queries using Serper.dev."""
-    
+
     def __init__(self, serper_search_api_key=None, query_params=None):
         """Args:
             serper_search_api_key str: API key to run serper, can be found by creating an account on https://serper.dev/
@@ -373,8 +374,8 @@ class SerperRM(dspy.Retrieve):
     def forward(self, query_or_queries: Union[str, List[str]], exclude_urls: List[str]):
         """
         Calls the API and searches for the query passed in.
-        
-        
+
+
         Args:
             query_or_queries (Union[str, List[str]]): The query or queries to search for.
             exclude_urls (List[str]): Dummy parameter to match the interface. Does not have any effect.
@@ -395,7 +396,7 @@ class SerperRM(dspy.Retrieve):
             if query == 'Queries:':
                 continue
             query_params = self.query_params
-            
+
             # All available parameters can be found in the playground: https://serper.dev/playground
             # Sets the json value for query to be the query that is being parsed.
             query_params['q'] = query
@@ -439,5 +440,73 @@ class SerperRM(dspy.Retrieve):
                         )
             except:
                 continue
+
+        return collected_results
+
+
+class BraveRM(dspy.Retrieve):
+    def __init__(self, brave_search_api_key=None, k=3, is_valid_source: Callable = None):
+        super().__init__(k=k)
+        if not brave_search_api_key and not os.environ.get("BRAVE_API_KEY"):
+            raise RuntimeError("You must supply brave_search_api_key or set environment variable BRAVE_API_KEY")
+        elif brave_search_api_key:
+            self.brave_search_api_key = brave_search_api_key
+        else:
+            self.brave_search_api_key = os.environ["BRAVE_API_KEY"]
+        self.usage = 0
+
+        # If not None, is_valid_source shall be a function that takes a URL and returns a boolean.
+        if is_valid_source:
+            self.is_valid_source = is_valid_source
+        else:
+            self.is_valid_source = lambda x: True
+
+    def get_usage_and_reset(self):
+        usage = self.usage
+        self.usage = 0
+
+        return {'BraveRM': usage}
+
+    def forward(self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []):
+        """Search with api.search.brave.com for self.k top passages for query or queries
+
+        Args:
+            query_or_queries (Union[str, List[str]]): The query or queries to search for.
+            exclude_urls (List[str]): A list of urls to exclude from the search results.
+
+        Returns:
+            a list of Dicts, each dict has keys of 'description', 'snippets' (list of strings), 'title', 'url'
+        """
+        queries = (
+            [query_or_queries]
+            if isinstance(query_or_queries, str)
+            else query_or_queries
+        )
+        self.usage += len(queries)
+        collected_results = []
+        for query in queries:
+            try:
+                headers = {
+                    "Accept": "application/json",
+                    "Accept-Encoding": "gzip",
+                    "X-Subscription-Token": self.brave_search_api_key
+                }
+                response = requests.get(
+                    f"https://api.search.brave.com/res/v1/web/search?result_filter=web&q={query}",
+                    headers=headers,
+                ).json()
+                results = response.get('web', {}).get('results', [])
+
+                for result in results:
+                    collected_results.append(
+                        {
+                            'snippets': result.get('extra_snippets', []),
+                            'title': result.get('title'),
+                            'url': result.get('url'),
+                            'description': result.get('description'),
+                        }
+                    )
+            except Exception as e:
+                logging.error(f'Error occurs when searching query {query}: {e}')
 
         return collected_results
