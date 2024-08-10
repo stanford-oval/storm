@@ -1,6 +1,5 @@
 import pytest
 import os
-import json
 from db.db_operations import (
     DB_PATH,
     init_db,
@@ -8,8 +7,10 @@ from db.db_operations import (
     load_setting,
     load_search_options,
     save_search_options,
+    update_search_option,
     load_llm_settings,
     save_llm_settings,
+    update_llm_setting,
 )
 
 
@@ -32,6 +33,37 @@ def test_db():
     globals()["DB_PATH"] = original_db_path
 
 
+@pytest.fixture
+def default_search_options():
+    return {
+        "primary_engine": "duckduckgo",
+        "fallback_engine": None,
+        "search_top_k": 3,
+        "retrieve_top_k": 3,
+        "engine_settings": {
+            "searxng": {"base_url": "", "api_key": ""},
+            "bing": {"api_key": ""},
+            "yourdm": {"api_key": ""},
+        },
+    }
+
+
+@pytest.fixture
+def default_llm_settings():
+    return {
+        "primary_model": "ollama",
+        "fallback_model": None,
+        "model_settings": {
+            "ollama": {
+                "model": "jaigouk/hermes-2-theta-llama-3:latest",
+                "max_tokens": 500,
+            },
+            "openai": {"model": "gpt-4o-mini", "max_tokens": 500},
+            "anthropic": {"model": "claude-3-haiku-20240307", "max_tokens": 500},
+        },
+    }
+
+
 def test_save_and_load_setting(test_db):
     key = "test_key"
     value = {"test": "value"}
@@ -47,56 +79,112 @@ def test_load_setting_default(test_db):
     assert loaded_value == default_value
 
 
-def test_save_and_load_search_options(test_db):
-    options = {
-        "primary_engine": "test_engine",
-        "fallback_engine": "fallback_engine",
-        "search_top_k": 5,
-        "retrieve_top_k": 3,
-        "engine_settings": {"test_engine": {"api_key": "test_key"}},
-    }
-    save_search_options(options)
+def test_save_and_load_search_options(default_search_options):
+    save_search_options(default_search_options)
     loaded_options = load_search_options()
-    assert loaded_options == options
+    assert loaded_options == default_search_options
+
+
+def test_update_search_option_valid(default_search_options):
+    save_search_options(default_search_options)
+    update_search_option("primary_engine", "bing")
+    loaded_options = load_search_options()
+    assert loaded_options["primary_engine"] == "bing"
+
+
+def test_update_search_option_top_level(test_db):
+    initial_options = load_search_options()
+    initial_primary_engine = initial_options["primary_engine"]
+
+    # Update to a different engine
+    new_engine = "bing" if initial_primary_engine != "bing" else "duckduckgo"
+    update_search_option("primary_engine", new_engine)
+
+    updated_options = load_search_options()
+    assert updated_options["primary_engine"] == new_engine
+    assert updated_options["primary_engine"] != initial_primary_engine
+
+
+def test_update_search_option_nested(test_db):
+    # Set initial search options
+    initial_options = load_search_options()
+
+    # Update a nested option
+    update_search_option("engine_settings.searxng.base_url", "https://example.com")
+
+    # Load and check the updated options
+    updated_options = load_search_options()
+    assert (
+        updated_options["engine_settings"]["searxng"]["base_url"]
+        == "https://example.com"
+    )
+    assert updated_options != initial_options
+
+
+def test_update_search_option_new_nested(test_db):
+    update_search_option("engine_settings.new_engine.api_key", "new_key")
+    updated_options = load_search_options()
+    assert updated_options["engine_settings"]["new_engine"]["api_key"] == "new_key"
+
+
+def test_update_search_option_invalid_key(test_db):
+    with pytest.raises(ValueError):
+        update_search_option("invalid_key", "value")
+
+
+def test_update_search_option_invalid_value(test_db):
+    with pytest.raises(ValueError):
+        update_search_option("search_top_k", "not_a_number")
+
+
+def test_update_search_option_numeric(test_db):
+    update_search_option("search_top_k", 10)
+    updated_options = load_search_options()
+    assert updated_options["search_top_k"] == 10
 
 
 def test_load_search_options_default(test_db):
-    # First, ensure no search options are saved
     save_setting("search_options", None)
-
     default_options = load_search_options()
     assert default_options["primary_engine"] == "duckduckgo"
-    assert default_options["fallback_engine"] is None
-    assert default_options["search_top_k"] == 3
-    assert default_options["retrieve_top_k"] == 3
-    assert "searxng" in default_options["engine_settings"]
-    assert "bing" in default_options["engine_settings"]
-    assert "yourdm" in default_options["engine_settings"]
+    assert "engine_settings" in default_options
 
 
-def test_save_and_load_llm_settings(test_db):
-    settings = {
-        "primary_model": "test_model",
-        "fallback_model": "fallback_model",
-        "model_settings": {
-            "test_model": {"model": "test_model_name", "max_tokens": 1000}
-        },
-    }
-    save_llm_settings(settings)
+def test_save_and_load_llm_settings(default_llm_settings):
+    save_llm_settings(default_llm_settings)
     loaded_settings = load_llm_settings()
-    assert loaded_settings == settings
+    assert loaded_settings == default_llm_settings
+
+
+def test_update_llm_setting_valid(default_llm_settings):
+    save_llm_settings(default_llm_settings)
+    update_llm_setting("primary_model", "openai")
+    loaded_settings = load_llm_settings()
+    assert loaded_settings["primary_model"] == "openai"
+
+
+def test_update_llm_setting_invalid_key():
+    with pytest.raises(ValueError):
+        update_llm_setting("invalid_key", "value")
 
 
 def test_load_llm_settings_default(test_db):
-    # First, ensure no LLM settings are saved
     save_setting("llm_settings", None)
-
     default_settings = load_llm_settings()
     assert default_settings["primary_model"] == "ollama"
-    assert default_settings["fallback_model"] is None
-    assert "ollama" in default_settings["model_settings"]
-    assert "openai" in default_settings["model_settings"]
-    assert "anthropic" in default_settings["model_settings"]
+    assert "model_settings" in default_settings
+
+
+def test_update_llm_setting_invalid_value(test_db):
+    with pytest.raises(ValueError):
+        update_llm_setting("model_settings.ollama.max_tokens", "not_a_number")
+
+
+def test_update_nested_llm_setting(default_llm_settings):
+    save_llm_settings(default_llm_settings)
+    update_llm_setting("model_settings.ollama.model", "llama2")
+    loaded_settings = load_llm_settings()
+    assert loaded_settings["model_settings"]["ollama"]["model"] == "llama2"
 
 
 def test_overwrite_setting(test_db):

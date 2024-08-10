@@ -1,10 +1,20 @@
 import os
+import json
+import openai
 from datetime import datetime
 import streamlit as st
 from util.ui_components import UIComponents, StreamlitCallbackHandler
 from util.file_io import FileIOHelper
 from util.text_processing import convert_txt_to_md
-from util.storm_runner import set_storm_runner, process_search_results
+from util.storm_runner import (
+    set_storm_runner,
+    process_search_results,
+    create_lm_client,
+    collect_existing_information,
+    use_fallback_llm,
+    write_fallback_result,
+)
+
 from util.theme_manager import (
     load_and_apply_theme,
     get_form_submit_button_css,
@@ -20,9 +30,14 @@ from db.db_operations import (
 )
 from pages_util.Settings import (
     update_llm_setting,
+    update_search_option,
     get_available_search_engines,
     list_downloaded_models,
 )
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 categories = FileIOHelper.load_categories()
 
@@ -106,11 +121,8 @@ def display_sidebar_options():
     st.sidebar.header("Search Options")
     search_options = load_search_options()
 
-    def update_search_option(key):
-        search_options[key] = st.session_state[f"{key}_input"]
-        save_search_options(search_options)
-
     available_engines = list(get_available_search_engines().keys())
+
     primary_engine = st.sidebar.selectbox(
         "Primary Search Engine",
         options=available_engines,
@@ -118,9 +130,10 @@ def display_sidebar_options():
         if search_options["primary_engine"] in available_engines
         else 0,
         key="primary_engine_input",
-        on_change=update_search_option,
-        args=("primary_engine",),
     )
+    if primary_engine != search_options["primary_engine"]:
+        update_search_option("primary_engine", primary_engine)
+
     fallback_options = [None] + [
         engine for engine in available_engines if engine != primary_engine
     ]
@@ -131,9 +144,9 @@ def display_sidebar_options():
         if search_options["fallback_engine"] in fallback_options
         else 0,
         key="fallback_engine_input",
-        on_change=update_search_option,
-        args=("fallback_engine",),
     )
+    if fallback_engine != search_options["fallback_engine"]:
+        update_search_option("fallback_engine", fallback_engine)
 
     search_top_k = st.sidebar.number_input(
         "Search Top K",
@@ -141,9 +154,9 @@ def display_sidebar_options():
         max_value=100,
         value=int(search_options.get("search_top_k", 3)),
         key="search_top_k_input",
-        on_change=update_search_option,
-        args=("search_top_k",),
     )
+    if search_top_k != search_options["search_top_k"]:
+        update_search_option("search_top_k", search_top_k)
 
     retrieve_top_k = st.sidebar.number_input(
         "Retrieve Top K",
@@ -151,22 +164,28 @@ def display_sidebar_options():
         max_value=100,
         value=int(search_options.get("retrieve_top_k", 3)),
         key="retrieve_top_k_input",
-        on_change=update_search_option,
-        args=("retrieve_top_k",),
     )
+    if retrieve_top_k != search_options["retrieve_top_k"]:
+        update_search_option("retrieve_top_k", retrieve_top_k)
 
     st.sidebar.header("LLM Options")
     llm_settings = load_llm_settings()
+    logger.info(f"Loaded LLM settings: {json.dumps(llm_settings, indent=2)}")
 
     def update_llm_setting(key):
         keys = key.split(".")
         if len(keys) == 1:
             llm_settings[key] = st.session_state[f"{key}_input"]
         elif len(keys) == 3:
+            if keys[0] not in llm_settings:
+                llm_settings[keys[0]] = {}
+            if keys[1] not in llm_settings[keys[0]]:
+                llm_settings[keys[0]][keys[1]] = {}
             llm_settings[keys[0]][keys[1]][keys[2]] = st.session_state[f"{key}_input"]
         else:
             st.error(f"Unexpected key format: {key}")
         save_llm_settings(llm_settings)
+        logger.info(f"Updated LLM settings: {json.dumps(llm_settings, indent=2)}")
 
     primary_model = st.sidebar.selectbox(
         "Primary LLM Model",
@@ -196,9 +215,12 @@ def display_sidebar_options():
     for model in LLM_MODELS.keys():
         if model == primary_model or model == fallback_model:
             st.sidebar.write(f"{model.capitalize()} Settings")
+            if model not in model_settings:
+                model_settings[model] = {}
+
             if model == "ollama":
                 downloaded_models = list_downloaded_models()
-                model_settings.setdefault(model, {})["model"] = st.sidebar.selectbox(
+                model_settings[model]["model"] = st.sidebar.selectbox(
                     "Ollama Model",
                     options=downloaded_models,
                     index=downloaded_models.index(
@@ -213,7 +235,7 @@ def display_sidebar_options():
                     args=(f"model_settings.{model}.model",),
                 )
             elif model == "openai":
-                model_settings.setdefault(model, {})["model"] = st.sidebar.selectbox(
+                model_settings[model]["model"] = st.sidebar.selectbox(
                     "OpenAI Model",
                     options=["gpt-4o-mini", "gpt-4o"],
                     index=0
@@ -224,7 +246,7 @@ def display_sidebar_options():
                     args=(f"model_settings.{model}.model",),
                 )
             elif model == "anthropic":
-                model_settings.setdefault(model, {})["model"] = st.sidebar.selectbox(
+                model_settings[model]["model"] = st.sidebar.selectbox(
                     "Anthropic Model",
                     options=["claude-3-haiku-20240307", "claude-3-5-sonnet-20240620"],
                     index=0
@@ -235,17 +257,18 @@ def display_sidebar_options():
                     args=(f"model_settings.{model}.model",),
                 )
 
-            model_settings.setdefault(model, {})["max_tokens"] = (
-                st.sidebar.number_input(
-                    f"{model.capitalize()} Max Tokens",
-                    min_value=1,
-                    max_value=10000,
-                    value=int(model_settings[model].get("max_tokens", 500)),
-                    key=f"model_settings.{model}.max_tokens_input",
-                    on_change=update_llm_setting,
-                    args=(f"model_settings.{model}.max_tokens",),
-                )
+            model_settings[model]["max_tokens"] = st.sidebar.number_input(
+                f"{model.capitalize()} Max Tokens",
+                min_value=1,
+                max_value=10000,
+                value=int(model_settings[model].get("max_tokens", 500)),
+                key=f"model_settings.{model}.max_tokens_input",
+                on_change=update_llm_setting,
+                args=(f"model_settings.{model}.max_tokens",),
             )
+
+    llm_settings["model_settings"] = model_settings
+    save_llm_settings(llm_settings)
 
     return {
         "search_options": search_options,
@@ -308,6 +331,11 @@ def run_storm_process(status, progress_bar, progress_text):
             current_category = st.session_state.get("selected_category", "Default")
             current_working_dir = get_output_dir(current_category)
 
+            logger.info(
+                f"Running STORM process for topic: {st.session_state['page3_topic']}"
+            )
+            logger.info(f"Current working directory: {current_working_dir}")
+
             runner = st.session_state["run_storm"](
                 st.session_state["page3_topic"],
                 current_working_dir,
@@ -319,6 +347,7 @@ def run_storm_process(status, progress_bar, progress_text):
             else:
                 raise Exception("STORM runner returned None")
         except Exception as e:
+            logger.error(f"Failed to generate the article: {str(e)}", exc_info=True)
             st.error(f"Failed to generate the article: {str(e)}")
             st.session_state["page3_write_article_state"] = "not started"
 
@@ -363,7 +392,42 @@ def finalize_article(status):
             status.update(label="information synthesis complete!", state="complete")
         except Exception as e:
             st.error(f"Error during final article generation: {str(e)}")
-            st.session_state["page3_write_article_state"] = "not started"
+            try:
+                # Make sure current_llm_options is available in the session state
+                if "current_llm_options" not in st.session_state:
+                    st.session_state["current_llm_options"] = load_llm_settings()
+
+                fallback_model = st.session_state["current_llm_options"].get(
+                    "fallback_model"
+                )
+                if not fallback_model:
+                    raise ValueError("No fallback model configured")
+
+                fallback_lm = create_lm_client(
+                    fallback_model,
+                    fallback=False,
+                    model_settings=st.session_state["current_llm_options"][
+                        "model_settings"
+                    ],
+                )
+                existing_info = collect_existing_information(st.session_state["runner"])
+                fallback_result = use_fallback_llm(
+                    st.session_state["page3_topic"], existing_info, fallback_lm
+                )
+                write_fallback_result(
+                    fallback_result,
+                    st.session_state["page3_current_working_dir"],
+                    st.session_state["page3_topic"],
+                )
+                st.success("Fallback LLM successfully generated content.")
+                st.session_state["page3_write_article_state"] = "prepare_to_show_result"
+                status.update(
+                    label="information synthesis complete (using fallback)!",
+                    state="complete",
+                )
+            except Exception as fallback_error:
+                st.error(f"Fallback LLM also failed: {str(fallback_error)}")
+                st.session_state["page3_write_article_state"] = "not started"
 
 
 def rename_and_date_article():
@@ -473,7 +537,17 @@ def create_new_article_page():
         )
         progress_bar = st.progress(0)
         progress_text = st.empty()
-        run_storm_process(status, progress_bar, progress_text)
+        try:
+            run_storm_process(status, progress_bar, progress_text)
+        except openai.NotFoundError as e:
+            st.error(f"Model not found: {e}. Please check your model configuration.")
+            st.session_state["page3_write_article_state"] = "not started"
+        except openai.APIError as e:
+            st.error(f"OpenAI API error: {e}")
+            st.session_state["page3_write_article_state"] = "not started"
+        except Exception as e:
+            st.error(f"An unexpected error occurred: {e}")
+            st.session_state["page3_write_article_state"] = "not started"
 
     if st.session_state["page3_write_article_state"] == "final_writing":
         if "runner" not in st.session_state or st.session_state["runner"] is None:

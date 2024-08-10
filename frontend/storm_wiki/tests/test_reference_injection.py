@@ -2,12 +2,21 @@ import pytest
 import os
 import json
 from unittest.mock import MagicMock, patch
-from util.storm_runner import process_search_results
+from util.storm_runner import process_search_results, run_storm_with_fallback
 
 
 @pytest.fixture
 def mock_runner():
-    return MagicMock()
+    runner = MagicMock()
+    runner.run.side_effect = Exception(
+        "HTTPConnectionPool(host='localhost', port=11434): Read timed out. (read timeout=120)"
+    )
+    return runner
+
+
+@pytest.fixture
+def mock_fallback_lm():
+    return MagicMock(return_value=["Fallback article content"])
 
 
 @pytest.fixture
@@ -36,6 +45,27 @@ def mock_raw_search_results():
             },
         ]
     }
+
+
+def test_run_storm_with_fallback_timeout(mock_runner, mock_fallback_lm):
+    with patch(
+        "util.storm_runner.collect_existing_information",
+        return_value={"research": "Mock research", "outline": "Mock outline"},
+    ):
+        with patch("util.storm_runner.write_fallback_result") as mock_write_fallback:
+            result = run_storm_with_fallback(
+                "Test topic",
+                "/mock/dir",
+                runner=mock_runner,
+                fallback_lm=mock_fallback_lm,
+            )
+
+            mock_runner.run.assert_called_once()
+            mock_fallback_lm.assert_called_once()
+            mock_write_fallback.assert_called_once_with(
+                "Fallback article content", "/mock/dir", "Test topic"
+            )
+            assert result == mock_runner
 
 
 def test_process_search_results(

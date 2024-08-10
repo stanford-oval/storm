@@ -8,7 +8,7 @@ import sqlite3
 import json
 import subprocess
 from dspy import Example
-
+import openai
 from knowledge_storm import (
     STORMWikiRunnerArguments,
     STORMWikiRunner,
@@ -21,8 +21,11 @@ from pages_util.Settings import (
     load_llm_settings,
     load_search_options,
 )
+from openai import NotFoundError
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 
@@ -91,24 +94,100 @@ def run_storm_with_fallback(
     current_working_dir: str,
     callback_handler=None,
     runner=None,
+    fallback_lm=None,
 ):
     log_progress(callback_handler, "Starting STORM process...")
 
     if runner is None:
         raise ValueError("Runner is not initialized")
 
-    # Set the output directory for the runner
-    runner.engine_args.output_dir = current_working_dir
+    try:
+        runner.run(
+            topic=topic,
+            do_research=True,
+            do_generate_outline=True,
+            do_generate_article=True,
+            do_polish_article=True,
+        )
+    except Exception as e:
+        logger.error(f"Error during STORM process: {str(e)}")
+        log_progress(callback_handler, "Attempting to use fallback LLM...")
 
-    runner.run(
-        topic=topic,
-        do_research=True,
-        do_generate_outline=True,
-        do_generate_article=True,
-        do_polish_article=True,
-    )
-    runner.post_run()
+        existing_info = collect_existing_information(runner)
+
+        try:
+            if fallback_lm is None:
+                raise ValueError("Fallback LLM is not configured")
+            fallback_result = use_fallback_llm(topic, existing_info, fallback_lm)
+            write_fallback_result(fallback_result, current_working_dir, topic)
+            log_progress(
+                callback_handler, "Fallback LLM successfully generated content."
+            )
+        except openai.NotFoundError as e:
+            logger.error(f"Fallback LLM model not found: {e}")
+            raise
+        except openai.APIError as e:
+            logger.error(f"OpenAI API error: {e}")
+            raise
+        except Exception as e:
+            logger.error(f"Unexpected error in fallback LLM: {e}")
+            raise
+    finally:
+        runner.post_run()
+
     return runner
+
+
+def use_fallback_llm(topic, existing_info, fallback_lm):
+    prompt = f"""
+    Topic: {topic}
+
+    Research Results:
+    {existing_info.get('research', 'No research available')}
+
+    Outline:
+    {existing_info.get('outline') if existing_info.get('outline') is not None else 'No outline available'}
+
+    Partial Article (if available):
+    {existing_info.get('partial_article') if existing_info.get('partial_article') is not None else 'No partial article available'}
+
+    Based on the above information, please complete a full article on the topic.
+    Ensure the article is well-structured, informative, and coherent.
+    """
+
+    try:
+        response = fallback_lm(prompt)
+        return response[0] if response else ""
+    except openai.NotFoundError as e:
+        logger.error(f"Fallback LLM model not found: {e}")
+        raise
+    except openai.APIError as e:
+        logger.error(f"OpenAI API error: {e}")
+        raise
+    except Exception as e:
+        logger.error(
+            f"Error in fallback LLM: {e}"
+        )  # Changed from "Unexpected error in fallback LLM"
+        raise
+
+
+def write_fallback_result(fallback_result, current_working_dir, topic):
+    file_path = os.path.join(current_working_dir, f"{topic.replace(' ', '_')}.md")
+    with open(file_path, "w") as f:
+        f.write(fallback_result)
+
+
+def collect_existing_information(runner):
+    existing_info = {
+        "research": runner.research_results
+        if hasattr(runner, "research_results")
+        else None,
+        "outline": runner.outline if hasattr(runner, "outline") else None,
+        "partial_article": runner.partial_article
+        if hasattr(runner, "partial_article")
+        else None,
+    }
+    return existing_info
 
 
 def process_raw_search_results(
@@ -172,7 +251,13 @@ def create_lm_client(
     model_type, fallback=False, model_settings=None, fallback_model=None
 ):
     try:
+        if model_type not in model_settings:
+            raise ValueError(f"Settings for {model_type} not found")
+
         if model_type == "ollama":
+            logger.info(
+                f"Creating Ollama client with model: {model_settings['ollama']['model']}"
+            )
             return OllamaClient(
                 model=model_settings["ollama"]["model"],
                 url="http://localhost",
@@ -181,13 +266,18 @@ def create_lm_client(
                 stop=("\n\n---",),
             )
         elif model_type == "openai":
+            logger.info(
+                f"Creating OpenAI client with model: {model_settings['openai']['model']}"
+            )
             return OpenAIModel(
                 model=model_settings["openai"]["model"],
                 api_key=os.getenv("OPENAI_API_KEY"),
                 max_tokens=model_settings["openai"]["max_tokens"],
             )
         elif model_type == "anthropic":
-            logger.info("Creating Anthropic client")
+            logger.info(
+                f"Creating Anthropic client with model: {model_settings['anthropic']['model']}"
+            )
             client = ClaudeModel(
                 model=model_settings["anthropic"]["model"],
                 api_key=os.getenv("ANTHROPIC_API_KEY"),
@@ -200,14 +290,14 @@ def create_lm_client(
         else:
             raise ValueError(f"Unsupported model type: {model_type}")
     except Exception as e:
-        logger.error(f"Error creating {model_type} client: {str(e)}")
+        logger.error(f"Error creating {model_type} client: {str(e)}", exc_info=True)
         if fallback and fallback_model:
             logger.warning(f"Falling back to {fallback_model}")
             return create_lm_client(
                 fallback_model, fallback=False, model_settings=model_settings
             )
         else:
-            raise e
+            raise
 
 
 def run_storm_with_config(
@@ -226,31 +316,45 @@ def run_storm_with_config(
     update_progress("Loading configurations...")
     llm_settings = load_llm_settings()
     search_options = load_search_options()
+    search_top_k = search_options["search_top_k"]
+    retrieve_top_k = search_options["retrieve_top_k"]
 
     update_progress("Setting up LLM...")
     primary_model = llm_settings["primary_model"]
     fallback_model = llm_settings["fallback_model"]
     model_settings = llm_settings["model_settings"]
-    search_top_k = search_options["search_top_k"]
-    retrieve_top_k = search_options["retrieve_top_k"]
+    logger.info(f"Primary model: {primary_model}, Fallback model: {fallback_model}")
+    logger.info(f"Model settings: {json.dumps(model_settings, indent=2)}")
 
     llm_configs = STORMWikiLMConfigs()
 
-    primary_lm = create_lm_client(
-        primary_model,
-        fallback=True,
-        model_settings=model_settings,
-        fallback_model=fallback_model,
-    )
+    try:
+        primary_lm = create_lm_client(
+            primary_model,
+            fallback=False,
+            model_settings=model_settings,
+        )
 
-    for lm_type in [
-        "conv_simulator",
-        "question_asker",
-        "outline_gen",
-        "article_gen",
-        "article_polish",
-    ]:
-        getattr(llm_configs, f"set_{lm_type}_lm")(primary_lm)
+        fallback_lm = None
+        if fallback_model:
+            fallback_lm = create_lm_client(
+                fallback_model,
+                fallback=False,
+                model_settings=model_settings,
+            )
+
+        for lm_type in [
+            "conv_simulator",
+            "question_asker",
+            "outline_gen",
+            "article_gen",
+            "article_polish",
+        ]:
+            getattr(llm_configs, f"set_{lm_type}_lm")(primary_lm)
+    except Exception as e:
+        logger.error(f"Error setting up LLM: {str(e)}", exc_info=True)
+        st.error(f"Failed to set up LLM: {str(e)}")
+        return None
 
     update_progress("Setting up search engine...")
     engine_args = STORMWikiRunnerArguments(
@@ -265,12 +369,15 @@ def run_storm_with_config(
 
     update_progress("Initializing STORM runner...")
     runner = STORMWikiRunner(engine_args, llm_configs, rm)
-    runner.engine_args = engine_args
 
     add_examples_to_runner(runner)
 
     result = run_storm_with_fallback(
-        topic, current_working_dir, callback_handler, runner=runner
+        topic=topic,
+        current_working_dir=current_working_dir,
+        callback_handler=callback_handler,
+        runner=runner,
+        fallback_lm=fallback_lm,
     )
 
     update_progress("STORM process completed.")

@@ -25,7 +25,7 @@ from db.db_operations import (
     load_setting,
     save_setting,
     load_search_options,
-    save_search_options,
+    update_search_option,
     load_llm_settings,
     save_llm_settings,
 )
@@ -198,6 +198,10 @@ def update_llm_setting(key, llm_settings):
     if len(keys) == 1:
         llm_settings[key] = st.session_state[f"{key}_input"]
     elif len(keys) == 3:
+        if keys[0] not in llm_settings:
+            llm_settings[keys[0]] = {}
+        if keys[1] not in llm_settings[keys[0]]:
+            llm_settings[keys[0]][keys[1]] = {}
         llm_settings[keys[0]][keys[1]][keys[2]] = st.session_state[f"{key}_input"]
     else:
         st.error(f"Unexpected key format: {key}")
@@ -272,16 +276,27 @@ def search_settings():
     st.subheader("Search Options Settings")
     search_options = load_search_options()
 
-    def update_search_option(key):
-        search_options[key] = st.session_state[f"{key}_input"]
-        save_setting("search_options", search_options)
+    # Initialize session state for engine-specific settings
+    for engine, engine_config in SEARCH_ENGINES.items():
+        if "settings" in engine_config:
+            for key in engine_config["settings"]:
+                input_key = f"engine_settings.{engine}.{key}_input"
+                if input_key not in st.session_state:
+                    st.session_state[input_key] = (
+                        search_options.get("engine_settings", {})
+                        .get(engine, {})
+                        .get(key, "")
+                    )
+
+    def update_search_option_callback(key):
+        update_search_option(key, st.session_state[f"{key}_input"])
 
     primary_engine = st.selectbox(
         "Primary Search Engine",
         options=list(SEARCH_ENGINES.keys()),
         index=list(SEARCH_ENGINES.keys()).index(search_options["primary_engine"]),
         key="primary_engine_input",
-        on_change=update_search_option,
+        on_change=update_search_option_callback,
         args=("primary_engine",),
     )
 
@@ -297,7 +312,7 @@ def search_settings():
         options=fallback_options,
         index=fallback_options.index(current_fallback),
         key="fallback_engine_input",
-        on_change=update_search_option,
+        on_change=update_search_option_callback,
         args=("fallback_engine",),
     )
 
@@ -307,7 +322,7 @@ def search_settings():
         max_value=100,
         value=search_options["search_top_k"],
         key="search_top_k_input",
-        on_change=update_search_option,
+        on_change=update_search_option_callback,
         args=("search_top_k",),
     )
 
@@ -317,7 +332,7 @@ def search_settings():
         max_value=100,
         value=search_options["retrieve_top_k"],
         key="retrieve_top_k_input",
-        on_change=update_search_option,
+        on_change=update_search_option_callback,
         args=("retrieve_top_k",),
     )
 
@@ -327,11 +342,8 @@ def search_settings():
     for engine in SEARCH_ENGINES:
         with st.expander(f"{engine.capitalize()} Settings"):
             engine_settings[engine] = get_engine_specific_settings(
-                engine, engine_settings.get(engine, {}), update_search_option
+                engine, engine_settings.get(engine, {}), update_search_option_callback
             )
-
-    search_options["engine_settings"] = engine_settings
-    save_setting("search_options", search_options)
 
 
 def get_engine_specific_settings(engine, current_settings, update_callback):
@@ -339,20 +351,20 @@ def get_engine_specific_settings(engine, current_settings, update_callback):
     if engine in SEARCH_ENGINES and "settings" in SEARCH_ENGINES[engine]:
         for key, config in SEARCH_ENGINES[engine]["settings"].items():
             input_type = config.get("type", "text")
+            input_key = f"engine_settings.{engine}.{key}_input"
+
             if input_type == "text":
                 settings[key] = st.text_input(
                     config["label"],
-                    value=current_settings.get(key, ""),
-                    key=f"{engine}_{key}_input",
+                    key=input_key,
                     on_change=update_callback,
                     args=(f"engine_settings.{engine}.{key}",),
                 )
             elif input_type == "password":
                 settings[key] = st.text_input(
                     config["label"],
-                    value=current_settings.get(key, ""),
                     type="password",
-                    key=f"{engine}_{key}_input",
+                    key=input_key,
                     on_change=update_callback,
                     args=(f"engine_settings.{engine}.{key}",),
                 )

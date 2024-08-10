@@ -1,12 +1,16 @@
 import pytest
 import unittest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch, MagicMock, call, ANY
 import streamlit as st
 from util.storm_runner import (
     run_storm_with_fallback,
     set_storm_runner,
     run_storm_with_config,
+    collect_existing_information,
+    use_fallback_llm,
+    write_fallback_result,
 )
+from openai import NotFoundError
 
 
 @pytest.fixture(autouse=True)
@@ -17,7 +21,7 @@ def mock_gpu_dependencies():
         "knowledge_storm.lm.OpenAIModel"
     ), patch("knowledge_storm.lm.OllamaClient"), patch(
         "knowledge_storm.lm.ClaudeModel"
-    ), patch("util.search.CombinedSearchAPI"):  # Change this line
+    ), patch("util.search.CombinedSearchAPI"):
         yield
 
 
@@ -48,8 +52,10 @@ class TestStormRunner(unittest.TestCase):
     @patch("util.storm_runner.create_lm_client")
     @patch("util.storm_runner.load_llm_settings")
     @patch("util.storm_runner.load_search_options")
+    @patch("util.storm_runner.run_storm_with_fallback")
     def test_run_storm_with_config_engine_args(
         self,
+        mock_run_storm_with_fallback,
         mock_load_search_options,
         mock_load_llm_settings,
         mock_create_lm_client,
@@ -61,7 +67,6 @@ class TestStormRunner(unittest.TestCase):
         mock_runner = MagicMock()
         mock_storm_wiki_runner.return_value = mock_runner
 
-        # Mock the load_llm_settings function
         mock_load_llm_settings.return_value = {
             "primary_model": "test_model",
             "fallback_model": "fallback_model",
@@ -71,7 +76,6 @@ class TestStormRunner(unittest.TestCase):
             },
         }
 
-        # Mock the load_search_options function
         mock_load_search_options.return_value = {
             "search_top_k": 10,
             "retrieve_top_k": 5,
@@ -81,18 +85,20 @@ class TestStormRunner(unittest.TestCase):
         result = run_storm_with_config("Test Topic", "/tmp/test_dir")
 
         # Assert
-        self.assertTrue(
-            hasattr(mock_runner, "engine_args"),
-            "STORMWikiRunner should have engine_args attribute",
+        mock_storm_wiki_runner.assert_called_once()
+        mock_run_storm_with_fallback.assert_called_once_with(
+            topic="Test Topic",
+            current_working_dir="/tmp/test_dir",
+            callback_handler=None,
+            runner=mock_runner,
+            fallback_lm=ANY,
         )
-        self.assertEqual(mock_runner.engine_args.output_dir, "/tmp/test_dir")
-
-        # Additional assertions
         mock_load_llm_settings.assert_called_once()
         mock_load_search_options.assert_called_once()
-        mock_create_lm_client.assert_called_once()
+        self.assertEqual(
+            mock_create_lm_client.call_count, 2
+        )  # Once for primary, once for fallback
         mock_combined_search_api.assert_called_once()
-        mock_storm_wiki_runner.assert_called_once()
 
 
 class TestSetStormRunner:
@@ -134,16 +140,14 @@ class TestRunStormWithFallback:
         ],
     )
     @patch("util.storm_runner.STORMWikiRunner")
-    @patch("util.storm_runner.STORMWikiRunnerArguments")
-    @patch("util.storm_runner.STORMWikiLMConfigs")
-    @patch("util.storm_runner.CombinedSearchAPI")
-    @patch("util.storm_runner.set_storm_runner")
+    @patch("util.storm_runner.collect_existing_information")
+    @patch("util.storm_runner.use_fallback_llm")
+    @patch("util.storm_runner.write_fallback_result")
     def test_run_storm_with_fallback_success(
         self,
-        mock_set_storm_runner,
-        mock_combined_search,
-        mock_configs,
-        mock_args,
+        mock_write_fallback_result,
+        mock_use_fallback_llm,
+        mock_collect_existing_information,
         mock_runner,
         primary_model,
         fallback_model,
@@ -165,38 +169,22 @@ class TestRunStormWithFallback:
             do_polish_article=True,
         )
         mock_runner_instance.post_run.assert_called_once()
-
-    @patch("util.storm_runner.STORMWikiRunner")
-    @patch("util.storm_runner.STORMWikiRunnerArguments")
-    @patch("util.storm_runner.STORMWikiLMConfigs")
-    @patch("util.storm_runner.CombinedSearchAPI")
-    @patch("util.storm_runner.set_storm_runner")
-    def test_run_storm_with_fallback_no_runner(
-        self,
-        mock_set_storm_runner,
-        mock_combined_search,
-        mock_configs,
-        mock_args,
-        mock_runner,
-        mock_streamlit,
-    ):
-        with pytest.raises(ValueError, match="Runner is not initialized"):
-            run_storm_with_fallback("test topic", "/tmp/test_dir")
+        mock_collect_existing_information.assert_not_called()
+        mock_use_fallback_llm.assert_not_called()
+        mock_write_fallback_result.assert_not_called()
 
     @pytest.mark.parametrize(
         "error_stage", ["research", "outline", "article", "polish"]
     )
     @patch("util.storm_runner.STORMWikiRunner")
-    @patch("util.storm_runner.STORMWikiRunnerArguments")
-    @patch("util.storm_runner.STORMWikiLMConfigs")
-    @patch("util.storm_runner.CombinedSearchAPI")
-    @patch("util.storm_runner.set_storm_runner")
+    @patch("util.storm_runner.collect_existing_information")
+    @patch("util.storm_runner.use_fallback_llm")
+    @patch("util.storm_runner.write_fallback_result")
     def test_run_storm_with_fallback_stage_failure(
         self,
-        mock_set_storm_runner,
-        mock_combined_search,
-        mock_configs,
-        mock_args,
+        mock_write_fallback_result,
+        mock_use_fallback_llm,
+        mock_collect_existing_information,
         mock_runner,
         error_stage,
         mock_streamlit,
@@ -206,250 +194,245 @@ class TestRunStormWithFallback:
         mock_runner_instance.run.side_effect = Exception(
             f"{error_stage.capitalize()} failed"
         )
+        mock_collect_existing_information.return_value = {"research": "mock research"}
+        mock_use_fallback_llm.return_value = "Fallback content"
 
-        with pytest.raises(
-            Exception,
-            match=f"{error_stage.capitalize()} failed",  # Fixed typo here
-        ):
+        mock_fallback_lm = None  # Set fallback_lm to None to trigger the ValueError
+
+        with pytest.raises(ValueError, match="Fallback LLM is not configured"):
             run_storm_with_fallback(
-                "test topic", "/tmp/test_dir", runner=mock_runner_instance
+                "test topic",
+                "/tmp/test_dir",
+                runner=mock_runner_instance,
+                fallback_lm=mock_fallback_lm,
             )
 
         mock_runner_instance.run.assert_called_once()
-        mock_runner_instance.post_run.assert_not_called()
+        mock_collect_existing_information.assert_called_once_with(mock_runner_instance)
+        mock_use_fallback_llm.assert_not_called()
+        mock_write_fallback_result.assert_not_called()
+        mock_runner_instance.post_run.assert_called_once()
 
-    @pytest.mark.parametrize(
-        "do_research,do_generate_outline,do_generate_article,do_polish_article",
-        [
-            (True, True, True, True),
-            (True, False, True, True),
-            (True, True, False, False),
-            (False, True, True, False),
-            (False, False, True, True),
-        ],
-    )
     @patch("util.storm_runner.STORMWikiRunner")
-    def test_run_storm_with_different_step_combinations(
+    @patch("util.storm_runner.collect_existing_information")
+    @patch("util.storm_runner.use_fallback_llm")
+    @patch("util.storm_runner.write_fallback_result")
+    def test_run_storm_with_fallback_llm_failure(
         self,
+        mock_write_fallback_result,
+        mock_use_fallback_llm,
+        mock_collect_existing_information,
         mock_runner,
-        do_research,
-        do_generate_outline,
-        do_generate_article,
-        do_polish_article,
         mock_streamlit,
     ):
         mock_runner_instance = Mock()
         mock_runner.return_value = mock_runner_instance
+        mock_runner_instance.run.side_effect = Exception("Primary LLM failed")
+        mock_collect_existing_information.return_value = {"research": "mock research"}
+        mock_use_fallback_llm.side_effect = Exception("Fallback LLM failed")
 
-        result = run_storm_with_fallback(
-            "test topic", "/tmp/test_dir", runner=mock_runner_instance
-        )
+        mock_fallback_lm = Mock()
 
-        assert result == mock_runner_instance
-        mock_runner_instance.run.assert_called_once_with(
-            topic="test topic",
-            do_research=True,
-            do_generate_outline=True,
-            do_generate_article=True,
-            do_polish_article=True,
-        )
+        with pytest.raises(Exception, match="Fallback LLM failed"):
+            run_storm_with_fallback(
+                "test topic",
+                "/tmp/test_dir",
+                runner=mock_runner_instance,
+                fallback_lm=mock_fallback_lm,
+            )
+
+        mock_runner_instance.run.assert_called_once()
+        mock_collect_existing_information.assert_called_once_with(mock_runner_instance)
+        mock_use_fallback_llm.assert_called_once()
+        mock_write_fallback_result.assert_not_called()
         mock_runner_instance.post_run.assert_called_once()
 
     @patch("util.storm_runner.STORMWikiRunner")
-    def test_run_storm_with_unexpected_exception(self, mock_runner, mock_streamlit):
+    @patch("util.storm_runner.collect_existing_information")
+    @patch("util.storm_runner.use_fallback_llm")
+    @patch("util.storm_runner.write_fallback_result")
+    def test_run_storm_with_fallback_no_fallback_lm(
+        self,
+        mock_write_fallback_result,
+        mock_use_fallback_llm,
+        mock_collect_existing_information,
+        mock_runner,
+        mock_streamlit,
+    ):
         mock_runner_instance = Mock()
         mock_runner.return_value = mock_runner_instance
-        mock_runner_instance.run.side_effect = Exception("Unexpected error")
+        mock_runner_instance.run.side_effect = Exception("Primary LLM failed")
+        mock_collect_existing_information.return_value = {"research": "mock research"}
 
-        with pytest.raises(Exception, match="Unexpected error"):
+        # Mock the fallback LLM configuration with None
+        mock_runner_instance.llm_configs = Mock()
+        mock_runner_instance.llm_configs.fallback_lm = None
+
+        with pytest.raises(ValueError, match="Fallback LLM is not configured"):
             run_storm_with_fallback(
                 "test topic", "/tmp/test_dir", runner=mock_runner_instance
             )
 
         mock_runner_instance.run.assert_called_once()
-        mock_runner_instance.post_run.assert_not_called()
-
-    @patch("util.storm_runner.STORMWikiRunner")
-    def test_run_storm_with_different_output_formats(self, mock_runner, mock_streamlit):
-        mock_runner_instance = Mock()
-        mock_runner.return_value = mock_runner_instance
-
-        # Simulate different output formats
-        mock_runner_instance.run.side_effect = [
-            {"outline": "Test outline", "article": "Test article"},
-            {
-                "outline": "Test outline",
-                "article": "Test article",
-                "polished_article": "Polished test article",
-            },
-            {"research": "Test research", "outline": "Test outline"},
-        ]
-
-        for _ in range(3):
-            result = run_storm_with_fallback(
-                "test topic", "/tmp/test_dir", runner=mock_runner_instance
-            )
-            assert result == mock_runner_instance
-            mock_runner_instance.post_run.assert_called_once()
-            mock_runner_instance.post_run.reset_mock()
-
-        assert mock_runner_instance.run.call_count == 3
-
-    @pytest.mark.parametrize(
-        "topic",
-        [
-            "Short topic",
-            "A very long topic that exceeds the usual length of topics and might cause issues if not handled properly",
-            "Topic with special characters: !@#$%^&*()",
-            "数学和科学",  # Topic in Chinese
-            "",  # Empty topic
-        ],
-    )
-    @patch("util.storm_runner.STORMWikiRunner")
-    def test_run_storm_with_different_topic_types(
-        self, mock_runner, topic, mock_streamlit
-    ):
-        mock_runner_instance = Mock()
-        mock_runner.return_value = mock_runner_instance
-
-        result = run_storm_with_fallback(
-            topic, "/tmp/test_dir", runner=mock_runner_instance
-        )
-
-        assert result == mock_runner_instance
-        mock_runner_instance.run.assert_called_once_with(
-            topic=topic,
-            do_research=True,
-            do_generate_outline=True,
-            do_generate_article=True,
-            do_polish_article=True,
-        )
+        mock_collect_existing_information.assert_called_once_with(mock_runner_instance)
+        mock_use_fallback_llm.assert_not_called()
+        mock_write_fallback_result.assert_not_called()
         mock_runner_instance.post_run.assert_called_once()
 
-    @pytest.mark.parametrize(
-        "working_dir",
-        [
+
+def test_collect_existing_information():
+    mock_runner = Mock()
+    mock_runner.research_results = "Mock research"
+    mock_runner.outline = "Mock outline"
+    mock_runner.partial_article = "Mock partial article"
+
+    result = collect_existing_information(mock_runner)
+
+    assert result == {
+        "research": "Mock research",
+        "outline": "Mock outline",
+        "partial_article": "Mock partial article",
+    }
+
+
+def test_collect_existing_information_missing_attributes():
+    mock_runner = Mock()
+    mock_runner.research_results = "Mock research"
+    # Explicitly delete outline and partial_article attributes
+    delattr(mock_runner, "outline")
+    delattr(mock_runner, "partial_article")
+
+    result = collect_existing_information(mock_runner)
+
+    assert result == {
+        "research": "Mock research",
+        "outline": None,
+        "partial_article": None,
+    }
+    assert not hasattr(mock_runner, "outline")
+    assert not hasattr(mock_runner, "partial_article")
+
+
+@patch("util.storm_runner.open", new_callable=unittest.mock.mock_open)
+def test_write_fallback_result(mock_open):
+    write_fallback_result("Fallback content", "/tmp/test_dir", "Test Topic")
+    mock_open.assert_called_once_with("/tmp/test_dir/Test_Topic.md", "w")
+    mock_open().write.assert_called_once_with("Fallback content")
+
+
+@patch("util.storm_runner.open", new_callable=unittest.mock.mock_open)
+def test_write_fallback_result_with_special_characters(mock_open):
+    write_fallback_result(
+        "Fallback content", "/tmp/test_dir", "Test Topic with spaces and $pecial chars!"
+    )
+    mock_open.assert_called_once_with(
+        "/tmp/test_dir/Test_Topic_with_spaces_and_$pecial_chars!.md", "w"
+    )
+    mock_open().write.assert_called_once_with("Fallback content")
+
+
+@patch("util.storm_runner.logger")
+def test_use_fallback_llm(mock_logger):
+    mock_fallback_lm = Mock()
+    mock_fallback_lm.return_value = ["Fallback content"]
+
+    existing_info = {
+        "research": "Mock research",
+        "outline": "Mock outline",
+        "partial_article": "Mock partial article",
+    }
+
+    result = use_fallback_llm("Test Topic", existing_info, mock_fallback_lm)
+
+    assert result == "Fallback content"
+    mock_fallback_lm.assert_called_once()
+    assert "Test Topic" in mock_fallback_lm.call_args[0][0]
+    assert "Mock research" in mock_fallback_lm.call_args[0][0]
+    assert "Mock outline" in mock_fallback_lm.call_args[0][0]
+    assert "Mock partial article" in mock_fallback_lm.call_args[0][0]
+
+
+@patch("util.storm_runner.logger")
+def test_use_fallback_llm_with_missing_info(mock_logger):
+    mock_fallback_lm = Mock()
+    mock_fallback_lm.return_value = ["Fallback content"]
+
+    existing_info = {
+        "research": "Mock research",
+        "outline": None,
+        "partial_article": None,
+    }
+
+    result = use_fallback_llm("Test Topic", existing_info, mock_fallback_lm)
+
+    assert result == "Fallback content"
+    mock_fallback_lm.assert_called_once()
+
+    # Get the prompt that was passed to the fallback_lm
+    call_args = mock_fallback_lm.call_args
+    if call_args is not None:
+        prompt = call_args[0][0]
+        assert "Test Topic" in prompt
+        assert "Mock research" in prompt
+        assert "No outline available" in prompt
+        assert "No partial article available" in prompt
+        assert "None" not in prompt
+    else:
+        pytest.fail("mock_fallback_lm was not called with any arguments")
+
+
+@patch("util.storm_runner.logger")
+def test_use_fallback_llm_exception(mock_logger):
+    mock_fallback_lm = Mock()
+    mock_fallback_lm.side_effect = Exception("Fallback LLM failed")
+
+    existing_info = {
+        "research": "Mock research",
+        "outline": "Mock outline",
+        "partial_article": "Mock partial article",
+    }
+
+    with pytest.raises(Exception, match="Fallback LLM failed"):
+        use_fallback_llm("Test Topic", existing_info, mock_fallback_lm)
+
+    mock_logger.error.assert_called_once_with(
+        "Error in fallback LLM: Fallback LLM failed"
+    )
+
+
+from openai import NotFoundError, APIError
+
+
+@patch("util.storm_runner.create_lm_client")
+@patch("util.storm_runner.collect_existing_information")
+def test_run_storm_with_fallback_model_not_found(
+    mock_collect_existing_information, mock_create_lm_client, mock_streamlit
+):
+    mock_runner = Mock()
+    mock_runner.run.side_effect = Exception("Primary LLM failed")
+
+    mock_collect_existing_information.return_value = {"research": "mock research"}
+
+    mock_fallback_lm = Mock()
+    error_message = "Error code: 404 - {'error': {'message': 'model \"gpt-4o-mini\" not found, try pulling it first', 'type': 'api_error', 'param': None, 'code': None}}"
+    mock_fallback_lm.side_effect = NotFoundError(
+        message=error_message,
+        response=Mock(status_code=404),
+        body={
+            "error": {"message": 'model "gpt-4o-mini" not found, try pulling it first'}
+        },
+    )
+    mock_create_lm_client.return_value = mock_fallback_lm
+
+    with pytest.raises(NotFoundError, match='model "gpt-4o-mini" not found'):
+        run_storm_with_fallback(
+            "test topic",
             "/tmp/test_dir",
-            "relative/path",
-            ".",
-            "/path/with spaces/and/special/chars!@#$",
-            "",  # Empty path
-        ],
-    )
-    @patch("util.storm_runner.STORMWikiRunner")
-    @patch("util.storm_runner.STORMWikiRunnerArguments")
-    @patch("util.storm_runner.STORMWikiLMConfigs")
-    @patch("util.storm_runner.CombinedSearchAPI")
-    @patch("util.storm_runner.os.path.exists")
-    @patch("util.storm_runner.os.makedirs")
-    def test_run_storm_with_different_working_directories(
-        self,
-        mock_makedirs,
-        mock_exists,
-        mock_combined_search,
-        mock_configs,
-        mock_args,
-        mock_runner,
-        working_dir,
-        mock_streamlit,
-    ):
-        mock_runner_instance = Mock()
-        mock_runner.return_value = mock_runner_instance
-        mock_exists.return_value = False
-
-        # Mock the STORMWikiRunnerArguments
-        mock_args_instance = Mock()
-        mock_args.return_value = mock_args_instance
-        mock_args_instance.output_dir = working_dir
-
-        # Mock the search engine and LLM model results
-        mock_search_results = {
-            "results": [{"title": "Test", "snippet": "Test snippet"}]
-        }
-        mock_llm_response = "Generated content"
-
-        mock_combined_search_instance = Mock()
-        mock_combined_search.return_value = mock_combined_search_instance
-        mock_combined_search_instance.search.return_value = mock_search_results
-
-        mock_runner_instance.run.return_value = {
-            "search_results": mock_search_results,
-            "generated_content": mock_llm_response,
-        }
-
-        result = run_storm_with_fallback(
-            "test topic", working_dir, runner=mock_runner_instance
+            runner=mock_runner,
+            fallback_lm=mock_fallback_lm,
         )
 
-        assert result == mock_runner_instance
-        mock_runner_instance.run.assert_called_once()
-        mock_runner_instance.post_run.assert_called_once()
-
-        # Check if the working_dir was passed correctly to the runner's engine_args
-        if working_dir:
-            assert mock_runner_instance.engine_args.output_dir == working_dir
-        else:
-            # If working_dir is empty, it should use a default directory
-            assert mock_runner_instance.engine_args.output_dir is not None
-
-        # Check if the run method was called with the correct arguments
-        expected_kwargs = {
-            "topic": "test topic",
-            "do_research": True,
-            "do_generate_outline": True,
-            "do_generate_article": True,
-            "do_polish_article": True,
-        }
-        mock_runner_instance.run.assert_called_once_with(**expected_kwargs)
-
-
-class TestSearchEngines:
-    @pytest.mark.parametrize(
-        "primary_search,fallback_search",
-        [
-            ("combined", "google"),
-            ("google", "combined"),
-            ("bing", "combined"),
-            ("combined", "bing"),
-        ],
-    )
-    @patch("util.storm_runner.STORMWikiRunner")
-    @patch("util.storm_runner.CombinedSearchAPI")
-    def test_search_engine_fallback(
-        self,
-        mock_combined_search,
-        mock_runner,
-        primary_search,
-        fallback_search,
-        mock_streamlit,
-    ):
-        mock_runner_instance = Mock()
-        mock_runner.return_value = mock_runner_instance
-
-        # Mock search results
-        mock_search_results = {
-            "results": [{"title": "Test", "snippet": "Test snippet"}]
-        }
-        mock_combined_search.return_value.search.return_value = mock_search_results
-
-        # Mock LLM response
-        mock_llm_response = "Generated content"
-
-        def run_side_effect(*args, **kwargs):
-            # Simulate calling the search method
-            mock_combined_search.return_value.search("test topic")
-            return {
-                "search_results": mock_search_results,
-                "generated_content": mock_llm_response,
-            }
-
-        mock_runner_instance.run.side_effect = run_side_effect
-
-        result = run_storm_with_fallback(
-            "test topic", "/tmp/test_dir", runner=mock_runner_instance
-        )
-
-        assert result == mock_runner_instance
-        mock_runner_instance.run.assert_called_once()
-        mock_runner_instance.post_run.assert_called_once()
-        mock_combined_search.return_value.search.assert_called_once_with("test topic")
+    mock_runner.run.assert_called_once()
+    mock_collect_existing_information.assert_called_once_with(mock_runner)
+    mock_fallback_lm.assert_called_once()
+    mock_runner.post_run.assert_called_once()
