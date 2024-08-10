@@ -191,7 +191,7 @@ if __name__ == "__main__":
         os.makedirs(output_directory, exist_ok=True)
         logger.info("Created directory: %s", output_directory)
     # Check if the file exists and ask for user confirmation to override
-    if os.path.exists(args.output_path):
+    if os.path.exists(args.output_path) and os.path.isfile(args.output_path): # Ensures that the output path is a file before prompting for overwriting.
         overwrite = input(f"The file {args.output_path} already exists. Do you want to overwrite it? (y/n): ")
         if overwrite.lower() != 'y':
             logger.info("User chose not to overwrite the existing file. Exiting.")
