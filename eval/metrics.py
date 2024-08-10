@@ -15,7 +15,7 @@ encoder = SentenceTransformer('paraphrase-MiniLM-L6-v2')
 def card(l):
     encoded_l = encoder.encode(list(l))
     cosine_sim = cosine_similarity(encoded_l)
-    soft_count = 1 / cosine_sim.sum(axis=1)
+    soft_count = 1 / (cosine_sim.sum(axis=1) + 1e-8) # Prevents division by zero if cosine similarity is too small.
 
     return soft_count.sum()
 
