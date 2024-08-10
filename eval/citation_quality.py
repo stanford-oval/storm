@@ -137,7 +137,7 @@ def compute_autoais(data,
             sents = [item['question'] + " " + x.strip() for x in
                      item['output'].rstrip().rstrip(".").rstrip(",").split(",")]
         else:
-            sents = sent_tokenize(item['output'])
+            sents = sent_tokenize(item['output']) if 'output' in item else [] # Checks for the existence of the output key in item before tokenizing to prevent errors.
         if len(sents) == 0:
             continue
 
