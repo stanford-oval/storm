@@ -25,7 +25,7 @@ def read_json(file_path):
     Read a json file to dict
     """
     with open(file_path, 'r') as file:
-        return json.load(file)
+        return json.load(file) if os.path.getsize(file_path) > 0 else {} # Prevents errors from trying to load empty JSON files.
 
 
 def preprocess_text(text):
