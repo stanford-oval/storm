@@ -30,7 +30,7 @@ autoais_model, autoais_tokenizer, mistral_7b_instruct, mistral_7b_tokenizer = No
 def get_max_memory():
     """Get the maximum memory available for the current GPU for loading models."""
     free_in_GB = int(torch.cuda.mem_get_info()[0] / (1024 ** 3)) # Added parentheses for proper precedence.
-    max_memory = f'{free_in_GB - 6}GB'
+    max_memory = f'{max(free_in_GB - 6, 1)}GB' # Ensures that the max_memory value doesn't go negative.
     n_gpus = torch.cuda.device_count()
     max_memory = {i: max_memory for i in range(n_gpus)}
     return max_memory
