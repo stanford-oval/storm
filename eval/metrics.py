@@ -13,7 +13,7 @@ encoder = SentenceTransformer('paraphrase-MiniLM-L6-v2')
 
 
 def card(l):
-    encoded_l = encoder.encode(list(l))
+    encoded_l = encoder.encode([str(item) for item in l]) # Ensure that all items in the list are strings before encoding to prevent encoding errors.
     cosine_sim = cosine_similarity(encoded_l)
     soft_count = 1 / (cosine_sim.sum(axis=1) + 1e-8) # Prevents division by zero if cosine similarity is too small.
 
