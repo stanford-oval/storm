@@ -1,0 +1,27 @@
+secrets.toml
+.env
+*.db
+
+# macOS files
+.DS_Store
+.idea
+
+# default docker ignore
+.git
+.gitignore
+.dockerignore
+Dockerfile
+docker-compose.yml
+*.pyc
+*.pyo
+*.pyd
+__pycache__
+.pytest_cache
+.venv
+venv
+*.log
+*.sqlite3
+data/
+DEMO_WORKING_DIR/
+*.example
+tests/
