@@ -36,7 +36,7 @@ def heading_soft_recall(golden_headings: List[str], predicted_headings: List[str
     card_g = card(g)
     card_p = card(p)
     card_intersection = card_g + card_p - card(g.union(p))
-    return card_intersection / card_g
+    return card_intersection / (card_g + 1e-8) # Prevents division by zero if card_g is too small.
 
 
 def extract_entities_from_list(l):
