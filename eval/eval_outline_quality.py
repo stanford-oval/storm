@@ -32,7 +32,7 @@ def get_sections(path):
     return sections
 
 def main(args):
-    df = pd.read_csv(args.input_path)
+    df = pd.read_csv(args.input_path) if os.path.exists(args.input_path) else pd.DataFrame() # Prevents error if the CSV file does not exist, initializes an empty DataFrame instead.
     entity_recalls = []
     heading_soft_recalls = []
     topics = []
