@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from collections import OrderedDict
 from typing import Dict, List, Optional, Union
 
-logging.basicConfig(level=logging.INFO, format='%(name)s : %(levelname)-8s : %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(name)s : %(levelname)-8s : %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -178,7 +178,7 @@ class Retriever(ABC):
     def collect_and_reset_rm_usage(self):
         combined_usage = []
         for attr_name in self.__dict__:
-            if '_rm' in attr_name and hasattr(getattr(self, attr_name), 'get_usage_and_reset'):
+            if "_rm" in attr_name and hasattr(getattr(self, attr_name), "get_usage_and_reset"):
                 combined_usage.append(getattr(self, attr_name).get_usage_and_reset())
 
         name_to_usage = {}
@@ -256,6 +256,34 @@ class OutlineGenerationModule(ABC):
         pass
 
 
+class TaskExtractionModule(ABC):
+    """
+    The interface for task extraction stage. Given topic and collected information,
+    extract tasks for the AI to complete.
+    """
+
+    @abstractmethod
+    def extract_tasks(
+        self, topic: str, information_table: InformationTable, **kwargs
+    ) -> List[Dict[str, str]]:
+        """
+        Extract tasks for the AI to complete. Required arguments include:
+            topic: the topic of interest
+            information_table: knowledge curation data generated from KnowledgeCurationModule
+
+        More arguments could be:
+            1. markdown_content: the original markdown content
+            2. user_provided_tasks: additional tasks provided by the user
+
+        Returns:
+            A list of dictionaries, where each dictionary represents a task with keys such as:
+            - 'task': the task to be completed
+            - 'description': a detailed description of the task
+            - 'context': relevant context for the task
+        """
+        pass
+
+
 class ArticleGenerationModule(ABC):
     """
     The interface for article generation stage. Given topic, collected information from
@@ -263,11 +291,9 @@ class ArticleGenerationModule(ABC):
     """
 
     @abstractmethod
-    def generate_article(self,
-                         topic: str,
-                         information_table: InformationTable,
-                         article_with_outline: Article,
-                         **kwargs) -> Article:
+    def generate_article(
+        self, topic: str, information_table: InformationTable, article_with_outline: Article, **kwargs
+    ) -> Article:
         """
         Generate article. Required arguments include:
             topic: the topic of interest
@@ -275,6 +301,35 @@ class ArticleGenerationModule(ABC):
             article_with_outline: article with specified outline from OutlineGenerationModule
         """
         pass
+
+
+# ... existing imports and classes ...
+
+
+class ArticleCompletionModule(ABC):
+    """
+    The interface for article completion stage. Given an article with tasks to be completed,
+    extract and complete these tasks, updating the article accordingly.
+    """
+
+    @abstractmethod
+    def complete_article(self, article: Article, information_table: InformationTable, **kwargs) -> Article:
+        """
+        Extract tasks, complete them, and update the article.
+
+        Args:
+            article (Article): The article to be completed.
+            information_table (InformationTable): Knowledge curation data.
+            **kwargs: Additional keyword arguments, which may include:
+                - callback_handler (Optional[BaseCallbackHandler]): An optional callback handler.
+
+        Returns:
+            Article: The completed article.
+        """
+        pass
+
+
+# ... rest of the file ...
 
 
 class ArticlePolishingModule(ABC):
@@ -319,7 +374,7 @@ class LMConfigs(ABC):
 
     def init_check(self):
         for attr_name in self.__dict__:
-            if '_lm' in attr_name and getattr(self, attr_name) is None:
+            if "_lm" in attr_name and getattr(self, attr_name) is None:
                 logging.warning(
                     f"Language model for {attr_name} is not initialized. Please call set_{attr_name}()"
                 )
@@ -327,7 +382,7 @@ class LMConfigs(ABC):
     def collect_and_reset_lm_history(self):
         history = []
         for attr_name in self.__dict__:
-            if '_lm' in attr_name and hasattr(getattr(self, attr_name), 'history'):
+            if "_lm" in attr_name and hasattr(getattr(self, attr_name), "history"):
                 history.extend(getattr(self, attr_name).history)
                 getattr(self, attr_name).history = []
 
@@ -336,7 +391,7 @@ class LMConfigs(ABC):
     def collect_and_reset_lm_usage(self):
         combined_usage = []
         for attr_name in self.__dict__:
-            if '_lm' in attr_name and hasattr(getattr(self, attr_name), 'get_usage_and_reset'):
+            if "_lm" in attr_name and hasattr(getattr(self, attr_name), "get_usage_and_reset"):
                 combined_usage.append(getattr(self, attr_name).get_usage_and_reset())
 
         model_name_to_usage = {}
@@ -345,8 +400,8 @@ class LMConfigs(ABC):
                 if model_name not in model_name_to_usage:
                     model_name_to_usage[model_name] = tokens
                 else:
-                    model_name_to_usage[model_name]['prompt_tokens'] += tokens['prompt_tokens']
-                    model_name_to_usage[model_name]['completion_tokens'] += tokens['completion_tokens']
+                    model_name_to_usage[model_name]["prompt_tokens"] += tokens["prompt_tokens"]
+                    model_name_to_usage[model_name]["completion_tokens"] += tokens["completion_tokens"]
 
         return model_name_to_usage
 
@@ -354,8 +409,9 @@ class LMConfigs(ABC):
 
         return OrderedDict(
             {
-                attr_name: getattr(self, attr_name).kwargs for attr_name in self.__dict__ if
-                '_lm' in attr_name and hasattr(getattr(self, attr_name), 'kwargs')
+                attr_name: getattr(self, attr_name).kwargs
+                for attr_name in self.__dict__
+                if "_lm" in attr_name and hasattr(getattr(self, attr_name), "kwargs")
             }
         )
 
@@ -379,7 +435,7 @@ class Engine(ABC):
             self.time[func.__name__] = execution_time
             logger.info(f"{func.__name__} executed in {execution_time:.4f} seconds")
             self.lm_cost[func.__name__] = self.lm_configs.collect_and_reset_lm_usage()
-            if hasattr(self, 'retriever'):
+            if hasattr(self, "retriever"):
                 self.rm_cost[func.__name__] = self.retriever.collect_and_reset_rm_usage()
             return result
 
@@ -387,8 +443,11 @@ class Engine(ABC):
 
     def apply_decorators(self):
         """Apply decorators to methods that need them."""
-        methods_to_decorate = [method_name for method_name in dir(self)
-                               if callable(getattr(self, method_name)) and method_name.startswith('run_')]
+        methods_to_decorate = [
+            method_name
+            for method_name in dir(self)
+            if callable(getattr(self, method_name)) and method_name.startswith("run_")
+        ]
         for method_name in methods_to_decorate:
             original_method = getattr(self, method_name)
             decorated_method = self.log_execution_time_and_lm_rm_usage(original_method)
