@@ -61,7 +61,7 @@ def main(args):
 
     # STORM is a knowledge curation system which consumes information from the retrieval module.
     # Currently, the information source is the Internet and we use search engine API as the retrieval module.
-    match args.retriver:
+    match args.retriever:
         case 'bing':
             rm = BingSearch(bing_search_api=os.getenv('BING_SEARCH_API_KEY'), k=engine_args.search_top_k)
         case 'you':
