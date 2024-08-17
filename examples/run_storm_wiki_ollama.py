@@ -1,7 +1,7 @@
 """
 STORM Wiki pipeline powered by local model hosted by Ollama server and You.com or Bing search engine.
 You need to set up the following environment variables to run this script:
-    - YDC_API_KEY: You.com API key; BING_SEARCH_API_KEY: Bing Search API key, SERPER_API_KEY: Serper API key, BRAVE_API_KEY: Brave API key
+    - YDC_API_KEY: You.com API key; BING_SEARCH_API_KEY: Bing Search API key, SERPER_API_KEY: Serper API key, or BRAVE_API_KEY: Brave API key
 You also need to have a Ollama server running with the llama3 model or other. Specify `--url`, `--port` and `--model` accordingly.
 
 Output will be structured as below

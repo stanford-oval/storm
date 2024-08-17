@@ -5,7 +5,7 @@ You need to set up the following environment variables to run this script:
     - OPENAI_API_TYPE: OpenAI API type (e.g., 'openai' or 'azure')
     - AZURE_API_BASE: Azure API base URL if using Azure API
     - AZURE_API_VERSION: Azure API version if using Azure API
-    - YDC_API_KEY: You.com API key; BING_SEARCH_API_KEY: Bing Search API key, SERPER_API_KEY: Serper API key, BRAVE_API_KEY: Brave API key
+    - YDC_API_KEY: You.com API key; BING_SEARCH_API_KEY: Bing Search API key, SERPER_API_KEY: Serper API key, or BRAVE_API_KEY: Brave API key
 
 Output will be structured as below
 args.output_dir/
