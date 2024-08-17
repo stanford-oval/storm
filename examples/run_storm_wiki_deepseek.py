@@ -3,7 +3,7 @@ STORM Wiki pipeline powered by DeepSeek models and You.com or Bing search engine
 You need to set up the following environment variables to run this script:
     - DEEPSEEK_API_KEY: DeepSeek API key
     - DEEPSEEK_API_BASE: DeepSeek API base URL (default is https://api.deepseek.com)
-    - YDC_API_KEY: You.com API key; BING_SEARCH_API_KEY: Bing Search API key, SERPER_API_KEY: Serper API key, BRAVE_API_KEY: Brave API key
+    - YDC_API_KEY: You.com API key; BING_SEARCH_API_KEY: Bing Search API key, SERPER_API_KEY: Serper API key, or BRAVE_API_KEY: Brave API key
 
 Output will be structured as below
 args.output_dir/

@@ -2,7 +2,7 @@
 STORM Wiki pipeline powered by Google Gemini models and search engine.
 You need to set up the following environment variables to run this script:
     - GOOGLE_API_KEY: Google API key (Can be obtained from https://ai.google.dev/gemini-api/docs/api-key)
-    - YDC_API_KEY: You.com API key; BING_SEARCH_API_KEY: Bing Search API key, SERPER_API_KEY: Serper API key, BRAVE_API_KEY: Brave API key
+    - YDC_API_KEY: You.com API key; BING_SEARCH_API_KEY: Bing Search API key, SERPER_API_KEY: Serper API key, or BRAVE_API_KEY: Brave API key
 
 Output will be structured as below
 args.output_dir/
