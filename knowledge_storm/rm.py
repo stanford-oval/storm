@@ -511,6 +511,7 @@ class BraveRM(dspy.Retrieve):
         return collected_results
 
 class DuckDuckGoSearchRM(dspy.Retrieve):
+    """Retrieve information from custom queries using DuckDuckGo."""
     def __init__(
         self,
         k: int =3,
@@ -520,7 +521,6 @@ class DuckDuckGoSearchRM(dspy.Retrieve):
         webpage_helper_max_threads=10,
         safe_search: str = 'On',
         region: str = 'us-en'
-        **kwargs,
     ):
         """
         Params:
@@ -538,7 +538,6 @@ class DuckDuckGoSearchRM(dspy.Retrieve):
             max_thread_num=webpage_helper_max_threads,
         )
         self.usage = 0
-
         # All params for search can be found here: 
         #   https://duckduckgo.com/duckduckgo-help-pages/settings/params/
 
