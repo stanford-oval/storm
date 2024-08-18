@@ -206,12 +206,14 @@ class STORMWikiRunner(Engine):
 
     def run_article_polishing_module(self,
                                      draft_article: StormArticle,
-                                     remove_duplicate: bool = False) -> StormArticle:
+                                     remove_duplicate: bool = False,
+                                     callback_handler: BaseCallbackHandler = None) -> StormArticle:
 
         polished_article = self.storm_article_polishing_module.polish_article(
             topic=self.topic,
             draft_article=draft_article,
-            remove_duplicate=remove_duplicate
+            remove_duplicate=remove_duplicate,
+            callback_handler=callback_handler
         )
         FileIOHelper.write_str(polished_article.to_string(),
                                os.path.join(self.article_output_dir, 'storm_gen_article_polished.txt'))
@@ -324,4 +326,4 @@ class STORMWikiRunner(Engine):
                 draft_article = self._load_draft_article_from_local_fs(topic=topic,
                                                                        draft_article_path=draft_article_path,
                                                                        url_to_info_path=url_to_info_path)
-            self.run_article_polishing_module(draft_article=draft_article, remove_duplicate=remove_duplicate)
+            self.run_article_polishing_module(draft_article=draft_article, remove_duplicate=remove_duplicate, callback_handler=callback_handler)

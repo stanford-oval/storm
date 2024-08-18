@@ -2,6 +2,7 @@ import copy
 from typing import Union
 
 import dspy
+from knowledge_storm.storm_wiki.modules.callback import BaseCallbackHandler
 
 from .storm_dataclass import StormArticle
 from ...interface import ArticlePolishingModule
@@ -28,7 +29,8 @@ class StormArticlePolishingModule(ArticlePolishingModule):
     def polish_article(self,
                        topic: str,
                        draft_article: StormArticle,
-                       remove_duplicate: bool = False) -> StormArticle:
+                       remove_duplicate: bool = False,
+                       callback_handler: BaseCallbackHandler = None) -> StormArticle:
         """
         Polish article.
 
@@ -38,6 +40,7 @@ class StormArticlePolishingModule(ArticlePolishingModule):
             remove_duplicate (bool): Whether to use one additional LM call to remove duplicates from the article.
         """
 
+        callback_handler.on_article_polishing_start()
         article_text = draft_article.to_string()
         polish_result = self.polish_page(topic=topic, draft_page=article_text, polish_whole_page=remove_duplicate)
         lead_section = f"# summary\n{polish_result.lead_section}"
@@ -46,6 +49,7 @@ class StormArticlePolishingModule(ArticlePolishingModule):
         polished_article = copy.deepcopy(draft_article)
         polished_article.insert_or_create_section(article_dict=polished_article_dict)
         polished_article.post_processing()
+        callback_handler.on_article_polishing_end()
         return polished_article
 
 
