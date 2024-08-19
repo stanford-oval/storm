@@ -232,12 +232,12 @@ class AzureOpenAIModel(dspy.AzureOpenAI):
 
         return usage
 
-class GroqOpenAIModel(dspy.OpenAI):
+class GroqModel(dspy.OpenAI):
     """A wrapper class for Groq API, compatible with dspy.OpenAI."""
 
     def __init__(
             self,
-            model: str = "mixtral-8x7b-32768",
+            model: str = "llama3-70b-8192",
             api_key: Optional[str] = None,
             api_base: str = "https://api.groq.com/openai/v1",
             **kwargs
@@ -317,7 +317,7 @@ class GroqOpenAIModel(dspy.OpenAI):
             only_completed: bool = True,
             return_sorted: bool = False,
             **kwargs,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Call the Groq API to generate completions."""
         assert only_completed, "for now"
         assert return_sorted is False, "for now"
