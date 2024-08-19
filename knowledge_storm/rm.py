@@ -1,7 +1,6 @@
 import logging
 import os
 from typing import Callable, Union, List
-from duckduckgo_search import DDGS
 import dspy
 import requests
 
@@ -510,6 +509,7 @@ class BraveRM(dspy.Retrieve):
 
         return collected_results
 
+
 class DuckDuckGoSearchRM(dspy.Retrieve):
     """Retrieve information from custom queries using DuckDuckGo."""
     def __init__(
@@ -530,7 +530,10 @@ class DuckDuckGoSearchRM(dspy.Retrieve):
             **kwargs: Additional parameters for the OpenAI API.
         """
         super().__init__(k=k)
-
+        try:
+            from duckduckgo_search import DDGS
+        except ImportError as err:
+            raise ImportError("Duckduckgo requires `pip install duckduckgo_search`.") from err
         self.k = k
         self.webpage_helper = WebPageHelper(
             min_char_count=min_char_count,
@@ -560,13 +563,11 @@ class DuckDuckGoSearchRM(dspy.Retrieve):
         # Import the duckduckgo search library found here: https://github.com/deedy5/duckduckgo_search
         self.ddgs = DDGS()
 
-    # Store usage of credits and reset the class usage variable
     def get_usage_and_reset(self):
         usage = self.usage
         self.usage = 0
         return {'DuckDuckGoRM': usage}
 
-    # this is the important function that is used by Retriever in the pipeline
     def forward(
         self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
     ):
