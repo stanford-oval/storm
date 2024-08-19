@@ -1,8 +1,7 @@
 """
-STORM Wiki pipeline powered by DeepSeek models and You.com or Bing search engine.
+STORM Wiki pipeline powered by Google Gemini models and search engine.
 You need to set up the following environment variables to run this script:
-    - DEEPSEEK_API_KEY: DeepSeek API key
-    - DEEPSEEK_API_BASE: DeepSeek API base URL (default is https://api.deepseek.com)
+    - GOOGLE_API_KEY: Google API key (Can be obtained from https://ai.google.dev/gemini-api/docs/api-key)
     - YDC_API_KEY: You.com API key; or, BING_SEARCH_API_KEY: Bing Search API key
 
 Output will be structured as below
@@ -18,57 +17,35 @@ args.output_dir/
 """
 
 import os
-import sys
-import re
-import logging
 from argparse import ArgumentParser
 
 from knowledge_storm import STORMWikiRunnerArguments, STORMWikiRunner, STORMWikiLMConfigs
-from knowledge_storm.lm import DeepSeekModel
+from knowledge_storm.lm import GoogleModel
 from knowledge_storm.rm import YouRM, BingSearch, BraveRM
 from knowledge_storm.utils import load_api_key
-
-
-def sanitize_topic(topic):
-    """
-    Sanitize the topic name for use in file names.
-    Remove or replace characters that are not allowed in file names.
-    """
-    # Replace spaces with underscores
-    topic = topic.replace(' ', '_')
-
-    # Remove any character that isn't alphanumeric, underscore, or hyphen
-    topic = re.sub(r'[^a-zA-Z0-9_-]', '', topic)
-
-    # Ensure the topic isn't empty after sanitization
-    if not topic:
-        topic = "unnamed_topic"
-
-    return topic
 
 
 def main(args):
     load_api_key(toml_file_path='secrets.toml')
     lm_configs = STORMWikiLMConfigs()
-
-    # Ensure DEEPSEEK_API_KEY is set
-    if not os.getenv("DEEPSEEK_API_KEY"):
-        raise ValueError("DEEPSEEK_API_KEY environment variable is not set. Please set it in your secrets.toml file.")
-
-    deepseek_kwargs = {
-        'api_key': os.getenv("DEEPSEEK_API_KEY"),
-        'api_base': os.getenv("DEEPSEEK_API_BASE", "https://api.deepseek.com"),
-        'temperature': args.temperature,
-        'top_p': args.top_p,
+    gemini_kwargs = {
+        'api_key': os.getenv("GOOGLE_API_KEY"),
+        'temperature': 1.0,
+        'top_p': 0.9
     }
 
-    # DeepSeek offers two main models: 'deepseek-chat' for general tasks and 'deepseek-coder' for coding tasks
-    # Users can choose the appropriate model based on their needs
-    conv_simulator_lm = DeepSeekModel(model=args.model, max_tokens=500, **deepseek_kwargs)
-    question_asker_lm = DeepSeekModel(model=args.model, max_tokens=500, **deepseek_kwargs)
-    outline_gen_lm = DeepSeekModel(model=args.model, max_tokens=400, **deepseek_kwargs)
-    article_gen_lm = DeepSeekModel(model=args.model, max_tokens=700, **deepseek_kwargs)
-    article_polish_lm = DeepSeekModel(model=args.model, max_tokens=4000, **deepseek_kwargs)
+    # STORM is a LM system so different components can be powered by different models.
+    # For a good balance between cost and quality, you can choose a cheaper/faster model for conv_simulator_lm
+    # which is used to split queries, synthesize answers in the conversation. We recommend using stronger models
+    # for outline_gen_lm which is responsible for organizing the collected information, and article_gen_lm
+    # which is responsible for generating sections with citations.
+    # To check out available Google models, see:
+    # https://ai.google.dev/gemini-api/docs/get-started/tutorial?lang=python#list_models
+    conv_simulator_lm = GoogleModel(model='models/gemini-1.5-flash', max_tokens=500, **gemini_kwargs)
+    question_asker_lm = GoogleModel(model='models/gemini-1.5-flash', max_tokens=500, **gemini_kwargs)
+    outline_gen_lm = GoogleModel(model='models/gemini-1.5-pro-exp-0801', max_tokens=400, **gemini_kwargs)
+    article_gen_lm = GoogleModel(model='models/gemini-1.5-pro-exp-0801', max_tokens=700, **gemini_kwargs)
+    article_polish_lm = GoogleModel(model='models/gemini-1.5-pro-exp-0801', max_tokens=4000, **gemini_kwargs)
 
     lm_configs.set_conv_simulator_lm(conv_simulator_lm)
     lm_configs.set_question_asker_lm(question_asker_lm)
@@ -92,47 +69,32 @@ def main(args):
         rm = YouRM(ydc_api_key=os.getenv('YDC_API_KEY'), k=engine_args.search_top_k)
     elif args.retriever == 'brave':
         rm = BraveRM(brave_search_api_key=os.getenv('BRAVE_API_KEY'), k=engine_args.search_top_k)
-    else:
-        raise ValueError(f"Invalid retriever: {args.retriever}. Choose either 'bing' or 'you'.")
 
     runner = STORMWikiRunner(engine_args, lm_configs, rm)
 
     topic = input('Topic: ')
-    sanitized_topic = sanitize_topic(topic)
-
-    try:
-        runner.run(
-            topic=sanitized_topic,
-            do_research=args.do_research,
-            do_generate_outline=args.do_generate_outline,
-            do_generate_article=args.do_generate_article,
-            do_polish_article=args.do_polish_article,
-            remove_duplicate=args.remove_duplicate,
-        )
-        runner.post_run()
-        runner.summary()
-    except Exception as e:
-        logger.exception(f"An error occurred: {str(e)}")
-        raise
+    runner.run(
+        topic=topic,
+        do_research=args.do_research,
+        do_generate_outline=args.do_generate_outline,
+        do_generate_article=args.do_generate_article,
+        do_polish_article=args.do_polish_article,
+    )
+    runner.post_run()
+    runner.summary()
 
 
 if __name__ == '__main__':
     parser = ArgumentParser()
     # global arguments
-    parser.add_argument('--output-dir', type=str, default='./results/deepseek',
+    parser.add_argument('--output-dir', type=str, default='./results/gemini',
                         help='Directory to store the outputs.')
     parser.add_argument('--max-thread-num', type=int, default=3,
                         help='Maximum number of threads to use. The information seeking part and the article generation'
                              'part can speed up by using multiple threads. Consider reducing it if keep getting '
                              '"Exceed rate limit" error when calling LM API.')
-    parser.add_argument('--retriever', type=str, choices=['bing', 'you', 'brave'], required=True,
+    parser.add_argument('--retriever', type=str, choices=['bing', 'you', 'brave'],
                         help='The search engine API to use for retrieving information.')
-    parser.add_argument('--model', type=str, choices=['deepseek-chat', 'deepseek-coder'], default='deepseek-chat',
-                        help='DeepSeek model to use. "deepseek-chat" for general tasks, "deepseek-coder" for coding tasks.')
-    parser.add_argument('--temperature', type=float, default=1.0,
-                        help='Sampling temperature to use.')
-    parser.add_argument('--top_p', type=float, default=0.9,
-                        help='Top-p sampling parameter.')
     # stage of the pipeline
     parser.add_argument('--do-research', action='store_true',
                         help='If True, simulate conversation to research the topic; otherwise, load the results.')
