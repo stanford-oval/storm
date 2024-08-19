@@ -544,12 +544,12 @@ class SerperRM(dspy.Retrieve):
 
 class SearXNG(dspy.Retrieve):
     def __init__(self, searxng_api_url, searxng_api_key=None, k=3, is_valid_source: Callable = None):
-        """
-        Initialize the SearXNG search retriever.
+        """Initialize the SearXNG search retriever.
+        Please set up SearXNG according to https://docs.searxng.org/index.html.
 
         Args:
-            searxng_api_url (str): The URL of the SearXNG API.
-            searxng_api_key (str, optional): The API key for the SearXNG API. Defaults to None.
+            searxng_api_url (str): The URL of the SearXNG API. Consult SearXNG documentation for details.
+            searxng_api_key (str, optional): The API key for the SearXNG API. Defaults to None. Consult SearXNG documentation for details.
             k (int, optional): The number of top passages to retrieve. Defaults to 3.
             is_valid_source (Callable, optional): A function that takes a URL and returns a boolean indicating if the
             source is valid. Defaults to None.
