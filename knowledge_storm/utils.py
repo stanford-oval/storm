@@ -602,7 +602,7 @@ class WebPageHelper:
                 h,
                 include_tables=False,
                 include_comments=False,
-                output_format="text",
+                output_format="txt",
             )
             if article_text is not None and len(article_text) > self.min_char_count:
                 articles[u] = {"text": article_text}
