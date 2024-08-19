@@ -30,10 +30,11 @@ import os
 import sys
 from argparse import ArgumentParser
 
+sys.path.append('./')
 from knowledge_storm import STORMWikiRunnerArguments, STORMWikiRunner, STORMWikiLMConfigs
 from knowledge_storm.rm import VectorRM
 from knowledge_storm.lm import OpenAIModel, AzureOpenAIModel
-from knowledge_storm.utils import load_api_key
+from knowledge_storm.utils import load_api_key, QdrantVectorStoreManager
 
 
 def main(args):
@@ -83,25 +84,40 @@ def main(args):
         max_thread_num=args.max_thread_num,
     )
 
+    # Create / update the vector store with the documents in the csv file
+    if args.csv_file_path:
+        kwargs = {
+            'file_path': args.csv_file_path,
+            'content_column': 'content',
+            'title_column': 'title',
+            'url_column': 'url',
+            'desc_column': 'description',
+            'batch_size': args.embed_batch_size,
+            'vector_db_mode': args.vector_db_mode,
+            'collection_name': args.collection_name,
+            'embedding_model': args.embedding_model,
+            'device': args.device,
+        }
+        if args.vector_db_mode == 'offline':
+            QdrantVectorStoreManager.create_or_update_vector_store(
+                vector_store_path=args.offline_vector_db_dir,
+                **kwargs
+            )
+        elif args.vector_db_mode == 'online':
+            QdrantVectorStoreManager.create_or_update_vector_store(
+                url=args.online_vector_db_url,
+                api_key=os.getenv('QDRANT_API_KEY'),
+                **kwargs
+            )
+
     # Setup VectorRM to retrieve information from your own data
-    rm = VectorRM(collection_name=args.collection_name, device=args.device, k=engine_args.search_top_k)
+    rm = VectorRM(collection_name=args.collection_name, embedding_model=args.embedding_model, device=args.device, k=engine_args.search_top_k)
 
     # initialize the vector store, either online (store the db on Qdrant server) or offline (store the db locally):
     if args.vector_db_mode == 'offline':
         rm.init_offline_vector_db(vector_store_path=args.offline_vector_db_dir)
     elif args.vector_db_mode == 'online':
         rm.init_online_vector_db(url=args.online_vector_db_url, api_key=os.getenv('QDRANT_API_KEY'))
-
-    # Update the vector store with the documents in the csv file
-    if args.update_vector_store:
-        rm.update_vector_store(
-            file_path=args.csv_file_path,
-            content_column='content',
-            title_column='title',
-            url_column='url',
-            desc_column='description',
-            batch_size=args.embed_batch_size
-        )
 
     # Initialize the STORM Wiki Runner
     runner = STORMWikiRunner(engine_args, engine_lm_configs, rm)
@@ -131,6 +147,8 @@ if __name__ == "__main__":
     # provide local corpus and set up vector db
     parser.add_argument('--collection-name', type=str, default="my_documents",
                         help='The collection name for vector store.')
+    parser.add_argument('--embedding_model', type=str, default="BAAI/bge-m3",
+                        help='The collection name for vector store.')
     parser.add_argument('--device', type=str, default="mps",
                         help='The device used to run the retrieval model (mps, cuda, cpu, etc).')
     parser.add_argument('--vector-db-mode', type=str, choices=['offline', 'online'],
@@ -139,10 +157,7 @@ if __name__ == "__main__":
                         help='If use offline mode, please provide the directory to store the vector store.')
     parser.add_argument('--online-vector-db-url', type=str,
                         help='If use online mode, please provide the url of the Qdrant server.')
-    parser.add_argument('--update-vector-store', action='store_true',
-                        help='If True, update the vector store with the documents in the csv file; otherwise, '
-                             'use the existing vector store.')
-    parser.add_argument('--csv-file-path', type=str,
+    parser.add_argument('--csv-file-path', type=str, default=None,
                         help='The path of the custom document corpus in CSV format. The CSV file should include '
                              'content, title, url, and description columns.')
     parser.add_argument('--embed-batch-size', type=int, default=64,

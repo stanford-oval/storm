@@ -54,7 +54,6 @@ By default, STORM is grounded on the Internet using the search engine, but it ca
        --output-dir $OUTPUT_DIR \
        --vector-db-mode offline \
        --offline-vector-db-dir $OFFLINE_VECTOR_DB_DIR \
-       --update-vector-store \
        --csv-file-path $CSV_FILE_PATH \ 
        --device $DEVICE_FOR_EMBEDDING(mps, cuda, cpu) \
        --do-research \
@@ -70,7 +69,6 @@ By default, STORM is grounded on the Internet using the search engine, but it ca
        --output-dir $OUTPUT_DIR \
        --vector-db-mode online \
        --online-vector-db-url $ONLINE_VECTOR_DB_URL \
-       --update-vector-store \
        --csv-file-path $CSV_FILE_PATH \
        --device $DEVICE_FOR_EMBEDDING(mps, cuda, cpu) \
        --do-research \
@@ -85,7 +83,7 @@ By default, STORM is grounded on the Internet using the search engine, but it ca
    - Run the following command under the root directory to downsample the dataset by filtering papers with terms `[cs.CV]` and get a csv file that match the format mentioned above.
 
      ```
-     python examples/helper/process_kaggle_arxiv_abstract_dataset --input-path $PATH_TO_THE_DOWNLOADED_FILE --output-path $PATH_TO_THE_PROCESSED_CSV
+     python examples/helper/process_kaggle_arxiv_abstract_dataset.py --input-path $PATH_TO_THE_DOWNLOADED_FILE --output-path $PATH_TO_THE_PROCESSED_CSV
      ```
    - Run the following command to run STORM grounding on the processed dataset. You can input a topic related to computer vision (e.g., "The progress of multimodal models in computer vision") to see the generated article. (Note that the generated article may not include enough details since the quick test only use the abstracts of arxiv papers.)
 
@@ -94,7 +92,6 @@ By default, STORM is grounded on the Internet using the search engine, but it ca
          --output-dir $OUTPUT_DIR \
          --vector-db-mode offline \
          --offline-vector-db-dir $OFFLINE_VECTOR_DB_DIR \
-         --update-vector-store \
          --csv-file-path $PATH_TO_THE_PROCESSED_CSV \
          --device $DEVICE_FOR_EMBEDDING(mps, cuda, cpu) \
          --do-research \
