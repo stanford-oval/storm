@@ -3,7 +3,7 @@ import time
 
 import demo_util
 import streamlit as st
-from demo_util import DemoFileIOHelper, DemoTextProcessingHelper, DemoUIHelper
+from demo_util import DemoFileIOHelper, DemoTextProcessingHelper, DemoUIHelper, truncate_filename
 
 
 def create_new_article_page():
@@ -33,6 +33,7 @@ def create_new_article_page():
 
                     st.session_state["page3_topic_name_cleaned"] = st.session_state["page3_topic"].replace(
                         ' ', '_').replace('/', '_')
+                    st.session_state["page3_topic_name_truncated"] = truncate_filename(st.session_state["page3_topic_name_cleaned"])
                     if not pass_appropriateness_check:
                         st.session_state["page3_write_article_state"] = "not started"
                         alert = st.warning(st.session_state["page3_warning_message"], icon="⚠️")
@@ -65,7 +66,7 @@ def create_new_article_page():
                 callback_handler=st_callback_handler
             )
             conversation_log_path = os.path.join(st.session_state["page3_current_working_dir"],
-                                                 st.session_state["page3_topic_name_cleaned"], "conversation_log.json")
+                                                 st.session_state["page3_topic_name_truncated"], "conversation_log.json")
             demo_util._display_persona_conversations(DemoFileIOHelper.read_json_file(conversation_log_path))
             st.session_state["page3_write_article_state"] = "final_writing"
             status.update(label="brain**STORM**ing complete!", state="complete")
@@ -96,7 +97,7 @@ def create_new_article_page():
         # display polished article
         current_working_dir_paths = DemoFileIOHelper.read_structure_to_dict(
             st.session_state["page3_current_working_dir"])
-        current_article_file_path_dict = current_working_dir_paths[st.session_state["page3_topic_name_cleaned"]]
+        current_article_file_path_dict = current_working_dir_paths[st.session_state["page3_topic_name_truncated"]]
         demo_util.display_article_page(selected_article_name=st.session_state["page3_topic_name_cleaned"],
                                        selected_article_file_path_dict=current_article_file_path_dict,
                                        show_title=True, show_main_article=True)
