@@ -2,7 +2,7 @@
 STORM Wiki pipeline powered by llama3-70b-8192 hosted by Groq server and You.com search engine.
 You need to set up the following environment variables to run this script:
     - GROQ_API_KEY: You can get your Groq API Key at https://console.groq.com/keys
-    - YDC_API_KEY: You.com API key; or, BING_SEARCH_API_KEY: Bing Search API key
+    - YDC_API_KEY: You.com API key; BING_SEARCH_API_KEY: Bing Search API key, SERPER_API_KEY: Serper API key, BRAVE_API_KEY: Brave API key, or TAVILY_API_KEY: Tavily API key
 You also need to have a VLLM server running with the Mistral-7B-Instruct-v0.2 model. Specify `--url` and `--port` accordingly.
 
 Output will be structured as below
@@ -33,7 +33,7 @@ sys.path.insert(0, lm_path)
 # Now import lm directly
 import lm
 from lm import GroqModel
-from knowledge_storm.rm import YouRM, BingSearch, BraveRM
+from knowledge_storm.rm import YouRM, BingSearch, BraveRM, SerperRM, DuckDuckGoSearchRM, TavilySearchRM, SearXNG
 from knowledge_storm.utils import load_api_key
 
 
@@ -93,14 +93,23 @@ def main(args):
 
     # STORM is a knowledge curation system which consumes information from the retrieval module.
     # Currently, the information source is the Internet and we use search engine API as the retrieval module.
-    if args.retriever == 'bing':
-        rm = BingSearch(bing_search_api=os.getenv('BING_SEARCH_API_KEY'), k=engine_args.search_top_k)
-    elif args.retriever == 'you':
-        rm = YouRM(ydc_api_key=os.getenv('YDC_API_KEY'), k=engine_args.search_top_k)
-    elif args.retriever == 'brave':
-        rm = BraveRM(brave_search_api_key=os.getenv('BRAVE_API_KEY'), k=engine_args.search_top_k)
-    else:
-        raise ValueError(f"Invalid retriever: {args.retriever}. Choose either 'bing', 'you', or 'brave'.")
+    match args.retriever:
+        case 'bing':
+            rm = BingSearch(bing_search_api=os.getenv('BING_SEARCH_API_KEY'), k=engine_args.search_top_k)
+        case 'you':
+             rm = YouRM(ydc_api_key=os.getenv('YDC_API_KEY'), k=engine_args.search_top_k)
+        case 'brave':
+            rm = BraveRM(brave_search_api_key=os.getenv('BRAVE_API_KEY'), k=engine_args.search_top_k)
+        case 'duckduckgo':
+            rm = DuckDuckGoSearchRM(k=engine_args.search_top_k, safe_search='On', region='us-en')
+        case 'serper':
+            rm = SerperRM(serper_search_api_key=os.getenv('SERPER_API_KEY'), query_params={'autocorrect': True, 'num': 10, 'page': 1})
+        case 'tavily':
+            rm = TavilySearchRM(tavily_search_api_key=os.getenv('TAVILY_API_KEY'), k=engine_args.search_top_k, include_raw_content=True)
+        case 'searxng':
+            rm = SearXNG(searxng_api_key=os.getenv('SEARXNG_API_KEY'), k=engine_args.search_top_k)
+        case _:
+             raise ValueError(f'Invalid retriever: {args.retriever}. Choose either "bing", "you", "brave", "duckduckgo", "serper", "tavily", or "searxng"')
 
     runner = STORMWikiRunner(engine_args, lm_configs, rm)
 
@@ -132,7 +141,7 @@ if __name__ == '__main__':
                         help='Maximum number of threads to use. The information seeking part and the article generation'
                              'part can speed up by using multiple threads. Consider reducing it if keep getting '
                              '"Exceed rate limit" error when calling LM API.')
-    parser.add_argument('--retriever', type=str, choices=['bing', 'you', 'brave'], required=True,
+    parser.add_argument('--retriever', type=str, choices=['bing', 'you', 'brave', 'serper', 'duckduckgo', 'tavily', 'searxng'],
                         help='The search engine API to use for retrieving information.')
     parser.add_argument('--temperature', type=float, default=1.0,
                         help='Sampling temperature to use.')
