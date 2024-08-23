@@ -1,7 +1,6 @@
 import logging
 import os
 from typing import Callable, Union, List
-
 import dspy
 import requests
 
@@ -510,7 +509,6 @@ class BraveRM(dspy.Retrieve):
 
         return collected_results
 
-
 class SearXNG(dspy.Retrieve):
     def __init__(self, searxng_api_url, searxng_api_key=None, k=3, is_valid_source: Callable = None):
         """Initialize the SearXNG search retriever.
@@ -577,3 +575,119 @@ class SearXNG(dspy.Retrieve):
                 logging.error(f'Error occurs when searching query {query}: {e}')
 
         return collected_results
+
+class DuckDuckGoSearchRM(dspy.Retrieve):
+    """Retrieve information from custom queries using DuckDuckGo."""
+    def __init__(
+        self,
+        k: int =3,
+        is_valid_source: Callable = None,
+        min_char_count: int = 150,
+        snippet_chunk_size: int = 1000,
+        webpage_helper_max_threads=10,
+        safe_search: str = 'On',
+        region: str = 'us-en'
+    ):
+        """
+        Params:
+            min_char_count: Minimum character count for the article to be considered valid.
+            snippet_chunk_size: Maximum character count for each snippet.
+            webpage_helper_max_threads: Maximum number of threads to use for webpage helper.
+            **kwargs: Additional parameters for the OpenAI API.
+        """
+        super().__init__(k=k)
+        try:
+            from duckduckgo_search import DDGS
+        except ImportError as err:
+            raise ImportError("Duckduckgo requires `pip install duckduckgo_search`.") from err
+        self.k = k
+        self.webpage_helper = WebPageHelper(
+            min_char_count=min_char_count,
+            snippet_chunk_size=snippet_chunk_size,
+            max_thread_num=webpage_helper_max_threads,
+        )
+        self.usage = 0
+        # All params for search can be found here: 
+        #   https://duckduckgo.com/duckduckgo-help-pages/settings/params/
+
+        # Sets the backend to be api
+        self.duck_duck_go_backend = 'api'
+
+        # Only gets safe search results
+        self.duck_duck_go_safe_search = safe_search
+
+        # Specifies the region that the search will use
+        self.duck_duck_go_region = region
+
+
+        # If not None, is_valid_source shall be a function that takes a URL and returns a boolean.
+        if is_valid_source:
+            self.is_valid_source = is_valid_source
+        else:
+            self.is_valid_source = lambda x: True
+
+        # Import the duckduckgo search library found here: https://github.com/deedy5/duckduckgo_search
+        self.ddgs = DDGS()
+
+    def get_usage_and_reset(self):
+        usage = self.usage
+        self.usage = 0
+        return {'DuckDuckGoRM': usage}
+
+    def forward(
+        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
+    ):
+        """Search with DuckDuckGoSearch for self.k top passages for query or queries
+        Args:
+            query_or_queries (Union[str, List[str]]): The query or queries to search for.
+            exclude_urls (List[str]): A list of urls to exclude from the search results.
+        Returns:
+            a list of Dicts, each dict has keys of 'description', 'snippets' (list of strings), 'title', 'url'
+        """
+        queries = (
+            [query_or_queries]
+            if isinstance(query_or_queries, str)
+            else query_or_queries
+        )
+        self.usage += len(queries)
+
+        collected_results = []
+
+        for query in queries:
+            #  list of dicts that will be parsed to return
+            results = self.ddgs.text(
+                query, max_results=self.k, backend=self.duck_duck_go_backend
+            )
+
+            for d in results:
+                # assert d is dict
+                if not isinstance(d, dict):
+                    print(f'Invalid result: {d}\n')
+                    continue
+
+                try:
+                    # ensure keys are present
+                    url = d.get('href', None)
+                    title = d.get('title', None)
+                    description = d.get('description', title)
+                    snippets = [d.get('body', None)]
+
+                    # raise exception of missing key(s)
+                    if not all([url, title, description, snippets]):
+                        raise ValueError(f'Missing key(s) in result: {d}')
+                    if self.is_valid_source(url) and url not in exclude_urls:
+                        result = {
+                            'url': url,
+                            'title': title,
+                            'description': description,
+                            'snippets': snippets,
+                        }
+                        collected_results.append(result)
+                    else:
+                        print(f'invalid source {url} or url in exclude_urls')
+                except Exception as e:
+                    print(f'Error occurs when processing {result=}: {e}\n')
+                    print(f'Error occurs when searching query {query}: {e}')
+
+        return collected_results
+
