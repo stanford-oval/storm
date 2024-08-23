@@ -233,6 +233,114 @@ class AzureOpenAIModel(dspy.AzureOpenAI):
         return usage
 
 
+class GroqModel(dspy.OpenAI):
+    """A wrapper class for Groq API (https://console.groq.com/), compatible with dspy.OpenAI."""
+
+    def __init__(
+            self,
+            model: str = "llama3-70b-8192",
+            api_key: Optional[str] = None,
+            api_base: str = "https://api.groq.com/openai/v1",
+            **kwargs
+    ):
+        super().__init__(model=model, api_key=api_key, api_base=api_base, **kwargs)
+        self._token_usage_lock = threading.Lock()
+        self.prompt_tokens = 0
+        self.completion_tokens = 0
+        self.model = model
+        self.api_key = api_key or os.getenv("GROQ_API_KEY")
+        self.api_base = api_base
+        if not self.api_key:
+            raise ValueError("Groq API key must be provided either as an argument or as an environment variable GROQ_API_KEY")
+
+    def log_usage(self, response):
+        """Log the total tokens from the Groq API response."""
+        usage_data = response.get('usage')
+        if usage_data:
+            with self._token_usage_lock:
+                self.prompt_tokens += usage_data.get('prompt_tokens', 0)
+                self.completion_tokens += usage_data.get('completion_tokens', 0)
+
+    def get_usage_and_reset(self):
+        """Get the total tokens used and reset the token usage."""
+        usage = {
+            self.model:
+                {'prompt_tokens': self.prompt_tokens, 'completion_tokens': self.completion_tokens}
+        }
+        self.prompt_tokens = 0
+        self.completion_tokens = 0
+        return usage
+
+    @backoff.on_exception(
+        backoff.expo,
+        ERRORS,
+        max_time=1000,
+        on_backoff=backoff_hdlr,
+        giveup=giveup_hdlr,
+    )
+    def _create_completion(self, prompt: str, **kwargs):
+        """Create a completion using the Groq API."""
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self.api_key}"
+        }
+
+        # Remove unsupported fields
+        kwargs.pop('logprobs', None)
+        kwargs.pop('logit_bias', None)
+        kwargs.pop('top_logprobs', None)
+
+        # Ensure N is 1 if supplied
+        if 'n' in kwargs and kwargs['n'] != 1:
+            raise ValueError("Groq API only supports N=1")
+
+        # Adjust temperature if it's 0
+        if kwargs.get('temperature', 1) == 0:
+            kwargs['temperature'] = 1e-8
+
+        data = {
+            "model": self.model,
+            "messages": [{"role": "user", "content": prompt}],
+            **kwargs
+        }
+
+        # Remove 'name' field from messages if present
+        for message in data['messages']:
+            message.pop('name', None)
+
+        response = requests.post(f"{self.api_base}/chat/completions", headers=headers, json=data)
+        response.raise_for_status()
+        return response.json()
+
+    def __call__(
+            self,
+            prompt: str,
+            only_completed: bool = True,
+            return_sorted: bool = False,
+            **kwargs,
+    ) -> list[dict[str, Any]]:
+        """Call the Groq API to generate completions."""
+        assert only_completed, "for now"
+        assert return_sorted is False, "for now"
+
+        response = self._create_completion(prompt, **kwargs)
+
+        # Log the token usage from the Groq API response.
+        self.log_usage(response)
+
+        choices = response["choices"]
+        completions = [choice["message"]["content"] for choice in choices]
+
+        history = {
+            "prompt": prompt,
+            "response": response,
+            "kwargs": kwargs,
+        }
+        self.history.append(history)
+
+        return completions
+
+
 class ClaudeModel(dspy.dsp.modules.lm.LM):
     """Copied from dspy/dsp/modules/anthropic.py with the addition of tracking token usage."""
 
