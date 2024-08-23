@@ -705,10 +705,11 @@ class TavilySearchRM(dspy.Retrieve):
     ):
         """
         Params:
+            tavily_search_api_key str: API key for tavily that can be retrieved from https://tavily.com/
             min_char_count: Minimum character count for the article to be considered valid.
             snippet_chunk_size: Maximum character count for each snippet.
             webpage_helper_max_threads: Maximum number of threads to use for webpage helper.
-            **kwargs: Additional parameters for the OpenAI API.
+            include_raw_content bool: Boolean that is used to determine if the full text should be returned.
         """
         super().__init__(k=k)
         try:
@@ -729,16 +730,20 @@ class TavilySearchRM(dspy.Retrieve):
             snippet_chunk_size=snippet_chunk_size,
             max_thread_num=webpage_helper_max_threads,
         )
+
         self.usage = 0
 
+        # Creates client instance that will use search. Full search params are here: 
+        # https://docs.tavily.com/docs/python-sdk/tavily-search/examples
         self.tavily_client = TavilyClient(api_key=self.tavily_search_api_key)
+
         self.include_raw_content = include_raw_content
+        
         # If not None, is_valid_source shall be a function that takes a URL and returns a boolean.
         if is_valid_source:
             self.is_valid_source = is_valid_source
         else:
             self.is_valid_source = lambda x: True
-
 
     def get_usage_and_reset(self):
         usage = self.usage
@@ -807,5 +812,3 @@ class TavilySearchRM(dspy.Retrieve):
                     print(f'Error occurs when searching query {query}: {e}')
 
         return collected_results
-
-
