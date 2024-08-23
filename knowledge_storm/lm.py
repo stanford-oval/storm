@@ -10,6 +10,7 @@ import requests
 from dsp import ERRORS, backoff_hdlr, giveup_hdlr
 from dsp.modules.hf import openai_to_hf
 from dsp.modules.hf_client import send_hfvllm_request_v00, send_hftgi_request_v01_wrapped
+from openai import OpenAI
 from transformers import AutoTokenizer
 
 try:
@@ -466,49 +467,84 @@ class ClaudeModel(dspy.dsp.modules.lm.LM):
         return completions
 
 
-class VLLMClient(dspy.HFClientVLLM):
-    """A wrapper class for dspy.HFClientVLLM."""
+class VLLMClient(dspy.dsp.LM):
+    """A client compatible with vLLM HTTP server.
 
-    def __init__(self, model, port, url="http://localhost", **kwargs):
-        """Copied from dspy/dsp/modules/hf_client.py with the addition of storing additional kwargs."""
+    vLLM HTTP server is designed to be compatible with the OpenAI API. Use OpenAI client to interact with the server.
+    """
 
-        super().__init__(model=model, port=port, url=url, **kwargs)
+    def __init__(self, model, port, model_type: Literal["chat", "text"] = "text", url="http://localhost",
+                 api_key="null", **kwargs):
+        """Check out https://docs.vllm.ai/en/latest/serving/openai_compatible_server.html for more information."""
+        super().__init__(model=model)
         # Store additional kwargs for the generate method.
         self.kwargs = {**self.kwargs, **kwargs}
+        self.model = model
+        self.base_url = f"{url}:{port}/v1/"
+        if model_type == "chat":
+            self.base_url += "chat/"
+        self.client = OpenAI(base_url=self.base_url, api_key=api_key)
+        self.prompt_tokens = 0
+        self.completion_tokens = 0
+        self._token_usage_lock = threading.Lock()
 
-    def _generate(self, prompt, **kwargs):
-        """Copied from dspy/dsp/modules/hf_client.py with the addition of passing kwargs to VLLM server."""
+    def basic_request(self, prompt, **kwargs):
+        completion = self.client.chat.completions.create(
+            **kwargs,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        return completion
+
+    @backoff.on_exception(
+        backoff.expo,
+        ERRORS,
+        max_time=1000,
+        on_backoff=backoff_hdlr,
+    )
+    def request(self, prompt: str, **kwargs):
+        return self.basic_request(prompt, **kwargs)
+
+    def log_usage(self, response):
+        """Log the total tokens from the response."""
+        usage_data = response.usage
+        if usage_data:
+            with self._token_usage_lock:
+                self.prompt_tokens += usage_data.prompt_tokens
+                self.completion_tokens += usage_data.completion_tokens
+
+    def get_usage_and_reset(self):
+        """Get the total tokens used and reset the token usage."""
+        usage = {
+            self.kwargs.get('model') or self.kwargs.get('engine'):
+                {'prompt_tokens': self.prompt_tokens, 'completion_tokens': self.completion_tokens}
+        }
+        self.prompt_tokens = 0
+        self.completion_tokens = 0
+
+        return usage
+
+    def __call__(self, prompt: str, **kwargs):
         kwargs = {**self.kwargs, **kwargs}
 
-        # payload = {
-        #     "model": kwargs["model"],
-        #     "prompt": prompt,
-        #     "max_tokens": kwargs["max_tokens"],
-        #     "temperature": kwargs["temperature"],
-        # }
-        payload = {
-            "prompt": prompt,
-            **kwargs
-        }
-
-        response = send_hfvllm_request_v00(
-            f"{self.url}/v1/completions",
-            json=payload,
-            headers=self.headers,
-        )
-
         try:
-            json_response = response.json()
-            completions = json_response["choices"]
-            response = {
-                "prompt": prompt,
-                "choices": [{"text": c["text"]} for c in completions],
-            }
-            return response
-
+            response = self.request(prompt, **kwargs)
         except Exception as e:
-            print("Failed to parse JSON response:", response.text)
-            raise Exception("Received invalid JSON response from server")
+            print(f"Failed to generate completion: {e}")
+            raise Exception(e)
+
+        self.log_usage(response)
+
+        choices = response.choices
+        completions = [choice.message.content for choice in choices]
+
+        history = {
+            "prompt": prompt,
+            "response": response,
+            "kwargs": kwargs,
+        }
+        self.history.append(history)
+
+        return completions
 
 
 class OllamaClient(dspy.OllamaLocal):
