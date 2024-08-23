@@ -24,3 +24,4 @@ secrets.toml
 *.log
 */assertion.log
 *results/
+.venv/
