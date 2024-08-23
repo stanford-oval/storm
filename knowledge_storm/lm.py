@@ -9,7 +9,7 @@ import dspy
 import requests
 from dsp import ERRORS, backoff_hdlr, giveup_hdlr
 from dsp.modules.hf import openai_to_hf
-from dsp.modules.hf_client import send_hfvllm_request_v00, send_hftgi_request_v01_wrapped
+from dsp.modules.hf_client import send_hftgi_request_v01_wrapped
 from openai import OpenAI
 from transformers import AutoTokenizer
 
@@ -124,7 +124,8 @@ class DeepSeekModel(dspy.OpenAI):
         self.api_key = api_key or os.getenv("DEEPSEEK_API_KEY")
         self.api_base = api_base
         if not self.api_key:
-            raise ValueError("DeepSeek API key must be provided either as an argument or as an environment variable DEEPSEEK_API_KEY")
+            raise ValueError(
+                "DeepSeek API key must be provided either as an argument or as an environment variable DEEPSEEK_API_KEY")
 
     def log_usage(self, response):
         """Log the total tokens from the DeepSeek API response."""
@@ -252,7 +253,8 @@ class GroqModel(dspy.OpenAI):
         self.api_key = api_key or os.getenv("GROQ_API_KEY")
         self.api_base = api_base
         if not self.api_key:
-            raise ValueError("Groq API key must be provided either as an argument or as an environment variable GROQ_API_KEY")
+            raise ValueError(
+                "Groq API key must be provided either as an argument or as an environment variable GROQ_API_KEY")
 
     def log_usage(self, response):
         """Log the total tokens from the Groq API response."""
