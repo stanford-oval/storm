@@ -232,8 +232,9 @@ class AzureOpenAIModel(dspy.AzureOpenAI):
 
         return usage
 
+
 class GroqModel(dspy.OpenAI):
-    """A wrapper class for Groq API, compatible with dspy.OpenAI."""
+    """A wrapper class for Groq API (https://console.groq.com/), compatible with dspy.OpenAI."""
 
     def __init__(
             self,
