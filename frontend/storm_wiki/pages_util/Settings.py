@@ -112,7 +112,7 @@ def llm_settings():
                 options=downloaded_models,
                 index=downloaded_models.index(
                     model_settings[model].get(
-                        "model", "jaigouk/hermes-2-theta-llama-3:latest"
+                        "model", "mistral-nemo:12b-instruct-2407-q6_K"
                     )
                 )
                 if model_settings[model].get("model") in downloaded_models
@@ -146,7 +146,7 @@ def llm_settings():
             f"{model.capitalize()} Max Tokens",
             min_value=1,
             max_value=10000,
-            value=int(model_settings[model].get("max_tokens", 500)),
+            value=int(model_settings[model].get("max_tokens", 4000)),
             key=f"model_settings.{model}.max_tokens_input",
             on_change=update_llm_setting,
             args=(f"model_settings.{model}.max_tokens", llm_settings),

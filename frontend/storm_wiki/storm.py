@@ -1,6 +1,5 @@
 import streamlit as st
 import os
-from dotenv import load_dotenv
 from db.db_operations import init_db
 from util.phoenix_setup import setup_phoenix
 from streamlit_option_menu import option_menu
@@ -8,8 +7,6 @@ from util.theme_manager import load_and_apply_theme, get_option_menu_style
 from pages_util.MyArticles import my_articles_page
 from pages_util.CreateNewArticle import create_new_article_page
 from pages_util.Settings import settings_page
-
-load_dotenv()
 
 # Set STREAMLIT_OUTPUT_DIR if not already set
 if "STREAMLIT_OUTPUT_DIR" not in os.environ:

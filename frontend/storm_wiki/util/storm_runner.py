@@ -1,12 +1,9 @@
+import streamlit as st
 import os
-import time
 import json
 import streamlit as st
 from typing import Optional, Dict, Any
 import logging
-import sqlite3
-import json
-import subprocess
 from dspy import Example
 import openai
 from knowledge_storm import (
@@ -261,7 +258,7 @@ def create_lm_client(
             return OllamaClient(
                 model=model_settings["ollama"]["model"],
                 url="http://localhost",
-                port=int(os.getenv("OLLAMA_PORT", 11434)),
+                port=int(st.secrets.get("OLLAMA_PORT", 11434)),
                 max_tokens=model_settings["ollama"]["max_tokens"],
                 stop=("\n\n---",),
             )
@@ -271,7 +268,7 @@ def create_lm_client(
             )
             return OpenAIModel(
                 model=model_settings["openai"]["model"],
-                api_key=os.getenv("OPENAI_API_KEY"),
+                api_key=st.secrets.get("OPENAI_API_KEY"),
                 max_tokens=model_settings["openai"]["max_tokens"],
             )
         elif model_type == "anthropic":
@@ -280,7 +277,7 @@ def create_lm_client(
             )
             client = ClaudeModel(
                 model=model_settings["anthropic"]["model"],
-                api_key=os.getenv("ANTHROPIC_API_KEY"),
+                api_key=st.secrets.get("ANTHROPIC_API_KEY"),
                 max_tokens=model_settings["anthropic"]["max_tokens"],
                 temperature=1.0,
                 top_p=0.9,
@@ -385,7 +382,7 @@ def run_storm_with_config(
 
 
 def set_storm_runner():
-    current_working_dir = os.getenv("STREAMLIT_OUTPUT_DIR")
+    current_working_dir = st.secrets.get("STREAMLIT_OUTPUT_DIR")
     if not current_working_dir:
         current_working_dir = os.path.join(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),

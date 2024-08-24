@@ -157,11 +157,11 @@ def load_llm_settings() -> Dict[str, Any]:
         "fallback_model": None,
         "model_settings": {
             "ollama": {
-                "model": "jaigouk/hermes-2-theta-llama-3:latest",
-                "max_tokens": 500,
+                "model": "mistral-nemo:12b-instruct-2407-q6_K",
+                "max_tokens": 4000,
             },
-            "openai": {"model": "gpt-4o-mini", "max_tokens": 500},
-            "anthropic": {"model": "claude-3-haiku-20240307", "max_tokens": 500},
+            "openai": {"model": "gpt-4o-mini", "max_tokens": 4000},
+            "anthropic": {"model": "claude-3-haiku-20240307", "max_tokens": 4000},
         },
     }
     loaded_settings = load_setting("llm_settings")

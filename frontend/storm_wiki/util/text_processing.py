@@ -1,5 +1,5 @@
+import streamlit as st
 import re
-import markdown
 import pytz
 import datetime
 from .shared_utils import parse
@@ -89,7 +89,7 @@ class DemoTextProcessingHelper:
         """
         # Load the time zone from the STORM_TIMEZONE environment variable,
         # default to "America/Los_Angeles" if not set
-        time_zone_str = os.getenv("STORM_TIMEZONE", "America/Los_Angeles")
+        time_zone_str = st.secrets.get("STORM_TIMEZONE", "America/Los_Angeles")
         time_zone = pytz.timezone(time_zone_str)
 
         # Get the current time in UTC and convert it to the specified time zone
