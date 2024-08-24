@@ -692,7 +692,7 @@ class DuckDuckGoSearchRM(dspy.Retrieve):
         return collected_results
 
 class TavilySearchRM(dspy.Retrieve):
-    """Retrieve information from custom queries using Tavily."""
+    """Retrieve information from custom queries using Tavily. Documentation and examples can be found at https://docs.tavily.com/docs/python-sdk/tavily-search/examples"""
     def __init__(
         self,
         tavily_search_api_key=None,
