@@ -169,11 +169,11 @@ class Retriever(ABC):
     The retrieval model/search engine used for each part should be declared with a suffix '_rm' in the attribute name.
     """
 
-    def __init__(self, search_top_k):
+    def __init__(self, search_top_k): # this search_top_k is not used anywhere later on
         self.search_top_k = search_top_k
 
     def update_search_top_k(self, k):
-        self.search_top_k = k
+        self.search_top_k = k # same thing for this as well.
 
     def collect_and_reset_rm_usage(self):
         combined_usage = []

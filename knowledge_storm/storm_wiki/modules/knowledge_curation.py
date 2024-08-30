@@ -27,13 +27,12 @@ class ConvSimulator(dspy.Module):
 
     def __init__(self, topic_expert_engine: Union[dspy.dsp.LM, dspy.dsp.HFModel],
                  question_asker_engine: Union[dspy.dsp.LM, dspy.dsp.HFModel],
-                 retriever: Retriever, max_search_queries_per_turn: int, search_top_k: int, max_turn: int):
+                 retriever: Retriever, max_search_queries_per_turn: int, max_turn: int):
         super().__init__()
         self.wiki_writer = WikiWriter(engine=question_asker_engine)
         self.topic_expert = TopicExpert(
             engine=topic_expert_engine,
             max_search_queries=max_search_queries_per_turn,
-            search_top_k=search_top_k,
             retriever=retriever
         )
         self.max_turn = max_turn
@@ -154,15 +153,13 @@ class TopicExpert(dspy.Module):
     """
 
     def __init__(self, engine: Union[dspy.dsp.LM, dspy.dsp.HFModel],
-                 max_search_queries: int, search_top_k: int, retriever: Retriever):
+                 max_search_queries: int, retriever: Retriever):
         super().__init__()
         self.generate_queries = dspy.Predict(QuestionToQuery)
         self.retriever = retriever
-        self.retriever.update_search_top_k(search_top_k)
         self.answer_question = dspy.Predict(AnswerQuestion)
         self.engine = engine
         self.max_search_queries = max_search_queries
-        self.search_top_k = search_top_k
 
     def forward(self, topic: str, question: str, ground_truth_url: str):
         with dspy.settings.context(lm=self.engine):
@@ -206,7 +203,6 @@ class StormKnowledgeCurationModule(KnowledgeCurationModule):
                  conv_simulator_lm: Union[dspy.dsp.LM, dspy.dsp.HFModel],
                  question_asker_lm: Union[dspy.dsp.LM, dspy.dsp.HFModel],
                  max_search_queries_per_turn: int,
-                 search_top_k: int,
                  max_conv_turn: int,
                  max_thread_num: int):
         """
@@ -215,7 +211,6 @@ class StormKnowledgeCurationModule(KnowledgeCurationModule):
         self.retriever = retriever
         self.persona_generator = persona_generator
         self.conv_simulator_lm = conv_simulator_lm
-        self.search_top_k = search_top_k
         self.max_thread_num = max_thread_num
         self.retriever = retriever
         self.conv_simulator = ConvSimulator(
@@ -223,7 +218,6 @@ class StormKnowledgeCurationModule(KnowledgeCurationModule):
             question_asker_engine=question_asker_lm,
             retriever=retriever,
             max_search_queries_per_turn=max_search_queries_per_turn,
-            search_top_k=search_top_k,
             max_turn=max_conv_turn
         )
 

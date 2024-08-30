@@ -234,8 +234,8 @@ def is_valid_wikipedia_source(url):
 
 
 class StormRetriever(Retriever):
-    def __init__(self, rm: Union[dspy.Retrieve, List[dspy.Retrieve]], k=3):
-        super().__init__(search_top_k=k)
+    def __init__(self, rm: Union[dspy.Retrieve, List[dspy.Retrieve]], k=3): # again this k is not updating any of the retrieval models.
+        super().__init__(search_top_k=k) # this search_top_k is going no where and not used to update anything
         self._rm = rm
         if not isinstance(self._rm, list):
             self._rm = [self._rm]
