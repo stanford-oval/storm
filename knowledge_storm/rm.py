@@ -12,7 +12,16 @@ from .utils import WebPageHelper
 
 
 class YouRM(dspy.Retrieve):
-    def __init__(self, ydc_api_key=None, k=3, is_valid_source: Callable = None):
+    def __init__(self, ydc_api_key=None, k=3, is_valid_source: Callable = None, nickname="YouRM",
+                 description="Retrieve information from You.com search."):
+        """
+        Params:
+            ydc_api_key: You.com API key.
+            k: Number of top chunks to retrieve.
+            is_valid_source: A function that takes a URL and returns a boolean.
+            nickname: Nickname of the retriever.
+            description: Description of the retriever and what it does.
+        """
         super().__init__(k=k)
         if not ydc_api_key and not os.environ.get("YDC_API_KEY"):
             raise RuntimeError("You must supply ydc_api_key or set environment variable YDC_API_KEY")
@@ -21,6 +30,8 @@ class YouRM(dspy.Retrieve):
         else:
             self.ydc_api_key = os.environ["YDC_API_KEY"]
         self.usage = 0
+        self.nickname = nickname
+        self.description = description
 
         # If not None, is_valid_source shall be a function that takes a URL and returns a boolean.
         if is_valid_source:
@@ -74,12 +85,15 @@ class YouRM(dspy.Retrieve):
 class BingSearch(dspy.Retrieve):
     def __init__(self, bing_search_api_key=None, k=3, is_valid_source: Callable = None,
                  min_char_count: int = 150, snippet_chunk_size: int = 1000, webpage_helper_max_threads=10,
+                 nickname="BingSearch", description="Retrieve information from Bing search.",
                  mkt='en-US', language='en', **kwargs):
         """
         Params:
             min_char_count: Minimum character count for the article to be considered valid.
             snippet_chunk_size: Maximum character count for each snippet.
             webpage_helper_max_threads: Maximum number of threads to use for webpage helper.
+            nickname: Nickname of the retriever.
+            description: Description of the retriever and what it does.
             mkt, language, **kwargs: Bing search API parameters.
             - Reference: https://learn.microsoft.com/en-us/bing/search-apis/bing-web-search/reference/query-parameters
         """
@@ -104,6 +118,8 @@ class BingSearch(dspy.Retrieve):
             max_thread_num=webpage_helper_max_threads
         )
         self.usage = 0
+        self.nickname = nickname
+        self.description = description
 
         # If not None, is_valid_source shall be a function that takes a URL and returns a boolean.
         if is_valid_source:
@@ -177,6 +193,8 @@ class VectorRM(dspy.Retrieve):
     def __init__(self,
                  collection_name: str,
                  embedding_model: str,
+                 nickname: str = "VectorRM",
+                 description: str = "Retrieve information from custom documents using Qdrant.",
                  device: str = "mps",
                  k: int = 3,
                 ):
@@ -184,6 +202,8 @@ class VectorRM(dspy.Retrieve):
         Params:
             collection_name: Name of the Qdrant collection.
             embedding_model: Name of the Hugging Face embedding model.
+            nickname: Nickname of the retriever.
+            description: Description of the retriever and what it does.
             device: Device to run the embeddings model on, can be "mps", "cuda", "cpu".
             k: Number of top chunks to retrieve.
         """
@@ -195,6 +215,8 @@ class VectorRM(dspy.Retrieve):
         # check if the embedding model is provided
         if not embedding_model:
             raise ValueError("Please provide an embedding model.")
+        self.nickname = nickname
+        self.description = description
 
         model_kwargs = {"device": device}
         encode_kwargs = {"normalize_embeddings": True}
