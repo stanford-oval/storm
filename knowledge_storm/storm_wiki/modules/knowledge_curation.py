@@ -118,7 +118,7 @@ class AskQuestionWithPersona(dspy.Signature):
 
 class Dispatcher(dspy.Signature):
     """You are given a question that you want to answer. You have the following information retrieval systems at your disposal.
-        If you think the question can be answered using some specific retrieval systems, choose those systems in the following format:
+        If you think the question can be answered using some specific retrieval systems, choose those systems and only reply in the following format:
         - system_name 1
         - system_name 2
         ...
@@ -181,13 +181,13 @@ class TopicExpert(dspy.Module):
             systems_with_descriptions = {nickname: f"-{nickname}: {description}" for nickname, description in self.retriever.get_nicknames_and_descriptions()}
             if len(systems_with_descriptions) == 1:
                 # if there is only one system, use it directly, do not waste time asking the dispatcher
-                systems = list(systems_with_descriptions.keys())
+                chosen_systems = list(systems_with_descriptions.keys())
             else:
-                systems = self.dispatcher(topic=topic, question=question, retrieval_systems='\n\n'.join(systems_with_descriptions.values())).chosen_systems
-                systems = [s.replace('-', '').strip().strip('"').strip('"').strip().lower() for s in systems.split('\n')]
+                chosen_systems = self.dispatcher(topic=topic, question=question, retrieval_systems='\n\n'.join(systems_with_descriptions.values())).chosen_systems
+                chosen_systems = [s.replace('-', '').strip().strip('"').strip('"').strip().lower() for s in chosen_systems.split('\n')]
             total_queries = []
             # identify queries for each system
-            for system in systems:
+            for system in chosen_systems:
                 # Identify: Break down question into queries.
                 queries = self.generate_queries(topic=topic, question=question, retrieval_system=systems_with_descriptions[system]).queries
                 queries = [q.replace('-', '').strip().strip('"').strip('"').strip() for q in queries.split('\n')]
