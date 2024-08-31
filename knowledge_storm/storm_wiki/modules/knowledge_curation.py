@@ -132,14 +132,14 @@ class QuestionToQuery(dspy.Signature):
 
 class AnswerQuestion(dspy.Signature):
     """You are an expert who can use information effectively. You are chatting with a Wikipedia writer who wants to write a Wikipedia page on topic you know. You have gathered the related information and will now use the information to form a response.
-    Make your response as informative as possible and make sure every sentence is supported by the gathered information. If [Gathered information] is not related to he [Topic] and [Question], output "Sorry, I don't have enough information to answer the question."."""
+    Make your response as informative as possible and make sure every sentence is supported by the gathered information. If [Gathered information] is not related to the [Topic] and [Question], output "Sorry, I don't have enough information to answer the question."."""
 
     topic = dspy.InputField(prefix='Topic you are discussing about:', format=str)
     conv = dspy.InputField(prefix='Question:\n', format=str)
     info = dspy.InputField(
         prefix='Gathered information:\n', format=str)
     answer = dspy.OutputField(
-        prefix='Now give your response. (Try to use as many different sources as possible and add do not hallucinate.)\n',
+        prefix='Now give your response. (Try to use as many different sources as possible and do not hallucinate.)\n',
         format=str
     )
 
