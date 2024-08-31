@@ -168,6 +168,7 @@ class TopicExpert(dspy.Module):
     def __init__(self, engine: Union[dspy.dsp.LM, dspy.dsp.HFModel],
                  max_search_queries: int, retriever: Retriever):
         super().__init__()
+        self.dispatcher = dspy.Predict(Dispatcher)
         self.generate_queries = dspy.Predict(QuestionToQuery)
         self.retriever = retriever
         self.answer_question = dspy.Predict(AnswerQuestion)
@@ -176,12 +177,24 @@ class TopicExpert(dspy.Module):
 
     def forward(self, topic: str, question: str, ground_truth_url: str):
         with dspy.settings.context(lm=self.engine):
-            # Identify: Break down question into queries.
-            queries = self.generate_queries(topic=topic, question=question).queries
-            queries = [q.replace('-', '').strip().strip('"').strip('"').strip() for q in queries.split('\n')]
-            queries = queries[:self.max_search_queries]
+            # Identify the system to use
+            systems_with_descriptions = {nickname: f"-{nickname}: {description}" for nickname, description in self.retriever.get_nicknames_and_descriptions()}
+            if len(systems_with_descriptions) == 1:
+                # if there is only one system, use it directly, do not waste time asking the dispatcher
+                systems = list(systems_with_descriptions.keys())
+            else:
+                systems = self.dispatcher(topic=topic, question=question, retrieval_systems='\n\n'.join(systems_with_descriptions.values())).chosen_systems
+                systems = [s.replace('-', '').strip().strip('"').strip('"').strip().lower() for s in systems.split('\n')]
+            total_queries = []
+            # identify queries for each system
+            for system in systems:
+                # Identify: Break down question into queries.
+                queries = self.generate_queries(topic=topic, question=question, retrieval_system=systems_with_descriptions[system]).queries
+                queries = [q.replace('-', '').strip().strip('"').strip('"').strip() for q in queries.split('\n')]
+                queries = queries[:self.max_search_queries]
+                total_queries.append((list(set(queries)), system))
             # Search
-            searched_results: List[StormInformation] = self.retriever.retrieve(list(set(queries)),
+            searched_results: List[StormInformation] = self.retriever.retrieve(total_queries,
                                                                                exclude_urls=[ground_truth_url])
             if len(searched_results) > 0:
                 # Evaluate: Simplify this part by directly using the top 1 snippet.
@@ -201,8 +214,9 @@ class TopicExpert(dspy.Module):
             else:
                 # When no information is found, the expert shouldn't hallucinate.
                 answer = 'Sorry, I cannot find information for this question. Please ask another question.'
-
-        return dspy.Prediction(queries=queries, searched_results=searched_results, answer=answer)
+    
+        total_queries = [query for queries, _ in total_queries for query in queries]
+        return dspy.Prediction(queries=total_queries, searched_results=searched_results, answer=answer)
 
 
 class StormKnowledgeCurationModule(KnowledgeCurationModule):
