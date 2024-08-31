@@ -116,9 +116,21 @@ class AskQuestionWithPersona(dspy.Signature):
     conv = dspy.InputField(prefix='Conversation history:\n', format=str)
     question = dspy.OutputField(format=str)
 
+class Dispatcher(dspy.Signature):
+    """You are given a question that you want to answer. You have the following information retrieval systems at your disposal.
+        If you think the question can be answered using some specific retrieval systems, choose those systems in the following format:
+        - system_name 1
+        - system_name 2
+        ...
+        - system_name n"""
+
+    topic = dspy.InputField(prefix='Topic you are discussing about: ', format=str)
+    question = dspy.InputField(prefix='Question you want to answer: ', format=str)
+    retrieval_systems = dspy.InputField(prefix='Retrieval systems names you can use along with their descriptions: ', format=str)
+    chosen_systems = dspy.OutputField(format=str)
 
 class QuestionToQuery(dspy.Signature):
-    """You want to answer the question using Google search. What do you type in the search box?
+    """You want to answer the question using this retrieval system. What do you type in the search box?
         Write the queries you will use in the following format:
         - query 1
         - query 2
@@ -127,6 +139,7 @@ class QuestionToQuery(dspy.Signature):
 
     topic = dspy.InputField(prefix='Topic you are discussing about: ', format=str)
     question = dspy.InputField(prefix='Question you want to answer: ', format=str)
+    retrieval_system = dspy.InputField(prefix='Retrieval system you are using: ', format=str)
     queries = dspy.OutputField(format=str)
 
 
