@@ -331,7 +331,8 @@ class VectorRM(dspy.Retrieve):
 class SerperRM(dspy.Retrieve):
     """Retrieve information from custom queries using Serper.dev."""
 
-    def __init__(self, serper_search_api_key=None, query_params=None):
+    def __init__(self, serper_search_api_key=None, query_params=None, nickname: str = "SerperRM",
+                 description: str = "Retrieve information from custom queries using Serper.dev."):
         """Args:
             serper_search_api_key str: API key to run serper, can be found by creating an account on https://serper.dev/
             query_params (dict or list of dict): parameters in dictionary or list of dictionaries that has a max size of 100 that will be used to query.
@@ -349,6 +350,8 @@ class SerperRM(dspy.Retrieve):
                     qdr:w str: Date time range for past week.
                     qdr:m str: Date time range for past month.
                     qdr:y str: Date time range for past year.
+            nickname: Nickname of the retriever.
+            description: Description of the retriever and what it does.
         """
         super().__init__()
         self.usage = 0
@@ -366,6 +369,8 @@ class SerperRM(dspy.Retrieve):
             self.serper_search_api_key = os.environ['SERPER_API_KEY']
 
         self.base_url = 'https://google.serper.dev'
+        self.nickname = nickname
+        self.description = description
 
     def serper_runner(self, query_params):
         self.search_url = f'{self.base_url}/search'
@@ -465,7 +470,8 @@ class SerperRM(dspy.Retrieve):
 
 
 class BraveRM(dspy.Retrieve):
-    def __init__(self, brave_search_api_key=None, k=3, is_valid_source: Callable = None):
+    def __init__(self, brave_search_api_key=None, k=3, is_valid_source: Callable = None, nickname="BraveRM",
+                 description="Retrieve information from Brave search."):
         super().__init__(k=k)
         if not brave_search_api_key and not os.environ.get("BRAVE_API_KEY"):
             raise RuntimeError("You must supply brave_search_api_key or set environment variable BRAVE_API_KEY")
@@ -480,6 +486,8 @@ class BraveRM(dspy.Retrieve):
             self.is_valid_source = is_valid_source
         else:
             self.is_valid_source = lambda x: True
+        self.nickname = nickname
+        self.description = description
 
     def get_usage_and_reset(self):
         usage = self.usage
@@ -532,7 +540,8 @@ class BraveRM(dspy.Retrieve):
         return collected_results
 
 class SearXNG(dspy.Retrieve):
-    def __init__(self, searxng_api_url, searxng_api_key=None, k=3, is_valid_source: Callable = None):
+    def __init__(self, searxng_api_url, searxng_api_key=None, k=3, is_valid_source: Callable = None, nickname="SearXNG",
+                 description="Retrieve information from SearXNG search."):
         """Initialize the SearXNG search retriever.
         Please set up SearXNG according to https://docs.searxng.org/index.html.
 
@@ -542,6 +551,8 @@ class SearXNG(dspy.Retrieve):
             k (int, optional): The number of top passages to retrieve. Defaults to 3.
             is_valid_source (Callable, optional): A function that takes a URL and returns a boolean indicating if the
             source is valid. Defaults to None.
+            nickname (str, optional): The nickname of the retriever. Defaults to "SearXNG".
+            description (str, optional): The description of the retriever. Defaults to "Retrieve information from SearXNG search.".
         """
         super().__init__(k=k)
         if not searxng_api_url:
@@ -554,6 +565,8 @@ class SearXNG(dspy.Retrieve):
             self.is_valid_source = is_valid_source
         else:
             self.is_valid_source = lambda x: True
+        self.nickname = nickname
+        self.description = description
 
     def get_usage_and_reset(self):
         usage = self.usage
@@ -608,13 +621,17 @@ class DuckDuckGoSearchRM(dspy.Retrieve):
         snippet_chunk_size: int = 1000,
         webpage_helper_max_threads=10,
         safe_search: str = 'On',
-        region: str = 'us-en'
+        region: str = 'us-en',
+        nickname="DuckDuckGoRM",
+        description="Retrieve information from DuckDuckGo search.",
     ):
         """
         Params:
             min_char_count: Minimum character count for the article to be considered valid.
             snippet_chunk_size: Maximum character count for each snippet.
             webpage_helper_max_threads: Maximum number of threads to use for webpage helper.
+            nickname: Nickname of the retriever.
+            description: Description of the retriever and what it does.
             **kwargs: Additional parameters for the OpenAI API.
         """
         super().__init__(k=k)
@@ -629,6 +646,8 @@ class DuckDuckGoSearchRM(dspy.Retrieve):
             max_thread_num=webpage_helper_max_threads,
         )
         self.usage = 0
+        self.nickname = nickname
+        self.description = description
         # All params for search can be found here: 
         #   https://duckduckgo.com/duckduckgo-help-pages/settings/params/
 
@@ -723,7 +742,9 @@ class TavilySearchRM(dspy.Retrieve):
         min_char_count: int = 150,
         snippet_chunk_size: int = 1000,
         webpage_helper_max_threads=10,
-        include_raw_content = False
+        include_raw_content = False,
+        nickname="TavilySearchRM",
+        description="Retrieve information from Tavily search.",
     ):
         """
         Params:
@@ -732,6 +753,8 @@ class TavilySearchRM(dspy.Retrieve):
             snippet_chunk_size: Maximum character count for each snippet.
             webpage_helper_max_threads: Maximum number of threads to use for webpage helper.
             include_raw_content bool: Boolean that is used to determine if the full text should be returned.
+            nickname: Nickname of the retriever.
+            description: Description of the retriever and what it does.
         """
         super().__init__(k=k)
         try:
@@ -766,6 +789,9 @@ class TavilySearchRM(dspy.Retrieve):
             self.is_valid_source = is_valid_source
         else:
             self.is_valid_source = lambda x: True
+            
+        self.nickname = nickname
+        self.description = description
 
     def get_usage_and_reset(self):
         usage = self.usage
