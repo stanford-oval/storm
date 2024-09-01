@@ -27,13 +27,12 @@ class ConvSimulator(dspy.Module):
 
     def __init__(self, topic_expert_engine: Union[dspy.dsp.LM, dspy.dsp.HFModel],
                  question_asker_engine: Union[dspy.dsp.LM, dspy.dsp.HFModel],
-                 retriever: Retriever, max_search_queries_per_turn: int, search_top_k: int, max_turn: int):
+                 retriever: Retriever, max_search_queries_per_turn: int, max_turn: int):
         super().__init__()
         self.wiki_writer = WikiWriter(engine=question_asker_engine)
         self.topic_expert = TopicExpert(
             engine=topic_expert_engine,
             max_search_queries=max_search_queries_per_turn,
-            search_top_k=search_top_k,
             retriever=retriever
         )
         self.max_turn = max_turn
@@ -117,9 +116,21 @@ class AskQuestionWithPersona(dspy.Signature):
     conv = dspy.InputField(prefix='Conversation history:\n', format=str)
     question = dspy.OutputField(format=str)
 
+class Dispatcher(dspy.Signature):
+    """You are given a question that you want to answer. You have the following information retrieval systems at your disposal.
+        If you think the question can be answered using some specific retrieval systems, choose those systems and only reply in the following format:
+        - system_name 1
+        - system_name 2
+        ...
+        - system_name n"""
+
+    topic = dspy.InputField(prefix='Topic you are discussing about: ', format=str)
+    question = dspy.InputField(prefix='Question you want to answer: ', format=str)
+    retrieval_systems = dspy.InputField(prefix='Retrieval systems names you can use along with their descriptions: ', format=str)
+    chosen_systems = dspy.OutputField(format=str)
 
 class QuestionToQuery(dspy.Signature):
-    """You want to answer the question using Google search. What do you type in the search box?
+    """You want to answer the question using this retrieval system. What do you type in the search box?
         Write the queries you will use in the following format:
         - query 1
         - query 2
@@ -128,19 +139,20 @@ class QuestionToQuery(dspy.Signature):
 
     topic = dspy.InputField(prefix='Topic you are discussing about: ', format=str)
     question = dspy.InputField(prefix='Question you want to answer: ', format=str)
+    retrieval_system = dspy.InputField(prefix='Retrieval system you are using: ', format=str)
     queries = dspy.OutputField(format=str)
 
 
 class AnswerQuestion(dspy.Signature):
     """You are an expert who can use information effectively. You are chatting with a Wikipedia writer who wants to write a Wikipedia page on topic you know. You have gathered the related information and will now use the information to form a response.
-    Make your response as informative as possible and make sure every sentence is supported by the gathered information. If [Gathered information] is not related to he [Topic] and [Question], output "Sorry, I don't have enough information to answer the question."."""
+    Make your response as informative as possible and make sure every sentence is supported by the gathered information. If [Gathered information] is not related to the [Topic] and [Question], output "Sorry, I don't have enough information to answer the question."."""
 
     topic = dspy.InputField(prefix='Topic you are discussing about:', format=str)
     conv = dspy.InputField(prefix='Question:\n', format=str)
     info = dspy.InputField(
         prefix='Gathered information:\n', format=str)
     answer = dspy.OutputField(
-        prefix='Now give your response. (Try to use as many different sources as possible and add do not hallucinate.)\n',
+        prefix='Now give your response. (Try to use as many different sources as possible and do not hallucinate.)\n',
         format=str
     )
 
@@ -154,24 +166,35 @@ class TopicExpert(dspy.Module):
     """
 
     def __init__(self, engine: Union[dspy.dsp.LM, dspy.dsp.HFModel],
-                 max_search_queries: int, search_top_k: int, retriever: Retriever):
+                 max_search_queries: int, retriever: Retriever):
         super().__init__()
+        self.dispatcher = dspy.Predict(Dispatcher)
         self.generate_queries = dspy.Predict(QuestionToQuery)
         self.retriever = retriever
-        self.retriever.update_search_top_k(search_top_k)
         self.answer_question = dspy.Predict(AnswerQuestion)
         self.engine = engine
         self.max_search_queries = max_search_queries
-        self.search_top_k = search_top_k
 
     def forward(self, topic: str, question: str, ground_truth_url: str):
         with dspy.settings.context(lm=self.engine):
-            # Identify: Break down question into queries.
-            queries = self.generate_queries(topic=topic, question=question).queries
-            queries = [q.replace('-', '').strip().strip('"').strip('"').strip() for q in queries.split('\n')]
-            queries = queries[:self.max_search_queries]
+            # Identify the system to use
+            systems_with_descriptions = {nickname: f"-{nickname}: {description}" for nickname, description in self.retriever.get_nicknames_and_descriptions()}
+            if len(systems_with_descriptions) == 1:
+                # if there is only one system, use it directly, do not waste time asking the dispatcher
+                chosen_systems = list(systems_with_descriptions.keys())
+            else:
+                chosen_systems = self.dispatcher(topic=topic, question=question, retrieval_systems='\n\n'.join(systems_with_descriptions.values())).chosen_systems
+                chosen_systems = [s.replace('-', '').strip().strip('"').strip('"').strip().lower() for s in chosen_systems.split('\n')]
+            total_queries = []
+            # identify queries for each system
+            for system in chosen_systems:
+                # Identify: Break down question into queries.
+                queries = self.generate_queries(topic=topic, question=question, retrieval_system=systems_with_descriptions[system]).queries
+                queries = [q.replace('-', '').strip().strip('"').strip('"').strip() for q in queries.split('\n')]
+                queries = queries[:self.max_search_queries]
+                total_queries.append((list(set(queries)), system))
             # Search
-            searched_results: List[StormInformation] = self.retriever.retrieve(list(set(queries)),
+            searched_results: List[StormInformation] = self.retriever.retrieve(total_queries,
                                                                                exclude_urls=[ground_truth_url])
             if len(searched_results) > 0:
                 # Evaluate: Simplify this part by directly using the top 1 snippet.
@@ -191,8 +214,9 @@ class TopicExpert(dspy.Module):
             else:
                 # When no information is found, the expert shouldn't hallucinate.
                 answer = 'Sorry, I cannot find information for this question. Please ask another question.'
-
-        return dspy.Prediction(queries=queries, searched_results=searched_results, answer=answer)
+    
+        total_queries = [query for queries, _ in total_queries for query in queries]
+        return dspy.Prediction(queries=total_queries, searched_results=searched_results, answer=answer)
 
 
 class StormKnowledgeCurationModule(KnowledgeCurationModule):
@@ -206,7 +230,6 @@ class StormKnowledgeCurationModule(KnowledgeCurationModule):
                  conv_simulator_lm: Union[dspy.dsp.LM, dspy.dsp.HFModel],
                  question_asker_lm: Union[dspy.dsp.LM, dspy.dsp.HFModel],
                  max_search_queries_per_turn: int,
-                 search_top_k: int,
                  max_conv_turn: int,
                  max_thread_num: int):
         """
@@ -215,7 +238,6 @@ class StormKnowledgeCurationModule(KnowledgeCurationModule):
         self.retriever = retriever
         self.persona_generator = persona_generator
         self.conv_simulator_lm = conv_simulator_lm
-        self.search_top_k = search_top_k
         self.max_thread_num = max_thread_num
         self.retriever = retriever
         self.conv_simulator = ConvSimulator(
@@ -223,7 +245,6 @@ class StormKnowledgeCurationModule(KnowledgeCurationModule):
             question_asker_engine=question_asker_lm,
             retriever=retriever,
             max_search_queries_per_turn=max_search_queries_per_turn,
-            search_top_k=search_top_k,
             max_turn=max_conv_turn
         )
 

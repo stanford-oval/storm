@@ -130,7 +130,7 @@ class STORMWikiRunner(Engine):
         self.args = args
         self.lm_configs = lm_configs
 
-        self.retriever = StormRetriever(rm=rm, k=self.args.retrieve_top_k)
+        self.retriever = StormRetriever(rm=rm, k=self.args.search_top_k)
         storm_persona_generator = StormPersonaGenerator(self.lm_configs.question_asker_lm)
         self.storm_knowledge_curation_module = StormKnowledgeCurationModule(
             retriever=self.retriever,
@@ -138,7 +138,6 @@ class STORMWikiRunner(Engine):
             conv_simulator_lm=self.lm_configs.conv_simulator_lm,
             question_asker_lm=self.lm_configs.question_asker_lm,
             max_search_queries_per_turn=self.args.max_search_queries_per_turn,
-            search_top_k=self.args.search_top_k,
             max_conv_turn=self.args.max_conv_turn,
             max_thread_num=self.args.max_thread_num
         )
