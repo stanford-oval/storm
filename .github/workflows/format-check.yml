@@ -4,21 +4,13 @@ on:
   pull_request:
     branches:
       - main
-    paths:
-      - 'knowledge_storm/**'
 
 jobs:
-  black-format-check:
+  linter_name:
+    name: runner / black formatter
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.10
-
-    - name: Install Black
-      run: pip install black
-
-    - name: Check formatting with Black
-      run: black --check specific-folder/
+      - uses: actions/checkout@v4
+      - uses: rickstaa/action-black@v1
+        with:
+          black_args: "knowledge_storm --check"
