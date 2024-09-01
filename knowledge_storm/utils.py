@@ -21,6 +21,20 @@ from trafilatura import extract
 
 logging.getLogger("httpx").setLevel(logging.WARNING)  # Disable INFO logging for httpx.
 
+def truncate_filename(filename, max_length=125):
+    """Truncate filename to max_length to ensure the filename won't exceed the file system limit.
+    
+    Args:
+        filename: str
+        max_length: int, default to 125 (usual path length limit is 255 chars)
+    """
+
+    if len(filename) > max_length:
+        truncated_filename = filename[:max_length]
+        logging.warning(f"Filename is too long. Filename is truncated to {truncated_filename}.")
+        return truncated_filename
+
+    return filename
 
 def load_api_key(toml_file_path):
     try:
@@ -635,7 +649,7 @@ class WebPageHelper:
                 h,
                 include_tables=False,
                 include_comments=False,
-                output_format="text",
+                output_format="txt",
             )
             if article_text is not None and len(article_text) > self.min_char_count:
                 articles[u] = {"text": article_text}

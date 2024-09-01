@@ -16,7 +16,7 @@ from .modules.retriever import StormRetriever
 from .modules.storm_dataclass import StormInformationTable, StormArticle
 from ..interface import Engine, LMConfigs
 from ..lm import OpenAIModel
-from ..utils import FileIOHelper, makeStringRed
+from ..utils import FileIOHelper, makeStringRed, truncate_filename
 
 
 class STORMWikiLMConfigs(LMConfigs):
@@ -295,7 +295,7 @@ class STORMWikiRunner(Engine):
         )
 
         self.topic = topic
-        self.article_dir_name = topic.replace(" ", "_").replace("/", "_")
+        self.article_dir_name = truncate_filename(topic.replace(" ", "_").replace("/", "_"))
         self.article_output_dir = os.path.join(self.args.output_dir, self.article_dir_name)
         os.makedirs(self.article_output_dir, exist_ok=True)
 

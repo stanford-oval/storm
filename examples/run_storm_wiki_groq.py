@@ -1,8 +1,9 @@
 """
-STORM Wiki pipeline powered by Claude family models and You.com search engine.
+STORM Wiki pipeline powered by llama3-70b-8192 hosted by Groq server and You.com search engine.
 You need to set up the following environment variables to run this script:
-    - ANTHROPIC_API_KEY: Anthropic API key
+    - GROQ_API_KEY: You can get your Groq API Key at https://console.groq.com/keys
     - YDC_API_KEY: You.com API key; BING_SEARCH_API_KEY: Bing Search API key, SERPER_API_KEY: Serper API key, BRAVE_API_KEY: Brave API key, or TAVILY_API_KEY: Tavily API key
+You also need to have a VLLM server running with the Mistral-7B-Instruct-v0.2 model. Specify `--url` and `--port` accordingly.
 
 Output will be structured as below
 args.output_dir/
@@ -17,33 +18,64 @@ args.output_dir/
 """
 
 import os
+import sys
+import re
+import logging
 from argparse import ArgumentParser
 
 from knowledge_storm import STORMWikiRunnerArguments, STORMWikiRunner, STORMWikiLMConfigs
-from knowledge_storm.lm import ClaudeModel
+# Get the absolute path to the directory containing lm.py
+lm_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'knowledge_storm'))
+
+# Add this path to sys.path
+sys.path.insert(0, lm_path)
+
+# Now import lm directly
+import lm
+from lm import GroqModel
 from knowledge_storm.rm import YouRM, BingSearch, BraveRM, SerperRM, DuckDuckGoSearchRM, TavilySearchRM, SearXNG
 from knowledge_storm.utils import load_api_key
+
+
+def sanitize_topic(topic):
+    """
+    Sanitize the topic name for use in file names.
+    Remove or replace characters that are not allowed in file names.
+    """
+    # Replace spaces with underscores
+    topic = topic.replace(' ', '_')
+
+    # Remove any character that isn't alphanumeric, underscore, or hyphen
+    topic = re.sub(r'[^a-zA-Z0-9_-]', '', topic)
+
+    # Ensure the topic isn't empty after sanitization
+    if not topic:
+        topic = "unnamed_topic"
+
+    return topic
 
 
 def main(args):
     load_api_key(toml_file_path='secrets.toml')
     lm_configs = STORMWikiLMConfigs()
-    claude_kwargs = {
-        'api_key': os.getenv("ANTHROPIC_API_KEY"),
-        'temperature': 1.0,
-        'top_p': 0.9
+
+    # Ensure GROQ_API_KEY is set
+    if not os.getenv("GROQ_API_KEY"):
+        raise ValueError("GROQ_API_KEY environment variable is not set. Please set it in your secrets.toml file.")
+
+    groq_kwargs = {
+        'api_key': os.getenv("GROQ_API_KEY"),
+        'api_base': "https://api.groq.com/openai/v1",
+        'temperature': args.temperature,
+        'top_p': args.top_p,
     }
 
-    # STORM is a LM system so different components can be powered by different models.
-    # For a good balance between cost and quality, you can choose a cheaper/faster model for conv_simulator_lm
-    # which is used to split queries, synthesize answers in the conversation. We recommend using stronger models
-    # for outline_gen_lm which is responsible for organizing the collected information, and article_gen_lm
-    # which is responsible for generating sections with citations.
-    conv_simulator_lm = ClaudeModel(model='claude-3-haiku-20240307', max_tokens=500, **claude_kwargs)
-    question_asker_lm = ClaudeModel(model='claude-3-sonnet-20240229', max_tokens=500, **claude_kwargs)
-    outline_gen_lm = ClaudeModel(model='claude-3-opus-20240229', max_tokens=400, **claude_kwargs)
-    article_gen_lm = ClaudeModel(model='claude-3-opus-20240229', max_tokens=700, **claude_kwargs)
-    article_polish_lm = ClaudeModel(model='claude-3-opus-20240229', max_tokens=4000, **claude_kwargs)
+    # Groq currently offers the "llama3-70b-8192" model with generous free API credits and the llama3.1 family of models as a preview for paying customers
+    conv_simulator_lm = GroqModel(model="llama3-70b-8192", max_tokens=500, **groq_kwargs)
+    question_asker_lm = GroqModel(model="llama3-70b-8192", max_tokens=500, **groq_kwargs)
+    outline_gen_lm = GroqModel(model="llama3-70b-8192", max_tokens=400, **groq_kwargs)
+    article_gen_lm = GroqModel(model="llama3-70b-8192", max_tokens=700, **groq_kwargs)
+    article_polish_lm = GroqModel(model="llama3-70b-8192", max_tokens=4000, **groq_kwargs)
 
     lm_configs.set_conv_simulator_lm(conv_simulator_lm)
     lm_configs.set_question_asker_lm(question_asker_lm)
@@ -78,25 +110,32 @@ def main(args):
             rm = SearXNG(searxng_api_key=os.getenv('SEARXNG_API_KEY'), k=engine_args.search_top_k)
         case _:
              raise ValueError(f'Invalid retriever: {args.retriever}. Choose either "bing", "you", "brave", "duckduckgo", "serper", "tavily", or "searxng"')
-    
+
     runner = STORMWikiRunner(engine_args, lm_configs, rm)
 
     topic = input('Topic: ')
-    runner.run(
-        topic=topic,
-        do_research=args.do_research,
-        do_generate_outline=args.do_generate_outline,
-        do_generate_article=args.do_generate_article,
-        do_polish_article=args.do_polish_article,
-    )
-    runner.post_run()
-    runner.summary()
+    sanitized_topic = sanitize_topic(topic)
+
+    try:
+        runner.run(
+            topic=sanitized_topic,
+            do_research=args.do_research,
+            do_generate_outline=args.do_generate_outline,
+            do_generate_article=args.do_generate_article,
+            do_polish_article=args.do_polish_article,
+            remove_duplicate=args.remove_duplicate,
+        )
+        runner.post_run()
+        runner.summary()
+    except Exception as e:
+        logger.exception(f"An error occurred: {str(e)}")
+        raise
 
 
 if __name__ == '__main__':
     parser = ArgumentParser()
     # global arguments
-    parser.add_argument('--output-dir', type=str, default='./results/claude',
+    parser.add_argument('--output-dir', type=str, default='./results/groq',
                         help='Directory to store the outputs.')
     parser.add_argument('--max-thread-num', type=int, default=3,
                         help='Maximum number of threads to use. The information seeking part and the article generation'
@@ -104,6 +143,10 @@ if __name__ == '__main__':
                              '"Exceed rate limit" error when calling LM API.')
     parser.add_argument('--retriever', type=str, choices=['bing', 'you', 'brave', 'serper', 'duckduckgo', 'tavily', 'searxng'],
                         help='The search engine API to use for retrieving information.')
+    parser.add_argument('--temperature', type=float, default=1.0,
+                        help='Sampling temperature to use.')
+    parser.add_argument('--top_p', type=float, default=0.9,
+                        help='Top-p sampling parameter.')
     # stage of the pipeline
     parser.add_argument('--do-research', action='store_true',
                         help='If True, simulate conversation to research the topic; otherwise, load the results.')

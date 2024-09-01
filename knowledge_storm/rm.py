@@ -1,7 +1,6 @@
 import logging
 import os
 from typing import Callable, Union, List
-
 import dspy
 import requests
 
@@ -507,5 +506,309 @@ class BraveRM(dspy.Retrieve):
                     )
             except Exception as e:
                 logging.error(f'Error occurs when searching query {query}: {e}')
+
+        return collected_results
+
+class SearXNG(dspy.Retrieve):
+    def __init__(self, searxng_api_url, searxng_api_key=None, k=3, is_valid_source: Callable = None):
+        """Initialize the SearXNG search retriever.
+        Please set up SearXNG according to https://docs.searxng.org/index.html.
+
+        Args:
+            searxng_api_url (str): The URL of the SearXNG API. Consult SearXNG documentation for details.
+            searxng_api_key (str, optional): The API key for the SearXNG API. Defaults to None. Consult SearXNG documentation for details.
+            k (int, optional): The number of top passages to retrieve. Defaults to 3.
+            is_valid_source (Callable, optional): A function that takes a URL and returns a boolean indicating if the
+            source is valid. Defaults to None.
+        """
+        super().__init__(k=k)
+        if not searxng_api_url:
+            raise RuntimeError("You must supply searxng_api_url")
+        self.searxng_api_url = searxng_api_url
+        self.searxng_api_key = searxng_api_key
+        self.usage = 0
+
+        if is_valid_source:
+            self.is_valid_source = is_valid_source
+        else:
+            self.is_valid_source = lambda x: True
+
+    def get_usage_and_reset(self):
+        usage = self.usage
+        self.usage = 0
+        return {'SearXNG': usage}
+
+    def forward(self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []):
+        """Search with SearxNG for self.k top passages for query or queries
+
+        Args:
+            query_or_queries (Union[str, List[str]]): The query or queries to search for.
+            exclude_urls (List[str]): A list of urls to exclude from the search results.
+
+        Returns:
+            a list of Dicts, each dict has keys of 'description', 'snippets' (list of strings), 'title', 'url'
+        """
+        queries = (
+            [query_or_queries]
+            if isinstance(query_or_queries, str)
+            else query_or_queries
+        )
+        self.usage += len(queries)
+        collected_results = []
+        headers = {"Authorization": f"Bearer {self.searxng_api_key}"} if self.searxng_api_key else {}
+
+        for query in queries:
+            try:
+                params = {"q": query, "format": "json"}
+                response = requests.get(self.searxng_api_url, headers=headers, params=params)
+                results = response.json()
+
+                for r in results['results']:
+                    if self.is_valid_source(r['url']) and r['url'] not in exclude_urls:
+                        collected_results.append({
+                            'description': r.get('content', ''),
+                            'snippets': [r.get('content', '')],
+                            'title': r.get('title', ''),
+                            'url': r['url']
+                        })
+            except Exception as e:
+                logging.error(f'Error occurs when searching query {query}: {e}')
+
+        return collected_results
+
+class DuckDuckGoSearchRM(dspy.Retrieve):
+    """Retrieve information from custom queries using DuckDuckGo."""
+    def __init__(
+        self,
+        k: int =3,
+        is_valid_source: Callable = None,
+        min_char_count: int = 150,
+        snippet_chunk_size: int = 1000,
+        webpage_helper_max_threads=10,
+        safe_search: str = 'On',
+        region: str = 'us-en'
+    ):
+        """
+        Params:
+            min_char_count: Minimum character count for the article to be considered valid.
+            snippet_chunk_size: Maximum character count for each snippet.
+            webpage_helper_max_threads: Maximum number of threads to use for webpage helper.
+            **kwargs: Additional parameters for the OpenAI API.
+        """
+        super().__init__(k=k)
+        try:
+            from duckduckgo_search import DDGS
+        except ImportError as err:
+            raise ImportError("Duckduckgo requires `pip install duckduckgo_search`.") from err
+        self.k = k
+        self.webpage_helper = WebPageHelper(
+            min_char_count=min_char_count,
+            snippet_chunk_size=snippet_chunk_size,
+            max_thread_num=webpage_helper_max_threads,
+        )
+        self.usage = 0
+        # All params for search can be found here: 
+        #   https://duckduckgo.com/duckduckgo-help-pages/settings/params/
+
+        # Sets the backend to be api
+        self.duck_duck_go_backend = 'api'
+
+        # Only gets safe search results
+        self.duck_duck_go_safe_search = safe_search
+
+        # Specifies the region that the search will use
+        self.duck_duck_go_region = region
+
+
+        # If not None, is_valid_source shall be a function that takes a URL and returns a boolean.
+        if is_valid_source:
+            self.is_valid_source = is_valid_source
+        else:
+            self.is_valid_source = lambda x: True
+
+        # Import the duckduckgo search library found here: https://github.com/deedy5/duckduckgo_search
+        self.ddgs = DDGS()
+
+    def get_usage_and_reset(self):
+        usage = self.usage
+        self.usage = 0
+        return {'DuckDuckGoRM': usage}
+
+    def forward(
+        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
+    ):
+        """Search with DuckDuckGoSearch for self.k top passages for query or queries
+        Args:
+            query_or_queries (Union[str, List[str]]): The query or queries to search for.
+            exclude_urls (List[str]): A list of urls to exclude from the search results.
+        Returns:
+            a list of Dicts, each dict has keys of 'description', 'snippets' (list of strings), 'title', 'url'
+        """
+        queries = (
+            [query_or_queries]
+            if isinstance(query_or_queries, str)
+            else query_or_queries
+        )
+        self.usage += len(queries)
+
+        collected_results = []
+
+        for query in queries:
+            #  list of dicts that will be parsed to return
+            results = self.ddgs.text(
+                query, max_results=self.k, backend=self.duck_duck_go_backend
+            )
+
+            for d in results:
+                # assert d is dict
+                if not isinstance(d, dict):
+                    print(f'Invalid result: {d}\n')
+                    continue
+
+                try:
+                    # ensure keys are present
+                    url = d.get('href', None)
+                    title = d.get('title', None)
+                    description = d.get('description', title)
+                    snippets = [d.get('body', None)]
+
+                    # raise exception of missing key(s)
+                    if not all([url, title, description, snippets]):
+                        raise ValueError(f'Missing key(s) in result: {d}')
+                    if self.is_valid_source(url) and url not in exclude_urls:
+                        result = {
+                            'url': url,
+                            'title': title,
+                            'description': description,
+                            'snippets': snippets,
+                        }
+                        collected_results.append(result)
+                    else:
+                        print(f'invalid source {url} or url in exclude_urls')
+                except Exception as e:
+                    print(f'Error occurs when processing {result=}: {e}\n')
+                    print(f'Error occurs when searching query {query}: {e}')
+
+        return collected_results
+
+class TavilySearchRM(dspy.Retrieve):
+    """Retrieve information from custom queries using Tavily. Documentation and examples can be found at https://docs.tavily.com/docs/python-sdk/tavily-search/examples"""
+    def __init__(
+        self,
+        tavily_search_api_key=None,
+        k: int = 3,
+        is_valid_source: Callable = None,
+        min_char_count: int = 150,
+        snippet_chunk_size: int = 1000,
+        webpage_helper_max_threads=10,
+        include_raw_content = False
+    ):
+        """
+        Params:
+            tavily_search_api_key str: API key for tavily that can be retrieved from https://tavily.com/
+            min_char_count: Minimum character count for the article to be considered valid.
+            snippet_chunk_size: Maximum character count for each snippet.
+            webpage_helper_max_threads: Maximum number of threads to use for webpage helper.
+            include_raw_content bool: Boolean that is used to determine if the full text should be returned.
+        """
+        super().__init__(k=k)
+        try:
+            from tavily import TavilyClient
+        except ImportError as err:
+            raise ImportError("Tavily requires `pip install tavily-python`.") from err
+        
+        if not tavily_search_api_key and not os.environ.get("TAVILY_API_KEY"):
+            raise RuntimeError("You must supply tavily_search_api_key or set environment variable TAVILY_API_KEY")
+        elif tavily_search_api_key:
+            self.tavily_search_api_key = tavily_search_api_key
+        else:
+            self.tavily_search_api_key = os.environ["TAVILY_API_KEY"]
+
+        self.k = k
+        self.webpage_helper = WebPageHelper(
+            min_char_count=min_char_count,
+            snippet_chunk_size=snippet_chunk_size,
+            max_thread_num=webpage_helper_max_threads,
+        )
+
+        self.usage = 0
+
+        # Creates client instance that will use search. Full search params are here: 
+        # https://docs.tavily.com/docs/python-sdk/tavily-search/examples
+        self.tavily_client = TavilyClient(api_key=self.tavily_search_api_key)
+
+        self.include_raw_content = include_raw_content
+        
+        # If not None, is_valid_source shall be a function that takes a URL and returns a boolean.
+        if is_valid_source:
+            self.is_valid_source = is_valid_source
+        else:
+            self.is_valid_source = lambda x: True
+
+    def get_usage_and_reset(self):
+        usage = self.usage
+        self.usage = 0
+        return {'TavilySearchRM': usage}
+
+    def forward(
+        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
+    ):
+        """Search with TavilySearch for self.k top passages for query or queries
+        Args:
+            query_or_queries (Union[str, List[str]]): The query or queries to search for.
+            exclude_urls (List[str]): A list of urls to exclude from the search results.
+        Returns:
+            a list of Dicts, each dict has keys of 'description', 'snippets' (list of strings), 'title', 'url'
+        """
+        queries = (
+            [query_or_queries]
+            if isinstance(query_or_queries, str)
+            else query_or_queries
+        )
+        self.usage += len(queries)
+
+        collected_results = []
+
+        for query in queries:
+            args = {
+                "max_results": self.k,
+                "include_raw_contents": self.include_raw_content
+            }
+            #  list of dicts that will be parsed to return
+            responseData = self.tavily_client.search(query)
+            results = responseData.get("results")
+            for d in results:
+                # assert d is dict
+                if not isinstance(d, dict):
+                    print(f'Invalid result: {d}\n')
+                    continue
+
+                try:
+                    # ensure keys are present
+                    url = d.get('url', None)
+                    title = d.get('title', None)
+                    description = d.get('content', None)
+                    snippets = []
+                    if(d.get('raw_body_content')):
+                        snippets.append(d.get('raw_body_content'))
+                    else:
+                        snippets.append(d.get('content'))
+
+                    # raise exception of missing key(s)
+                    if not all([url, title, description, snippets]):
+                        raise ValueError(f'Missing key(s) in result: {d}')
+                    if self.is_valid_source(url) and url not in exclude_urls:
+                        result = {
+                            'url': url,
+                            'title': title,
+                            'description': description,
+                            'snippets': snippets,
+                        }
+                        collected_results.append(result)
+                    else:
+                        print(f'invalid source {url} or url in exclude_urls')
+                except Exception as e:
+                    print(f'Error occurs when processing {result=}: {e}\n')
+                    print(f'Error occurs when searching query {query}: {e}')
 
         return collected_results

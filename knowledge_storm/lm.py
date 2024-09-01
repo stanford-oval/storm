@@ -9,7 +9,8 @@ import dspy
 import requests
 from dsp import ERRORS, backoff_hdlr, giveup_hdlr
 from dsp.modules.hf import openai_to_hf
-from dsp.modules.hf_client import send_hfvllm_request_v00, send_hftgi_request_v01_wrapped
+from dsp.modules.hf_client import send_hftgi_request_v01_wrapped
+from openai import OpenAI
 from transformers import AutoTokenizer
 
 try:
@@ -123,7 +124,8 @@ class DeepSeekModel(dspy.OpenAI):
         self.api_key = api_key or os.getenv("DEEPSEEK_API_KEY")
         self.api_base = api_base
         if not self.api_key:
-            raise ValueError("DeepSeek API key must be provided either as an argument or as an environment variable DEEPSEEK_API_KEY")
+            raise ValueError(
+                "DeepSeek API key must be provided either as an argument or as an environment variable DEEPSEEK_API_KEY")
 
     def log_usage(self, response):
         """Log the total tokens from the DeepSeek API response."""
@@ -231,6 +233,115 @@ class AzureOpenAIModel(dspy.AzureOpenAI):
         self.completion_tokens = 0
 
         return usage
+
+
+class GroqModel(dspy.OpenAI):
+    """A wrapper class for Groq API (https://console.groq.com/), compatible with dspy.OpenAI."""
+
+    def __init__(
+            self,
+            model: str = "llama3-70b-8192",
+            api_key: Optional[str] = None,
+            api_base: str = "https://api.groq.com/openai/v1",
+            **kwargs
+    ):
+        super().__init__(model=model, api_key=api_key, api_base=api_base, **kwargs)
+        self._token_usage_lock = threading.Lock()
+        self.prompt_tokens = 0
+        self.completion_tokens = 0
+        self.model = model
+        self.api_key = api_key or os.getenv("GROQ_API_KEY")
+        self.api_base = api_base
+        if not self.api_key:
+            raise ValueError(
+                "Groq API key must be provided either as an argument or as an environment variable GROQ_API_KEY")
+
+    def log_usage(self, response):
+        """Log the total tokens from the Groq API response."""
+        usage_data = response.get('usage')
+        if usage_data:
+            with self._token_usage_lock:
+                self.prompt_tokens += usage_data.get('prompt_tokens', 0)
+                self.completion_tokens += usage_data.get('completion_tokens', 0)
+
+    def get_usage_and_reset(self):
+        """Get the total tokens used and reset the token usage."""
+        usage = {
+            self.model:
+                {'prompt_tokens': self.prompt_tokens, 'completion_tokens': self.completion_tokens}
+        }
+        self.prompt_tokens = 0
+        self.completion_tokens = 0
+        return usage
+
+    @backoff.on_exception(
+        backoff.expo,
+        ERRORS,
+        max_time=1000,
+        on_backoff=backoff_hdlr,
+        giveup=giveup_hdlr,
+    )
+    def _create_completion(self, prompt: str, **kwargs):
+        """Create a completion using the Groq API."""
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self.api_key}"
+        }
+
+        # Remove unsupported fields
+        kwargs.pop('logprobs', None)
+        kwargs.pop('logit_bias', None)
+        kwargs.pop('top_logprobs', None)
+
+        # Ensure N is 1 if supplied
+        if 'n' in kwargs and kwargs['n'] != 1:
+            raise ValueError("Groq API only supports N=1")
+
+        # Adjust temperature if it's 0
+        if kwargs.get('temperature', 1) == 0:
+            kwargs['temperature'] = 1e-8
+
+        data = {
+            "model": self.model,
+            "messages": [{"role": "user", "content": prompt}],
+            **kwargs
+        }
+
+        # Remove 'name' field from messages if present
+        for message in data['messages']:
+            message.pop('name', None)
+
+        response = requests.post(f"{self.api_base}/chat/completions", headers=headers, json=data)
+        response.raise_for_status()
+        return response.json()
+
+    def __call__(
+            self,
+            prompt: str,
+            only_completed: bool = True,
+            return_sorted: bool = False,
+            **kwargs,
+    ) -> list[dict[str, Any]]:
+        """Call the Groq API to generate completions."""
+        assert only_completed, "for now"
+        assert return_sorted is False, "for now"
+
+        response = self._create_completion(prompt, **kwargs)
+
+        # Log the token usage from the Groq API response.
+        self.log_usage(response)
+
+        choices = response["choices"]
+        completions = [choice["message"]["content"] for choice in choices]
+
+        history = {
+            "prompt": prompt,
+            "response": response,
+            "kwargs": kwargs,
+        }
+        self.history.append(history)
+
+        return completions
 
 
 class ClaudeModel(dspy.dsp.modules.lm.LM):
@@ -358,49 +469,84 @@ class ClaudeModel(dspy.dsp.modules.lm.LM):
         return completions
 
 
-class VLLMClient(dspy.HFClientVLLM):
-    """A wrapper class for dspy.HFClientVLLM."""
+class VLLMClient(dspy.dsp.LM):
+    """A client compatible with vLLM HTTP server.
 
-    def __init__(self, model, port, url="http://localhost", **kwargs):
-        """Copied from dspy/dsp/modules/hf_client.py with the addition of storing additional kwargs."""
+    vLLM HTTP server is designed to be compatible with the OpenAI API. Use OpenAI client to interact with the server.
+    """
 
-        super().__init__(model=model, port=port, url=url, **kwargs)
+    def __init__(self, model, port, model_type: Literal["chat", "text"] = "text", url="http://localhost",
+                 api_key="null", **kwargs):
+        """Check out https://docs.vllm.ai/en/latest/serving/openai_compatible_server.html for more information."""
+        super().__init__(model=model)
         # Store additional kwargs for the generate method.
         self.kwargs = {**self.kwargs, **kwargs}
+        self.model = model
+        self.base_url = f"{url}:{port}/v1/"
+        if model_type == "chat":
+            self.base_url += "chat/"
+        self.client = OpenAI(base_url=self.base_url, api_key=api_key)
+        self.prompt_tokens = 0
+        self.completion_tokens = 0
+        self._token_usage_lock = threading.Lock()
 
-    def _generate(self, prompt, **kwargs):
-        """Copied from dspy/dsp/modules/hf_client.py with the addition of passing kwargs to VLLM server."""
+    def basic_request(self, prompt, **kwargs):
+        completion = self.client.chat.completions.create(
+            **kwargs,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        return completion
+
+    @backoff.on_exception(
+        backoff.expo,
+        ERRORS,
+        max_time=1000,
+        on_backoff=backoff_hdlr,
+    )
+    def request(self, prompt: str, **kwargs):
+        return self.basic_request(prompt, **kwargs)
+
+    def log_usage(self, response):
+        """Log the total tokens from the response."""
+        usage_data = response.usage
+        if usage_data:
+            with self._token_usage_lock:
+                self.prompt_tokens += usage_data.prompt_tokens
+                self.completion_tokens += usage_data.completion_tokens
+
+    def get_usage_and_reset(self):
+        """Get the total tokens used and reset the token usage."""
+        usage = {
+            self.kwargs.get('model') or self.kwargs.get('engine'):
+                {'prompt_tokens': self.prompt_tokens, 'completion_tokens': self.completion_tokens}
+        }
+        self.prompt_tokens = 0
+        self.completion_tokens = 0
+
+        return usage
+
+    def __call__(self, prompt: str, **kwargs):
         kwargs = {**self.kwargs, **kwargs}
 
-        # payload = {
-        #     "model": kwargs["model"],
-        #     "prompt": prompt,
-        #     "max_tokens": kwargs["max_tokens"],
-        #     "temperature": kwargs["temperature"],
-        # }
-        payload = {
-            "prompt": prompt,
-            **kwargs
-        }
-
-        response = send_hfvllm_request_v00(
-            f"{self.url}/v1/completions",
-            json=payload,
-            headers=self.headers,
-        )
-
         try:
-            json_response = response.json()
-            completions = json_response["choices"]
-            response = {
-                "prompt": prompt,
-                "choices": [{"text": c["text"]} for c in completions],
-            }
-            return response
-
+            response = self.request(prompt, **kwargs)
         except Exception as e:
-            print("Failed to parse JSON response:", response.text)
-            raise Exception("Received invalid JSON response from server")
+            print(f"Failed to generate completion: {e}")
+            raise Exception(e)
+
+        self.log_usage(response)
+
+        choices = response.choices
+        completions = [choice.message.content for choice in choices]
+
+        history = {
+            "prompt": prompt,
+            "response": response,
+            "kwargs": kwargs,
+        }
+        self.history.append(history)
+
+        return completions
 
 
 class OllamaClient(dspy.OllamaLocal):

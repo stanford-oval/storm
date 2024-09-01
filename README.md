@@ -87,7 +87,7 @@ openai_kwargs = {
 # For a good practice, choose a cheaper/faster model for `conv_simulator_lm` which is used to split queries, synthesize answers in the conversation.
 # Choose a more powerful model for `article_gen_lm` to generate verifiable text with citations.
 gpt_35 = OpenAIModel(model='gpt-3.5-turbo', max_tokens=500, **openai_kwargs)
-gpt_4 = OpenAIModel(model='gpt-4-o', max_tokens=3000, **openai_kwargs)
+gpt_4 = OpenAIModel(model='gpt-4o', max_tokens=3000, **openai_kwargs)
 lm_configs.set_conv_simulator_lm(gpt_35)
 lm_configs.set_question_asker_lm(gpt_35)
 lm_configs.set_outline_gen_lm(gpt_4)
@@ -100,8 +100,8 @@ runner = STORMWikiRunner(engine_args, lm_configs, rm)
 ```
 
 Currently, our package support:
-- `OpenAIModel`, `AzureOpenAIModel`, `ClaudeModel`, `VLLMClient`, `TGIClient`, `TogetherClient`, `OllamaClient`, `GoogleModel`, `DeepSeekModel` as language model components
-- `YouRM`, `BingSearch`, `VectorRM`, `SerperRM`, `BraveRM` as retrieval module components
+- `OpenAIModel`, `AzureOpenAIModel`, `ClaudeModel`, `VLLMClient`, `TGIClient`, `TogetherClient`, `OllamaClient`, `GoogleModel`, `DeepSeekModel`, `GroqModel` as language model components
+- `YouRM`, `BingSearch`, `VectorRM`, `SerperRM`, `BraveRM`, `SearXNG`, `DuckDuckGoSearchRM`, and `TavilySearchRM` as retrieval module components
 
 :star2: **PRs for integrating more language models into [knowledge_storm/lm.py](knowledge_storm/lm.py) and search engines/retrievers into [knowledge_storm/rm.py](knowledge_storm/rm.py) are highly appreciated!**
 

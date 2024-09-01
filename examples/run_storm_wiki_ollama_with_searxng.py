@@ -1,30 +1,11 @@
-"""
-STORM Wiki pipeline powered by local model hosted by Ollama server and You.com or Bing search engine.
-You need to set up the following environment variables to run this script:
-    - YDC_API_KEY: You.com API key; BING_SEARCH_API_KEY: Bing Search API key, SERPER_API_KEY: Serper API key, BRAVE_API_KEY: Brave API key, or TAVILY_API_KEY: Tavily API key
-You also need to have a Ollama server running with the llama3 model or other. Specify `--url`, `--port` and `--model` accordingly.
-
-Output will be structured as below
-args.output_dir/
-    topic_name/  # topic_name will follow convention of underscore-connected topic name w/o space and slash
-        conversation_log.json           # Log of information-seeking conversation
-        raw_search_results.json         # Raw search results from search engine
-        direct_gen_outline.txt          # Outline directly generated with LLM's parametric knowledge
-        storm_gen_outline.txt           # Outline refined with collected information
-        url_to_info.json                # Sources that are used in the final article
-        storm_gen_article.txt           # Final article generated
-        storm_gen_article_polished.txt  # Polished final article (if args.do_polish_article is True)
-"""
 import os
-import sys
 from argparse import ArgumentParser
 
 from dspy import Example
 
-sys.path.append('./src')
-from knowledge_storm.lm import OllamaClient
-from knowledge_storm.rm import YouRM, BingSearch, BraveRM, SerperRM, DuckDuckGoSearchRM, TavilySearchRM, SearXNG
 from knowledge_storm import STORMWikiRunnerArguments, STORMWikiRunner, STORMWikiLMConfigs
+from knowledge_storm.lm import OllamaClient
+from knowledge_storm.rm import SearXNG
 from knowledge_storm.utils import load_api_key
 
 
@@ -36,7 +17,7 @@ def main(args):
         "model": args.model,
         "port": args.port,
         "url": args.url,
-        "stop": ('\n\n---',)  # dspy uses "\n\n---" to separate examples. Open models sometimes generate this.
+        "stop": ('\n\n---',)
     }
 
     conv_simulator_lm = OllamaClient(max_tokens=500, **ollama_kwargs)
@@ -59,33 +40,10 @@ def main(args):
         max_thread_num=args.max_thread_num,
     )
 
-    # STORM is a knowledge curation system which consumes information from the retrieval module.
-    # Currently, the information source is the Internet and we use search engine API as the retrieval module.
-    match args.retriever:
-        case 'bing':
-            rm = BingSearch(bing_search_api=os.getenv('BING_SEARCH_API_KEY'), k=engine_args.search_top_k)
-        case 'you':
-             rm = YouRM(ydc_api_key=os.getenv('YDC_API_KEY'), k=engine_args.search_top_k)
-        case 'brave':
-            rm = BraveRM(brave_search_api_key=os.getenv('BRAVE_API_KEY'), k=engine_args.search_top_k)
-        case 'duckduckgo':
-            rm = DuckDuckGoSearchRM(k=engine_args.search_top_k, safe_search='On', region='us-en')
-        case 'serper':
-            rm = SerperRM(serper_search_api_key=os.getenv('SERPER_API_KEY'), query_params={'autocorrect': True, 'num': 10, 'page': 1})
-        case 'tavily':
-            rm = TavilySearchRM(tavily_search_api_key=os.getenv('TAVILY_API_KEY'), k=engine_args.search_top_k, include_raw_content=True)
-        case 'searxng':
-            rm = SearXNG(searxng_api_key=os.getenv('SEARXNG_API_KEY'), k=engine_args.search_top_k)
-        case _:
-             raise ValueError(f'Invalid retriever: {args.retriever}. Choose either "bing", "you", "brave", "duckduckgo", "serper", "tavily", or "searxng"')
+    rm = SearXNG(searxng_api_url=args.searxng_api_url, searxng_api_key=os.getenv('SEARXNG_API_KEY'), k=engine_args.search_top_k)
 
     runner = STORMWikiRunner(engine_args, lm_configs, rm)
 
-    # Open LMs are generally weaker in following output format.
-    # One way for mitigation is to add one-shot example to the prompt to exemplify the desired output format.
-    # For example, we can add the following examples to the two prompts used in StormPersonaGenerator.
-    # Note that the example should be an object of dspy.Example with fields matching the InputField
-    # and OutputField in the prompt (i.e., dspy.Signature).
     find_related_topic_example = Example(
         topic="Knowledge Curation",
         related_topics="https://en.wikipedia.org/wiki/Knowledge_management\n"
@@ -99,23 +57,25 @@ def main(args):
                  "\nKnowledge barriers\nKnowledge retention\nKnowledge audit\nKnowledge protection\n"
                  "  Knowledge protection methods\n    Formal methods\n    Informal methods\n"
                  "  Balancing knowledge protection and knowledge sharing\n  Knowledge protection risks",
-        personas="1. Historian of Knowledge Systems: This editor will focus on the history and evolution of knowledge curation. They will provide context on how knowledge curation has changed over time and its impact on modern practices.\n"
-                 "2. Information Science Professional: With insights from 'Information science', this editor will explore the foundational theories, definitions, and philosophy that underpin knowledge curation\n"
-                 "3. Digital Librarian: This editor will delve into the specifics of how digital libraries operate, including software, metadata, digital preservation.\n"
-                 "4. Technical expert: This editor will focus on the technical aspects of knowledge curation, such as common features of content management systems.\n"
-                 "5. Museum Curator: The museum curator will contribute expertise on the curation of physical items and the transition of these practices into the digital realm."
+        personas=(
+            "1. Historian of Knowledge Systems: This editor will focus on the history and evolution of knowledge "
+            "curation. They will provide context on how knowledge curation has changed over time and its impact on "
+            "modern practices.\n"
+            "2. Information Science Professional: With insights from 'Information science', this editor will "
+            "explore the foundational theories, definitions, and philosophy that underpin knowledge curation\n"
+            "3. Digital Librarian: This editor will delve into the specifics of how digital libraries operate, "
+            "including software, metadata, digital preservation.\n"
+            "4. Technical expert: This editor will focus on the technical aspects of knowledge curation, "
+            "such as common features of content management systems.\n"
+            "5. Museum Curator: The museum curator will contribute expertise on the curation of physical items and "
+            "the transition of these practices into the digital realm."
+        )
     )
     runner.storm_knowledge_curation_module.persona_generator.create_writer_with_persona.find_related_topic.demos = [
         find_related_topic_example]
     runner.storm_knowledge_curation_module.persona_generator.create_writer_with_persona.gen_persona.demos = [
         gen_persona_example]
 
-    # A trade-off of adding one-shot example is that it will increase the input length of the prompt. Also, some
-    # examples may be very long (e.g., an example for writing a section based on the given information), which may
-    # confuse the model. For these cases, you can create a pseudo-example that is short and easy to understand to steer
-    # the model's output format.
-    # For example, we can add the following pseudo-examples to the prompt used in WritePageOutlineFromConv and
-    # ConvToSection.
     write_page_outline_example = Example(
         topic="Example Topic",
         conv="Wikipedia Writer: ...\nExpert: ...\nWikipedia Writer: ...\nExpert: ...",
@@ -164,8 +124,10 @@ if __name__ == '__main__':
                         help='Maximum number of threads to use. The information seeking part and the article generation'
                              'part can speed up by using multiple threads. Consider reducing it if keep getting '
                              '"Exceed rate limit" error when calling LM API.')
-    parser.add_argument('--retriever', type=str, choices=['bing', 'you', 'brave', 'serper', 'duckduckgo', 'tavily', 'searxng'],
+    parser.add_argument('--retriever', type=str, choices=['searxng'],
                         help='The search engine API to use for retrieving information.')
+    parser.add_argument('--searxng-api-url', type=str, required=True,
+                        help='URL of the SearXNG API.')
     # stage of the pipeline
     parser.add_argument('--do-research', action='store_true',
                         help='If True, simulate conversation to research the topic; otherwise, load the results.')
