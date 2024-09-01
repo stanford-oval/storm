@@ -6,11 +6,11 @@ on:
       - main
 
 jobs:
-  linter_name:
-    name: runner / black formatter
+  lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: rickstaa/action-black@v1
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+      - uses: psf/black@stable
         with:
           black_args: "knowledge_storm --check"
