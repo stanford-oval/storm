@@ -1,0 +1,24 @@
+name: Check Python formatting with Black
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'knowledge_storm/**'
+
+jobs:
+  black-format-check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.10
+
+    - name: Install Black
+      run: pip install black
+
+    - name: Check formatting with Black
+      run: black --check specific-folder/
