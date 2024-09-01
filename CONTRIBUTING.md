@@ -40,4 +40,9 @@ Following the suggested format can lead to a faster review process.
 
 **Code Format:**
 
-We adopt [PEP8 rules](https://peps.python.org/pep-0008/) for arranging and formatting Python code. Please use a code formatter tool in your IDE to reformat the code before submitting the PR.
+We adopt [`black`](https://github.com/psf/black) for arranging and formatting Python code. Please complete the following step before submitting the PR. See [here](https://github.com/psf/black?tab=readme-ov-file#installation-and-usage) for more information.
+```shell
+pip install black
+black {path_to_the_changed_python_code}
+```
+
