@@ -40,4 +40,9 @@ Following the suggested format can lead to a faster review process.
 
 **Code Format:**
 
-We adopt [PEP8 rules](https://peps.python.org/pep-0008/) for arranging and formatting Python code. Please use a code formatter tool in your IDE to reformat the code before submitting the PR.
+We adopt [`black`](https://github.com/psf/black) for arranging and formatting Python code. To streamline the contribution process, we set up a [pre-commit hook](https://pre-commit.com/) to format the code under `knowledge_storm/` before committing. To install the pre-commit hook, run:
+```
+pip install pre-commit
+pre-commit install
+```
+The hook will automatically format the code before each commit.
