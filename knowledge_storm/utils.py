@@ -20,9 +20,10 @@ from trafilatura import extract
 
 logging.getLogger("httpx").setLevel(logging.WARNING)  # Disable INFO logging for httpx.
 
+
 def truncate_filename(filename, max_length=125):
     """Truncate filename to max_length to ensure the filename won't exceed the file system limit.
-    
+
     Args:
         filename: str
         max_length: int, default to 125 (usual path length limit is 255 chars)
@@ -30,14 +31,17 @@ def truncate_filename(filename, max_length=125):
 
     if len(filename) > max_length:
         truncated_filename = filename[:max_length]
-        logging.warning(f"Filename is too long. Filename is truncated to {truncated_filename}.")
+        logging.warning(
+            f"Filename is too long. Filename is truncated to {truncated_filename}."
+        )
         return truncated_filename
 
     return filename
 
+
 def load_api_key(toml_file_path):
     try:
-        with open(toml_file_path, 'r') as file:
+        with open(toml_file_path, "r") as file:
             data = toml.load(file)
     except FileNotFoundError:
         print(f"File not found: {toml_file_path}", file=sys.stderr)
@@ -57,12 +61,15 @@ def makeStringRed(message):
 class QdrantVectorStoreManager:
     """
     Helper class for managing the Qdrant vector store, can be used with `VectorRM` in rm.py.
-    
+
     Before you initialize `VectorRM`, call `create_or_update_vector_store` to create or update the vector store.
     Once you have the vector store, you can initialize `VectorRM` with the vector store path or the Qdrant server URL.
     """
+
     @staticmethod
-    def _check_create_collection(client: QdrantClient, collection_name: str, model: HuggingFaceEmbeddings):
+    def _check_create_collection(
+        client: QdrantClient, collection_name: str, model: HuggingFaceEmbeddings
+    ):
         """Check if the Qdrant collection exists and create it if it does not."""
         if client is None:
             raise ValueError("Qdrant client is not initialized.")
@@ -74,20 +81,26 @@ class QdrantVectorStoreManager:
                 embeddings=model,
             )
         else:
-            print(f"Collection {collection_name} does not exist. Creating the collection...")
+            print(
+                f"Collection {collection_name} does not exist. Creating the collection..."
+            )
             # create the collection
             client.create_collection(
                 collection_name=f"{collection_name}",
-                vectors_config=models.VectorParams(size=1024, distance=models.Distance.COSINE),
+                vectors_config=models.VectorParams(
+                    size=1024, distance=models.Distance.COSINE
+                ),
             )
             return Qdrant(
                 client=client,
                 collection_name=collection_name,
                 embeddings=model,
             )
-    
+
     @staticmethod
-    def _init_online_vector_db(url: str, api_key: str, collection_name: str, model: HuggingFaceEmbeddings):
+    def _init_online_vector_db(
+        url: str, api_key: str, collection_name: str, model: HuggingFaceEmbeddings
+    ):
         """Initialize the Qdrant client that is connected to an online vector store with the given URL and API key.
 
         Args:
@@ -103,12 +116,16 @@ class QdrantVectorStoreManager:
 
         try:
             client = QdrantClient(url=url, api_key=api_key)
-            return QdrantVectorStoreManager._check_create_collection(client=client, collection_name=collection_name, model=model)
+            return QdrantVectorStoreManager._check_create_collection(
+                client=client, collection_name=collection_name, model=model
+            )
         except Exception as e:
             raise ValueError(f"Error occurs when connecting to the server: {e}")
 
     @staticmethod
-    def _init_offline_vector_db(vector_store_path: str, collection_name: str, model: HuggingFaceEmbeddings):
+    def _init_offline_vector_db(
+        vector_store_path: str, collection_name: str, model: HuggingFaceEmbeddings
+    ):
         """Initialize the Qdrant client that is connected to an offline vector store with the given vector store folder path.
 
         Args:
@@ -119,37 +136,39 @@ class QdrantVectorStoreManager:
 
         try:
             client = QdrantClient(path=vector_store_path)
-            return QdrantVectorStoreManager._check_create_collection(client=client, collection_name=collection_name, model=model)
+            return QdrantVectorStoreManager._check_create_collection(
+                client=client, collection_name=collection_name, model=model
+            )
         except Exception as e:
             raise ValueError(f"Error occurs when loading the vector store: {e}")
-    
+
     @staticmethod
     def create_or_update_vector_store(
-            collection_name: str,
-            vector_db_mode: str,
-            file_path: str,
-            content_column: str,
-            title_column: str = "title",
-            url_column: str = "url",
-            desc_column: str = "description",
-            batch_size: int = 64,
-            chunk_size: int = 500,
-            chunk_overlap: int = 100,
-            vector_store_path: str = None,
-            url: str =  None,
-            qdrant_api_key: str = None,
-            embedding_model: str = 'BAAI/bge-m3',
-            device: str = "mps",
+        collection_name: str,
+        vector_db_mode: str,
+        file_path: str,
+        content_column: str,
+        title_column: str = "title",
+        url_column: str = "url",
+        desc_column: str = "description",
+        batch_size: int = 64,
+        chunk_size: int = 500,
+        chunk_overlap: int = 100,
+        vector_store_path: str = None,
+        url: str = None,
+        qdrant_api_key: str = None,
+        embedding_model: str = "BAAI/bge-m3",
+        device: str = "mps",
     ):
         """
         Takes a CSV file and adds each row in the CSV file to the Qdrant collection.
-        
+
         This function expects each row of the CSV file as a document.
         The CSV file should have columns for "content", "title", "URL", and "description".
 
         Args:
             collection_name: Name of the Qdrant collection.
-            vector_store_path (str): Path to the directory where the vector store is stored or will be stored. 
+            vector_store_path (str): Path to the directory where the vector store is stored or will be stored.
             vector_db_mode (str): Mode of the Qdrant vector store (offline or online).
             file_path (str): Path to the CSV file.
             content_column (str): Name of the column containing the content.
@@ -166,17 +185,19 @@ class QdrantVectorStoreManager:
         # check if the collection name is provided
         if collection_name is None:
             raise ValueError("Please provide a collection name.")
-        
+
         model_kwargs = {"device": device}
         encode_kwargs = {"normalize_embeddings": True}
         model = HuggingFaceEmbeddings(
-            model_name=embedding_model, model_kwargs=model_kwargs, encode_kwargs=encode_kwargs
+            model_name=embedding_model,
+            model_kwargs=model_kwargs,
+            encode_kwargs=encode_kwargs,
         )
 
         if file_path is None:
             raise ValueError("Please provide a file path.")
         # check if the file is a csv file
-        if not file_path.endswith('.csv'):
+        if not file_path.endswith(".csv"):
             raise ValueError(f"Not valid file format. Please provide a csv file.")
         if content_column is None:
             raise ValueError("Please provide the name of the content column.")
@@ -185,17 +206,23 @@ class QdrantVectorStoreManager:
 
         # try to initialize the Qdrant client
         qdrant = None
-        if vector_db_mode == 'online':
+        if vector_db_mode == "online":
             qdrant = QdrantVectorStoreManager._init_online_vector_db(
                 url=url,
                 api_key=qdrant_api_key,
                 collection_name=collection_name,
                 model=model,
             )
-        elif vector_db_mode == 'offline':
-            qdrant = QdrantVectorStoreManager._init_offline_vector_db(vector_store_path=vector_store_path, collection_name=collection_name, model=model)
+        elif vector_db_mode == "offline":
+            qdrant = QdrantVectorStoreManager._init_offline_vector_db(
+                vector_store_path=vector_store_path,
+                collection_name=collection_name,
+                model=model,
+            )
         else:
-            raise ValueError("Invalid vector_db_mode. Please provide either 'online' or 'offline'.")
+            raise ValueError(
+                "Invalid vector_db_mode. Please provide either 'online' or 'offline'."
+            )
         if qdrant is None:
             raise ValueError("Qdrant client is not initialized.")
 
@@ -203,7 +230,9 @@ class QdrantVectorStoreManager:
         df = pd.read_csv(file_path)
         # check that content column exists and url column exists
         if content_column not in df.columns:
-            raise ValueError(f"Content column {content_column} not found in the csv file.")
+            raise ValueError(
+                f"Content column {content_column} not found in the csv file."
+            )
         if url_column not in df.columns:
             raise ValueError(f"URL column {url_column} not found in the csv file.")
 
@@ -211,16 +240,17 @@ class QdrantVectorStoreManager:
             Document(
                 page_content=row[content_column],
                 metadata={
-                    "title": row.get(title_column, ''),
+                    "title": row.get(title_column, ""),
                     "url": row[url_column],
-                    "description": row.get(desc_column, ''),
-                }
+                    "description": row.get(desc_column, ""),
+                },
             )
-            for row in df.to_dict(orient='records')
+            for row in df.to_dict(orient="records")
         ]
 
         # split the documents
         from langchain_text_splitters import RecursiveCharacterTextSplitter
+
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=chunk_size,
             chunk_overlap=chunk_overlap,
@@ -238,7 +268,7 @@ class QdrantVectorStoreManager:
                 " ",
                 "\u200B",  # Zero-width space
                 "",
-            ]
+            ],
         )
         split_documents = text_splitter.split_documents(documents)
 
@@ -251,7 +281,7 @@ class QdrantVectorStoreManager:
                 documents=split_documents[start_idx:end_idx],
                 batch_size=batch_size,
             )
-        
+
         # close the qdrant client
         qdrant.client.close()
 
@@ -275,19 +305,19 @@ class ArticleTextProcessing:
         """
 
         word_count = 0
-        limited_string = ''
+        limited_string = ""
 
-        for word in input_string.split('\n'):
+        for word in input_string.split("\n"):
             line_words = word.split()
             for lw in line_words:
                 if word_count < max_word_count:
-                    limited_string += lw + ' '
+                    limited_string += lw + " "
                     word_count += 1
                 else:
                     break
             if word_count >= max_word_count:
                 break
-            limited_string = limited_string.strip() + '\n'
+            limited_string = limited_string.strip() + "\n"
 
         return limited_string.strip()
 
@@ -305,7 +335,7 @@ class ArticleTextProcessing:
             str: The string with all citation patterns removed.
         """
 
-        return re.sub(r'\[\d+(?:,\s*\d+)*\]', '', s)
+        return re.sub(r"\[\d+(?:,\s*\d+)*\]", "", s)
 
     @staticmethod
     def parse_citation_indices(s):
@@ -318,7 +348,7 @@ class ArticleTextProcessing:
         Returns:
             List[int]: A list of unique citation indexes extracted from the content, in the order they appear.
         """
-        matches = re.findall(r'\[\d+\]', s)
+        matches = re.findall(r"\[\d+\]", s)
         return [int(index[1:-1]) for index in matches]
 
     @staticmethod
@@ -339,19 +369,21 @@ class ArticleTextProcessing:
 
         # Convert citations like [1, 2, 3] to [1][2][3].
         def replace_with_individual_brackets(match):
-            numbers = match.group(1).split(', ')
-            return ' '.join(f'[{n}]' for n in numbers)
+            numbers = match.group(1).split(", ")
+            return " ".join(f"[{n}]" for n in numbers)
 
         # Deduplicate and sort individual groups of citations.
         def deduplicate_group(match):
             citations = match.group(0)
-            unique_citations = list(set(re.findall(r'\[\d+\]', citations)))
-            sorted_citations = sorted(unique_citations, key=lambda x: int(x.strip('[]')))
+            unique_citations = list(set(re.findall(r"\[\d+\]", citations)))
+            sorted_citations = sorted(
+                unique_citations, key=lambda x: int(x.strip("[]"))
+            )
             # Return the sorted unique citations as a string
-            return ''.join(sorted_citations)
+            return "".join(sorted_citations)
 
-        text = re.sub(r'\[([0-9, ]+)\]', replace_with_individual_brackets, text)
-        text = re.sub(r'(\[\d+\])+', deduplicate_group, text)
+        text = re.sub(r"\[([0-9, ]+)\]", replace_with_individual_brackets, text)
+        text = re.sub(r"(\[\d+\])+", deduplicate_group, text)
 
         # Deprecated: Remove sentence without proper ending punctuation and citations.
         # Split the text into sentences (including citations).
@@ -372,29 +404,38 @@ class ArticleTextProcessing:
         #     combined_sentences += ' '.join(trailing_citations)
 
         # Regex pattern to match sentence endings, including optional citation markers.
-        eos_pattern = r'([.!?])\s*(\[\d+\])?\s*'
+        eos_pattern = r"([.!?])\s*(\[\d+\])?\s*"
         matches = list(re.finditer(eos_pattern, text))
         if matches:
             last_match = matches[-1]
-            text = text[:last_match.end()].strip()
+            text = text[: last_match.end()].strip()
 
         return text
 
     @staticmethod
     def clean_up_citation(conv):
         for turn in conv.dlg_history:
-            turn.agent_utterance = turn.agent_utterance[:turn.agent_utterance.find('References:')]
-            turn.agent_utterance = turn.agent_utterance[:turn.agent_utterance.find('Sources:')]
-            turn.agent_utterance = turn.agent_utterance.replace('Answer:', '').strip()
+            turn.agent_utterance = turn.agent_utterance[
+                : turn.agent_utterance.find("References:")
+            ]
+            turn.agent_utterance = turn.agent_utterance[
+                : turn.agent_utterance.find("Sources:")
+            ]
+            turn.agent_utterance = turn.agent_utterance.replace("Answer:", "").strip()
             try:
-                max_ref_num = max([int(x) for x in re.findall(r'\[(\d+)\]', turn.agent_utterance)])
+                max_ref_num = max(
+                    [int(x) for x in re.findall(r"\[(\d+)\]", turn.agent_utterance)]
+                )
             except Exception as e:
                 max_ref_num = 0
             if max_ref_num > len(turn.search_results):
                 for i in range(len(turn.search_results), max_ref_num + 1):
-                    turn.agent_utterance = turn.agent_utterance.replace(f'[{i}]', '')
-            turn.agent_utterance = ArticleTextProcessing.remove_uncompleted_sentences_with_citations(
-                turn.agent_utterance)
+                    turn.agent_utterance = turn.agent_utterance.replace(f"[{i}]", "")
+            turn.agent_utterance = (
+                ArticleTextProcessing.remove_uncompleted_sentences_with_citations(
+                    turn.agent_utterance
+                )
+            )
 
         return conv
 
@@ -403,36 +444,46 @@ class ArticleTextProcessing:
         output_lines = []
         current_level = 0  # To track the current section level
 
-        for line in outline.split('\n'):
+        for line in outline.split("\n"):
             stripped_line = line.strip()
 
             if topic != "" and f"# {topic.lower()}" in stripped_line.lower():
                 output_lines = []
 
             # Check if the line is a section header
-            if stripped_line.startswith('#'):
-                current_level = stripped_line.count('#')
+            if stripped_line.startswith("#"):
+                current_level = stripped_line.count("#")
                 output_lines.append(stripped_line)
             # Check if the line is a bullet point
-            elif stripped_line.startswith('-'):
-                subsection_header = '#' * (current_level + 1) + ' ' + stripped_line[1:].strip()
+            elif stripped_line.startswith("-"):
+                subsection_header = (
+                    "#" * (current_level + 1) + " " + stripped_line[1:].strip()
+                )
                 output_lines.append(subsection_header)
 
-        outline = '\n'.join(output_lines)
+        outline = "\n".join(output_lines)
 
         # Remove references.
-        outline = re.sub(r"#[#]? See also.*?(?=##|$)", '', outline, flags=re.DOTALL)
-        outline = re.sub(r"#[#]? See Also.*?(?=##|$)", '', outline, flags=re.DOTALL)
-        outline = re.sub(r"#[#]? Notes.*?(?=##|$)", '', outline, flags=re.DOTALL)
-        outline = re.sub(r"#[#]? References.*?(?=##|$)", '', outline, flags=re.DOTALL)
-        outline = re.sub(r"#[#]? External links.*?(?=##|$)", '', outline, flags=re.DOTALL)
-        outline = re.sub(r"#[#]? External Links.*?(?=##|$)", '', outline, flags=re.DOTALL)
-        outline = re.sub(r"#[#]? Bibliography.*?(?=##|$)", '', outline, flags=re.DOTALL)
-        outline = re.sub(r"#[#]? Further reading*?(?=##|$)", '', outline, flags=re.DOTALL)
-        outline = re.sub(r"#[#]? Further Reading*?(?=##|$)", '', outline, flags=re.DOTALL)
-        outline = re.sub(r"#[#]? Summary.*?(?=##|$)", '', outline, flags=re.DOTALL)
-        outline = re.sub(r"#[#]? Appendices.*?(?=##|$)", '', outline, flags=re.DOTALL)
-        outline = re.sub(r"#[#]? Appendix.*?(?=##|$)", '', outline, flags=re.DOTALL)
+        outline = re.sub(r"#[#]? See also.*?(?=##|$)", "", outline, flags=re.DOTALL)
+        outline = re.sub(r"#[#]? See Also.*?(?=##|$)", "", outline, flags=re.DOTALL)
+        outline = re.sub(r"#[#]? Notes.*?(?=##|$)", "", outline, flags=re.DOTALL)
+        outline = re.sub(r"#[#]? References.*?(?=##|$)", "", outline, flags=re.DOTALL)
+        outline = re.sub(
+            r"#[#]? External links.*?(?=##|$)", "", outline, flags=re.DOTALL
+        )
+        outline = re.sub(
+            r"#[#]? External Links.*?(?=##|$)", "", outline, flags=re.DOTALL
+        )
+        outline = re.sub(r"#[#]? Bibliography.*?(?=##|$)", "", outline, flags=re.DOTALL)
+        outline = re.sub(
+            r"#[#]? Further reading*?(?=##|$)", "", outline, flags=re.DOTALL
+        )
+        outline = re.sub(
+            r"#[#]? Further Reading*?(?=##|$)", "", outline, flags=re.DOTALL
+        )
+        outline = re.sub(r"#[#]? Summary.*?(?=##|$)", "", outline, flags=re.DOTALL)
+        outline = re.sub(r"#[#]? Appendices.*?(?=##|$)", "", outline, flags=re.DOTALL)
+        outline = re.sub(r"#[#]? Appendix.*?(?=##|$)", "", outline, flags=re.DOTALL)
 
         return outline
 
@@ -443,34 +494,40 @@ class ArticleTextProcessing:
         2. Deduplicate individual groups of citations.
         3. Remove unnecessary summary."""
 
-        paragraphs = text.split('\n')
+        paragraphs = text.split("\n")
         output_paragraphs = []
         summary_sec_flag = False
         for p in paragraphs:
             p = p.strip()
             if len(p) == 0:
                 continue
-            if not p.startswith('#'):
+            if not p.startswith("#"):
                 p = ArticleTextProcessing.remove_uncompleted_sentences_with_citations(p)
             if summary_sec_flag:
-                if p.startswith('#'):
+                if p.startswith("#"):
                     summary_sec_flag = False
                 else:
                     continue
-            if p.startswith('Overall') or p.startswith('In summary') or p.startswith('In conclusion'):
+            if (
+                p.startswith("Overall")
+                or p.startswith("In summary")
+                or p.startswith("In conclusion")
+            ):
                 continue
-            if "# Summary" in p or '# Conclusion' in p:
+            if "# Summary" in p or "# Conclusion" in p:
                 summary_sec_flag = True
                 continue
             output_paragraphs.append(p)
 
-        return '\n\n'.join(output_paragraphs)  # Join with '\n\n' for markdown format.
+        return "\n\n".join(output_paragraphs)  # Join with '\n\n' for markdown format.
 
     @staticmethod
     def update_citation_index(s, citation_map):
         """Update citation index in the string based on the citation map."""
         for original_citation in citation_map:
-            s = s.replace(f"[{original_citation}]", f"__PLACEHOLDER_{original_citation}__")
+            s = s.replace(
+                f"[{original_citation}]", f"__PLACEHOLDER_{original_citation}__"
+            )
         for original_citation, unify_citation in citation_map.items():
             s = s.replace(f"__PLACEHOLDER_{original_citation}__", f"[{unify_citation}]")
 
@@ -497,34 +554,34 @@ class ArticleTextProcessing:
             A dictionary representing contains the section title as the key, and another dictionary
         as the value, which includes the 'content' and 'subsections' keys as described above.
         """
-        lines = input_string.split('\n')
+        lines = input_string.split("\n")
         lines = [line for line in lines if line.strip()]
-        root = {'content': '', 'subsections': {}}
+        root = {"content": "", "subsections": {}}
         current_path = [(root, -1)]  # (current_dict, level)
 
         for line in lines:
-            if line.startswith('#'):
-                level = line.count('#')
-                title = line.strip('# ').strip()
-                new_section = {'content': '', 'subsections': {}}
+            if line.startswith("#"):
+                level = line.count("#")
+                title = line.strip("# ").strip()
+                new_section = {"content": "", "subsections": {}}
 
                 # Pop from stack until find the parent level
                 while current_path and current_path[-1][1] >= level:
                     current_path.pop()
 
                 # Append new section to the nearest upper level's subsections
-                current_path[-1][0]['subsections'][title] = new_section
+                current_path[-1][0]["subsections"][title] = new_section
                 current_path.append((new_section, level))
             else:
-                current_path[-1][0]['content'] += line + '\n'
+                current_path[-1][0]["content"] += line + "\n"
 
-        return root['subsections']
+        return root["subsections"]
 
 
 class FileIOHelper:
     @staticmethod
     def dump_json(obj, file_name, encoding="utf-8"):
-        with open(file_name, 'w', encoding=encoding) as fw:
+        with open(file_name, "w", encoding=encoding) as fw:
             json.dump(obj, fw, default=FileIOHelper.handle_non_serializable)
 
     @staticmethod
@@ -533,27 +590,27 @@ class FileIOHelper:
 
     @staticmethod
     def load_json(file_name, encoding="utf-8"):
-        with open(file_name, 'r', encoding=encoding) as fr:
+        with open(file_name, "r", encoding=encoding) as fr:
             return json.load(fr)
 
     @staticmethod
     def write_str(s, path):
-        with open(path, 'w') as f:
+        with open(path, "w") as f:
             f.write(s)
 
     @staticmethod
     def load_str(path):
-        with open(path, 'r') as f:
-            return '\n'.join(f.readlines())
+        with open(path, "r") as f:
+            return "\n".join(f.readlines())
 
     @staticmethod
     def dump_pickle(obj, path):
-        with open(path, 'wb') as f:
+        with open(path, "wb") as f:
             pickle.dump(obj, f)
 
     @staticmethod
     def load_pickle(path):
-        with open(path, 'rb') as f:
+        with open(path, "rb") as f:
             return pickle.load(f)
 
 
@@ -563,7 +620,12 @@ class WebPageHelper:
     Acknowledgement: Part of the code is adapted from https://github.com/stanford-oval/WikiChat project.
     """
 
-    def __init__(self, min_char_count: int = 150, snippet_chunk_size: int = 1000, max_thread_num: int = 10):
+    def __init__(
+        self,
+        min_char_count: int = 150,
+        snippet_chunk_size: int = 1000,
+        max_thread_num: int = 10,
+    ):
         """
         Args:
             min_char_count: Minimum character count for the article to be considered valid.
@@ -604,7 +666,9 @@ class WebPageHelper:
             return None
 
     def urls_to_articles(self, urls: List[str]) -> Dict:
-        with concurrent.futures.ThreadPoolExecutor(max_workers=self.max_thread_num) as executor:
+        with concurrent.futures.ThreadPoolExecutor(
+            max_workers=self.max_thread_num
+        ) as executor:
             htmls = list(executor.map(self.download_webpage, urls))
 
         articles = {}
