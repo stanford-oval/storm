@@ -40,6 +40,30 @@ LLM_MODELS = {
     "anthropic": "ANTHROPIC_API_KEY",
 }
 
+DEFAULT_SEARCH_OPTIONS = {
+    "primary_engine": "duckduckgo",
+    "fallback_engine": None,
+    "search_top_k": 3,
+    "retrieve_top_k": 3,
+    "engine_settings": {
+        "searxng": {"base_url": "", "api_key": ""},
+        "bing": {"api_key": ""},
+        "yourdm": {"api_key": ""},
+    },
+}
+
+DEFAULT_LLM_SETTINGS = {
+    "primary_model": "ollama",
+    "fallback_model": None,
+    "model_settings": {
+        "ollama": {
+            "model": "mistral-nemo:12b-instruct-2407-q6_K",
+            "max_tokens": 4000,
+        },
+        "openai": {"model": "gpt-4o-mini", "max_tokens": 4000},
+        "anthropic": {"model": "claude-3-haiku-20240307", "max_tokens": 4000},
+    },
+}
 
 DRACULA_SOFT_DARK = {
     "primaryColor": "#bf96f9",

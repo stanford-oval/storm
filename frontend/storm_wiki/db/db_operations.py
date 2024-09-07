@@ -1,58 +1,80 @@
-import sqlite3
-import json
-import os
 import logging
+import streamlit as st
 from typing import Any, Dict
+from db.db_core import save_setting, load_setting
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "settings.db")
+def get_consts():
+    from util.consts import DEFAULT_SEARCH_OPTIONS, DEFAULT_LLM_SETTINGS, LLM_MODELS
+    return DEFAULT_SEARCH_OPTIONS, DEFAULT_LLM_SETTINGS, LLM_MODELS
 
+def get_db_core():
+    from db.db_core import save_setting, load_setting
+    return save_setting, load_setting
 
-def init_db():
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute("""CREATE TABLE IF NOT EXISTS settings
-                 (key TEXT PRIMARY KEY, value TEXT)""")
-    conn.commit()
-    conn.close()
-
-
-def save_setting(key: str, value: Any):
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute(
-        "INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)",
-        (key, json.dumps(value)),
-    )
-    conn.commit()
-    conn.close()
-
-
-def load_setting(key: str, default: Any = None) -> Any:
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute("SELECT value FROM settings WHERE key=?", (key,))
-    result = c.fetchone()
-    conn.close()
-
-    if result:
-        return json.loads(result[0])
-    return default
-
+def load_search_options() -> Dict[str, Any]:
+    save_setting, load_setting = get_db_core()
+    DEFAULT_SEARCH_OPTIONS, _, _ = get_consts()
+    options = load_setting("search_options")
+    if options is None:
+        options = DEFAULT_SEARCH_OPTIONS.copy()
+        save_search_options(options)
+    return options
 
 def save_search_options(options: Dict[str, Any]):
-    validate_search_options(options)
+    save_setting, _ = get_db_core()
     save_setting("search_options", options)
 
+def update_search_option(key: str, value: Any):
+    options = load_search_options()
+    keys = key.split(".")
+    if len(keys) == 1:
+        if key not in options:
+            raise ValueError(f"Invalid search option key: {key}")
+        options[key] = validate_search_option_value(key, value)
+    elif len(keys) == 3 and keys[0] == "engine_settings":
+        if keys[1] not in options["engine_settings"]:
+            options["engine_settings"][keys[1]] = {}
+        options["engine_settings"][keys[1]][keys[2]] = validate_search_option_value(
+            key, value
+        )
+    else:
+        raise ValueError(f"Invalid search option key format: {key}")
+    save_search_options(options)
+
+def load_llm_settings() -> Dict[str, Any]:
+    save_setting, load_setting = get_db_core()
+    _, DEFAULT_LLM_SETTINGS, _ = get_consts()
+    settings = load_setting("llm_settings")
+    if settings is None:
+        settings = DEFAULT_LLM_SETTINGS.copy()
+        save_llm_settings(settings)
+    return settings
 
 def save_llm_settings(settings: Dict[str, Any]):
     validate_llm_settings(settings)
     save_setting("llm_settings", settings)
 
+def update_llm_setting(key: str, value: Any):
+    settings = load_llm_settings()
+    keys = key.split(".")
+    if len(keys) == 1:
+        if key not in settings:
+            raise ValueError(f"Invalid LLM setting key: {key}")
+        settings[key] = validate_llm_setting_value(key, value)
+    elif len(keys) == 3 and keys[0] == "model_settings":
+        if keys[1] not in settings["model_settings"]:
+            settings["model_settings"][keys[1]] = {}
+        settings["model_settings"][keys[1]][keys[2]] = validate_llm_setting_value(
+            key, value
+        )
+    else:
+        raise ValueError(f"Invalid LLM setting key format: {key}")
+    save_llm_settings(settings)
 
 def validate_llm_settings(settings: Dict[str, Any]):
     required_keys = {"primary_model", "fallback_model", "model_settings"}
@@ -73,43 +95,18 @@ def validate_llm_settings(settings: Dict[str, Any]):
             raise ValueError(f"max_tokens for {model} must be a positive integer")
 
 
-def load_search_options() -> Dict[str, Any]:
-    default_options = {
-        "primary_engine": "duckduckgo",
-        "fallback_engine": None,
-        "search_top_k": 3,
-        "retrieve_top_k": 3,
-        "engine_settings": {
-            "searxng": {"base_url": "", "api_key": ""},
-            "bing": {"api_key": ""},
-            "yourdm": {"api_key": ""},
-        },
-    }
-    loaded_options = load_setting("search_options")
-    if loaded_options is None:
-        return default_options
-    merged_options = default_options.copy()
-    merged_options.update(loaded_options)
-    validate_search_options(merged_options)
-    return merged_options
+def update_settings_with_secrets(options, settings):
+    for engine, config in options["engine_settings"].items():
+        for key, value in config.items():
+            env_var = f"{engine.upper()}_{key.upper()}"
+            config[key] = st.secrets.get(env_var, value)
 
+    for model, config in settings["model_settings"].items():
+        env_var = LLM_MODELS.get(model)
+        if env_var:
+            config["api_key"] = st.secrets.get(env_var)
 
-def update_search_option(key: str, value: Any):
-    options = load_search_options()
-    keys = key.split(".")
-    if len(keys) == 1:
-        if key not in options:
-            raise ValueError(f"Invalid search option key: {key}")
-        options[key] = validate_search_option_value(key, value)
-    elif len(keys) == 3 and keys[0] == "engine_settings":
-        if keys[1] not in options["engine_settings"]:
-            options["engine_settings"][keys[1]] = {}
-        options["engine_settings"][keys[1]][keys[2]] = validate_search_option_value(
-            key, value
-        )
-    else:
-        raise ValueError(f"Invalid search option key format: {key}")
-    save_search_options(options)
+    return options, settings
 
 
 def validate_search_options(options: Dict[str, Any]):
@@ -149,46 +146,6 @@ def validate_search_option_value(key: str, value: Any) -> Any:
     else:
         raise ValueError(f"Unknown search option key: {key}")
     return value
-
-
-def load_llm_settings() -> Dict[str, Any]:
-    default_settings = {
-        "primary_model": "ollama",
-        "fallback_model": None,
-        "model_settings": {
-            "ollama": {
-                "model": "mistral-nemo:12b-instruct-2407-q6_K",
-                "max_tokens": 4000,
-            },
-            "openai": {"model": "gpt-4o-mini", "max_tokens": 4000},
-            "anthropic": {"model": "claude-3-haiku-20240307", "max_tokens": 4000},
-        },
-    }
-    loaded_settings = load_setting("llm_settings")
-    if loaded_settings is None:
-        return default_settings
-    merged_settings = default_settings.copy()
-    merged_settings.update(loaded_settings)
-    validate_llm_settings(merged_settings)
-    return merged_settings
-
-
-def update_llm_setting(key: str, value: Any):
-    settings = load_llm_settings()
-    keys = key.split(".")
-    if len(keys) == 1:
-        if key not in settings:
-            raise ValueError(f"Invalid LLM setting key: {key}")
-        settings[key] = validate_llm_setting_value(key, value)
-    elif len(keys) == 3 and keys[0] == "model_settings":
-        if keys[1] not in settings["model_settings"]:
-            settings["model_settings"][keys[1]] = {}
-        settings["model_settings"][keys[1]][keys[2]] = validate_llm_setting_value(
-            key, value
-        )
-    else:
-        raise ValueError(f"Invalid LLM setting key format: {key}")
-    save_llm_settings(settings)
 
 
 def validate_llm_setting_value(key: str, value: Any) -> Any:

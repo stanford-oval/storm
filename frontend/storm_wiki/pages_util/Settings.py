@@ -1,26 +1,23 @@
 import streamlit as st
 import subprocess
-from util.file_io import FileIOHelper
 import shutil
 import os
 import re
+from util.file_io import FileIOHelper
 from util.ui_components import UIComponents
 from util.consts import (
     SEARCH_ENGINES,
     DARK_THEMES,
     LIGHT_THEMES,
     LLM_MODELS,
+    DEFAULT_SEARCH_OPTIONS, DEFAULT_LLM_SETTINGS, LLM_MODELS
 )
 from util.theme_manager import (
-    load_and_apply_theme,
-    get_theme_css,
-    get_global_css,
-    get_all_custom_css,
-    get_preview_html,
     save_theme,
-    get_option_menu_style,
+    load_theme_from_db,
+    get_preview_html,
+    get_all_custom_css,
 )
-
 from db.db_operations import (
     load_setting,
     save_setting,
@@ -30,22 +27,20 @@ from db.db_operations import (
     save_llm_settings,
 )
 
+import logging
+logger = logging.getLogger(__name__)
 
 def load_output_dir():
     return FileIOHelper.load_output_base_dir()
 
-
 def save_output_dir(output_dir):
     FileIOHelper.save_output_base_dir(output_dir)
-
 
 def load_categories():
     return FileIOHelper.load_categories()
 
-
 def save_categories(categories):
     FileIOHelper.save_categories(categories)
-
 
 def get_available_search_engines():
     available_engines = {}
@@ -70,7 +65,6 @@ def get_available_search_engines():
 
     return available_engines
 
-
 def llm_settings():
     st.subheader("LLM Settings")
     llm_settings = load_llm_settings()
@@ -87,7 +81,7 @@ def llm_settings():
     fallback_model_options = [None] + [
         model for model in LLM_MODELS.keys() if model != primary_model
     ]
-    fallback_model = st.selectbox(
+    st.selectbox(
         "Fallback LLM Model",
         options=fallback_model_options,
         index=fallback_model_options.index(llm_settings["fallback_model"])
@@ -98,73 +92,64 @@ def llm_settings():
         args=("fallback_model", llm_settings),
     )
 
-    model_settings = llm_settings.get("model_settings", {})
-
     st.subheader("Model-specific Settings")
     for model, env_var in LLM_MODELS.items():
         st.write(f"{model.capitalize()} Settings")
-        model_settings.setdefault(model, {})
+        model_settings = llm_settings.get("model_settings", {}).setdefault(model, {})
 
         if model == "ollama":
             downloaded_models = list_downloaded_models()
-            model_settings[model]["model"] = st.selectbox(
+            st.selectbox(
                 "Ollama Model",
                 options=downloaded_models,
                 index=downloaded_models.index(
-                    model_settings[model].get(
-                        "model", "mistral-nemo:12b-instruct-2407-q6_K"
-                    )
-                )
-                if model_settings[model].get("model") in downloaded_models
-                else 0,
+                    model_settings.get("model", "mistral-nemo:12b-instruct-2407-q6_K")
+                ) if model_settings.get("model") in downloaded_models else 0,
                 key=f"model_settings.{model}.model_input",
                 on_change=update_llm_setting,
                 args=(f"model_settings.{model}.model", llm_settings),
             )
-        elif model == "openai":
-            model_settings[model]["model"] = st.selectbox(
-                "OpenAI Model",
-                options=["gpt-4o-mini", "gpt-4o"],
-                index=0 if model_settings[model].get("model") == "gpt-4o-mini" else 1,
-                key=f"model_settings.{model}.model_input",
-                on_change=update_llm_setting,
-                args=(f"model_settings.{model}.model", llm_settings),
-            )
-        elif model == "anthropic":
-            model_settings[model]["model"] = st.selectbox(
-                "Anthropic Model",
-                options=["claude-3-haiku-20240307", "claude-3-5-sonnet-20240620"],
-                index=0
-                if model_settings[model].get("model") == "claude-3-haiku-20240307"
-                else 1,
+        elif model in ["openai", "anthropic"]:
+            model_options = {
+                "openai": ["gpt-4o-mini", "gpt-4o"],
+                "anthropic": ["claude-3-haiku-20240307", "claude-3-5-sonnet-20240620"]
+            }
+            st.selectbox(
+                f"{model.capitalize()} Model",
+                options=model_options[model],
+                index=model_options[model].index(model_settings.get("model", model_options[model][0])),
                 key=f"model_settings.{model}.model_input",
                 on_change=update_llm_setting,
                 args=(f"model_settings.{model}.model", llm_settings),
             )
 
-        model_settings[model]["max_tokens"] = st.number_input(
+        st.number_input(
             f"{model.capitalize()} Max Tokens",
             min_value=1,
             max_value=10000,
-            value=int(model_settings[model].get("max_tokens", 4000)),
+            value=int(model_settings.get("max_tokens", 4000)),
             key=f"model_settings.{model}.max_tokens_input",
             on_change=update_llm_setting,
             args=(f"model_settings.{model}.max_tokens", llm_settings),
         )
 
+        api_key = st.text_input(
+            f"{model.capitalize()} API Key",
+            type="password",
+            value=st.secrets.get(env_var, ""),
+            key=f"model_settings.{model}.api_key_input",
+        )
+        if api_key:
+            model_settings["api_key"] = api_key
+            update_llm_setting(f"model_settings.{model}.api_key", llm_settings)
 
 def list_downloaded_models():
     try:
         output = subprocess.check_output(["ollama", "list"], stderr=subprocess.STDOUT)
-        models_list = []
-        for line in output.decode("utf-8").splitlines():
-            model_name = line.split()[0]
-            models_list.append(model_name)
-        return models_list
+        return [line.split()[0] for line in output.decode("utf-8").splitlines()]
     except Exception as e:
-        print(f"Error executing command: {e}")
+        logger.error(f"Error listing Ollama models: {e}")
         return []
-
 
 def settings_page(selected_setting=None):
     current_theme = load_and_apply_theme()
@@ -176,60 +161,50 @@ def settings_page(selected_setting=None):
 
     st.title("Settings")
 
-    if selected_setting == "General":
-        general_settings()
-    elif selected_setting == "Theme":
-        theme_settings()
-    elif selected_setting == "Search":
-        search_settings()
-    elif selected_setting == "LLM":
-        llm_settings()
-    elif selected_setting == "Categories":
-        category_settings()
+    settings_map = {
+        "General": general_settings,
+        "Theme": theme_settings,
+        "Search": search_settings,
+        "LLM": llm_settings,
+        "Categories": category_settings
+    }
 
+    if selected_setting in settings_map:
+        settings_map[selected_setting]()
+    else:
+        st.error(f"Unknown setting: {selected_setting}")
 
 def update_theme(custom_theme):
     save_theme(custom_theme)
     st.session_state.current_theme = custom_theme
-
 
 def update_llm_setting(key, llm_settings):
     keys = key.split(".")
     if len(keys) == 1:
         llm_settings[key] = st.session_state[f"{key}_input"]
     elif len(keys) == 3:
-        if keys[0] not in llm_settings:
-            llm_settings[keys[0]] = {}
-        if keys[1] not in llm_settings[keys[0]]:
-            llm_settings[keys[0]][keys[1]] = {}
-        llm_settings[keys[0]][keys[1]][keys[2]] = st.session_state[f"{key}_input"]
+        llm_settings.setdefault(keys[0], {}).setdefault(keys[1], {})[keys[2]] = st.session_state[f"{key}_input"]
     else:
-        st.error(f"Unexpected key format: {key}")
+        logger.error(f"Unexpected key format: {key}")
     save_llm_settings(llm_settings)
-
 
 def is_valid_hex_color(color):
     return bool(re.match(r"^#(?:[0-9a-fA-F]{3}){1,2}$", color))
-
 
 def theme_settings():
     st.subheader("Theme Settings")
     current_theme = st.session_state.current_theme.copy()
 
-    current_theme_mode = "Light" if current_theme in LIGHT_THEMES.values() else "Dark"
     theme_mode = st.radio(
         "Theme Mode",
         ["Light", "Dark"],
-        index=["Light", "Dark"].index(current_theme_mode),
+        index=0 if current_theme in LIGHT_THEMES.values() else 1,
         key="theme_mode_radio",
     )
 
     theme_options = LIGHT_THEMES if theme_mode == "Light" else DARK_THEMES
-    current_theme_name = next(
-        (k for k, v in theme_options.items() if v == current_theme), None
-    )
-    if current_theme_name is None:
-        current_theme_name = list(theme_options.keys())[0]
+    current_theme_name = next((k for k, v in theme_options.items() if v == current_theme), None)
+    current_theme_name = current_theme_name or list(theme_options.keys())[0]
 
     selected_theme_name = st.selectbox(
         "Select a theme",
@@ -247,11 +222,7 @@ def theme_settings():
     with col1:
         for key, value in base_theme.items():
             if key != "font":
-                custom_theme[key] = st.color_picker(
-                    f"{key}",
-                    value,
-                    key=f"color_picker_{key}",
-                )
+                custom_theme[key] = st.color_picker(f"{key}", value, key=f"color_picker_{key}")
             else:
                 custom_theme[key] = st.selectbox(
                     "Font",
@@ -267,31 +238,17 @@ def theme_settings():
         save_theme(custom_theme)
         st.session_state.current_theme = custom_theme
         st.session_state.option_menu_style = get_option_menu_style(custom_theme)
-        st.session_state.theme_updated = True  # Set this flag to True
+        st.session_state.theme_updated = True
         st.success("Theme applied successfully!")
         st.rerun()
-
 
 def search_settings():
     st.subheader("Search Options Settings")
     search_options = load_search_options()
 
-    # Initialize session state for engine-specific settings
-    for engine, engine_config in SEARCH_ENGINES.items():
-        if "settings" in engine_config:
-            for key in engine_config["settings"]:
-                input_key = f"engine_settings.{engine}.{key}_input"
-                if input_key not in st.session_state:
-                    st.session_state[input_key] = (
-                        search_options.get("engine_settings", {})
-                        .get(engine, {})
-                        .get(key, "")
-                    )
+    update_search_option_callback = lambda key: update_search_option(key, st.session_state[f"{key}_input"])
 
-    def update_search_option_callback(key):
-        update_search_option(key, st.session_state[f"{key}_input"])
-
-    primary_engine = st.selectbox(
+    st.selectbox(
         "Primary Search Engine",
         options=list(SEARCH_ENGINES.keys()),
         index=list(SEARCH_ENGINES.keys()).index(search_options["primary_engine"]),
@@ -300,23 +257,17 @@ def search_settings():
         args=("primary_engine",),
     )
 
-    fallback_options = [None] + [
-        engine for engine in SEARCH_ENGINES.keys() if engine != primary_engine
-    ]
-    current_fallback = search_options["fallback_engine"]
-    if current_fallback == primary_engine or current_fallback not in fallback_options:
-        current_fallback = None
-
-    fallback_engine = st.selectbox(
+    fallback_options = [None] + [engine for engine in SEARCH_ENGINES.keys() if engine != search_options["primary_engine"]]
+    st.selectbox(
         "Fallback Search Engine",
         options=fallback_options,
-        index=fallback_options.index(current_fallback),
+        index=fallback_options.index(search_options["fallback_engine"]) if search_options["fallback_engine"] in fallback_options else 0,
         key="fallback_engine_input",
         on_change=update_search_option_callback,
         args=("fallback_engine",),
     )
 
-    search_top_k = st.number_input(
+    st.number_input(
         "Search Top K",
         min_value=1,
         max_value=100,
@@ -326,7 +277,7 @@ def search_settings():
         args=("search_top_k",),
     )
 
-    retrieve_top_k = st.number_input(
+    st.number_input(
         "Retrieve Top K",
         min_value=1,
         max_value=100,
@@ -345,31 +296,19 @@ def search_settings():
                 engine, engine_settings.get(engine, {}), update_search_option_callback
             )
 
-
 def get_engine_specific_settings(engine, current_settings, update_callback):
     settings = {}
     if engine in SEARCH_ENGINES and "settings" in SEARCH_ENGINES[engine]:
         for key, config in SEARCH_ENGINES[engine]["settings"].items():
             input_type = config.get("type", "text")
             input_key = f"engine_settings.{engine}.{key}_input"
+            value = st.secrets.get(f"{engine.upper()}_{key.upper()}", current_settings.get(key, ""))
 
             if input_type == "text":
-                settings[key] = st.text_input(
-                    config["label"],
-                    key=input_key,
-                    on_change=update_callback,
-                    args=(f"engine_settings.{engine}.{key}",),
-                )
+                settings[key] = st.text_input(config["label"], value=value, key=input_key, on_change=update_callback, args=(f"engine_settings.{engine}.{key}",))
             elif input_type == "password":
-                settings[key] = st.text_input(
-                    config["label"],
-                    type="password",
-                    key=input_key,
-                    on_change=update_callback,
-                    args=(f"engine_settings.{engine}.{key}",),
-                )
+                settings[key] = st.text_input(config["label"], type="password", value=value, key=input_key, on_change=update_callback, args=(f"engine_settings.{engine}.{key}",))
     return settings
-
 
 def general_settings():
     st.subheader("Display Settings")
@@ -408,13 +347,8 @@ def general_settings():
         save_setting("phoenix_settings", phoenix_settings)
         st.session_state.phoenix_settings_updated = True
 
-    toggle_label = (
-        "Enable Phoenix Tracing"
-        if not phoenix_settings["enabled"]
-        else "Disable Phoenix Tracing"
-    )
     st.toggle(
-        toggle_label,
+        "Enable Phoenix Tracing" if not phoenix_settings["enabled"] else "Disable Phoenix Tracing",
         value=phoenix_settings["enabled"],
         help="Toggle Phoenix tracing on/off.",
         key="phoenix_enabled_input",
@@ -439,7 +373,6 @@ def general_settings():
         on_change=update_phoenix_setting,
         args=("collector_endpoint",),
     )
-
 
 def category_settings():
     st.header("Category Management")
@@ -481,38 +414,18 @@ def category_settings():
                 st.markdown("---")
                 st.write(f"Deleting category: {st.session_state.deleting_category}")
                 remaining_categories = [
-                    cat
-                    for cat in categories
-                    if cat != st.session_state.deleting_category
+                    cat for cat in categories if cat != st.session_state.deleting_category
                 ]
                 if remaining_categories:
-                    target_category = st.selectbox(
-                        "Move articles to:", remaining_categories
-                    )
+                    target_category = st.selectbox("Move articles to:", remaining_categories)
                     if st.button("Confirm Delete"):
-                        delete_category(
-                            st.session_state.deleting_category, target_category
-                        )
+                        delete_category(st.session_state.deleting_category, target_category)
                         del st.session_state.deleting_category
                         st.rerun()
                 else:
                     st.warning("Cannot delete the last remaining category.")
         else:
             st.info("No existing categories.")
-
-    with st.expander("## Add New Category", expanded=False):
-        new_category = st.text_input("New category name")
-        if st.button("Add Category"):
-            if new_category and new_category not in categories:
-                categories.append(new_category)
-                save_categories(categories)
-                create_category_folder(new_category)
-                st.success(f"Added new category: {new_category}")
-                st.rerun()
-            elif new_category in categories:
-                st.warning("Category already exists")
-            else:
-                st.warning("Please enter a category name")
 
 
 def update_category(old_name, new_name):
@@ -525,25 +438,20 @@ def update_category(old_name, new_name):
     else:
         st.error("Category not found")
 
-
 def delete_category(category, target_category):
     categories = load_categories()
     if category in categories:
         categories.remove(category)
         save_categories(categories)
         move_category_contents(category, target_category)
-        st.success(
-            f"Category {category} deleted and contents moved to {target_category}"
-        )
+        st.success(f"Category {category} deleted and contents moved to {target_category}")
     else:
         st.error("Category not found")
-
 
 def create_category_folder(category):
     output_dir = load_output_dir()
     category_path = os.path.join(output_dir, category)
     os.makedirs(category_path, exist_ok=True)
-
 
 def rename_category_folder(old_name, new_name):
     output_dir = load_output_dir()
@@ -551,7 +459,6 @@ def rename_category_folder(old_name, new_name):
     new_path = os.path.join(output_dir, new_name)
     if os.path.exists(old_path):
         os.rename(old_path, new_path)
-
 
 def move_category_contents(source_category, target_category):
     output_dir = load_output_dir()

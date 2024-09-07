@@ -9,8 +9,6 @@ import dspy
 import streamlit as st
 from langchain_community.utilities.duckduckgo_search import DuckDuckGoSearchAPIWrapper
 
-from pages_util.Settings import load_search_options
-
 import logging
 
 logging.basicConfig(
@@ -23,7 +21,7 @@ class CombinedSearchAPI(dspy.Retrieve):
     def __init__(self, max_results=20):
         super().__init__()
         self.max_results = max_results
-        self.search_options = load_search_options()
+        self.search_options = self._load_search_options()
         self.primary_engine = self.search_options["primary_engine"]
         self.fallback_engine = self.search_options["fallback_engine"]
         self.ddg_search = DuckDuckGoSearchAPIWrapper()
@@ -41,6 +39,10 @@ class CombinedSearchAPI(dspy.Retrieve):
             "searxng": self._search_searxng,
             "arxiv": self._search_arxiv,
         }
+
+    def _load_search_options(self):
+        from db.db_operations import load_search_options
+        return load_search_options()
 
     def _initialize_domain_restrictions(self):
         self.generally_unreliable = set()

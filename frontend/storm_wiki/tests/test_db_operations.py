@@ -1,10 +1,8 @@
 import pytest
 import os
+from db.db_config import DB_PATH
+from db.db_core import init_db, save_setting, load_setting
 from db.db_operations import (
-    DB_PATH,
-    init_db,
-    save_setting,
-    load_setting,
     load_search_options,
     save_search_options,
     update_search_option,
@@ -13,6 +11,12 @@ from db.db_operations import (
     update_llm_setting,
 )
 
+def setup_function(function):
+    init_db()
+
+def teardown_function(function):
+    if os.path.exists(DB_PATH):
+        os.remove(DB_PATH)
 
 @pytest.fixture(scope="function")
 def test_db():
@@ -21,7 +25,8 @@ def test_db():
     original_db_path = DB_PATH
 
     # Temporarily change the DB_PATH
-    globals()["DB_PATH"] = test_db_path
+    import db.db_core as db_core
+    db_core.DB_PATH = test_db_path
 
     init_db()
 
@@ -30,7 +35,7 @@ def test_db():
     # Clean up: remove the test database and restore the original DB_PATH
     if os.path.exists(test_db_path):
         os.remove(test_db_path)
-    globals()["DB_PATH"] = original_db_path
+    db_core.DB_PATH = original_db_path
 
 
 @pytest.fixture

@@ -15,7 +15,7 @@ def mock_file_content():
 
 @pytest.fixture
 def mock_load_search_options():
-    with patch("util.search.load_search_options") as mock:
+    with patch("db.db_operations.load_search_options") as mock:
         mock.return_value = {
             "primary_engine": "duckduckgo",
             "fallback_engine": None,

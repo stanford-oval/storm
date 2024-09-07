@@ -11,16 +11,14 @@ from .consts import (
     ALL_CUSTOM_CSS_TEMPLATE,
     TOKYO_NIGHT,
 )
-from db.db_operations import save_setting, load_setting
-
 
 def save_theme(theme):
+    from db.db_operations import save_setting
     save_setting("theme", theme)
 
-
 def load_theme_from_db():
-    return load_setting("theme", TOKYO_NIGHT.copy())
-
+    from db.db_operations import load_setting
+    return load_setting("theme", "light")
 
 def adjust_color_brightness(hex_color, brightness_factor):
     # Convert hex to RGB
