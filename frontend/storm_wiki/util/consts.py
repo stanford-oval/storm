@@ -3,7 +3,7 @@ import os
 DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "db", "settings.db")
 
 SEARCH_ENGINES = {
-    "searxng": {
+    "SearXNG": {
         "env_var": "SEARXNG_BASE_URL",
         "settings": {
             "base_url": {"type": "text", "required": True, "label": "SearXNG Base URL"},
@@ -14,24 +14,24 @@ SEARCH_ENGINES = {
             },
         },
     },
-    "bing": {
+    "Bing": {
         "env_var": "BING_SEARCH_API_KEY",
         "settings": {
             "api_key": {"type": "password", "required": True, "label": "Bing API Key"},
         },
     },
-    "yourdm": {
+    "YouRM": {
         "env_var": "YDC_API_KEY",
         "settings": {
             "api_key": {
                 "type": "password",
                 "required": True,
-                "label": "YourDM API Key",
+                "label": "YouRM API Key",
             },
         },
     },
-    "duckduckgo": {"env_var": None, "settings": {}},
-    "arxiv": {"env_var": None, "settings": {}},
+    "Duckduckgo": {"env_var": None, "settings": {}},
+    "Arxiv": {"env_var": None, "settings": {}},
 }
 
 LLM_MODELS = {
@@ -41,14 +41,14 @@ LLM_MODELS = {
 }
 
 DEFAULT_SEARCH_OPTIONS = {
-    "primary_engine": "duckduckgo",
+    "primary_engine": "Duckduckgo",
     "fallback_engine": None,
     "search_top_k": 3,
     "retrieve_top_k": 3,
     "engine_settings": {
-        "searxng": {"base_url": "", "api_key": ""},
-        "bing": {"api_key": ""},
-        "yourdm": {"api_key": ""},
+        "SearXNG": {"base_url": "", "api_key": ""},
+        "Bing": {"api_key": ""},
+        "YouRM": {"api_key": ""},
     },
 }
 

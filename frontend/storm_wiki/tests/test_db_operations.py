@@ -41,14 +41,14 @@ def test_db():
 @pytest.fixture
 def default_search_options():
     return {
-        "primary_engine": "duckduckgo",
+        "primary_engine": "Duckduckgo",
         "fallback_engine": None,
         "search_top_k": 3,
         "retrieve_top_k": 3,
         "engine_settings": {
-            "searxng": {"base_url": "", "api_key": ""},
-            "bing": {"api_key": ""},
-            "yourdm": {"api_key": ""},
+            "SearXNG": {"base_url": "", "api_key": ""},
+            "Bing": {"api_key": ""},
+            "YouRM": {"api_key": ""},
         },
     }
 
@@ -92,9 +92,9 @@ def test_save_and_load_search_options(default_search_options):
 
 def test_update_search_option_valid(default_search_options):
     save_search_options(default_search_options)
-    update_search_option("primary_engine", "bing")
+    update_search_option("primary_engine", "Bing")
     loaded_options = load_search_options()
-    assert loaded_options["primary_engine"] == "bing"
+    assert loaded_options["primary_engine"] == "Bing"
 
 
 def test_update_search_option_top_level(test_db):
@@ -102,7 +102,7 @@ def test_update_search_option_top_level(test_db):
     initial_primary_engine = initial_options["primary_engine"]
 
     # Update to a different engine
-    new_engine = "bing" if initial_primary_engine != "bing" else "duckduckgo"
+    new_engine = "Bing" if initial_primary_engine != "Bing" else "Duckduckgo"
     update_search_option("primary_engine", new_engine)
 
     updated_options = load_search_options()
@@ -151,7 +151,7 @@ def test_update_search_option_numeric(test_db):
 def test_load_search_options_default(test_db):
     save_setting("search_options", None)
     default_options = load_search_options()
-    assert default_options["primary_engine"] == "duckduckgo"
+    assert default_options["primary_engine"] == "Duckduckgo"
     assert "engine_settings" in default_options
 
 

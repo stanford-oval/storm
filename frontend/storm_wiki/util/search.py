@@ -35,9 +35,9 @@ class CombinedSearchAPI(dspy.Retrieve):
 
     def _initialize_search_engines(self):
         return {
-            "duckduckgo": self._search_duckduckgo,
-            "searxng": self._search_searxng,
-            "arxiv": self._search_arxiv,
+            "Duckduckgo": self._search_duckduckgo,
+            "SearXNG": self._search_searxng,
+            "Arxiv": self._search_arxiv,
         }
 
     def _load_search_options(self):
@@ -143,10 +143,11 @@ class CombinedSearchAPI(dspy.Retrieve):
         return results
 
     def _search(self, engine: str, query: str) -> List[Dict[str, Any]]:
-        if engine not in self.search_engines:
+        engine = engine.lower()  # Convert to lowercase for case-insensitive comparison
+        if engine not in map(str.lower, self.search_engines.keys()):
             raise ValueError(f"Unsupported or unavailable search engine: {engine}")
 
-        search_engine = self.search_engines[engine]
+        search_engine = next(func for key, func in self.search_engines.items() if key.lower() == engine)
         results = search_engine(query)
 
         logger.info(f"Raw results from {engine}: {results}")

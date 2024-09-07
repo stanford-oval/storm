@@ -17,7 +17,7 @@ def mock_file_content():
 def mock_load_search_options():
     with patch("db.db_operations.load_search_options") as mock:
         mock.return_value = {
-            "primary_engine": "duckduckgo",
+            "primary_engine": "Duckduckgo",
             "fallback_engine": None,
             "search_top_k": 3,
             "retrieve_top_k": 3,
@@ -73,7 +73,7 @@ class TestCombinedSearchAPI:
     def test_duckduckgo_failure_searxng_success(
         self, mock_requests_get, mock_ddg_wrapper, combined_search_api
     ):
-        combined_search_api.primary_engine = "duckduckgo"
+        combined_search_api.primary_engine = "Duckduckgo"
         combined_search_api.fallback_engine = "searxng"
 
         # Mock DuckDuckGo failure
@@ -105,7 +105,7 @@ class TestCombinedSearchAPI:
 
     @patch("util.search.DuckDuckGoSearchAPIWrapper")
     def test_duckduckgo_success(self, mock_ddg_wrapper, combined_search_api):
-        combined_search_api.primary_engine = "duckduckgo"
+        combined_search_api.primary_engine = "Duckduckgo"
         mock_ddg_instance = MagicMock()
         mock_ddg_instance.results.return_value = [
             {
@@ -125,7 +125,7 @@ class TestCombinedSearchAPI:
 
     @patch("util.search.DuckDuckGoSearchAPIWrapper")
     def test_multiple_queries(self, mock_ddg_wrapper, combined_search_api):
-        combined_search_api.primary_engine = "duckduckgo"
+        combined_search_api.primary_engine = "Duckduckgo"
         mock_ddg_instance = MagicMock()
         mock_ddg_instance.results.side_effect = [
             [
@@ -198,8 +198,8 @@ class TestCombinedSearchAPI:
     def test_arxiv_failure_searxng_fallback(
         self, mock_ddg_wrapper, mock_requests_get, combined_search_api
     ):
-        combined_search_api.primary_engine = "arxiv"
-        combined_search_api.fallback_engine = "searxng"
+        combined_search_api.primary_engine = "Arxiv"
+        combined_search_api.fallback_engine = "SearXNG"
 
         # Mock ArXiv failure
         mock_arxiv_response = MagicMock()
@@ -232,15 +232,15 @@ class TestCombinedSearchAPI:
         def test_searxng_failure_duckduckgo_fallback(
             self, mock_ddg_wrapper, mock_requests_get, combined_search_api
         ):
-            combined_search_api.primary_engine = "searxng"
-            combined_search_api.fallback_engine = "duckduckgo"
+            combined_search_api.primary_engine = "SearXNG"
+            combined_search_api.fallback_engine = "Duckduckgo"
 
             # Mock SearxNG failure
             mock_searxng_response = MagicMock()
             mock_searxng_response.status_code = 500
             mock_requests_get.return_value = mock_searxng_response
 
-            # Mock DuckDuckGo success
+            # Mock Duckduckgo success
             mock_ddg_instance = MagicMock()
             mock_ddg_instance.results.return_value = [
                 {
@@ -264,17 +264,17 @@ class TestCombinedSearchAPI:
         def test_all_engines_failure(
             self, mock_ddg_wrapper, mock_requests_get, combined_search_api
         ):
-            combined_search_api.primary_engine = "searxng"
-            combined_search_api.fallback_engine = "duckduckgo"
+            combined_search_api.primary_engine = "SearXNG"
+            combined_search_api.fallback_engine = "Duckduckgo"
 
             # Mock SearxNG failure
             mock_searxng_response = MagicMock()
             mock_searxng_response.status_code = 500
             mock_requests_get.return_value = mock_searxng_response
 
-            # Mock DuckDuckGo failure
+            # Mock Duckduckgo failure
             mock_ddg_instance = MagicMock()
-            mock_ddg_instance.results.side_effect = Exception("DuckDuckGo failed")
+            mock_ddg_instance.results.side_effect = Exception("Duckduckgo failed")
             mock_ddg_wrapper.return_value = mock_ddg_instance
             combined_search_api.ddg_search = mock_ddg_instance
 
@@ -284,13 +284,13 @@ class TestCombinedSearchAPI:
 
         @patch("util.search.requests.get")
         def test_searxng_error_response(self, mock_requests_get, combined_search_api):
-            combined_search_api.primary_engine = "searxng"
+            combined_search_api.primary_engine = "SearXNG"
             combined_search_api.fallback_engine = None
 
             # Mock SearxNG error response
             mock_response = MagicMock()
             mock_response.status_code = 200
-            mock_response.json.return_value = {"error": "SearxNG error message"}
+            mock_response.json.return_value = {"error": "SearXNG error message"}
             mock_requests_get.return_value = mock_response
 
             results = combined_search_api.forward("test query", [])

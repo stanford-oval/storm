@@ -51,7 +51,7 @@ def get_available_search_engines():
     engine_settings = search_options.get("engine_settings", {})
 
     for engine, config in SEARCH_ENGINES.items():
-        if config["env_var"] is None or engine == "searxng":
+        if config["env_var"] is None or engine == "SearXNG":
             available_engines[engine] = None
         elif engine in config.get("settings", {}):
             required_settings = [
