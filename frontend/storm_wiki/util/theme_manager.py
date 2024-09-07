@@ -9,7 +9,7 @@ from .consts import (
     FORM_SUBMIT_BUTTON_CSS_TEMPLATE,
     PREVIEW_HTML_TEMPLATE,
     ALL_CUSTOM_CSS_TEMPLATE,
-    TOKYO_NIGHT,
+    DEFAULT_THEME,
 )
 
 def save_theme(theme):
@@ -18,7 +18,7 @@ def save_theme(theme):
 
 def load_theme_from_db():
     from db.db_operations import load_setting
-    return load_setting("theme", "light")
+    return load_setting("theme", DEFAULT_THEME)
 
 def adjust_color_brightness(hex_color, brightness_factor):
     # Convert hex to RGB

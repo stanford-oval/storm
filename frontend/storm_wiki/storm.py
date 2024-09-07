@@ -1,6 +1,6 @@
 import streamlit as st
 import os
-from db.db_operations import init_db
+from db.db_core import init_db  # Updated import
 from util.phoenix_setup import setup_phoenix
 from streamlit_option_menu import option_menu
 from util.theme_manager import load_and_apply_theme, get_option_menu_style

@@ -125,6 +125,7 @@ NORD_LIGHT = {
     "font": "sans serif",
 }
 
+DEFAULT_THEME = TOKYO_NIGHT
 
 LIGHT_THEMES = {
     "Solarized Light": SOLARIZED_LIGHT,

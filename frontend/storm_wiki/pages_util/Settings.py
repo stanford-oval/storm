@@ -9,14 +9,17 @@ from util.consts import (
     SEARCH_ENGINES,
     DARK_THEMES,
     LIGHT_THEMES,
-    LLM_MODELS,
-    DEFAULT_SEARCH_OPTIONS, DEFAULT_LLM_SETTINGS, LLM_MODELS
+    LLM_MODELS
 )
 from util.theme_manager import (
     save_theme,
     load_theme_from_db,
     get_preview_html,
     get_all_custom_css,
+    load_and_apply_theme,
+    get_theme_css,
+    get_global_css,
+    get_option_menu_style,
 )
 from db.db_operations import (
     load_setting,
