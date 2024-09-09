@@ -1,8 +1,11 @@
 import logging
 import os
 from typing import Callable, Union, List
+
+import backoff
 import dspy
 import requests
+from dsp import backoff_hdlr, giveup_hdlr
 
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_qdrant import Qdrant
@@ -684,6 +687,20 @@ class DuckDuckGoSearchRM(dspy.Retrieve):
         self.usage = 0
         return {"DuckDuckGoRM": usage}
 
+    @backoff.on_exception(
+        backoff.expo,
+        (Exception,),
+        max_time=1000,
+        max_tries=8,
+        on_backoff=backoff_hdlr,
+        giveup=giveup_hdlr,
+    )
+    def request(self, query: str):
+        results = self.ddgs.text(
+            query, max_results=self.k, backend=self.duck_duck_go_backend
+        )
+        return results
+
     def forward(
         self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
     ):
@@ -705,9 +722,7 @@ class DuckDuckGoSearchRM(dspy.Retrieve):
 
         for query in queries:
             #  list of dicts that will be parsed to return
-            results = self.ddgs.text(
-                query, max_results=self.k, backend=self.duck_duck_go_backend
-            )
+            results = self.request(query)
 
             for d in results:
                 # assert d is dict
