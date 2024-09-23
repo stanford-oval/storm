@@ -386,7 +386,7 @@ class SerperRM(dspy.Retrieve):
 
         if response == None:
             raise RuntimeError(
-                f"Error had occured while running the search process.\n Error is {response.reason}, had failed with status code {response.status_code}"
+                f"Error had occurred while running the search process.\n Error is {response.reason}, had failed with status code {response.status_code}"
             )
 
         return response.json()
