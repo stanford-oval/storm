@@ -48,7 +48,11 @@ class ArticleNode:
             self.content.append(content_line)
 
     def __repr__(self):
-        return f"ArticleNode(title='{self.title}', content='{self.content}', children={self.children})"
+        return (
+            f"ArticleNode(title='{self.title}',"
+            + f" content='{self.content}'"
+            + f", children={self.children})"
+        )
 
 
 def parse_article(article):
