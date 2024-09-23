@@ -122,7 +122,7 @@ def get_grading_dict(responses,
             score = decoded_output[decoded_output.find("[RESULT]") + len("[RESULT]"):].replace("</s>", "").strip()
             try:
                 int(score)
-            except Exception as e:
+            except ValueError as e:
                 pattern = r"the overall score is (\d+)"
                 match = re.search(pattern, feedback)
                 if match:
