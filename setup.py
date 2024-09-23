@@ -6,8 +6,8 @@ from setuptools import setup, find_packages
 with open("README.md", encoding="utf-8") as f:
     long_description = f.read()
     # Remove p tags.
-    pattern = re.compile(r'<p.*?>.*?</p>', re.DOTALL)
-    long_description = re.sub(pattern, '', long_description)
+    pattern = re.compile(r"<p.*?>.*?</p>", re.DOTALL)
+    long_description = re.sub(pattern, "", long_description)
 
 # Read the content of the requirements.txt file
 with open("requirements.txt", encoding="utf-8") as f:
@@ -16,7 +16,7 @@ with open("requirements.txt", encoding="utf-8") as f:
 
 setup(
     name="knowledge-storm",
-    version="0.2.5",
+    version="0.2.6",
     author="Yijia Shao, Yucheng Jiang",
     author_email="shaoyj@stanford.edu, yuchengj@stanford.edu",
     description="STORM: A language model-powered knowledge curation engine.",
@@ -34,6 +34,6 @@ setup(
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
     ],
-    python_requires='>=3.9',
+    python_requires=">=3.9",
     install_requires=requirements,
 )
