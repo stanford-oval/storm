@@ -138,14 +138,21 @@ def main(args):
 
     # compute average score
     logger.info(f"Computing average score.")
+    avg_results = get_avg_results(aggregated_results)
+    dump_json(avg_results, os.path.join(args.result_output_dir, "avg_results.json"))
+
+
+def get_avg_results(aggregated_results):
     avg_results = {}
     for k in aggregated_results:
         if type(aggregated_results[k][0]) is dict:
-            avg_results[k] = sum([float(x['score']) for x in aggregated_results[k]]) / len(aggregated_results[k])
+            avg_results[k] = sum(
+                [float(x["score"]) for x in aggregated_results[k]]
+            ) / len(aggregated_results[k])
         else:
             avg_results[k] = sum(aggregated_results[k]) / len(aggregated_results[k])
         print(f"{k}: {avg_results[k]}")
-    dump_json(avg_results, os.path.join(args.result_output_dir, "avg_results.json"))
+    return avg_results
 
 
 if __name__ == "__main__":
