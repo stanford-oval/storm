@@ -202,7 +202,7 @@ def main(args):
         for _, row in tqdm(df.iterrows()):
             try:
                 process_url(row['url'], args.outputDirectory)
-            except Exception as e:
+            except IOError as e:
                 print(e)
                 print(f'Error occurs when processing {row["url"]}')
     else:
