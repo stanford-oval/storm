@@ -95,6 +95,27 @@ def _run_nli_autoais(passage, claim, partial):
     return inference
 
 
+def _format_document(doc):
+    """Format document for AutoAIS."""
+
+    if "sent" in doc:
+        # QA-extracted docs
+        return "Title: %s\n%s" % (doc['title'], doc['sent'])
+    else:
+        return "Title: %s\n%s" % (doc['title'], doc['text'])
+
+def get_item_sentences(item
+                       , qampari):
+    # Get sentences by using NLTK
+    if qampari:
+        sents = [item['question'] + " " + x.strip() for x in
+                item['output'].rstrip().rstrip(".").rstrip(",").split(",")]
+    else:
+        sents = sent_tokenize(item['output'])
+
+    return sents
+
+
 def compute_autoais(data,
                     decontext=False,
                     concat=False,
@@ -112,15 +133,6 @@ def compute_autoais(data,
 
     global mistral_7b_instruct, mistral_7b_tokenizer
 
-    def _format_document(doc):
-        """Format document for AutoAIS."""
-
-        if "sent" in doc:
-            # QA-extracted docs
-            return "Title: %s\n%s" % (doc['title'], doc['sent'])
-        else:
-            return "Title: %s\n%s" % (doc['title'], doc['text'])
-
     ais_scores = []
     ais_scores_prec = []
 
@@ -132,12 +144,7 @@ def compute_autoais(data,
     eval_log = []
 
     for item in tqdm(data):
-        # Get sentences by using NLTK
-        if qampari:
-            sents = [item['question'] + " " + x.strip() for x in
-                     item['output'].rstrip().rstrip(".").rstrip(",").split(",")]
-        else:
-            sents = sent_tokenize(item['output'])
+        sents = get_item_sentences(item, qampari)
         if len(sents) == 0:
             continue
 
@@ -150,20 +157,10 @@ def compute_autoais(data,
             target_sent = target_sents[sent_id]  # Citation removed and (if opted for) decontextualized
             joint_entail = -1  # Undecided
 
-            # Find references
-            ref = [int(r[1:]) - 1 for r in re.findall(r"\[\d+", sent)]  # In text citation id starts from 1
-            logger.info(f"For `{sent}`, find citations {ref}")
-            if len(ref) == 0:
-                # No citations
-                joint_entail = 0
-            elif any([ref_id >= len(item['docs']) for ref_id in ref]):
-                # Citations out of range
-                joint_entail = 0
-            else:
-                if at_most_citations is not None:
-                    ref = ref[:at_most_citations]
-                total_citations += len(ref)
-                joint_passage = '\n'.join([_format_document(item['docs'][psgs_id]) for psgs_id in ref])
+            joint_entail, ref, total_citations, joint_passage = find_references(sent
+                                                                               , item
+                                                                               , at_most_citations
+                                                                               , total_citations)
 
             # If not directly rejected by citation format error, calculate the recall score
             if joint_entail == -1:
@@ -188,12 +185,9 @@ def compute_autoais(data,
 
                     # condition B
                     if not nli_result:
-                        subset_exclude = copy.deepcopy(ref)
-                        subset_exclude.remove(psgs_id)
-                        passage = '\n'.join([_format_document(item['docs'][pid]) for pid in subset_exclude])
-                        nli_result = _run_nli_autoais(passage, target_sent, partial=False)
+                        nli_result = check_condition_b(ref, psgs_id, item, target_sent)
                         if nli_result:  # psgs_id is not necessary
-                            flag = 0
+                            flag = 0 # TODO - unused variable - should be removed
                             sent_mcite_overcite += 1
                             logger.info(f'[Unnecessary citation] sent: {sent} citation: [{psgs_id}]')
                             unnecessary_citations.append(psgs_id)
@@ -216,13 +210,7 @@ def compute_autoais(data,
         ais_scores.append(entail / len(sents))
         ais_scores_prec.append(entail_prec / total_citations if total_citations > 0 else 0)  # len(sents))
 
-    if sent_mcite > 0 and sent_mcite_support > 0:
-        print(
-            "Among all sentences, %.2f%% have multiple citations, among which %.2f%% are supported by the joint set, among which %.2f%% overcite." % (
-                100 * sent_mcite / sent_total,
-                100 * sent_mcite_support / sent_mcite,
-                100 * sent_mcite_overcite / sent_mcite_support
-            ))
+    present_stats(sent_mcite, sent_mcite_overcite, sent_mcite_support, sent_total)
 
     citation_rec = 100 * np.mean(ais_scores)
     citation_prec = 100 * np.mean(ais_scores_prec)
@@ -232,6 +220,39 @@ def compute_autoais(data,
         "citation_rec": citation_rec,
         "citation_prec": citation_prec,
     }
+
+def check_condition_b(ref, psgs_id, item, target_sent):
+    subset_exclude = copy.deepcopy(ref)
+    subset_exclude.remove(psgs_id)
+    passage = '\n'.join([_format_document(item['docs'][pid]) for pid in subset_exclude])
+    nli_result = _run_nli_autoais(passage, target_sent, partial=False)
+
+    return nli_result
+
+def present_stats(sent_mcite, sent_mcite_overcite, sent_mcite_support, sent_total):
+    if sent_mcite > 0 and sent_mcite_support > 0:
+        print(
+            "Among all sentences, %.2f%% have multiple citations, among which %.2f%% are supported by the joint set, among which %.2f%% overcite." % (
+                100 * sent_mcite / sent_total,
+                100 * sent_mcite_support / sent_mcite,
+                100 * sent_mcite_overcite / sent_mcite_support
+            ))
+
+def find_references(sent, item, at_most_citations, total_citations):
+    # Find references
+    ref = [int(r[1:]) - 1 for r in re.findall(r"\[\d+", sent)]  # In text citation id starts from 1
+    logger.info(f"For `{sent}`, find citations {ref}")
+    if (len(ref) == 0  # No citations
+            or any([ref_id >= len(item['docs']) for ref_id in ref])  # Citations out of range
+    ):
+        joint_entail = 0
+    else:
+        if at_most_citations is not None:
+            ref = ref[:at_most_citations]
+        total_citations += len(ref)
+        joint_passage = '\n'.join([_format_document(item['docs'][psgs_id]) for psgs_id in ref])
+
+    return joint_entail, ref, total_citations, joint_passage
 
 
 def load_str(path):
