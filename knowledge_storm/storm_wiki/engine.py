@@ -12,10 +12,9 @@ from .modules.callback import BaseCallbackHandler
 from .modules.knowledge_curation import StormKnowledgeCurationModule
 from .modules.outline_generation import StormOutlineGenerationModule
 from .modules.persona_generator import StormPersonaGenerator
-from .modules.retriever import StormRetriever
 from .modules.storm_dataclass import StormInformationTable, StormArticle
-from ..interface import Engine, LMConfigs
-from ..lm import OpenAIModel
+from ..interface import Engine, LMConfigs, Retriever
+from ..lm import OpenAIModel, AzureOpenAIModel
 from ..utils import FileIOHelper, makeStringRed, truncate_filename
 
 
@@ -39,6 +38,7 @@ class STORMWikiLMConfigs(LMConfigs):
     def init_openai_model(
         self,
         openai_api_key: str,
+        azure_api_key: str,
         openai_type: Literal["openai", "azure"],
         api_base: Optional[str] = None,
         api_version: Optional[str] = None,
@@ -46,19 +46,27 @@ class STORMWikiLMConfigs(LMConfigs):
         top_p: Optional[float] = 0.9,
     ):
         """Legacy: Corresponding to the original setup in the NAACL'24 paper."""
+        azure_kwargs = {
+            "api_key": azure_api_key,
+            "temperature": temperature,
+            "top_p": top_p,
+            "api_base": api_base,
+            "api_version": api_version,
+        }
+
         openai_kwargs = {
             "api_key": openai_api_key,
-            "api_provider": openai_type,
+            "api_provider": "openai",
             "temperature": temperature,
             "top_p": top_p,
             "api_base": None,
         }
         if openai_type and openai_type == "openai":
             self.conv_simulator_lm = OpenAIModel(
-                model="gpt-3.5-turbo-instruct", max_tokens=500, **openai_kwargs
+                model="gpt-4o-mini-2024-07-18", max_tokens=500, **openai_kwargs
             )
             self.question_asker_lm = OpenAIModel(
-                model="gpt-3.5-turbo", max_tokens=500, **openai_kwargs
+                model="gpt-4o-mini-2024-07-18", max_tokens=500, **openai_kwargs
             )
             # 1/12/2024: Update gpt-4 to gpt-4-1106-preview. (Currently keep the original setup when using azure.)
             self.outline_gen_lm = OpenAIModel(
@@ -69,6 +77,32 @@ class STORMWikiLMConfigs(LMConfigs):
             )
             self.article_polish_lm = OpenAIModel(
                 model="gpt-4o-2024-05-13", max_tokens=4000, **openai_kwargs
+            )
+        elif openai_type and openai_type == "azure":
+            self.conv_simulator_lm = OpenAIModel(
+                model="gpt-4o-mini-2024-07-18", max_tokens=500, **openai_kwargs
+            )
+            self.question_asker_lm = AzureOpenAIModel(
+                model="gpt-4o-mini-2024-07-18",
+                max_tokens=500,
+                **azure_kwargs,
+                model_type="chat",
+            )
+            # use combination of openai and azure-openai as azure-openai does not support gpt-4 in standard deployment
+            self.outline_gen_lm = AzureOpenAIModel(
+                model="gpt-4o", max_tokens=400, **azure_kwargs, model_type="chat"
+            )
+            self.article_gen_lm = AzureOpenAIModel(
+                model="gpt-4o-mini-2024-07-18",
+                max_tokens=700,
+                **azure_kwargs,
+                model_type="chat",
+            )
+            self.article_polish_lm = AzureOpenAIModel(
+                model="gpt-4o-mini-2024-07-18",
+                max_tokens=4000,
+                **azure_kwargs,
+                model_type="chat",
             )
         else:
             logging.warning(
@@ -145,7 +179,7 @@ class STORMWikiRunner(Engine):
         self.args = args
         self.lm_configs = lm_configs
 
-        self.retriever = StormRetriever(rm=rm, k=self.args.retrieve_top_k)
+        self.retriever = Retriever(rm=rm, max_thread=self.args.max_thread_num)
         storm_persona_generator = StormPersonaGenerator(
             self.lm_configs.question_asker_lm
         )
