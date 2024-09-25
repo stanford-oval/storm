@@ -11,7 +11,7 @@ We host a number of example scripts for various customization of STORM (e.g., us
 2. Run the following command under the root directory of the repository:
 
    ```
-    python examples/run_storm_wiki_mistral.py \
+    python examples/storm_examples/run_storm_wiki_mistral.py \
        --url $URL \
        --port $PORT \
        --output-dir $OUTPUT_DIR \
@@ -50,7 +50,7 @@ By default, STORM is grounded on the Internet using the search engine, but it ca
    To create the vector store offline, run
 
    ```
-   python examples/run_storm_wiki_gpt_with_VectorRM.py \
+   python examples/storm_examples/run_storm_wiki_gpt_with_VectorRM.py \
        --output-dir $OUTPUT_DIR \
        --vector-db-mode offline \
        --offline-vector-db-dir $OFFLINE_VECTOR_DB_DIR \
@@ -65,7 +65,7 @@ By default, STORM is grounded on the Internet using the search engine, but it ca
    To create the vector store online on a Qdrant server, run
 
    ```
-   python examples/run_storm_wiki_gpt_with_VectorRM.py \
+   python examples/storm_examples/run_storm_wiki_gpt_with_VectorRM.py \
        --output-dir $OUTPUT_DIR \
        --vector-db-mode online \
        --online-vector-db-url $ONLINE_VECTOR_DB_URL \
@@ -83,12 +83,12 @@ By default, STORM is grounded on the Internet using the search engine, but it ca
    - Run the following command under the root directory to downsample the dataset by filtering papers with terms `[cs.CV]` and get a csv file that match the format mentioned above.
 
      ```
-     python examples/helper/process_kaggle_arxiv_abstract_dataset.py --input-path $PATH_TO_THE_DOWNLOADED_FILE --output-path $PATH_TO_THE_PROCESSED_CSV
+     python examples/storm_examples/helper/process_kaggle_arxiv_abstract_dataset.py --input-path $PATH_TO_THE_DOWNLOADED_FILE --output-path $PATH_TO_THE_PROCESSED_CSV
      ```
    - Run the following command to run STORM grounding on the processed dataset. You can input a topic related to computer vision (e.g., "The progress of multimodal models in computer vision") to see the generated article. (Note that the generated article may not include enough details since the quick test only use the abstracts of arxiv papers.)
 
      ```
-     python examples/run_storm_wiki_gpt_with_VectorRM.py \
+     python examples/storm_examples/run_storm_wiki_gpt_with_VectorRM.py \
          --output-dir $OUTPUT_DIR \
          --vector-db-mode offline \
          --offline-vector-db-dir $OFFLINE_VECTOR_DB_DIR \
@@ -102,7 +102,7 @@ By default, STORM is grounded on the Internet using the search engine, but it ca
    - For a quicker run, you can also download the pre-embedded vector store directly from [here](https://drive.google.com/file/d/1bijFkw5BKU7bqcmXMhO-5hg2fdKAL9bf/view?usp=share_link).
 
      ```
-     python examples/run_storm_wiki_gpt_with_VectorRM.py \
+     python examples/storm_examples/run_storm_wiki_gpt_with_VectorRM.py \
          --output-dir $OUTPUT_DIR \
          --vector-db-mode offline \
          --offline-vector-db-dir $DOWNLOADED_VECTOR_DB_DR \

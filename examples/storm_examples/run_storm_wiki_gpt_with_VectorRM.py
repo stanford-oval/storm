@@ -27,10 +27,8 @@ args.output_dir/
 """
 
 import os
-import sys
 from argparse import ArgumentParser
 
-sys.path.append('./')
 from knowledge_storm import STORMWikiRunnerArguments, STORMWikiRunner, STORMWikiLMConfigs
 from knowledge_storm.rm import VectorRM
 from knowledge_storm.lm import OpenAIModel, AzureOpenAIModel
