@@ -24,7 +24,7 @@ if TYPE_CHECKING:
 class CoStormExpert(Agent):
     """
     Represents an expert agent in the Co-STORM framework.
-    The `CoStormExpert` is a specialized type of `Agent` that is tasked with participating in roundtable discussions within the Co-STORM system. 
+    The `CoStormExpert` is a specialized type of `Agent` that is tasked with participating in roundtable discussions within the Co-STORM system.
     The expert uses language models to generate action plans, answer questions, and polish its utterances based on the current conversation history and knowledge base.
       It interacts with modules for action planning and question answering grounding on provided retrieval models.
 
@@ -38,6 +38,7 @@ class CoStormExpert(Agent):
         rm (Optional[dspy.Retrieve], optional): A retrieval module used for fetching external knowledge or context.
         callback_handler (BaseCallbackHandler, optional): Handles log message printing
     """
+
     def __init__(
         self,
         topic: str,
@@ -112,6 +113,7 @@ class SimulatedUser(Agent):
 
     For more information, please refer to Section 3.4 of Co-STORM paper: https://www.arxiv.org/pdf/2408.15232
     """
+
     def __init__(
         self,
         topic: str,
@@ -155,13 +157,14 @@ class SimulatedUser(Agent):
 
 class Moderator(Agent):
     """
-    The moderator's role in the Co-STORM framework is to inject new perspectives into the conversation to avoid stagnation, repetition, or overly niche discussions. 
-    This is achieved by generating questions based on unused, uncited snippets of information retrieved since the last moderator's turn. 
-    The selected information is reranked according to its relevance to the conversation topic and its dissimilarity to the original question. 
+    The moderator's role in the Co-STORM framework is to inject new perspectives into the conversation to avoid stagnation, repetition, or overly niche discussions.
+    This is achieved by generating questions based on unused, uncited snippets of information retrieved since the last moderator's turn.
+    The selected information is reranked according to its relevance to the conversation topic and its dissimilarity to the original question.
     The resulting top-ranked snippets are used to generate an informed question to be presented to the conversation participants.
 
     For more information, please refer to Section 3.5 of Co-STORM paper: https://www.arxiv.org/pdf/2408.15232
     """
+
     def __init__(
         self,
         topic: str,
@@ -319,6 +322,7 @@ class PureRAGAgent(Agent):
     It does not utilize any other information besides query itself.
     It's designed for Co-STORM paper baseline comparison.
     """
+
     def __init__(
         self,
         topic: str,
