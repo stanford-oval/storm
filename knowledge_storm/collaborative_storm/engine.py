@@ -296,19 +296,20 @@ class TurnPolicySpec:
     Represents the policy specifications for determining the behavior of a conversation turn.
 
     Attributes:
-        should_reorganize_knowledge_base (bool): 
-            A flag that indicates whether the knowledge base should be reorganized after the current turn. 
-            
-        should_update_experts_list (bool): 
+        should_reorganize_knowledge_base (bool):
+            A flag that indicates whether the knowledge base should be reorganized after the current turn.
+
+        should_update_experts_list (bool):
             A flag that indicates whether the list of experts should be updated based on the conversation context.
-            
-        should_polish_utterance (bool): 
+
+        should_polish_utterance (bool):
             A flag that indicates whether the generated utterance should be polished (e.g., refined or rephrased) before it is used in the conversation.
-            
-        agent (Agent): 
-            The `Agent` responsible for generating utterances or responses during the conversation turn. 
-            This agent interacts with the knowledge base and the conversation history to produce responses. 
+
+        agent (Agent):
+            The `Agent` responsible for generating utterances or responses during the conversation turn.
+            This agent interacts with the knowledge base and the conversation history to produce responses.
     """
+
     should_reorganize_knowledge_base: bool = False
     should_update_experts_list: bool = False
     should_polish_utterance: bool = False
@@ -626,7 +627,7 @@ class CoStormRunner:
 
     def generate_report(self) -> str:
         """
-        Generate report leveraging organized collected information in the knowledge base (i.e. mind map). 
+        Generate report leveraging organized collected information in the knowledge base (i.e. mind map).
         The article generation follows the paradigm in STORM paper, where it considers mind map nodes as section names, and generate the report section by section.
 
         Returns:
@@ -650,8 +651,8 @@ class CoStormRunner:
         """
         Yields a single turn in the conversation flow.
 
-        This method take a user input when user choose to inject an utterance or generates the next system utterance based on the current conversation history and defined discourse policies. 
-        It handles updating the conversation history, managing expert lists, and interacting with the knowledge base. 
+        This method take a user input when user choose to inject an utterance or generates the next system utterance based on the current conversation history and defined discourse policies.
+        It handles updating the conversation history, managing expert lists, and interacting with the knowledge base.
         Additionally, it logs each stage of the conversation for monitoring and debugging purposes.
 
         Args:
@@ -665,13 +666,13 @@ class CoStormRunner:
         Workflow:
             1. User Utterance Handling
                 - If `user_utterance` is provided, it is appended to the `conversation_history`
-            
+
             2. System Utterance Generation
                 - If no `user_utterance` is provided, the method proceeds to generate the next system utterance.
                 - Determines the next turn policy by consulting the `discourse_manager` with the current conversation history.
                 - Generates a new utterance using the agent defined in the turn policy, leveraging the `knowledge_base` and `conversation_history`.
                 - If the turn policy indicates that the experts list should be updated, it updates the expert list based on the latest utterances.
-            
+
             4. Knowledge Base Update
                 - Inserts the new turn into the `knowledge_base`, optionally allowing the creation of new nodes or inserting under the root based on the `rag_only_baseline_mode` flag.
                 - If the turn policy specifies, it reorganizes the `knowledge_base` to maintain optimal structure and relevance.
