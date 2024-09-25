@@ -9,9 +9,9 @@
 </p>
 **Latest News** 🔥
 
-- [2024/09] Release Co-STORM codebase and intergrated into knowledge-storm python package.
+- [2024/09] Co-STORM codebase is now released and integrated into `knowledge-storm` python package v1.0.0. Run `pip install knowledge-storm --upgrade` to check it out.
 
-- [2024/09] Introduce collaborative STORM (Co-STORM) to support human-AI collaborative knowledge curation! [Co-STORM Paper](https://www.arxiv.org/abs/2408.15232) accepted to 2024 EMNLP.
+- [2024/09] We introduce collaborative STORM (Co-STORM) to support human-AI collaborative knowledge curation! [Co-STORM Paper](https://www.arxiv.org/abs/2408.15232) has been accepted to EMNLP 2024 main conference.
 
 - [2024/07] You can now install our package with `pip install knowledge-storm`!
 - [2024/07] We add `VectorRM` to support grounding on user-provided documents, complementing existing support of search engines (`YouRM`, `BingSearch`). (check out [#58](https://github.com/stanford-oval/storm/pull/58))
@@ -35,7 +35,7 @@ While the system cannot produce publication-ready articles that often require a 
 
 
 
-## How STORM / Co-STORM works
+## How STORM & Co-STORM works
 
 ### STORM
 
@@ -51,23 +51,21 @@ STORM identifies the core of automating the research process as automatically co
 1. **Perspective-Guided Question Asking**: Given the input topic, STORM discovers different perspectives by surveying existing articles from similar topics and uses them to control the question-asking process.
 2. **Simulated Conversation**: STORM simulates a conversation between a Wikipedia writer and a topic expert grounded in Internet sources to enable the language model to update its understanding of the topic and ask follow-up questions.
 
-Based on the separation of the two stages, STORM is implemented in a highly modular way using [dspy](https://github.com/stanfordnlp/dspy).
-
 ### CO-STORM
 
-Co-STORM proposes collaborative discourse protocol which implements conversation turn policy management controlling smooth collaboration among 
+Co-STORM proposes **a collaborative discourse protocol** which implements a turn management policy to support smooth collaboration among 
 
-- **Co-STORM LLM experts**: This type of agent generate answers grounded on external knowledge sources and/or raise follow up questions based on discourse history.
-- **Moderator**: This agent generate thought provoking questions taking inspiring from collection information provided by Co-STORM LLM experts.
-- **Human user**: Human user will take the initiative to either (1) observe the discourse to gain deeper understanding of the topic, or (2) actively engaging in the conversation by injecting utterances to steer the discussion focus
+- **Co-STORM LLM experts**: This type of agent generates answers grounded on external knowledge sources and/or raises follow-up questions based on the discourse history.
+- **Moderator**: This agent generates thought-provoking questions inspired by information discovered by the retriever but not directly used in previous turns. Question generation can also be grounded!
+- **Human user**: The human user will take the initiative to either (1) observe the discourse to gain deeper understanding of the topic, or (2) actively engage in the conversation by injecting utterances to steer the discussion focus.
 
 <p align="center">
   <img src="assets/co-storm-workflow.jpg" style="width: 60%; height: auto;">
 </p>
 
-Co-STORM also maintains a dynamic updated **mind map**, which organize collected information into hirarchical concept structure, aiming to build a shared conceptual space between the human user and the system while reducing the mental load when having long in depth discourse. 
+Co-STORM also maintains a dynamic updated **mind map**, which organize collected information into a hierarchical concept structure, aiming to **build a shared conceptual space between the human user and the system**. The mind map has been proven to help reduce the mental load when the discourse goes long and in-depth. 
 
-Co-STORM is also implemented in a highly modular way using [dspy](https://github.com/stanfordnlp/dspy).
+Both STORM and Co-STORM are implemented in a highly modular way using [dspy](https://github.com/stanfordnlp/dspy).
 
 ## Installation
 
@@ -152,7 +150,7 @@ runner.summary()
 
 ### Co-STORM
 
-The Co-STORM knowledge curation engine is defined as a simple Python `STORMWikiRunner` class. Here is an example of using Bing search engine and OpenAI models.
+The Co-STORM knowledge curation engine is defined as a simple Python `CoStormRunner` class. Here is an example of using Bing search engine and OpenAI models.
 
 ```python
 from knowledge_storm.collaborative_storm.engine import CollaborativeStormLMConfigs, RunnerArgument, CoStormRunner
@@ -183,7 +181,7 @@ lm_config.set_warmstart_outline_gen_lm(warmstart_outline_gen_lm)
 lm_config.set_question_asking_lm(question_asking_lm)
 lm_config.set_knowledge_base_lm(knowledge_base_lm)
 
-# Check out the CoSTORM's RunnerArguments class for more configurations.
+# Check out the Co-STORM's RunnerArguments class for more configurations.
 topic = input('Topic: ')
 runner_argument = RunnerArgument(topic=topic, ...)
 logging_wrapper = LoggingWrapper(lm_config)
@@ -198,17 +196,17 @@ costorm_runner = CoStormRunner(lm_config=lm_config,
 The `CoStormRunner` instance can be evoked with the `warmstart()` and `step(...)` methods.
 
 ```python
-# warm start the system to build shared conceptual space between Co-STORM and users
+# Warm start the system to build shared conceptual space between Co-STORM and users
 costorm_runner.warm_start()
 
-# step through the collaborative discourse 
-# running either of code below in any order for as many times as you would like
-# Either by observing the conversation via running
+# Step through the collaborative discourse 
+# Run either of the code snippets below in any order, as many times as you'd like
+# To observe the conversation:
 conv_turn = costorm_runner.step()
-# Or by actively engaging in the conversation to inject your utterance via running
+# To inject your utterance to actively steer the conversation:
 costorm_runner.step(user_utterance="YOUR UTTERANCE HERE")
 
-# generate report
+# Generate report based on the collaborative discourse
 costorm_runner.knowledge_base.reogranize()
 article = costorm_runner.generate_report()
 print(article)
@@ -283,15 +281,15 @@ The interface for each module is defined in `knowledge_storm/interface.py`, whil
 
 If you have installed the source code, you can customize Co-STORM based on your own use case
 
-1. Co-STORM introduces multiple LLM agent types (i.e. CoSTORM experts and Moderator). LLM agent interface is defined in `knowledge_storm/interface.py` , while its implementation are instantiated in `knowledge_storm/collaborative_storm/modules/co_storm_agents.py`. Different LLM agent policy can be customized.
-2. Co-STORM introduces collaborative discourse protocol and the core function is turn policy management. We provide an example implementation of turn policy management through DiscourseManager in `knowledge_storm/collaborative_storm/engine.py`. It can be customized and further improved.
+1. Co-STORM introduces multiple LLM agent types (i.e. Co-STORM experts and Moderator). LLM agent interface is defined in `knowledge_storm/interface.py` , while its implementation is instantiated in `knowledge_storm/collaborative_storm/modules/co_storm_agents.py`. Different LLM agent policies can be customized.
+2. Co-STORM introduces a collaborative discourse protocol, with its core function centered on turn policy management. We provide an example implementation of turn policy management through `DiscourseManager` in `knowledge_storm/collaborative_storm/engine.py`. It can be customized and further improved.
 
 
 ## Replicate Replicate STORM & Co-STORM paper result
 
 For STORM paper experiments, please switch to the branch `NAACL-2024-code-backup` [here](https://github.com/stanford-oval/storm/tree/NAACL-2024-code-backup).
 
-For Co-STORM paper experiments, please switch to the branch `EMNLP-2024-code-backup` (place holder right now, will be updated soon).
+For Co-STORM paper experiments, please switch to the branch `EMNLP-2024-code-backup` (placeholder for now, will be updated soon).
 
 ## Roadmap & Contributions
 Our team is actively working on:
@@ -303,7 +301,7 @@ If you have any questions or suggestions, please feel free to open an issue or p
 Contact person: [Yijia Shao](mailto:shaoyj@stanford.edu) and [Yucheng Jiang](mailto:yuchengj@stanford.edu)
 
 ## Acknowledgement
-We would like to thank Wikipedia for their excellent open-source content. The FreshWiki dataset is sourced from Wikipedia, licensed under the Creative Commons Attribution-ShareAlike (CC BY-SA) license.
+We would like to thank Wikipedia for its excellent open-source content. The FreshWiki dataset is sourced from Wikipedia, licensed under the Creative Commons Attribution-ShareAlike (CC BY-SA) license.
 
 We are very grateful to [Michelle Lam](https://michelle123lam.github.io/) for designing the logo for this project and [Dekun Ma](https://dekun.me) for leading the UI development.
 
