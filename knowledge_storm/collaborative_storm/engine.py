@@ -609,14 +609,6 @@ class CoStormRunner:
     def dump_logging_and_reset(self):
         return self.logging_wrapper.dump_logging_and_reset()
 
-    def get_next_turn_experts_for_frontend_render(self):
-        turn_policy = self.discourse_manager.get_next_turn_policy(
-            conversation_history=self.conversation_history,
-            simulate_user=False,
-            dry_run=True,
-        )
-        return turn_policy.agent.role_name
-
     def step(
         self,
         user_utterance: str = "",
