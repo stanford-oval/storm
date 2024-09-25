@@ -85,14 +85,16 @@ class PolishPageModule(dspy.Module):
         self.polish_page = dspy.Predict(PolishPage)
 
     def forward(self, topic: str, draft_page: str, polish_whole_page: bool = True):
-        with dspy.settings.context(lm=self.write_lead_engine):
+        # NOTE: Change show_guidelines to false to make the generation more robust to different LM families.
+        with dspy.settings.context(lm=self.write_lead_engine, show_guidelines=False):
             lead_section = self.write_lead(
                 topic=topic, draft_page=draft_page
             ).lead_section
             if "The lead section:" in lead_section:
                 lead_section = lead_section.split("The lead section:")[1].strip()
         if polish_whole_page:
-            with dspy.settings.context(lm=self.polish_engine):
+            # NOTE: Change show_guidelines to false to make the generation more robust to different LM families.
+            with dspy.settings.context(lm=self.polish_engine, show_guidelines=False):
                 page = self.polish_page(draft_page=draft_page).page
         else:
             page = draft_page

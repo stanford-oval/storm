@@ -11,69 +11,13 @@ from ...interface import Information, InformationTable, Article, ArticleSectionN
 from ...utils import ArticleTextProcessing, FileIOHelper
 
 
-class StormInformation(Information):
-    """Class to represent detailed information.
-
-    Inherits from Information to include a unique identifier (URL), and extends
-    it with a description, snippets, and title of the storm information.
-
-    Attributes:
-        description (str): Brief description.
-        snippets (list): List of brief excerpts or snippets.
-        title (str): The title or headline of the information.
-        url (str): The unique URL (serving as UUID) of the information.
-    """
-
-    def __init__(self, uuid, description, snippets, title):
-        """Initialize the StormInformation object with detailed attributes.
-
-        Args:
-            uuid (str): The unique URL serving as the identifier for the information.
-            description (str): Detailed description.
-            snippets (list): List of brief excerpts or snippet.
-            title (str): The title or headline of the information.
-        """
-        super().__init__(uuid=uuid, meta={})
-        self.description = description
-        self.snippets = snippets
-        self.title = title
-        self.url = self.uuid
-
-    @classmethod
-    def from_dict(cls, info_dict):
-        """Create a StormInformation object from a dictionary.
-           Usage: storm_info = StormInformation.from_dict(storm_info_dict)
-
-        Args:
-            info_dict (dict): A dictionary containing keys 'uuid', 'description',
-                              'snippets', and 'title' corresponding to the object's attributes.
-
-        Returns:
-            StormInformation: An instance of StormInformation.
-        """
-        return cls(
-            info_dict["url"],
-            info_dict["description"],
-            info_dict["snippets"],
-            info_dict["title"],
-        )
-
-    def to_dict(self):
-        return {
-            "url": self.uuid,
-            "description": self.description,
-            "snippets": self.snippets,
-            "title": self.title,
-        }
-
-
 class DialogueTurn:
     def __init__(
         self,
         agent_utterance: str = None,
         user_utterance: str = None,
         search_queries: Optional[List[str]] = None,
-        search_results: Optional[List[Union[StormInformation, Dict]]] = None,
+        search_results: Optional[List[Union[Information, Dict]]] = None,
     ):
         self.agent_utterance = agent_utterance
         self.user_utterance = user_utterance
@@ -83,7 +27,7 @@ class DialogueTurn:
         if self.search_results:
             for idx in range(len(self.search_results)):
                 if type(self.search_results[idx]) == dict:
-                    self.search_results[idx] = StormInformation.from_dict(
+                    self.search_results[idx] = Information.from_dict(
                         self.search_results[idx]
                     )
 
@@ -91,7 +35,6 @@ class DialogueTurn:
         """
         Returns a json object that contains all information inside `self`
         """
-
         return OrderedDict(
             {
                 "agent_utterance": self.agent_utterance,
@@ -115,14 +58,14 @@ class StormInformationTable(InformationTable):
     def __init__(self, conversations=List[Tuple[str, List[DialogueTurn]]]):
         super().__init__()
         self.conversations = conversations
-        self.url_to_info: Dict[str, StormInformation] = (
+        self.url_to_info: Dict[str, Information] = (
             StormInformationTable.construct_url_to_info(self.conversations)
         )
 
     @staticmethod
     def construct_url_to_info(
         conversations: List[Tuple[str, List[DialogueTurn]]]
-    ) -> Dict[str, StormInformation]:
+    ) -> Dict[str, Information]:
         url_to_info = {}
 
         for persona, conv in conversations:
@@ -177,7 +120,7 @@ class StormInformationTable(InformationTable):
 
     def retrieve_information(
         self, queries: Union[List[str], str], search_top_k
-    ) -> List[StormInformation]:
+    ) -> List[Information]:
         selected_urls = []
         selected_snippets = []
         if type(queries) is str:
@@ -231,13 +174,13 @@ class StormArticle(Article):
         return None
 
     def _merge_new_info_to_references(
-        self, new_info_list: List[StormInformation], index_to_keep=None
+        self, new_info_list: List[Information], index_to_keep=None
     ) -> Dict[int, int]:
         """
         Merges new storm information into existing references and updates the citation index mapping.
 
         Args:
-        new_info_list (List[StormInformation]): A list of dictionaries representing new storm information.
+        new_info_list (List[Information]): A list of dictionaries representing new storm information.
         index_to_keep (List[int]): A list of index of the new_info_list to keep. If none, keep all.
 
         Returns:
@@ -308,7 +251,7 @@ class StormArticle(Article):
     def update_section(
         self,
         current_section_content: str,
-        current_section_info_list: List[StormInformation],
+        current_section_info_list: List[Information],
         parent_section_name: Optional[str] = None,
     ) -> Optional[ArticleSectionNode]:
         """
@@ -552,7 +495,7 @@ class StormArticle(Article):
         article = cls(topic_name=topic_name)
         article.insert_or_create_section(article_dict=article_dict)
         for url in list(references["url_to_info"]):
-            references["url_to_info"][url] = StormInformation.from_dict(
+            references["url_to_info"][url] = Information.from_dict(
                 references["url_to_info"][url]
             )
         article.reference = references

@@ -16,7 +16,7 @@ with open("requirements.txt", encoding="utf-8") as f:
 
 setup(
     name="knowledge-storm",
-    version="0.2.8",
+    version="1.0.0",
     author="Yijia Shao, Yucheng Jiang",
     author_email="shaoyj@stanford.edu, yuchengj@stanford.edu",
     description="STORM: A language model-powered knowledge curation engine.",
@@ -30,10 +30,9 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
     ],
-    python_requires=">=3.9",
+    python_requires=">=3.10",
     install_requires=requirements,
 )
