@@ -290,10 +290,19 @@ class KnowledgeNode:
 
 class KnowledgeBase:
     """
-    Class representing the knowledge base.
+    Represents the dynamic, hierarchical mind map used in Co-STORM to track and organize discourse.
 
+    The knowledge base serves as a shared conceptual space between the user and the system, allowing for effective collaboration by reducing the user's cognitive load and ensuring that the discourse is easy to follow. 
+    
+    The knowledge base is structured as a tree (or mind map) that dynamically organizes collected information and concepts as the conversation progresses.
+
+    The mind map consists of concepts (nodes) and edges that represent parent-child relationships among topics. Each concept is linked to retrieved information, 
+    which is placed under the most appropriate concept based on its associated question and semantic similarity.
+
+    For more details, please refer to Section 3.2 of Co-STORM paper: https://www.arxiv.org/pdf/2408.15232 
     Attributes:
-        root (KnowledgeNode): The root node of the knowledge base.
+        root (KnowledgeNode): The root node of the hierarchical knowledge base, representing the top-level concept.
+
     """
 
     def __init__(
@@ -817,6 +826,15 @@ class KnowledgeBase:
         return self.gen_summary_module(self)
 
     def reogranize(self):
+        """
+    Reorganizes the knowledge base through two main processes: top-down expansion and bottom-up cleaning.
+
+    The reorganization process ensures that the knowledge base remains well-structured and relevant as new information is added. It consists of the following steps:
+    1.Top-Down Expansion: Expands nodes that have accumulated significant amounts of information by creating subtopics, 
+      ensuring that each concept remains specific and manageable.
+    2.Bottom-Up Cleaning: Cleans the knowledge base by removing empty leaf nodes (nodes with no supporting information) 
+      and merging nodes that have only a single child, simplifying the structure and maintaining clarity.
+    """
         # pre-processing
         self.trim_empty_leaf_nodes()
         self.merge_single_child_nodes()

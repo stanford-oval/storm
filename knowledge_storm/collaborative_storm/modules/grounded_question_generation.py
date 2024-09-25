@@ -1,3 +1,11 @@
+"""
+This module handles question generation within the Co-STORM framework, specifically designed to support the Moderator role.
+
+The Moderator generates insightful, thought-provoking questions that introduce new directions into the conversation. 
+By leveraging uncited or unused snippets of information retrieved during the discussion, the Moderator ensures the conversation remains dynamic and avoids repetitive or overly niche topics.
+
+For more detailed information, refer to Section 3.5 of the Co-STORM paper: https://www.arxiv.org/pdf/2408.15232.
+"""
 import dspy
 from typing import List, Union
 

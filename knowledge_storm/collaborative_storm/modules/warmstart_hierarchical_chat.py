@@ -1,3 +1,13 @@
+"""
+Warm starts the Co-STORM system by conducting a background information search to establish a shared conceptual space with the user.
+ 
+This stage functions as a mini-STORM, where multiple LLM agents are spawned with different perspectives to engage in multi-round conversations. 
+The knowledge base (represented as a mind map) is initialized using the information gathered during these exchanges.
+
+Additionally, the system generates a first draft of the report, which is then used to create a concise and engaging conversation. 
+The synthesized conversation is presented to the user to help them quickly catch up on the system's current knowledge about the topic.
+"""
+
 import dspy
 import concurrent.futures
 from threading import Lock
