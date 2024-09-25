@@ -3,7 +3,7 @@ from ...interface import Information
 
 
 class BaseCallbackHandler:
-    """Base callback handler to manage callbacks from the STORM pipeline."""
+    """Base callback handler to manage callbacks from the Co-STORM pipeline."""
 
     def on_turn_policy_planning_start(self, **kwargs):
         """Run when the turn policy planning begins, before deciding the direction or goal for the next conversation turn."""
@@ -58,94 +58,7 @@ class BaseCallbackHandler:
         pass
 
 
-class CoStormDemoCallBackHandler(BaseCallbackHandler):
-    from ...api import BackendAPI
-
-    def __init__(self, backend_api: BackendAPI, conversation_id: int):
-        self.backend_api = backend_api
-        self.conversation_id = conversation_id
-
-    def on_turn_policy_planning_start(self, **kwargs):
-        """Run when the turn policy planning begins, before deciding the direction or goal for the next conversation turn."""
-        # self.backend_api.update_conversation_status(
-        #     self.conversation_id,
-        #     "active",
-        #     "Start planning next expert; inspect mind map; inspect system state.",
-        # )
-        # skip this part due to message sync latency in the frontend UI, which introduce more confusion.
-        pass
-
-    def on_expert_action_planning_start(self, **kwargs):
-        """Run when the expert action planning begins, preparing to determine the actions that each expert should take."""
-        self.backend_api.update_conversation_status(
-            self.conversation_id,
-            "active",
-            "Reviewing discourse history; Deciding utterance intent.",
-        )
-
-    def on_expert_information_collection_start(self, **kwargs):
-        """Run when the expert information collection ends, after gathering all necessary data from selected sources."""
-        self.backend_api.update_conversation_status(
-            self.conversation_id,
-            "active",
-            "Start searching and browsing collected information; drafting utterance",
-        )
-
-    def on_expert_information_collection_end(self, info: List[Information], **kwargs):
-        """Run when the expert information collection ends, after gathering all necessary data from selected sources."""
-        if info:
-            urls = [i.url for i in info]
-            information_string = "\n".join([f"Finish browsing {url}" for url in urls])
-            self.backend_api.update_conversation_status(
-                self.conversation_id, "active", information_string
-            )
-
-    def on_expert_utterance_generation_end(self, **kwargs):
-        """Run when the expert utterance generation ends, before creating responses or statements from each expert."""
-        self.backend_api.update_conversation_status(
-            self.conversation_id,
-            "active",
-            "Finish generating utterance from collected information.",
-        )
-
-    def on_expert_utterance_polishing_start(self, **kwargs):
-        """Run when the expert utterance polishing begins, to refine and improve the clarity and coherence of generated content."""
-        self.backend_api.update_conversation_status(
-            self.conversation_id, "active", "Start polishing utterance."
-        )
-
-    def on_mindmap_insert_start(self, **kwargs):
-        """Run when the process of inserting new information into the mindmap starts."""
-        self.backend_api.update_conversation_status(
-            self.conversation_id, "active", "Start inserting information into mind map."
-        )
-
-    def on_mindmap_insert_end(self, **kwargs):
-        """Run when the process of inserting new information into the mindmap ends."""
-        self.backend_api.update_conversation_status(self.conversation_id, "active", "")
-
-    def on_mindmap_reorg_start(self, **kwargs):
-        """Run when the reorganization of the mindmap begins, to restructure and optimize the flow of information."""
-        self.backend_api.update_conversation_status(
-            self.conversation_id, "active", "Start re-organizing mind map."
-        )
-
-    def on_expert_list_update_start(self, **kwargs):
-        """Run when the expert list update starts, to modify or refresh the list of active experts."""
-        self.backend_api.update_conversation_status(
-            self.conversation_id, "active", "Start updating expert candidates."
-        )
-
-    def on_warmstart_update(self, message, **kwargs):
-        """Run when the warm start process has update."""
-        self.backend_api.update_conversation_status(
-            self.conversation_id, "warmup", message
-        )
-
-
 class LocalConsolePrintCallBackHandler(BaseCallbackHandler):
-    from ...api import BackendAPI
-
     def __init__(self):
         pass
 

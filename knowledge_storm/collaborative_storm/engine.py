@@ -21,9 +21,9 @@ from ..rm import BingSearch
 
 
 class CollaborativeStormLMConfigs(LMConfigs):
-    """Configurations for LLM used in different parts of STORM.
+    """Configurations for LLM used in different parts of Co-STORM.
 
-    Given that different parts in STORM framework have different complexity, we use different LLM configurations
+    Given that different parts in Co-STORM framework have different complexity, we use different LLM configurations
     to achieve a balance between quality and efficiency. If no specific configuration is provided, we use the default
     setup in the paper.
     """
@@ -292,6 +292,23 @@ class RunnerArgument:
 
 @dataclass
 class TurnPolicySpec:
+    """
+    Represents the policy specifications for determining the behavior of a conversation turn.
+
+    Attributes:
+        should_reorganize_knowledge_base (bool): 
+            A flag that indicates whether the knowledge base should be reorganized after the current turn. 
+            
+        should_update_experts_list (bool): 
+            A flag that indicates whether the list of experts should be updated based on the conversation context.
+            
+        should_polish_utterance (bool): 
+            A flag that indicates whether the generated utterance should be polished (e.g., refined or rephrased) before it is used in the conversation.
+            
+        agent (Agent): 
+            The `Agent` responsible for generating utterances or responses during the conversation turn. 
+            This agent interacts with the knowledge base and the conversation history to produce responses. 
+    """
     should_reorganize_knowledge_base: bool = False
     should_update_experts_list: bool = False
     should_polish_utterance: bool = False
@@ -553,6 +570,14 @@ class CoStormRunner:
         return costorm_runner
 
     def warm_start(self):
+        """
+        Warm start co-storm system to conduct background information search in order to build shared conceptual space with user.
+        This stage is a mini-STORM, spawning multiple LLM agent with different perspective and perform multi-round conversation.
+        The knowledge base (i.e. mind map) will be initialize using the collected information.
+
+        It will also generate a first draft of report and use it to produce an engaging and concise conversation presented to the
+        user to catch up with system's knowledge about the topic.
+        """
         with self.logging_wrapper.log_pipeline_stage(
             pipeline_stage=f"warm start stage"
         ):
@@ -600,6 +625,13 @@ class CoStormRunner:
                 )
 
     def generate_report(self) -> str:
+        """
+        Generate report leveraging organized collected information in the knowledge base (i.e. mind map). 
+        The article generation follows the paradigm in STORM paper, where it considers mind map nodes as section names, and generate the report section by section.
+
+        Returns:
+            str: A string representing the report, with "#" "##" indicating hierarchical sections and [1][2] indicating references.
+        """
         with self.logging_wrapper.log_pipeline_stage("report generation stage"):
             with self.logging_wrapper.log_event(
                 "report generation stage: generate report"
@@ -615,6 +647,35 @@ class CoStormRunner:
         simulate_user: bool = False,
         simulate_user_intent: str = "",
     ) -> ConversationTurn:
+        """
+        Yields a single turn in the conversation flow.
+
+        This method take a user input when user choose to inject an utterance or generates the next system utterance based on the current conversation history and defined discourse policies. 
+        It handles updating the conversation history, managing expert lists, and interacting with the knowledge base. 
+        Additionally, it logs each stage of the conversation for monitoring and debugging purposes.
+
+        Args:
+            user_utterance (str, optional): The input provided by the user. If provided, this utterance is added directly to the conversation history and returns with no further action.
+            simulate_user (bool, optional): This is designed for automatic experiments using a LLM agent to simulate user actions. Flag indicating whether to simulate user behavior. When set to `True`, the system will generate user intents based on predefined simulation logic. Defaults to `False`.
+            simulate_user_intent (str, optional): This is designed for automatic experiments using a LLM agent to simulate user actions. Specifies the intent to simulate for the user. This is used when `simulate_user` is `True` to guide the simulated user's responses,
+
+        Returns:
+            ConversationTurn: An object representing the latest turn in the conversation.
+
+        Workflow:
+            1. User Utterance Handling
+                - If `user_utterance` is provided, it is appended to the `conversation_history`
+            
+            2. System Utterance Generation
+                - If no `user_utterance` is provided, the method proceeds to generate the next system utterance.
+                - Determines the next turn policy by consulting the `discourse_manager` with the current conversation history.
+                - Generates a new utterance using the agent defined in the turn policy, leveraging the `knowledge_base` and `conversation_history`.
+                - If the turn policy indicates that the experts list should be updated, it updates the expert list based on the latest utterances.
+            
+            4. Knowledge Base Update
+                - Inserts the new turn into the `knowledge_base`, optionally allowing the creation of new nodes or inserting under the root based on the `rag_only_baseline_mode` flag.
+                - If the turn policy specifies, it reorganizes the `knowledge_base` to maintain optimal structure and relevance.
+        """
         last_conv_turn = self.conversation_history[-1]
         cur_turn_name = f"conv turn: {len(self.conversation_history) + 1}"
         with self.logging_wrapper.log_pipeline_stage(
