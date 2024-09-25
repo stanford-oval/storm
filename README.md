@@ -172,81 +172,9 @@ The interface for each module is defined in `knowledge_storm/interface.py`, whil
 
 ## Replicate NAACL2024 result
 
-Please switch to the branch `NAACL-2024-code-backup` 
-
-<details>
-  <summary>Show me instructions</summary>
-
-### Paper Experiments
-
-The FreshWiki dataset used in our experiments can be found in [./FreshWiki](FreshWiki).
-    
-Run the following commands under [./src](knowledge_storm).
-
-#### Pre-writing Stage
-For batch experiment on FreshWiki dataset:
-```shell
-python -m scripts.run_prewriting --input-source file --input-path ../FreshWiki/topic_list.csv  --engine gpt-4 --do-research --max-conv-turn 5 --max-perspective 5
-```
-- `--engine` (choices=[`gpt-4`, `gpt-35-turbo`]): the LLM engine used for generating the outline
-- `--do-research`: if True, simulate conversation to research the topic; otherwise, load the results.
-- `--max-conv-turn`: the maximum number of questions for each information-seeking conversation
-- `--max-perspective`: the maximum number of perspectives to be considered, each perspective corresponds to an information-seeking conversation. 
-  - STORM also uses a general conversation to collect basic information about the topic. So, the maximum number of QA pairs is `max_turn * (max_perspective + 1)`. :bulb: Reducing `max_turn` or `max_perspective` can speed up the process and reduce the cost but may result in less comprehensive outline.
-  - The parameter will not have any effect if `--disable-perspective` is set (the perspective-driven question asking is disabled).
-
-To run the experiment on a single topic:
-```shell
-python -m scripts.run_prewriting --input-source console --engine gpt-4 --max-conv-turn 5 --max-perspective 5 --do-research
-```
-- The script will ask you to enter the `Topic` and the `Ground truth url` that will be excluded. If you do not have any url to exclude, leave that field empty.
-
-The generated outline will be saved in `{output_dir}/{topic}/storm_gen_outline.txt` and the collected references will be saved in `{output_dir}/{topic}/raw_search_results.json`.
+Please switch to the branch `NAACL-2024-code-backup` [here](https://github.com/stanford-oval/storm/tree/NAACL-2024-code-backup).
 
 
-#### Writing Stage
-For batch experiment on FreshWiki dataset:
-```shell
-python -m scripts.run_writing --input-source file --input-path ../FreshWiki/topic_list.csv --engine gpt-4 --do-polish-article --remove-duplicate
-```
-- `--do-polish-article`: if True, polish the article by adding a summarization section and removing duplicate content if `--remove-duplicate` is set True.
-
-To run the experiment on a single topic:
-```shell
-python -m scripts.run_writing --input-source console --engine gpt-4 --do-polish-article --remove-duplicate
-```
-- The script will ask you to enter the `Topic`. Please enter the same topic as the one used in the pre-writing stage.
-
-The generated article will be saved in `{output_dir}/{topic}/storm_gen_article.txt` and the references corresponding to citation index will be saved in `{output_dir}/{topic}/url_to_info.json`. If `--do-polish-article` is set, the polished article will be saved in `{output_dir}/{topic}/storm_gen_article_polished.txt`. 
-
-### Customize the STORM Configurations
-We set up the default LLM configuration in `LLMConfigs` in [src/modules/utils.py](knowledge_storm/modules/utils.py). You can use `set_conv_simulator_lm()`,`set_question_asker_lm()`, `set_outline_gen_lm()`, `set_article_gen_lm()`, `set_article_polish_lm()` to override the default configuration. These functions take in an instance from `dspy.dsp.LM` or `dspy.dsp.HFModel`.
-
-
-### Automatic Evaluation
-
-In our paper, we break down the evaluation into two parts: outline quality and full-length article quality.
-
-#### Outline Quality
-We introduce *heading soft recall* and *heading entity recall* to evaluate the outline quality. This makes it easier to prototype methods for pre-writing.
-
-Run the following command under [./eval](eval) to compute the metrics on FreshWiki dataset:
-```shell
-python eval_outline_quality.py --input-path ../FreshWiki/topic_list.csv --gt-dir ../FreshWiki --pred-dir ../results --pred-file-name storm_gen_outline.txt --result-output-path ../results/storm_outline_quality.csv
-```
-
-#### Full-length Article Quality
-[eval/eval_article_quality.py](eval/eval_article_quality.py) provides the entry point of evaluating full-length article quality using ROUGE, entity recall, and rubric grading. Run the following command under `eval` to compute the metrics:
-```shell
-python eval_article_quality.py --input-path ../FreshWiki/topic_list.csv --gt-dir ../FreshWiki --pred-dir ../results --gt-dir ../FreshWiki --output-dir ../results/storm_article_eval_results --pred-file-name storm_gen_article_polished.txt
-```
-
-#### Use the Metric Yourself
-The similarity-based metrics (i.e., ROUGE, entity recall, and heading entity recall) are implemented in [eval/metrics.py](eval/metrics.py).
-
-For rubric grading, we use the [prometheus-13b-v1.0](https://huggingface.co/prometheus-eval/prometheus-13b-v1.0) introduced in [this paper](https://arxiv.org/abs/2310.08491). [eval/evaluation_prometheus.py](eval/evaluation_prometheus.py) provides the entry point of using the metric.
-
-</details>
 
 ## Roadmap & Contributions
 Our team is actively working on:
