@@ -334,6 +334,7 @@ class VectorRM(dspy.Retrieve):
 
 
 class StanfordOvalArxivRM(dspy.Retrieve):
+    """[Alpha] This retrieval class is for internal use only, not intended for the public."""
     def __init__(self, endpoint, k=3):
         super().__init__(k=k)
         self.endpoint = endpoint
