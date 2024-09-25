@@ -18,17 +18,10 @@ args.output_dir/
 """
 
 import os
-import sys
 import re
-import logging
 from argparse import ArgumentParser
 
 from knowledge_storm import STORMWikiRunnerArguments, STORMWikiRunner, STORMWikiLMConfigs
-# Get the absolute path to the directory containing lm.py
-lm_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'knowledge_storm'))
-
-# Add this path to sys.path
-sys.path.insert(0, lm_path)
 
 # Now import lm directly
 import lm
