@@ -7,8 +7,8 @@ from typing import List, Union
 import dspy
 
 from .callback import BaseCallbackHandler
-from .storm_dataclass import StormInformationTable, StormArticle, StormInformation
-from ...interface import ArticleGenerationModule
+from .storm_dataclass import StormInformationTable, StormArticle
+from ...interface import ArticleGenerationModule, Information
 from ...utils import ArticleTextProcessing
 
 
@@ -33,7 +33,7 @@ class StormArticleGenerationModule(ArticleGenerationModule):
     def generate_section(
         self, topic, section_name, information_table, section_outline, section_query
     ):
-        collected_info: List[StormInformation] = []
+        collected_info: List[Information] = []
         if information_table is not None:
             collected_info = information_table.retrieve_information(
                 queries=section_query, search_top_k=self.retrieve_top_k
@@ -143,11 +143,7 @@ class ConvToSection(dspy.Module):
         self.engine = engine
 
     def forward(
-        self,
-        topic: str,
-        outline: str,
-        section: str,
-        collected_info: List[StormInformation],
+        self, topic: str, outline: str, section: str, collected_info: List[Information]
     ):
         info = ""
         for idx, storm_info in enumerate(collected_info):

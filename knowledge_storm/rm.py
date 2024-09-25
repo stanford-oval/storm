@@ -333,10 +333,77 @@ class VectorRM(dspy.Retrieve):
         return collected_results
 
 
+class StanfordOvalArxivRM(dspy.Retrieve):
+    def __init__(self, endpoint, k=3):
+        super().__init__(k=k)
+        self.endpoint = endpoint
+        self.usage = 0
+
+    def get_usage_and_reset(self):
+        usage = self.usage
+        self.usage = 0
+
+        return {"CS224vArxivRM": usage}
+
+    def _retrieve(self, query: str):
+        payload = {"query": query, "num_blocks": self.k}
+
+        response = requests.post(
+            self.endpoint, json=payload, headers={"Content-Type": "application/json"}
+        )
+
+        # Check if the request was successful
+        if response.status_code == 200:
+            data = response.json()[0]
+            results = []
+            for i in range(len(data["title"])):
+                result = {
+                    "title": data["title"][i],
+                    "url": data["title"][i],
+                    "snippets": [data["text"][i]],
+                    "description": "N/A",
+                    "meta": {"section_title": data["full_section_title"][i]},
+                }
+                results.append(result)
+
+            return results
+        else:
+            raise Exception(
+                f"Error: Unable to retrieve results. Status code: {response.status_code}"
+            )
+
+    def forward(
+        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
+    ):
+        collected_results = []
+        queries = (
+            [query_or_queries]
+            if isinstance(query_or_queries, str)
+            else query_or_queries
+        )
+
+        for query in queries:
+            try:
+                results = self._retrieve(query)
+                collected_results.extend(results)
+            except Exception as e:
+                logging.error(f"Error occurs when searching query {query}: {e}")
+        return collected_results
+
+
 class SerperRM(dspy.Retrieve):
     """Retrieve information from custom queries using Serper.dev."""
 
-    def __init__(self, serper_search_api_key=None, query_params=None):
+    def __init__(
+        self,
+        serper_search_api_key=None,
+        k=3,
+        query_params=None,
+        ENABLE_EXTRA_SNIPPET_EXTRACTION=False,
+        min_char_count: int = 150,
+        snippet_chunk_size: int = 1000,
+        webpage_helper_max_threads=10,
+    ):
         """Args:
         serper_search_api_key str: API key to run serper, can be found by creating an account on https://serper.dev/
         query_params (dict or list of dict): parameters in dictionary or list of dictionaries that has a max size of 100 that will be used to query.
@@ -355,9 +422,21 @@ class SerperRM(dspy.Retrieve):
                 qdr:m str: Date time range for past month.
                 qdr:y str: Date time range for past year.
         """
-        super().__init__()
+        super().__init__(k=k)
         self.usage = 0
-        self.query_params = query_params
+        self.query_params = None
+        self.ENABLE_EXTRA_SNIPPET_EXTRACTION = ENABLE_EXTRA_SNIPPET_EXTRACTION
+        self.webpage_helper = WebPageHelper(
+            min_char_count=min_char_count,
+            snippet_chunk_size=snippet_chunk_size,
+            max_thread_num=webpage_helper_max_threads,
+        )
+
+        if query_params is None:
+            self.query_params = {"num": k, "autocorrect": True, "page": 1}
+        else:
+            self.query_params = query_params
+            self.query_params.update({"num": k})
         self.serper_search_api_key = serper_search_api_key
         if not self.serper_search_api_key and not os.environ.get("SERPER_API_KEY"):
             raise RuntimeError(
@@ -386,7 +465,7 @@ class SerperRM(dspy.Retrieve):
 
         if response == None:
             raise RuntimeError(
-                f"Error had occurred while running the search process.\n Error is {response.reason}, had failed with status code {response.status_code}"
+                f"Error had occured while running the search process.\n Error is {response.reason}, had failed with status code {response.status_code}"
             )
 
         return response.json()
@@ -435,34 +514,41 @@ class SerperRM(dspy.Retrieve):
         # Array of dictionaries that will be used by Storm to create the jsons
         collected_results = []
 
+        if self.ENABLE_EXTRA_SNIPPET_EXTRACTION:
+            urls = []
+            for result in self.results:
+                organic_results = result.get("organic", [])
+                for organic in organic_results:
+                    url = organic.get("link")
+                    if url:
+                        urls.append(url)
+            valid_url_to_snippets = self.webpage_helper.urls_to_snippets(urls)
+        else:
+            valid_url_to_snippets = {}
+
         for result in self.results:
             try:
                 # An array of dictionaries that contains the snippets, title of the document and url that will be used.
                 organic_results = result.get("organic")
-
                 knowledge_graph = result.get("knowledgeGraph")
                 for organic in organic_results:
-                    snippets = []
-                    snippets.append(organic.get("snippet"))
-                    if knowledge_graph != None:
-                        collected_results.append(
-                            {
-                                "snippets": snippets,
-                                "title": organic.get("title"),
-                                "url": organic.get("link"),
-                                "description": knowledge_graph.get("description"),
-                            }
+                    snippets = [organic.get("snippet")]
+                    if self.ENABLE_EXTRA_SNIPPET_EXTRACTION:
+                        snippets.extend(
+                            valid_url_to_snippets.get(url, {}).get("snippets", [])
                         )
-                    else:
-                        # Common for knowledge graph to be None, set description to empty string
-                        collected_results.append(
-                            {
-                                "snippets": snippets,
-                                "title": organic.get("title"),
-                                "url": organic.get("link"),
-                                "description": "",
-                            }
-                        )
+                    collected_results.append(
+                        {
+                            "snippets": snippets,
+                            "title": organic.get("title"),
+                            "url": organic.get("link"),
+                            "description": (
+                                knowledge_graph.get("description")
+                                if knowledge_graph is not None
+                                else ""
+                            ),
+                        }
+                    )
             except:
                 continue
 

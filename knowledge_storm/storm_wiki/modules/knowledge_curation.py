@@ -8,8 +8,8 @@ import dspy
 
 from .callback import BaseCallbackHandler
 from .persona_generator import StormPersonaGenerator
-from .storm_dataclass import DialogueTurn, StormInformationTable, StormInformation
-from ...interface import KnowledgeCurationModule, Retriever
+from .storm_dataclass import DialogueTurn, StormInformationTable
+from ...interface import KnowledgeCurationModule, Retriever, Information
 from ...utils import ArticleTextProcessing
 
 try:
@@ -196,14 +196,13 @@ class TopicExpert(dspy.Module):
         super().__init__()
         self.generate_queries = dspy.Predict(QuestionToQuery)
         self.retriever = retriever
-        self.retriever.update_search_top_k(search_top_k)
         self.answer_question = dspy.Predict(AnswerQuestion)
         self.engine = engine
         self.max_search_queries = max_search_queries
         self.search_top_k = search_top_k
 
     def forward(self, topic: str, question: str, ground_truth_url: str):
-        with dspy.settings.context(lm=self.engine):
+        with dspy.settings.context(lm=self.engine, show_guidelines=False):
             # Identify: Break down question into queries.
             queries = self.generate_queries(topic=topic, question=question).queries
             queries = [
@@ -212,7 +211,7 @@ class TopicExpert(dspy.Module):
             ]
             queries = queries[: self.max_search_queries]
             # Search
-            searched_results: List[StormInformation] = self.retriever.retrieve(
+            searched_results: List[Information] = self.retriever.retrieve(
                 list(set(queries)), exclude_urls=[ground_truth_url]
             )
             if len(searched_results) > 0:
