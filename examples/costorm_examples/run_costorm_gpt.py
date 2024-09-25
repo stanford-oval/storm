@@ -1,5 +1,5 @@
 """
-STORM Wiki pipeline powered by GPT-4o/4o-mini and Bing search engine.
+Co-STORM pipeline powered by GPT-4o/4o-mini and Bing search engine.
 You need to set up the following environment variables to run this script:
     - OPENAI_API_KEY: OpenAI API key
     - OPENAI_API_TYPE: OpenAI API type (e.g., 'openai' or 'azure')
@@ -116,6 +116,9 @@ def main(args):
     # warm start the system
     costorm_runner.warm_start()
 
+    # Below is an example of how users may interact with Co-STORM to seek information together
+    # In actual deployment, we suggest allowing the user to decide whether to observe the agent utterance or inject a turn
+    
     # observing Co-STORM LLM agent utterance for 5 turns
     for _ in range(1):
         conv_turn = costorm_runner.step()
