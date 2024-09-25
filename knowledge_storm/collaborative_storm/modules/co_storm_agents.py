@@ -109,8 +109,9 @@ class CoStormExpert(Agent):
 
 class SimulatedUser(Agent):
     """
-    Simulated Users is a special type of Agent in Co-STORM that simulate real user interaction behavior or automatic experiments.
-
+    Simulated Users is a special type of Agent in Co-STORM that simulates real user interaction behavior based on the given intent.
+    
+    This class can be used for automatic experiments.
     For more information, please refer to Section 3.4 of Co-STORM paper: https://www.arxiv.org/pdf/2408.15232
     """
 
@@ -318,8 +319,9 @@ class Moderator(Agent):
 
 class PureRAGAgent(Agent):
     """
-    PureRAGAgent only handles grounded question generation by retrieving information from retriever based on the query.
-    It does not utilize any other information besides query itself.
+    PureRAGAgent only handles grounded question generation by retrieving information from the retriever based on the query.
+    It does not utilize any other information besides the query itself.
+    
     It's designed for Co-STORM paper baseline comparison.
     """
 
