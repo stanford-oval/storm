@@ -24,7 +24,7 @@ class OpenAIModel(dspy.OpenAI):
 
     def __init__(
         self,
-        model: str = "gpt-3.5-turbo-instruct",
+        model: str = "gpt-4o-mini",
         api_key: Optional[str] = None,
         model_type: Literal["chat", "text"] = None,
         **kwargs,
@@ -211,7 +211,7 @@ class AzureOpenAIModel(dspy.AzureOpenAI):
         self,
         api_base: Optional[str] = None,
         api_version: Optional[str] = None,
-        model: str = "gpt-3.5-turbo-instruct",
+        model: str = "gpt-4o-mini",
         api_key: Optional[str] = None,
         model_type: Literal["chat", "text"] = "chat",
         **kwargs,
@@ -674,21 +674,28 @@ class TogetherClient(dspy.HFModel):
     def __init__(
         self,
         model,
+        api_key: Optional[str] = None,
         apply_tokenizer_chat_template=False,
         hf_tokenizer_name=None,
+        model_type: Literal["chat", "text"] = "chat",
         **kwargs,
     ):
         """Copied from dspy/dsp/modules/hf_client.py with the support of applying tokenizer chat template."""
 
         super().__init__(model=model, is_client=True)
         self.session = requests.Session()
-        self.api_base = (
-            "https://api.together.xyz/v1/completions"
-            if os.getenv("TOGETHER_API_BASE") is None
-            else os.getenv("TOGETHER_API_BASE")
+        self.api_key = api_key = (
+            os.environ.get("TOGETHER_API_KEY") if api_key is None else api_key
         )
-        self.token = os.getenv("TOGETHER_API_KEY")
         self.model = model
+        self.model_type = model_type
+        if os.getenv("TOGETHER_API_BASE") is None:
+            if self.model_type == "chat":
+                self.api_base = "https://api.together.xyz/v1/chat/completions"
+            else:
+                self.api_base = "https://api.together.xyz/v1/completions"
+        else:
+            self.api_base = os.getenv("TOGETHER_API_BASE")
 
         # self.use_inst_template = False
         # if any(keyword in self.model.lower() for keyword in ["inst", "instruct"]):
@@ -705,12 +712,12 @@ class TogetherClient(dspy.HFModel):
         stop_default = "\n\n---"
 
         self.kwargs = {
-            "temperature": 0.0,
-            "max_tokens": 512,
-            "top_p": 1,
-            "top_k": 20,
+            "temperature": kwargs.get("temperature", 0.0),
+            "max_tokens": min(kwargs.get("max_tokens", 4096), 4096),
+            "top_p": kwargs.get("top_p", 1.0),
+            "top_k": kwargs.get("top_k", 1),
             "repetition_penalty": 1,
-            "n": 1,
+            "n": kwargs.pop("n", kwargs.pop("num_generations", 1)),
             "stop": stop_default if "stop" not in kwargs else kwargs["stop"],
             **kwargs,
         }
@@ -745,9 +752,7 @@ class TogetherClient(dspy.HFModel):
         max_time=1000,
         on_backoff=backoff_hdlr,
     )
-    def _generate(self, prompt, use_chat_api=False, **kwargs):
-        url = f"{self.api_base}"
-
+    def _generate(self, prompt, **kwargs):
         kwargs = {**self.kwargs, **kwargs}
 
         stop = kwargs.get("stop")
@@ -762,8 +767,7 @@ class TogetherClient(dspy.HFModel):
             )
         # prompt = f"[INST]{prompt}[/INST]" if self.use_inst_template else prompt
 
-        if use_chat_api:
-            url = f"{self.api_base}/chat/completions"
+        if self.model_type == "chat":
             messages = [
                 {
                     "role": "system",
@@ -793,13 +797,13 @@ class TogetherClient(dspy.HFModel):
                 "stop": stop,
             }
 
-        headers = {"Authorization": f"Bearer {self.token}"}
+        headers = {"Authorization": f"Bearer {self.api_key}"}
 
-        with self.session.post(url, headers=headers, json=body) as resp:
+        with self.session.post(self.api_base, headers=headers, json=body) as resp:
             resp_json = resp.json()
             # Log the token usage from the Together API response.
             self.log_usage(resp_json)
-            if use_chat_api:
+            if self.model_type == "chat":
                 # completions = [resp_json['output'].get('choices', [])[0].get('message', {}).get('content', "")]
                 completions = [
                     resp_json.get("choices", [])[0]
