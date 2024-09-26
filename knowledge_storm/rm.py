@@ -333,10 +333,79 @@ class VectorRM(dspy.Retrieve):
         return collected_results
 
 
+class StanfordOvalArxivRM(dspy.Retrieve):
+    """[Alpha] This retrieval class is for internal use only, not intended for the public."""
+
+    def __init__(self, endpoint, k=3):
+        super().__init__(k=k)
+        self.endpoint = endpoint
+        self.usage = 0
+
+    def get_usage_and_reset(self):
+        usage = self.usage
+        self.usage = 0
+
+        return {"CS224vArxivRM": usage}
+
+    def _retrieve(self, query: str):
+        payload = {"query": query, "num_blocks": self.k}
+
+        response = requests.post(
+            self.endpoint, json=payload, headers={"Content-Type": "application/json"}
+        )
+
+        # Check if the request was successful
+        if response.status_code == 200:
+            data = response.json()[0]
+            results = []
+            for i in range(len(data["title"])):
+                result = {
+                    "title": data["title"][i],
+                    "url": data["title"][i],
+                    "snippets": [data["text"][i]],
+                    "description": "N/A",
+                    "meta": {"section_title": data["full_section_title"][i]},
+                }
+                results.append(result)
+
+            return results
+        else:
+            raise Exception(
+                f"Error: Unable to retrieve results. Status code: {response.status_code}"
+            )
+
+    def forward(
+        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
+    ):
+        collected_results = []
+        queries = (
+            [query_or_queries]
+            if isinstance(query_or_queries, str)
+            else query_or_queries
+        )
+
+        for query in queries:
+            try:
+                results = self._retrieve(query)
+                collected_results.extend(results)
+            except Exception as e:
+                logging.error(f"Error occurs when searching query {query}: {e}")
+        return collected_results
+
+
 class SerperRM(dspy.Retrieve):
     """Retrieve information from custom queries using Serper.dev."""
 
-    def __init__(self, serper_search_api_key=None, query_params=None):
+    def __init__(
+        self,
+        serper_search_api_key=None,
+        k=3,
+        query_params=None,
+        ENABLE_EXTRA_SNIPPET_EXTRACTION=False,
+        min_char_count: int = 150,
+        snippet_chunk_size: int = 1000,
+        webpage_helper_max_threads=10,
+    ):
         """Args:
         serper_search_api_key str: API key to run serper, can be found by creating an account on https://serper.dev/
         query_params (dict or list of dict): parameters in dictionary or list of dictionaries that has a max size of 100 that will be used to query.
@@ -355,9 +424,21 @@ class SerperRM(dspy.Retrieve):
                 qdr:m str: Date time range for past month.
                 qdr:y str: Date time range for past year.
         """
-        super().__init__()
+        super().__init__(k=k)
         self.usage = 0
-        self.query_params = query_params
+        self.query_params = None
+        self.ENABLE_EXTRA_SNIPPET_EXTRACTION = ENABLE_EXTRA_SNIPPET_EXTRACTION
+        self.webpage_helper = WebPageHelper(
+            min_char_count=min_char_count,
+            snippet_chunk_size=snippet_chunk_size,
+            max_thread_num=webpage_helper_max_threads,
+        )
+
+        if query_params is None:
+            self.query_params = {"num": k, "autocorrect": True, "page": 1}
+        else:
+            self.query_params = query_params
+            self.query_params.update({"num": k})
         self.serper_search_api_key = serper_search_api_key
         if not self.serper_search_api_key and not os.environ.get("SERPER_API_KEY"):
             raise RuntimeError(
@@ -435,34 +516,41 @@ class SerperRM(dspy.Retrieve):
         # Array of dictionaries that will be used by Storm to create the jsons
         collected_results = []
 
+        if self.ENABLE_EXTRA_SNIPPET_EXTRACTION:
+            urls = []
+            for result in self.results:
+                organic_results = result.get("organic", [])
+                for organic in organic_results:
+                    url = organic.get("link")
+                    if url:
+                        urls.append(url)
+            valid_url_to_snippets = self.webpage_helper.urls_to_snippets(urls)
+        else:
+            valid_url_to_snippets = {}
+
         for result in self.results:
             try:
                 # An array of dictionaries that contains the snippets, title of the document and url that will be used.
                 organic_results = result.get("organic")
-
                 knowledge_graph = result.get("knowledgeGraph")
                 for organic in organic_results:
-                    snippets = []
-                    snippets.append(organic.get("snippet"))
-                    if knowledge_graph != None:
-                        collected_results.append(
-                            {
-                                "snippets": snippets,
-                                "title": organic.get("title"),
-                                "url": organic.get("link"),
-                                "description": knowledge_graph.get("description"),
-                            }
+                    snippets = [organic.get("snippet")]
+                    if self.ENABLE_EXTRA_SNIPPET_EXTRACTION:
+                        snippets.extend(
+                            valid_url_to_snippets.get(url, {}).get("snippets", [])
                         )
-                    else:
-                        # Common for knowledge graph to be None, set description to empty string
-                        collected_results.append(
-                            {
-                                "snippets": snippets,
-                                "title": organic.get("title"),
-                                "url": organic.get("link"),
-                                "description": "",
-                            }
-                        )
+                    collected_results.append(
+                        {
+                            "snippets": snippets,
+                            "title": organic.get("title"),
+                            "url": organic.get("link"),
+                            "description": (
+                                knowledge_graph.get("description")
+                                if knowledge_graph is not None
+                                else ""
+                            ),
+                        }
+                    )
             except:
                 continue
 
@@ -879,5 +967,129 @@ class TavilySearchRM(dspy.Retrieve):
                 except Exception as e:
                     print(f"Error occurs when processing {result=}: {e}\n")
                     print(f"Error occurs when searching query {query}: {e}")
+
+        return collected_results
+
+
+class GoogleSearch(dspy.Retrieve):
+    def __init__(
+        self,
+        google_search_api_key=None,
+        google_cse_id=None,
+        k=3,
+        is_valid_source: Callable = None,
+        min_char_count: int = 150,
+        snippet_chunk_size: int = 1000,
+        webpage_helper_max_threads=10,
+    ):
+        """
+        Params:
+            google_search_api_key: Google API key. Check out https://developers.google.com/custom-search/v1/overview
+                "API key" section
+            google_cse_id: Custom search engine ID. Check out https://developers.google.com/custom-search/v1/overview
+                "Search engine ID" section
+            k: Number of top results to retrieve.
+            is_valid_source: Optional function to filter valid sources.
+            min_char_count: Minimum character count for the article to be considered valid.
+            snippet_chunk_size: Maximum character count for each snippet.
+            webpage_helper_max_threads: Maximum number of threads to use for webpage helper.
+        """
+        super().__init__(k=k)
+        try:
+            from googleapiclient.discovery import build
+        except ImportError as err:
+            raise ImportError(
+                "GoogleSearch requires `pip install google-api-python-client`."
+            ) from err
+        if not google_search_api_key and not os.environ.get("GOOGLE_SEARCH_API_KEY"):
+            raise RuntimeError(
+                "You must supply google_search_api_key or set the GOOGLE_SEARCH_API_KEY environment variable"
+            )
+        if not google_cse_id and not os.environ.get("GOOGLE_CSE_ID"):
+            raise RuntimeError(
+                "You must supply google_cse_id or set the GOOGLE_CSE_ID environment variable"
+            )
+
+        self.google_search_api_key = (
+            google_search_api_key or os.environ["GOOGLE_SEARCH_API_KEY"]
+        )
+        self.google_cse_id = google_cse_id or os.environ["GOOGLE_CSE_ID"]
+
+        if is_valid_source:
+            self.is_valid_source = is_valid_source
+        else:
+            self.is_valid_source = lambda x: True
+
+        self.service = build(
+            "customsearch", "v1", developerKey=self.google_search_api_key
+        )
+        self.webpage_helper = WebPageHelper(
+            min_char_count=min_char_count,
+            snippet_chunk_size=snippet_chunk_size,
+            max_thread_num=webpage_helper_max_threads,
+        )
+        self.usage = 0
+
+    def get_usage_and_reset(self):
+        usage = self.usage
+        self.usage = 0
+        return {"GoogleSearch": usage}
+
+    def forward(
+        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
+    ):
+        """Search using Google Custom Search API for self.k top results for query or queries.
+
+        Args:
+            query_or_queries (Union[str, List[str]]): The query or queries to search for.
+            exclude_urls (List[str]): A list of URLs to exclude from the search results.
+
+        Returns:
+            A list of dicts, each dict has keys: 'title', 'url', 'snippet', 'description'.
+        """
+        queries = (
+            [query_or_queries]
+            if isinstance(query_or_queries, str)
+            else query_or_queries
+        )
+        self.usage += len(queries)
+
+        url_to_results = {}
+
+        for query in queries:
+            try:
+                response = (
+                    self.service.cse()
+                    .list(
+                        q=query,
+                        cx=self.google_cse_id,
+                        num=self.k,
+                    )
+                    .execute()
+                )
+
+                for item in response.get("items", []):
+                    if (
+                        self.is_valid_source(item["link"])
+                        and item["link"] not in exclude_urls
+                    ):
+                        url_to_results[item["link"]] = {
+                            "title": item["title"],
+                            "url": item["link"],
+                            # "snippet": item.get("snippet", ""),  # Google search snippet is very short.
+                            "description": item.get("snippet", ""),
+                        }
+
+            except Exception as e:
+                logging.error(f"Error occurred while searching query {query}: {e}")
+
+        valid_url_to_snippets = self.webpage_helper.urls_to_snippets(
+            list(url_to_results.keys())
+        )
+        collected_results = []
+        for url in valid_url_to_snippets:
+            r = url_to_results[url]
+            r["snippets"] = valid_url_to_snippets[url]["snippets"]
+            collected_results.append(r)
 
         return collected_results

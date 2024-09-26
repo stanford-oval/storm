@@ -4,7 +4,9 @@ import logging
 import os
 import pickle
 import re
+import regex
 import sys
+import time
 from typing import List, Dict
 
 import httpx
@@ -17,6 +19,8 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from qdrant_client import QdrantClient, models
 from tqdm import tqdm
 from trafilatura import extract
+
+from .lm import OpenAIModel
 
 logging.getLogger("httpx").setLevel(logging.WARNING)  # Disable INFO logging for httpx.
 
@@ -415,12 +419,14 @@ class ArticleTextProcessing:
     @staticmethod
     def clean_up_citation(conv):
         for turn in conv.dlg_history:
-            turn.agent_utterance = turn.agent_utterance[
-                : turn.agent_utterance.find("References:")
-            ]
-            turn.agent_utterance = turn.agent_utterance[
-                : turn.agent_utterance.find("Sources:")
-            ]
+            if "References:" in turn.agent_utterance:
+                turn.agent_utterance = turn.agent_utterance[
+                    : turn.agent_utterance.find("References:")
+                ]
+            if "Sources:" in turn.agent_utterance:
+                turn.agent_utterance = turn.agent_utterance[
+                    : turn.agent_utterance.find("Sources:")
+                ]
             turn.agent_utterance = turn.agent_utterance.replace("Answer:", "").strip()
             try:
                 max_ref_num = max(
@@ -484,7 +490,8 @@ class ArticleTextProcessing:
         outline = re.sub(r"#[#]? Summary.*?(?=##|$)", "", outline, flags=re.DOTALL)
         outline = re.sub(r"#[#]? Appendices.*?(?=##|$)", "", outline, flags=re.DOTALL)
         outline = re.sub(r"#[#]? Appendix.*?(?=##|$)", "", outline, flags=re.DOTALL)
-
+        # clean up citation in outline
+        outline = re.sub(r"\[.*?\]", "", outline)
         return outline
 
     @staticmethod
@@ -519,7 +526,8 @@ class ArticleTextProcessing:
                 continue
             output_paragraphs.append(p)
 
-        return "\n\n".join(output_paragraphs)  # Join with '\n\n' for markdown format.
+        # Join with '\n\n' for markdown format.
+        return "\n\n".join(output_paragraphs)
 
     @staticmethod
     def update_citation_index(s, citation_map):
@@ -693,3 +701,89 @@ class WebPageHelper:
             articles[u]["snippets"] = self.text_splitter.split_text(articles[u]["text"])
 
         return articles
+
+
+def user_input_appropriateness_check(user_input):
+    my_openai_model = OpenAIModel(
+        api_key=os.getenv("OPENAI_API_KEY"),
+        api_provider="openai",
+        model="gpt-4o-mini-2024-07-18",
+        max_tokens=10,
+        temperature=0.0,
+        top_p=0.9,
+    )
+
+    if len(user_input.split()) > 20:
+        return "The input is too long. Please make your input topic more concise!"
+
+    if not re.match(r'^[a-zA-Z0-9\s\-"\,\.?\']*$', user_input):
+        return "The input contains invalid characters. The input should only contain a-z, A-Z, 0-9, space, -/\"/,./?/'."
+
+    prompt = f"""Here is a topic input into a knowledge curation engine that can write a Wikipedia-like article for the topic. Please judge whether it is appropriate or not for the engine to curate information for this topic based on English search engine. The following types of inputs are inappropriate:
+1. Inputs that may be related to illegal, harmful, violent, racist, or sexual purposes.
+2. Inputs that are given using languages other than English. Currently, the engine can only support English.
+3. Inputs that are related to personal experience or personal information. Currently, the engine can only use information from the search engine.
+4. Inputs that are not aimed at topic research or inquiry. For example, asks requiring detailed execution, such as calculations, programming, or specific service searches fall outside the engine's scope of capabilities.
+If the topic is appropriate for the engine to process, output "Yes."; otherwise, output "No. The input violates reason [1/2/3/4]".
+User input: {user_input}"""
+    reject_reason_info = {
+        1: "Sorry, this input may be related to sensitive topics. Please try another topic. "
+        "(Our input filtering uses OpenAI GPT-4o-mini, which may result in false positives. "
+        "We apologize for any inconvenience.)",
+        2: "Sorry, the current engine can only support English. Please try another topic. "
+        "(Our input filtering uses OpenAI GPT-4o-mini, which may result in false positives. "
+        "We apologize for any inconvenience.)",
+        3: "Sorry, the current engine cannot process topics related to personal experience. Please try another topic. "
+        "(Our input filtering uses OpenAI GPT-4o-mini, which may result in false positives. "
+        "We apologize for any inconvenience.)",
+        4: "Sorry, STORM cannot follow arbitrary instruction. Please input a topic you want to learn about. "
+        "(Our input filtering uses OpenAI GPT-4o-mini, which may result in false positives. "
+        "We apologize for any inconvenience.)",
+    }
+
+    try:
+        response = my_openai_model(prompt)[0].replace("[", "").replace("]", "")
+        if response.startswith("No"):
+            match = regex.search(r"reason\s(\d+)", response)
+            if match:
+                reject_reason = int(match.group(1))
+                if reject_reason in reject_reason_info:
+                    return reject_reason_info[reject_reason]
+                else:
+                    return (
+                        "Sorry, the input is inappropriate. Please try another topic!"
+                    )
+            return "Sorry, the input is inappropriate. Please try another topic!"
+
+    except Exception as e:
+        return "Sorry, the input is inappropriate. Please try another topic!"
+    return "Approved"
+
+
+def purpose_appropriateness_check(user_input):
+    my_openai_model = OpenAIModel(
+        api_key=os.getenv("OPENAI_API_KEY"),
+        api_provider="openai",
+        model="gpt-4o-mini-2024-07-18",
+        max_tokens=10,
+        temperature=0.0,
+        top_p=0.9,
+    )
+
+    prompt = f"""
+    Here is a purpose input into a report generation engine that can create a long-form report on any topic of interest. 
+    Please judge whether the provided purpose is valid for using this service. 
+    Try to judge if given purpose is non-sense like random words or just try to get around the sanity check.
+    You should not make the rule too strict.
+    
+    If the purpose is valid, output "Yes."; otherwise, output "No" followed by reason.
+    User input: {user_input}
+    """
+    try:
+        response = my_openai_model(prompt)[0].replace("[", "").replace("]", "")
+        if response.startswith("No"):
+            return "Please provide a more detailed explanation on your purpose of requesting this article."
+
+    except Exception as e:
+        return "Please provide a more detailed explanation on your purpose of requesting this article."
+    return "Approved"

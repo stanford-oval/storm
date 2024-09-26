@@ -1,27 +1,23 @@
+import concurrent.futures
+import dspy
 import functools
+import hashlib
+import json
 import logging
 import time
 from abc import ABC, abstractmethod
 from collections import OrderedDict
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, TYPE_CHECKING
+
+from .utils import ArticleTextProcessing
 
 logging.basicConfig(
     level=logging.INFO, format="%(name)s : %(levelname)-8s : %(message)s"
 )
 logger = logging.getLogger(__name__)
 
-
-class Information(ABC):
-    """Abstract base class to represent basic information.
-
-    Attributes:
-        uuid (str): The unique identifier for the information.
-        meta (dict): The meta information associated with the information.
-    """
-
-    def __init__(self, uuid, meta={}):
-        self.uuid = uuid
-        self.meta = meta
+if TYPE_CHECKING:
+    from .logging_wrapper import LoggingWrapper
 
 
 class InformationTable(ABC):
@@ -40,6 +36,101 @@ class InformationTable(ABC):
     @abstractmethod
     def retrieve_information(**kwargs):
         pass
+
+
+class Information:
+    """Class to represent detailed information.
+
+    Inherits from Information to include a unique identifier (URL), and extends
+    it with a description, snippets, and title of the storm information.
+
+    Attributes:
+        description (str): Brief description.
+        snippets (list): List of brief excerpts or snippets.
+        title (str): The title or headline of the information.
+        url (str): The unique URL (serving as UUID) of the information.
+    """
+
+    def __init__(self, url, description, snippets, title, meta=None):
+        """Initialize the Information object with detailed attributes.
+
+        Args:
+            url (str): The unique URL serving as the identifier for the information.
+            description (str): Detailed description.
+            snippets (list): List of brief excerpts or snippet.
+            title (str): The title or headline of the information.
+        """
+        self.description = description
+        self.snippets = snippets
+        self.title = title
+        self.url = url
+        self.meta = meta if meta is not None else {}
+        self.citation_uuid = -1
+
+    def __hash__(self):
+        return hash(
+            (
+                self.url,
+                tuple(sorted(self.snippets)),
+            )
+        )
+
+    def __eq__(self, other):
+        if not isinstance(other, Information):
+            return False
+        return (
+            self.url == other.url
+            and set(self.snippets) == set(other.snippets)
+            and self._meta_str() == other._meta_str()
+        )
+
+    def __hash__(self):
+        return int(
+            self._md5_hash((self.url, tuple(sorted(self.snippets)), self._meta_str())),
+            16,
+        )
+
+    def _meta_str(self):
+        """Generate a string representation of relevant meta information."""
+        return f"Question: {self.meta.get('question', '')}, Query: {self.meta.get('query', '')}"
+
+    def _md5_hash(self, value):
+        """Generate an MD5 hash for a given value."""
+        if isinstance(value, (dict, list, tuple)):
+            value = json.dumps(value, sort_keys=True)
+        return hashlib.md5(str(value).encode("utf-8")).hexdigest()
+
+    @classmethod
+    def from_dict(cls, info_dict):
+        """Create a Information object from a dictionary.
+           Usage: info = Information.from_dict(storm_info_dict)
+
+        Args:
+            info_dict (dict): A dictionary containing keys 'url', 'description',
+                              'snippets', and 'title' corresponding to the object's attributes.
+
+        Returns:
+            Information: An instance of Information.
+        """
+        info = cls(
+            url=info_dict["url"],
+            description=info_dict["description"],
+            snippets=info_dict["snippets"],
+            title=info_dict["title"],
+            meta=info_dict.get("meta", None),
+        )
+        info.citation_uuid = int(info_dict.get("citation_uuid", -1))
+        return info
+
+    def to_dict(self):
+        return {
+            "url": self.url,
+            "description": self.description,
+            "snippets": self.snippets,
+            "title": self.title,
+            "meta": self.meta,
+            "citation_uuid": self.citation_uuid,
+        }
 
 
 class ArticleSectionNode:
@@ -166,7 +257,7 @@ class Article(ABC):
             return node
 
 
-class Retriever(ABC):
+class Retriever:
     """
     An abstract base class for retriever modules. It provides a template for retrieving information based on a query.
 
@@ -175,19 +266,14 @@ class Retriever(ABC):
     The retrieval model/search engine used for each part should be declared with a suffix '_rm' in the attribute name.
     """
 
-    def __init__(self, search_top_k):
-        self.search_top_k = search_top_k
-
-    def update_search_top_k(self, k):
-        self.search_top_k = k
+    def __init__(self, rm: dspy.Retrieve, max_thread: int = 1):
+        self.max_thread = max_thread
+        self.rm = rm
 
     def collect_and_reset_rm_usage(self):
         combined_usage = []
-        for attr_name in self.__dict__:
-            if "_rm" in attr_name and hasattr(
-                getattr(self, attr_name), "get_usage_and_reset"
-            ):
-                combined_usage.append(getattr(self, attr_name).get_usage_and_reset())
+        if hasattr(getattr(self, "rm"), "get_usage_and_reset"):
+            combined_usage.append(getattr(self, "rm").get_usage_and_reset())
 
         name_to_usage = {}
         for usage in combined_usage:
@@ -199,21 +285,38 @@ class Retriever(ABC):
 
         return name_to_usage
 
-    @abstractmethod
-    def retrieve(self, query: Union[str, List[str]], **kwargs) -> List[Information]:
-        """
-        Retrieves information based on a query.
+    def retrieve(
+        self, query: Union[str, List[str]], exclude_urls: List[str] = []
+    ) -> List[Information]:
+        queries = query if isinstance(query, list) else [query]
+        to_return = []
 
-        This method must be implemented by subclasses to specify how information is retrieved.
+        def process_query(q):
+            retrieved_data_list = self.rm(
+                query_or_queries=[q], exclude_urls=exclude_urls
+            )
+            local_to_return = []
+            for data in retrieved_data_list:
+                for i in range(len(data["snippets"])):
+                    # STORM generate the article with citations. We do not consider multi-hop citations.
+                    # Remove citations in the source to avoid confusion.
+                    data["snippets"][i] = ArticleTextProcessing.remove_citations(
+                        data["snippets"][i]
+                    )
+                storm_info = Information.from_dict(data)
+                storm_info.meta["query"] = q
+                local_to_return.append(storm_info)
+            return local_to_return
 
-        Args:
-            query (Union[str, List[str]]): The query or list of queries to retrieve information for.
-            **kwargs: Additional keyword arguments that might be necessary for the retrieval process.
+        with concurrent.futures.ThreadPoolExecutor(
+            max_workers=self.max_thread
+        ) as executor:
+            results = list(executor.map(process_query, queries))
 
-        Returns:
-            List[Information]: A list of Information objects retrieved based on the query.
-        """
-        pass
+        for result in results:
+            to_return.extend(result)
+
+        return to_return
 
 
 class KnowledgeCurationModule(ABC):
@@ -458,3 +561,49 @@ class Engine(ABC):
         self.time = {}
         self.lm_cost = {}
         self.rm_cost = {}
+
+
+class Agent(ABC):
+    """
+    Interface for STORM and Co-STORM LLM agent
+
+    This class must be implemented by any subclass of `Agent` to define how the agent generates an utterance.
+    The generated utterance can be influenced by the conversation history, knowledge base, and any additional parameters passed via `kwargs`.
+    The implementation should align with the specific role and perspective of the agent, as defined by the agent's topic, role name, and role description.
+
+    Args:
+        knowledge_base (KnowledgeBase): The current knowledge base (e.g., mind map in Co-STORM) that contains the accumulated information relevant to the conversation.
+        conversation_history (List[ConversationTurn]): A list of past conversation turns, providing context for generating the next utterance.
+                                                       The agent can refer to this history to maintain continuity and relevance in the conversation.
+        logging_wrapper (LoggingWrapper): A wrapper used for logging important events during the utterance generation process.
+        **kwargs: Additional arguments that can be passed to the method for more specialized utterance generation behavior depending on the agent's specific implementation.
+
+    Returns:
+        ConversationTurn: A new conversation turn generated by the agent, containing the agent's response, including the role, utterance type, and relevant information from the knowledge base.
+
+    Notes:
+        - Subclasses of `Agent` should define the exact strategy for generating the utterance, which could involve interacting with a language model, retrieving relevant knowledge, or following specific conversational policies.
+        - The agent's role, perspective, and the knowledge base content will influence how the utterance is formulated.
+    """
+
+    from .dataclass import KnowledgeBase, ConversationTurn
+
+    def __init__(self, topic: str, role_name: str, role_description: str):
+        self.topic = topic
+        self.role_name = role_name
+        self.role_description = role_description
+
+    def get_role_description(self):
+        if self.role_description:
+            return f"{self.role_name}: {self.role_description}"
+        return self.role_name
+
+    @abstractmethod
+    def generate_utterance(
+        self,
+        knowledge_base: KnowledgeBase,
+        conversation_history: List[ConversationTurn],
+        logging_wrapper: "LoggingWrapper",
+        **kwargs,
+    ):
+        pass
