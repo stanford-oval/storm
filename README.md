@@ -255,7 +255,7 @@ python examples/storm_examples/run_storm_wiki_gpt.py \
 
 To run Co-STORM with `gpt` family models with default configurations,
 
-1. Add `BING_SEARCH_API_KEY="xxx"`to `secrets.toml`
+1. Add `BING_SEARCH_API_KEY="xxx"` and `ENCODER_API_TYPE="xxx"` to `secrets.toml`
 2. Run the following command
 
 ```bash

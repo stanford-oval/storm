@@ -7,36 +7,11 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
 class EmbeddingModel:
-    def __init__():
+    def __init__(self):
         pass
 
     def get_embedding(self, text: str) -> Tuple[np.ndarray, int]:
         raise Exception("Not implemented")
-
-
-class OpenAIEmbeddingModel(EmbeddingModel):
-    def __init__(self, model: str = "text-embedding-3-small", api_key: str = None):
-        if not api_key:
-            self.api_key = os.getenv("OPENAI_API_KEY")
-
-        self.url = "https://api.openai.com/v1/embeddings"
-        self.headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {self.api_key}",
-        }
-        self.model = model
-
-    def get_embedding(self, text: str) -> Tuple[np.ndarray, int]:
-        data = {"input": text, "model": "text-embedding-3-small"}
-
-        response = requests.post(self.url, headers=self.headers, json=data)
-        if response.status_code == 200:
-            data = response.json()
-            embedding = np.array(data["data"][0]["embedding"])
-            token = data["usage"]["prompt_tokens"]
-            return embedding, token
-        else:
-            response.raise_for_status()
 
 
 class OpenAIEmbeddingModel(EmbeddingModel):
