@@ -152,6 +152,9 @@ class StormArticle(Article):
         super().__init__(topic_name=topic_name)
         self.reference = {"url_to_unified_index": {}, "url_to_info": {}}
 
+    def has_section(self, section_name: str) -> bool:
+        return self.find_section(self.root, section_name) is not None
+
     def find_section(
         self, node: ArticleSectionNode, name: str
     ) -> Optional[ArticleSectionNode]:
