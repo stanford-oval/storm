@@ -11,7 +11,7 @@ from typing import List, Dict
 
 import httpx
 import pandas as pd
-import toml
+import toml, requests, os
 from langchain_core.documents import Document
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_qdrant import Qdrant
@@ -19,11 +19,26 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from qdrant_client import QdrantClient, models
 from tqdm import tqdm
 from trafilatura import extract
-
+from base64 import b64decode
 from .lm import OpenAIModel
 
 logging.getLogger("httpx").setLevel(logging.WARNING)  # Disable INFO logging for httpx.
 
+def get_zyte_response(url):
+    api_response = requests.post(
+        "https://api.zyte.com/v1/extract",
+        auth=(os.environ.get("ZYTE_API_KEY"), ""),
+        json={
+            "url": url,
+            "httpResponseBody": True,
+        },
+    )
+    if api_response.status_code != 200:
+        print(f"Error: {api_response.status_code} - {api_response.text}")
+        return None
+    http_response_body: bytes = b64decode(api_response.json()["httpResponseBody"])
+
+    return http_response_body.decode("utf-8")
 
 def truncate_filename(filename, max_length=125):
     """Truncate filename to max_length to ensure the filename won't exceed the file system limit.
@@ -55,6 +70,7 @@ def load_api_key(toml_file_path):
         return
     # Set environment variables
     for key, value in data.items():
+        print(f"Setting environment variable: {key}")
         os.environ[key] = str(value)
 
 

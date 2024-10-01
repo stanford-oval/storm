@@ -11,7 +11,136 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_qdrant import Qdrant
 from qdrant_client import QdrantClient
 
-from .utils import WebPageHelper
+from .utils import WebPageHelper, get_zyte_response
+import requests
+from base64 import b64decode
+from bs4 import BeautifulSoup
+import re
+
+class ZyteSearchRM(dspy.Retrieve):
+    def __init__(
+        self,
+        zyte_api_key=None,
+        k: int = 3,
+        is_valid_source: Callable = None,
+        min_char_count: int = 150,
+        snippet_chunk_size: int = 1000,
+    ):
+        super().__init__(k=k)
+        
+        if not zyte_api_key and not os.environ.get("ZYTE_API_KEY"):
+            raise RuntimeError(
+                "You must supply zyte_api_key or set environment variable ZYTE_API_KEY"
+            )
+        elif zyte_api_key:
+            self.zyte_api_key = zyte_api_key
+        else:
+            self.zyte_api_key = os.environ["ZYTE_API_KEY"]
+
+        self.k = k
+        self.usage = 0
+        
+        if is_valid_source:
+            self.is_valid_source = is_valid_source
+        else:
+            self.is_valid_source = lambda x: True
+
+    def get_usage_and_reset(self):
+        usage = self.usage
+        self.usage = 0
+        return {"ZyteSearchRM": usage}
+
+    def local_google_search(self, query: str, blacklisted_domains=None, results=3):
+        if blacklisted_domains is None:
+            blacklisted_domains = []
+        search = query.replace(' ', '+')
+        url = f"https://www.google.com/search?q={search}&num={results}"
+        requests_results = get_zyte_response(url)
+        soup_link = BeautifulSoup(requests_results, "html.parser")
+        links = soup_link.find_all("a")
+        
+        output = []
+        seen_links = set()
+        for link in links:
+            href = link.get("href")
+            excluded_values = ["/search?num=", "translate", "/search?q=", "support.google.com", "#", "google."]
+            if href and not any(value in href for value in excluded_values):
+                if not any(domain in href for domain in blacklisted_domains):
+                    title = link.get_text(strip=True)
+                    if title and href not in seen_links:
+                        output.append({"title": title, "href": href})
+                        seen_links.add(href)
+                    
+        cleaned_data = [
+            {
+                'index': i + 1,
+                'title': re.sub(r'https?://\S+', '', item['title']).replace('...', '').strip(),
+                'href': item['href']
+            } for i, item in enumerate(output)
+        ]
+        return cleaned_data, len(cleaned_data)
+
+    def extract_article(self, url):
+        try:
+            api_response = requests.post(
+                "https://api.zyte.com/v1/extract",
+                auth=(os.environ["ZYTE_API_KEY"], ""),
+                json={
+                    "url": url,
+                    "httpResponseBody": True,
+                    "article": True,
+                    "articleOptions": {"extractFrom": "httpResponseBody"},
+                },
+            )
+            http_response_body = b64decode(api_response.json()["httpResponseBody"])
+            article = api_response.json()["article"]
+            return http_response_body, article
+        except Exception as e:
+            print(f"Failed to extract article: {e}", url)
+            return None, None
+        
+    def forward(
+        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
+    ):
+        queries = (
+            [query_or_queries]
+            if isinstance(query_or_queries, str)
+            else query_or_queries
+        )
+        self.usage += len(queries)
+
+        collected_results = []
+
+        for query in queries:
+            print(f"Processing query: {query}")
+            
+            # Perform the search
+            search_results, num_results = self.local_google_search(query, results=self.k)
+            # print(f"Number of search results: {num_results}")
+
+            for result in search_results:
+                url = result['href']
+                title = result['title']
+                
+                if self.is_valid_source(url) and url not in exclude_urls:
+                    # Extract the article content
+                    _, article = self.extract_article(url)
+                    
+                    if article:
+                        description = article.get('description', '')
+                        content = article.get('articleBody', '')
+                        
+                        result = {
+                            "url": url,
+                            "title": title,
+                            "description": description,
+                            "snippets": [content],
+                        }
+                        collected_results.append(result)
+                        # print(f"Added result: {result}")
+
+        print(f"Total collected results: {len(collected_results)}")
+        return collected_results
 
 
 class YouRM(dspy.Retrieve):
@@ -910,13 +1039,7 @@ class TavilySearchRM(dspy.Retrieve):
     def forward(
         self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
     ):
-        """Search with TavilySearch for self.k top passages for query or queries
-        Args:
-            query_or_queries (Union[str, List[str]]): The query or queries to search for.
-            exclude_urls (List[str]): A list of urls to exclude from the search results.
-        Returns:
-            a list of Dicts, each dict has keys of 'description', 'snippets' (list of strings), 'title', 'url'
-        """
+        """Search with TavilySearch for self.k top passages for query or queries"""
         queries = (
             [query_or_queries]
             if isinstance(query_or_queries, str)
@@ -931,17 +1054,16 @@ class TavilySearchRM(dspy.Retrieve):
                 "max_results": self.k,
                 "include_raw_contents": self.include_raw_content,
             }
-            #  list of dicts that will be parsed to return
+            
             responseData = self.tavily_client.search(query)
+            
             results = responseData.get("results")
+
             for d in results:
-                # assert d is dict
                 if not isinstance(d, dict):
-                    print(f"Invalid result: {d}\n")
                     continue
 
                 try:
-                    # ensure keys are present
                     url = d.get("url", None)
                     title = d.get("title", None)
                     description = d.get("content", None)
@@ -951,9 +1073,9 @@ class TavilySearchRM(dspy.Retrieve):
                     else:
                         snippets.append(d.get("content"))
 
-                    # raise exception of missing key(s)
                     if not all([url, title, description, snippets]):
                         raise ValueError(f"Missing key(s) in result: {d}")
+                    
                     if self.is_valid_source(url) and url not in exclude_urls:
                         result = {
                             "url": url,
@@ -962,12 +1084,10 @@ class TavilySearchRM(dspy.Retrieve):
                             "snippets": snippets,
                         }
                         collected_results.append(result)
-                    else:
-                        print(f"invalid source {url} or url in exclude_urls")
                 except Exception as e:
-                    print(f"Error occurs when processing {result=}: {e}\n")
-                    print(f"Error occurs when searching query {query}: {e}")
+                    print(f"Error processing result: {e}")
 
+        print(f"Total collected results: {len(collected_results)}")
         return collected_results
 
 
