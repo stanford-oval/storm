@@ -18,6 +18,7 @@ build/
 *.egg-info/
 .idea
 .venv
+/frontend/demo_light/DEMO_WORKING_DIR/
 
 # Project-specific
 secrets.toml
