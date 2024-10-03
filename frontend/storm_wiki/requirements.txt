@@ -1,0 +1,32 @@
+# storm
+knowledge_storm==0.2.5
+openai==1.42.0
+ollama==0.3.1
+
+# streamlit
+streamlit==1.37.1
+streamlit-card
+markdown
+unidecode
+extra-streamlit-components==0.1.71
+streamlit_extras
+deprecation==2.1.0
+st-pages==1.0.1
+streamlit-float
+streamlit-option-menu
+pytz==2024.1
+
+# anthropic
+anthropic==0.34.1
+
+# duckduckgo
+langchain-community==0.2.12
+duckduckgo-search==6.2.11
+
+# tracing
+arize-phoenix==4.12.0
+
+# tests
+pytest==8.3.1
+flake8==7.1.0
+
