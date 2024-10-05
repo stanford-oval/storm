@@ -138,7 +138,7 @@ class WritePageOutline(dspy.Signature):
 
 
 class NaiveOutlineGen(dspy.Module):
-    """Generate the outline with LLM's parametric knowledge directly."""
+    """Generate the outline with LLM's parametric knowledge directly. Generate the outline in Chinese (生成中文大纲)."""
 
     def __init__(self):
         super().__init__()
@@ -151,7 +151,7 @@ class NaiveOutlineGen(dspy.Module):
 
 
 class WritePageOutlineFromConv(dspy.Signature):
-    """Improve an outline for a Wikipedia page. You already have a draft outline that covers the general information. Now you want to improve it based on the information learned from an information-seeking conversation to make it more informative.
+    """Improve an outline for a Wikipedia page. You already have a draft outline that covers the general information. Now you want to improve it based on the information learned from an information-seeking conversation to make it more informative. Generate the outline in Chinese (生成中文大纲).
     Here is the format of your writing:
     1. Use "#" Title" to indicate section title, "##" Title" to indicate subsection title, "###" Title" to indicate subsubsection title, and so on.
     2. Do not include other information.

@@ -15,7 +15,17 @@ from .utils import WebPageHelper
 
 
 class YouRM(dspy.Retrieve):
-    def __init__(self, ydc_api_key=None, k=3, is_valid_source: Callable = None):
+    def __init__(
+        self,
+        ydc_api_key=None,
+        k=3,
+        country="US",
+        is_valid_source: Callable = None,
+        use_default_snippets: bool = True,
+        min_char_count: int = 150,
+        snippet_chunk_size: int = 1000,
+        webpage_helper_max_threads=10,
+    ):
         super().__init__(k=k)
         if not ydc_api_key and not os.environ.get("YDC_API_KEY"):
             raise RuntimeError(
@@ -25,6 +35,13 @@ class YouRM(dspy.Retrieve):
             self.ydc_api_key = ydc_api_key
         else:
             self.ydc_api_key = os.environ["YDC_API_KEY"]
+        self.country = country
+        self.use_default_snippets = use_default_snippets
+        self.webpage_helper = WebPageHelper(
+            min_char_count=min_char_count,
+            snippet_chunk_size=snippet_chunk_size,
+            max_thread_num=webpage_helper_max_threads,
+        )
         self.usage = 0
 
         # If not None, is_valid_source shall be a function that takes a URL and returns a boolean.
@@ -62,8 +79,12 @@ class YouRM(dspy.Retrieve):
             try:
                 headers = {"X-API-Key": self.ydc_api_key}
                 results = requests.get(
-                    f"https://api.ydc-index.io/search?query={query}",
+                    f"https://api.ydc-index.io/search",
                     headers=headers,
+                    params={
+                        "query": query,
+                        "country": self.country,
+                    },
                 ).json()
 
                 authoritative_results = []
@@ -74,6 +95,15 @@ class YouRM(dspy.Retrieve):
                     collected_results.extend(authoritative_results[: self.k])
             except Exception as e:
                 logging.error(f"Error occurs when searching query {query}: {e}")
+
+        if not self.use_default_snippets:
+            valid_url_to_snippets = self.webpage_helper.urls_to_snippets(
+                [r["url"] for r in collected_results]
+            )
+            for r in collected_results:
+                r["snippets"] = valid_url_to_snippets.get(r["url"], {"snippets": []})[
+                    "snippets"
+                ]
 
         return collected_results
 

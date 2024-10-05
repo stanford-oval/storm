@@ -166,12 +166,13 @@ class WriteSection(dspy.Signature):
     Here is the format of your writing:
         1. Use "#" Title" to indicate section title, "##" Title" to indicate subsection title, "###" Title" to indicate subsubsection title, and so on.
         2. Use [1], [2], ..., [n] in line (for example, "The capital of the United States is Washington, D.C.[1][3]."). You DO NOT need to include a References or Sources section to list the sources at the end.
+    Please generate the section in Chinese (请用中文写).
     """
 
     info = dspy.InputField(prefix="The collected information:\n", format=str)
     topic = dspy.InputField(prefix="The topic of the page: ", format=str)
     section = dspy.InputField(prefix="The section you need to write: ", format=str)
     output = dspy.OutputField(
-        prefix="Write the section with proper inline citations (Start your writing with # section title. Don't include the page title or try to write other sections):\n",
+        prefix="Write the section with proper inline citations (Start your writing with # section title. Don't include the page title or try to write other sections), generate the section in Chinese:\n",
         format=str,
     )

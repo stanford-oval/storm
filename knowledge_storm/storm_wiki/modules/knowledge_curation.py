@@ -141,6 +141,7 @@ class AskQuestionWithPersona(dspy.Signature):
     Now, you are chatting with an expert to get information. Ask good questions to get more useful information.
     When you have no more question to ask, say "Thank you so much for your help!" to end the conversation.
     Please only ask a question at a time and don't ask what you have asked before. Your questions should be related to the topic you want to write.
+    Please ask the question in Chinese (请用中文提问).
     """
 
     topic = dspy.InputField(prefix="Topic you want to write: ", format=str)
@@ -152,7 +153,7 @@ class AskQuestionWithPersona(dspy.Signature):
 
 
 class QuestionToQuery(dspy.Signature):
-    """You want to answer the question using Google search. What do you type in the search box?
+    """You want to answer the question using Google search. What do you type in the search box? Please write the queries in Chinese (请用中文搜索).
     Write the queries you will use in the following format:
     - query 1
     - query 2
@@ -167,6 +168,7 @@ class QuestionToQuery(dspy.Signature):
 class AnswerQuestion(dspy.Signature):
     """You are an expert who can use information effectively. You are chatting with a Wikipedia writer who wants to write a Wikipedia page on topic you know. You have gathered the related information and will now use the information to form a response.
     Make your response as informative as possible, ensuring that every sentence is supported by the gathered information. If the [gathered information] is not directly related to the [topic] or [question], provide the most relevant answer based on the available information. If no appropriate answer can be formulated, respond with, “I cannot answer this question based on the available information,” and explain any limitations or gaps.
+    Please provide the response in Chinese (请用中文回答).
     """
 
     topic = dspy.InputField(prefix="Topic you are discussing about:", format=str)

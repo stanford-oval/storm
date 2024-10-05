@@ -107,7 +107,8 @@ class StormInformationTable(InformationTable):
         return cls(conversations)
 
     def prepare_table_for_retrieval(self):
-        self.encoder = SentenceTransformer("paraphrase-MiniLM-L6-v2")
+        # self.encoder = SentenceTransformer("paraphrase-MiniLM-L6-v2")
+        self.encoder = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
         self.collected_urls = []
         self.collected_snippets = []
         for url, information in self.url_to_info.items():
