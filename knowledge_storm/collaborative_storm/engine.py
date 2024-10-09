@@ -607,7 +607,7 @@ class CoStormRunner:
                     warmstart_revised_conv if warmstart_revised_conv else warmstart_conv
                 )
                 self.warmstart_conv_archive = warmstart_conv
-                self.knowledge_base.reogranize()
+                self.knowledge_base.reorganize()
             else:
                 if self.knowledge_base is None:
                     self.knowledge_base = KnowledgeBase(
@@ -741,5 +741,5 @@ class CoStormRunner:
                     ):
                         if self.callback_handler is not None:
                             self.callback_handler.on_mindmap_reorg_start()
-                        self.knowledge_base.reogranize()
+                        self.knowledge_base.reorganize()
         return conv_turn

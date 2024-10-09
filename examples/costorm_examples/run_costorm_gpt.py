@@ -133,7 +133,7 @@ def main(args):
     print(f"**{conv_turn.role}**: {conv_turn.utterance}\n")
 
     # generate report
-    costorm_runner.knowledge_base.reogranize()
+    costorm_runner.knowledge_base.reorganize()
     article = costorm_runner.generate_report()
 
     # save results
