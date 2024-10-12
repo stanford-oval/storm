@@ -162,10 +162,11 @@ def output_as_text(result, reference_dict):
         output += f"[{idx}] {link}\n"
     return output
 
+tagger = Classifier.load('ner')
+
 
 def extract_entities_flair(text):
-    sentences = re.split(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s', text)
-    tagger = Classifier.load('ner')
+    sentences = re.split(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s', text)    
     entities = []
     for sentence in sentences:
         if len(sentence) == 0:
