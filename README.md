@@ -208,7 +208,7 @@ conv_turn = costorm_runner.step()
 costorm_runner.step(user_utterance="YOUR UTTERANCE HERE")
 
 # Generate report based on the collaborative discourse
-costorm_runner.knowledge_base.reogranize()
+costorm_runner.knowledge_base.reorganize()
 article = costorm_runner.generate_report()
 print(article)
 ```
