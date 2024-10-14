@@ -249,7 +249,7 @@ python examples/storm_examples/run_storm_wiki_gpt.py \
     --do-polish-article
 ```
 
-**To run STORM using your favorite language models or grounding on your own corpus:** Check out [examples/README.md](examples/README.md).
+**To run STORM using your favorite language models or grounding on your own corpus:** Check out [examples/storm_examples/README.md](examples/storm_examples/README.md).
 
 ### Co-STORM examples
 
