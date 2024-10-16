@@ -13,8 +13,6 @@ from qdrant_client import QdrantClient
 
 from .utils import WebPageHelper
 
-from azure.core.credentials import AzureKeyCredential
-from azure.search.documents import SearchClient
 
 class YouRM(dspy.Retrieve):
     def __init__(self, ydc_api_key=None, k=3, is_valid_source: Callable = None):
@@ -78,6 +76,7 @@ class YouRM(dspy.Retrieve):
                 logging.error(f"Error occurs when searching query {query}: {e}")
 
         return collected_results
+
 
 class BingSearch(dspy.Retrieve):
     def __init__(
@@ -1095,16 +1094,19 @@ class GoogleSearch(dspy.Retrieve):
 
         return collected_results
 
+
 class AzureAISearch(dspy.Retrieve):
-    """Retrieve information from custom queries using Azure AI Search. General Documentation can be found at: https://learn.microsoft.com/en-us/azure/search/search-create-service-portal. Python Documentation and examples can be found at https://learn.microsoft.com/en-us/python/api/overview/azure/search-documents-readme?view=azure-python. Requires pip install azure-search-documents"""
+    """Retrieve information from custom queries using Azure AI Search.
+    General Documentation can be found at: https://learn.microsoft.com/en-us/azure/search/search-create-service-portal. Python Documentation and examples can be found at https://learn.microsoft.com/en-us/python/api/overview/azure/search-documents-readme?view=azure-python. Requires pip install azure-search-documents
+    """
 
     def __init__(
-        self, 
-        azure_ai_search_api_key=None, 
-        azure_ai_search_url=None, 
-        azure_ai_search_index_name=None, 
-        k=3, 
-        is_valid_source: Callable = None
+        self,
+        azure_ai_search_api_key=None,
+        azure_ai_search_url=None,
+        azure_ai_search_index_name=None,
+        k=3,
+        is_valid_source: Callable = None,
     ):
         """
         Params:
@@ -1119,7 +1121,18 @@ class AzureAISearch(dspy.Retrieve):
             webpage_helper_max_threads: Maximum number of threads to use for webpage helper.
         """
         super().__init__(k=k)
-        if not azure_ai_search_api_key and not os.environ.get("AZURE_AI_SEARCH_API_KEY"):
+
+        try:
+            from azure.core.credentials import AzureKeyCredential
+            from azure.search.documents import SearchClient
+        except ImportError as err:
+            raise ImportError(
+                "AzureAISearch requires `pip install azure-search-documents`."
+            ) from err
+
+        if not azure_ai_search_api_key and not os.environ.get(
+            "AZURE_AI_SEARCH_API_KEY"
+        ):
             raise RuntimeError(
                 "You must supply azure_ai_search_api_key or set environment variable AZURE_AI_SEARCH_API_KEY"
             )
@@ -1127,7 +1140,7 @@ class AzureAISearch(dspy.Retrieve):
             self.azure_ai_search_api_key = azure_ai_search_api_key
         else:
             self.azure_ai_search_api_key = os.environ["AZURE_AI_SEARCH_API_KEY"]
-        
+
         if not azure_ai_search_url and not os.environ.get("AZURE_AI_SEARCH_URL"):
             raise RuntimeError(
                 "You must supply azure_ai_search_url or set environment variable AZURE_AI_SEARCH_URL"
@@ -1136,8 +1149,10 @@ class AzureAISearch(dspy.Retrieve):
             self.azure_ai_search_url = azure_ai_search_url
         else:
             self.azure_ai_search_url = os.environ["AZURE_AI_SEARCH_URL"]
-        
-        if not azure_ai_search_index_name and not os.environ.get("AZURE_AI_SEARCH_INDEX_NAME"):
+
+        if not azure_ai_search_index_name and not os.environ.get(
+            "AZURE_AI_SEARCH_INDEX_NAME"
+        ):
             raise RuntimeError(
                 "You must supply azure_ai_search_index_name or set environment variable AZURE_AI_SEARCH_INDEX_NAME"
             )
@@ -1180,7 +1195,11 @@ class AzureAISearch(dspy.Retrieve):
         self.usage += len(queries)
         collected_results = []
 
-        client = SearchClient(self.azure_ai_search_url,self.azure_ai_search_index_name,AzureKeyCredential(self.azure_ai_search_api_key))
+        client = SearchClient(
+            self.azure_ai_search_url,
+            self.azure_ai_search_index_name,
+            AzureKeyCredential(self.azure_ai_search_api_key),
+        )
         for query in queries:
             try:
                 # https://learn.microsoft.com/en-us/python/api/azure-search-documents/azure.search.documents.searchclient?view=azure-python#azure-search-documents-searchclient-search
@@ -1188,15 +1207,13 @@ class AzureAISearch(dspy.Retrieve):
 
                 for result in results:
                     document = {
-                        "url": result['metadata_storage_path'],
-                        "title": result['title'],
+                        "url": result["metadata_storage_path"],
+                        "title": result["title"],
                         "description": "N/A",
-                        "snippets": [result['chunk']]
+                        "snippets": [result["chunk"]],
                     }
                     collected_results.append(document)
             except Exception as e:
                 logging.error(f"Error occurs when searching query {query}: {e}")
 
         return collected_results
-
-
