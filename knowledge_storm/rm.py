@@ -1187,6 +1187,13 @@ class AzureAISearch(dspy.Retrieve):
         Returns:
             a list of Dicts, each dict has keys of 'description', 'snippets' (list of strings), 'title', 'url'
         """
+        try:
+            from azure.core.credentials import AzureKeyCredential
+            from azure.search.documents import SearchClient
+        except ImportError as err:
+            raise ImportError(
+                "AzureAISearch requires `pip install azure-search-documents`."
+            ) from err
         queries = (
             [query_or_queries]
             if isinstance(query_or_queries, str)
