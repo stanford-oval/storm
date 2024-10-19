@@ -1097,7 +1097,9 @@ class GoogleSearch(dspy.Retrieve):
 
 class AzureAISearch(dspy.Retrieve):
     """Retrieve information from custom queries using Azure AI Search.
-    General Documentation can be found at: https://learn.microsoft.com/en-us/azure/search/search-create-service-portal. Python Documentation and examples can be found at https://learn.microsoft.com/en-us/python/api/overview/azure/search-documents-readme?view=azure-python. Requires pip install azure-search-documents
+    
+    General Documentation: https://learn.microsoft.com/en-us/azure/search/search-create-service-portal.
+    Python Documentation: https://learn.microsoft.com/en-us/python/api/overview/azure/search-documents-readme?view=azure-python.
     """
 
     def __init__(
