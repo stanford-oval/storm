@@ -567,7 +567,7 @@ class SerperRM(dspy.Retrieve):
                     snippets = [organic.get("snippet")]
                     if self.ENABLE_EXTRA_SNIPPET_EXTRACTION:
                         snippets.extend(
-                            valid_url_to_snippets.get(url, {}).get("snippets", [])
+                            valid_url_to_snippets.get(url.strip("\'"), {}).get("snippets", [])
                         )
                     collected_results.append(
                         {
