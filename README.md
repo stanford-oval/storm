@@ -93,7 +93,7 @@ You could also install the source code which allows you to modify the behavior o
 Currently, our package support:
 
 - `OpenAIModel`, `AzureOpenAIModel`, `ClaudeModel`, `VLLMClient`, `TGIClient`, `TogetherClient`, `OllamaClient`, `GoogleModel`, `DeepSeekModel`, `GroqModel` as language model components
-- `YouRM`, `BingSearch`, `VectorRM`, `SerperRM`, `BraveRM`, `SearXNG`, `DuckDuckGoSearchRM`, `TavilySearchRM`, `GoogleSearch` as retrieval module components
+- `YouRM`, `BingSearch`, `VectorRM`, `SerperRM`, `BraveRM`, `SearXNG`, `DuckDuckGoSearchRM`, `TavilySearchRM`, `GoogleSearch`, and `AzureAISearch` as retrieval module components
 
 :star2: **PRs for integrating more language models into [knowledge_storm/lm.py](knowledge_storm/lm.py) and search engines/retrievers into [knowledge_storm/rm.py](knowledge_storm/rm.py) are highly appreciated!**
 
@@ -208,7 +208,7 @@ conv_turn = costorm_runner.step()
 costorm_runner.step(user_utterance="YOUR UTTERANCE HERE")
 
 # Generate report based on the collaborative discourse
-costorm_runner.knowledge_base.reogranize()
+costorm_runner.knowledge_base.reorganize()
 article = costorm_runner.generate_report()
 print(article)
 ```
@@ -249,7 +249,7 @@ python examples/storm_examples/run_storm_wiki_gpt.py \
     --do-polish-article
 ```
 
-**To run STORM using your favorite language models or grounding on your own corpus:** Check out [examples/README.md](examples/README.md).
+**To run STORM using your favorite language models or grounding on your own corpus:** Check out [examples/storm_examples/README.md](examples/storm_examples/README.md).
 
 ### Co-STORM examples
 
