@@ -75,7 +75,7 @@ class StormArticleGenerationModule(ArticleGenerationModule):
         sections_to_write = article_with_outline.get_first_level_section_names()
 
         section_output_dict_collection = []
-        if len(sections_to_write) == 0:
+        if not sections_to_write:
             logging.error(
                 f"No outline for {topic}. Will directly search with the topic."
             )
@@ -124,13 +124,16 @@ class StormArticleGenerationModule(ArticleGenerationModule):
                     section_output_dict_collection.append(future.result())
 
         article = copy.deepcopy(article_with_outline)
+ 
         for section_output_dict in section_output_dict_collection:
-            article.update_section(
-                parent_section_name=topic,
-                current_section_content=section_output_dict["section_content"],
-                current_section_info_list=section_output_dict["collected_info"],
-            )
-        article.post_processing()
+            if article.has_section(section_output_dict["section_name"]):
+                article.update_section(
+                    parent_section_name=topic,
+                    current_section_content=section_output_dict["section_content"],
+                    current_section_info_list=section_output_dict["collected_info"],
+                )
+            else:
+                logging.warning(f"Section {section_output_dict['section_name']} not found in the article outline. Skipping update.")
         return article
 
 
