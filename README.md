@@ -241,12 +241,11 @@ YDC_API_KEY="your_youcom_api_key"
 Run the following command.
 ```bash
 python examples/storm_examples/run_storm_wiki_gpt.py \
-    --output-dir $OUTPUT_DIR \
-    --retriever you \
     --do-research \
     --do-generate-outline \
     --do-generate-article \
-    --do-polish-article
+    --do-polish-article \
+    --retriever zyte
 ```
 
 **To run STORM using your favorite language models or grounding on your own corpus:** Check out [examples/README.md](examples/README.md).
