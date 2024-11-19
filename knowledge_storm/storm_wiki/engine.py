@@ -258,7 +258,7 @@ class STORMWikiRunner(Engine):
     def run_article_generation_module(
         self,
         outline: StormArticle,
-        information_table=StormInformationTable,
+        information_table: StormInformationTable,
         callback_handler: BaseCallbackHandler = None,
     ) -> StormArticle:
 
