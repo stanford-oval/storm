@@ -133,7 +133,7 @@ def main(args):
     print(f"**{conv_turn.role}**: {conv_turn.utterance}\n")
 
     # generate report
-    costorm_runner.knowledge_base.reogranize()
+    costorm_runner.knowledge_base.reorganize()
     article = costorm_runner.generate_report()
 
     # save results
@@ -142,6 +142,11 @@ def main(args):
     # Save article
     with open(os.path.join(args.output_dir, "report.md"), "w") as f:
         f.write(article)
+
+    # Save instance dump
+    instance_copy = costorm_runner.to_dict()
+    with open(os.path.join(args.output_dir, "instance_dump.json"), "w") as f:
+        json.dump(instance_copy, f, indent=2)
 
     # Save logging
     log_dump = costorm_runner.dump_logging_and_reset()

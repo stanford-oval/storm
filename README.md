@@ -93,7 +93,7 @@ You could also install the source code which allows you to modify the behavior o
 Currently, our package support:
 
 - `OpenAIModel`, `AzureOpenAIModel`, `ClaudeModel`, `VLLMClient`, `TGIClient`, `TogetherClient`, `OllamaClient`, `GoogleModel`, `DeepSeekModel`, `GroqModel` as language model components
-- `YouRM`, `BingSearch`, `VectorRM`, `SerperRM`, `BraveRM`, `SearXNG`, `DuckDuckGoSearchRM`, `TavilySearchRM`, `GoogleSearch` as retrieval module components
+- `YouRM`, `BingSearch`, `VectorRM`, `SerperRM`, `BraveRM`, `SearXNG`, `DuckDuckGoSearchRM`, `TavilySearchRM`, `GoogleSearch`, and `AzureAISearch` as retrieval module components
 
 :star2: **PRs for integrating more language models into [knowledge_storm/lm.py](knowledge_storm/lm.py) and search engines/retrievers into [knowledge_storm/rm.py](knowledge_storm/rm.py) are highly appreciated!**
 
@@ -208,7 +208,7 @@ conv_turn = costorm_runner.step()
 costorm_runner.step(user_utterance="YOUR UTTERANCE HERE")
 
 # Generate report based on the collaborative discourse
-costorm_runner.knowledge_base.reogranize()
+costorm_runner.knowledge_base.reorganize()
 article = costorm_runner.generate_report()
 print(article)
 ```
@@ -249,13 +249,13 @@ python examples/storm_examples/run_storm_wiki_gpt.py \
     --do-polish-article
 ```
 
-**To run STORM using your favorite language models or grounding on your own corpus:** Check out [examples/README.md](examples/README.md).
+**To run STORM using your favorite language models or grounding on your own corpus:** Check out [examples/storm_examples/README.md](examples/storm_examples/README.md).
 
 ### Co-STORM examples
 
 To run Co-STORM with `gpt` family models with default configurations,
 
-1. Add `BING_SEARCH_API_KEY="xxx"`to `secrets.toml`
+1. Add `BING_SEARCH_API_KEY="xxx"` and `ENCODER_API_TYPE="xxx"` to `secrets.toml`
 2. Run the following command
 
 ```bash
@@ -285,8 +285,20 @@ If you have installed the source code, you can customize Co-STORM based on your 
 1. Co-STORM introduces multiple LLM agent types (i.e. Co-STORM experts and Moderator). LLM agent interface is defined in `knowledge_storm/interface.py` , while its implementation is instantiated in `knowledge_storm/collaborative_storm/modules/co_storm_agents.py`. Different LLM agent policies can be customized.
 2. Co-STORM introduces a collaborative discourse protocol, with its core function centered on turn policy management. We provide an example implementation of turn policy management through `DiscourseManager` in `knowledge_storm/collaborative_storm/engine.py`. It can be customized and further improved.
 
+## Datasets
+To facilitate the study of automatic knowledge curation and complex information seeking, our project releases the following datasets:
 
-## Replicate Replicate STORM & Co-STORM paper result
+### FreshWiki
+The FreshWiki Dataset is a collection of 100 high-quality Wikipedia articles focusing on the most-edited pages from February 2022 to September 2023. See Section 2.1 in [STORM paper](https://arxiv.org/abs/2402.14207) for more details.
+
+You can download the dataset from [huggingface](https://huggingface.co/datasets/EchoShao8899/FreshWiki) directly. To ease the data contamination issue, we archive the [source code](https://github.com/stanford-oval/storm/tree/NAACL-2024-code-backup/FreshWiki) for the data construction pipeline that can be repeated at future dates.
+
+### WildSeek
+To study users’ interests in complex information seeking tasks in the wild, we utilized data collected from the web research preview to create the WildSeek dataset. We downsampled the data to ensure the diversity of the topics and the quality of the data. Each data point is a pair comprising a topic and the user’s goal for conducting deep search on the topic.  For more details, please refer to Section 2.2 and Appendix A of [Co-STORM paper](https://www.arxiv.org/abs/2408.15232).
+
+The WildSeek dataset is available [here](https://huggingface.co/datasets/YuchengJiang/WildSeek).
+
+## Replicate STORM & Co-STORM paper result
 
 For STORM paper experiments, please switch to the branch `NAACL-2024-code-backup` [here](https://github.com/stanford-oval/storm/tree/NAACL-2024-code-backup).
 

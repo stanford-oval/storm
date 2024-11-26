@@ -537,7 +537,9 @@ class SerperRM(dspy.Retrieve):
                     snippets = [organic.get("snippet")]
                     if self.ENABLE_EXTRA_SNIPPET_EXTRACTION:
                         snippets.extend(
-                            valid_url_to_snippets.get(url, {}).get("snippets", [])
+                            valid_url_to_snippets.get(url.strip("'"), {}).get(
+                                "snippets", []
+                            )
                         )
                     collected_results.append(
                         {
@@ -1091,5 +1093,138 @@ class GoogleSearch(dspy.Retrieve):
             r = url_to_results[url]
             r["snippets"] = valid_url_to_snippets[url]["snippets"]
             collected_results.append(r)
+
+        return collected_results
+
+
+class AzureAISearch(dspy.Retrieve):
+    """Retrieve information from custom queries using Azure AI Search.
+
+    General Documentation: https://learn.microsoft.com/en-us/azure/search/search-create-service-portal.
+    Python Documentation: https://learn.microsoft.com/en-us/python/api/overview/azure/search-documents-readme?view=azure-python.
+    """
+
+    def __init__(
+        self,
+        azure_ai_search_api_key=None,
+        azure_ai_search_url=None,
+        azure_ai_search_index_name=None,
+        k=3,
+        is_valid_source: Callable = None,
+    ):
+        """
+        Params:
+            azure_ai_search_api_key: Azure AI Search API key. Check out https://learn.microsoft.com/en-us/azure/search/search-security-api-keys?tabs=rest-use%2Cportal-find%2Cportal-query
+                "API key" section
+            azure_ai_search_url: Custom Azure AI Search Endpoint URL. Check out https://learn.microsoft.com/en-us/azure/search/search-create-service-portal#name-the-service
+            azure_ai_search_index_name: Custom Azure AI Search Index Name. Check out https://learn.microsoft.com/en-us/azure/search/search-how-to-create-search-index?tabs=portal
+            k: Number of top results to retrieve.
+            is_valid_source: Optional function to filter valid sources.
+            min_char_count: Minimum character count for the article to be considered valid.
+            snippet_chunk_size: Maximum character count for each snippet.
+            webpage_helper_max_threads: Maximum number of threads to use for webpage helper.
+        """
+        super().__init__(k=k)
+
+        try:
+            from azure.core.credentials import AzureKeyCredential
+            from azure.search.documents import SearchClient
+        except ImportError as err:
+            raise ImportError(
+                "AzureAISearch requires `pip install azure-search-documents`."
+            ) from err
+
+        if not azure_ai_search_api_key and not os.environ.get(
+            "AZURE_AI_SEARCH_API_KEY"
+        ):
+            raise RuntimeError(
+                "You must supply azure_ai_search_api_key or set environment variable AZURE_AI_SEARCH_API_KEY"
+            )
+        elif azure_ai_search_api_key:
+            self.azure_ai_search_api_key = azure_ai_search_api_key
+        else:
+            self.azure_ai_search_api_key = os.environ["AZURE_AI_SEARCH_API_KEY"]
+
+        if not azure_ai_search_url and not os.environ.get("AZURE_AI_SEARCH_URL"):
+            raise RuntimeError(
+                "You must supply azure_ai_search_url or set environment variable AZURE_AI_SEARCH_URL"
+            )
+        elif azure_ai_search_url:
+            self.azure_ai_search_url = azure_ai_search_url
+        else:
+            self.azure_ai_search_url = os.environ["AZURE_AI_SEARCH_URL"]
+
+        if not azure_ai_search_index_name and not os.environ.get(
+            "AZURE_AI_SEARCH_INDEX_NAME"
+        ):
+            raise RuntimeError(
+                "You must supply azure_ai_search_index_name or set environment variable AZURE_AI_SEARCH_INDEX_NAME"
+            )
+        elif azure_ai_search_index_name:
+            self.azure_ai_search_index_name = azure_ai_search_index_name
+        else:
+            self.azure_ai_search_index_name = os.environ["AZURE_AI_SEARCH_INDEX_NAME"]
+
+        self.usage = 0
+
+        # If not None, is_valid_source shall be a function that takes a URL and returns a boolean.
+        if is_valid_source:
+            self.is_valid_source = is_valid_source
+        else:
+            self.is_valid_source = lambda x: True
+
+    def get_usage_and_reset(self):
+        usage = self.usage
+        self.usage = 0
+
+        return {"AzureAISearch": usage}
+
+    def forward(
+        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
+    ):
+        """Search with Azure Open AI for self.k top passages for query or queries
+
+        Args:
+            query_or_queries (Union[str, List[str]]): The query or queries to search for.
+            exclude_urls (List[str]): A list of urls to exclude from the search results.
+
+        Returns:
+            a list of Dicts, each dict has keys of 'description', 'snippets' (list of strings), 'title', 'url'
+        """
+        try:
+            from azure.core.credentials import AzureKeyCredential
+            from azure.search.documents import SearchClient
+        except ImportError as err:
+            raise ImportError(
+                "AzureAISearch requires `pip install azure-search-documents`."
+            ) from err
+        queries = (
+            [query_or_queries]
+            if isinstance(query_or_queries, str)
+            else query_or_queries
+        )
+        self.usage += len(queries)
+        collected_results = []
+
+        client = SearchClient(
+            self.azure_ai_search_url,
+            self.azure_ai_search_index_name,
+            AzureKeyCredential(self.azure_ai_search_api_key),
+        )
+        for query in queries:
+            try:
+                # https://learn.microsoft.com/en-us/python/api/azure-search-documents/azure.search.documents.searchclient?view=azure-python#azure-search-documents-searchclient-search
+                results = client.search(search_text=query, top=1)
+
+                for result in results:
+                    document = {
+                        "url": result["metadata_storage_path"],
+                        "title": result["title"],
+                        "description": "N/A",
+                        "snippets": [result["chunk"]],
+                    }
+                    collected_results.append(document)
+            except Exception as e:
+                logging.error(f"Error occurs when searching query {query}: {e}")
 
         return collected_results
