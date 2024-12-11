@@ -16,7 +16,7 @@ with open("requirements.txt", encoding="utf-8") as f:
 
 setup(
     name="knowledge-storm",
-    version="1.0.0",
+    version="1.0.1",
     author="Yijia Shao, Yucheng Jiang",
     author_email="shaoyj@stanford.edu, yuchengj@stanford.edu",
     description="STORM: A language model-powered knowledge curation engine.",
