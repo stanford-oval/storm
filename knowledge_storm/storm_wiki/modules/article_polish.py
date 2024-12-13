@@ -29,15 +29,17 @@ class StormArticlePolishingModule(ArticlePolishingModule):
     def polish_article(
         self, topic: str, draft_article: StormArticle, remove_duplicate: bool = False
     ) -> StormArticle:
-        """
-        Polish article.
+    """
+    Enhance readability, add a lead section, and optionally remove duplicates from the article.
 
-        Args:
-            topic (str): The topic of the article.
-            draft_article (StormArticle): The draft article.
-            remove_duplicate (bool): Whether to use one additional LM call to remove duplicates from the article.
-        """
+    Args:
+        topic (str): The topic of the article.
+        draft_article (StormArticle): The article to be polished.
+        remove_duplicate (bool): Whether to eliminate duplicate content.
 
+    Returns:
+        StormArticle: The improved article with enhanced structure.
+    """
         article_text = draft_article.to_string()
         polish_result = self.polish_page(
             topic=topic, draft_page=article_text, polish_whole_page=remove_duplicate
