@@ -82,7 +82,7 @@ You could also install the source code which allows you to modify the behavior o
    
 2. Install the required packages.
    ```shell
-   conda create -n storm python=3.11
+   conda create -n storm python=3.13
    conda activate storm
    pip install -r requirements.txt
    ```
