@@ -13,6 +13,13 @@ from qdrant_client import QdrantClient
 
 from .utils import WebPageHelper
 
+from pgvector.sqlalchemy import Vector
+from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.orm import sessionmaker, declarative_base
+
+import networkx as nx
+from networkx.readwrite import json_graph
+
 
 class YouRM(dspy.Retrieve):
     def __init__(self, ydc_api_key=None, k=3, is_valid_source: Callable = None):
@@ -327,6 +334,187 @@ class VectorRM(dspy.Retrieve):
                         "snippets": [doc.page_content],
                         "title": doc.metadata["title"],
                         "url": doc.metadata["url"],
+                    }
+                )
+
+        return collected_results
+
+
+class PGVectorRetriever(dspy.Retrieve):
+    """Retrieve information from custom documents using PGVector."""
+
+    def __init__(
+        self,
+        db_url: str,
+        table_name: str,
+        embedding_model: str,
+        k: int = 3,
+    ):
+        """
+        Params:
+            db_url: Database URL for the PostgreSQL database with PGVector extension.
+            table_name: Name of the table containing the vectors.
+            embedding_model: Name of the Hugging Face embedding model.
+            k: Number of top chunks to retrieve.
+        """
+        super().__init__(k=k)
+        self.usage = 0
+        self.db_url = db_url
+        self.table_name = table_name
+
+        if not db_url:
+            raise ValueError("Please provide a database URL.")
+        if not table_name:
+            raise ValueError("Please provide a table name.")
+        if not embedding_model:
+            raise ValueError("Please provide an embedding model.")
+
+        model_kwargs = {"device": "cpu"}
+        encode_kwargs = {"normalize_embeddings": True}
+        self.model = HuggingFaceEmbeddings(
+            model_name=embedding_model,
+            model_kwargs=model_kwargs,
+            encode_kwargs=encode_kwargs,
+        )
+
+        self.engine = create_engine(self.db_url)
+        self.Session = sessionmaker(bind=self.engine)
+        self.Base = declarative_base()
+
+        class VectorTable(self.Base):
+            __tablename__ = self.table_name
+            id = Column(Integer, primary_key=True)
+            content = Column(String)
+            title = Column(String)
+            url = Column(String)
+            description = Column(String)
+            vector = Column(Vector(1536))
+
+        self.VectorTable = VectorTable
+
+    def get_usage_and_reset(self):
+        usage = self.usage
+        self.usage = 0
+
+        return {"PGVectorRetriever": usage}
+
+    def forward(self, query_or_queries: Union[str, List[str]], exclude_urls: List[str]):
+        """
+        Search in your data for self.k top passages for query or queries.
+
+        Args:
+            query_or_queries (Union[str, List[str]]): The query or queries to search for.
+            exclude_urls (List[str]): Dummy parameter to match the interface. Does not have any effect.
+
+        Returns:
+            a list of Dicts, each dict has keys of 'description', 'snippets' (list of strings), 'title', 'url'
+        """
+        queries = (
+            [query_or_queries]
+            if isinstance(query_or_queries, str)
+            else query_or_queries
+        )
+        self.usage += len(queries)
+        collected_results = []
+
+        session = self.Session()
+        for query in queries:
+            query_vector = self.model.embed_query(query)
+            results = (
+                session.query(self.VectorTable)
+                .order_by(self.VectorTable.vector.l2_distance(query_vector))
+                .limit(self.k)
+                .all()
+            )
+            for result in results:
+                collected_results.append(
+                    {
+                        "description": result.description,
+                        "snippets": [result.content],
+                        "title": result.title,
+                        "url": result.url,
+                    }
+                )
+        session.close()
+
+        return collected_results
+
+
+class GraphRAGRM(dspy.Retrieve):
+    """Retrieve information from custom documents using GraphRAG."""
+
+    def __init__(
+        self,
+        graph_data: dict,
+        embedding_model: str,
+        k: int = 3,
+    ):
+        """
+        Params:
+            graph_data: Graph data in JSON format.
+            embedding_model: Name of the Hugging Face embedding model.
+            k: Number of top chunks to retrieve.
+        """
+        super().__init__(k=k)
+        self.usage = 0
+        self.graph = json_graph.node_link_graph(graph_data)
+
+        if not embedding_model:
+            raise ValueError("Please provide an embedding model.")
+
+        model_kwargs = {"device": "cpu"}
+        encode_kwargs = {"normalize_embeddings": True}
+        self.model = HuggingFaceEmbeddings(
+            model_name=embedding_model,
+            model_kwargs=model_kwargs,
+            encode_kwargs=encode_kwargs,
+        )
+
+    def get_usage_and_reset(self):
+        usage = self.usage
+        self.usage = 0
+
+        return {"GraphRAGRM": usage}
+
+    def forward(self, query_or_queries: Union[str, List[str]], exclude_urls: List[str]):
+        """
+        Search in your data for self.k top passages for query or queries.
+
+        Args:
+            query_or_queries (Union[str, List[str]]): The query or queries to search for.
+            exclude_urls (List[str]): Dummy parameter to match the interface. Does not have any effect.
+
+        Returns:
+            a list of Dicts, each dict has keys of 'description', 'snippets' (list of strings), 'title', 'url'
+        """
+        queries = (
+            [query_or_queries]
+            if isinstance(query_or_queries, str)
+            else query_or_queries
+        )
+        self.usage += len(queries)
+        collected_results = []
+
+        for query in queries:
+            query_vector = self.model.embed_query(query)
+            node_scores = {}
+            for node, data in self.graph.nodes(data=True):
+                node_vector = data.get("vector")
+                if node_vector is not None:
+                    score = sum(
+                        (a - b) ** 2 for a, b in zip(query_vector, node_vector)
+                    )  # Euclidean distance
+                    node_scores[node] = score
+
+            top_nodes = sorted(node_scores, key=node_scores.get)[: self.k]
+            for node in top_nodes:
+                data = self.graph.nodes[node]
+                collected_results.append(
+                    {
+                        "description": data.get("description", ""),
+                        "snippets": [data.get("content", "")],
+                        "title": data.get("title", ""),
+                        "url": data.get("url", ""),
                     }
                 )
 

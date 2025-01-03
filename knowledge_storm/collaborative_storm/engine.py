@@ -17,7 +17,7 @@ from ..dataclass import ConversationTurn, KnowledgeBase
 from ..interface import LMConfigs, Agent
 from ..logging_wrapper import LoggingWrapper
 from ..lm import OpenAIModel, AzureOpenAIModel, TogetherClient
-from ..rm import BingSearch
+from ..rm import BingSearch, PGVectorRetriever
 
 
 class CollaborativeStormLMConfigs(LMConfigs):
@@ -35,6 +35,7 @@ class CollaborativeStormLMConfigs(LMConfigs):
         self.warmstart_outline_gen_lm = None
         self.question_asking_lm = None
         self.knowledge_base_lm = None
+        self.pgvector_retriever = None  # Peebb
 
     def init(
         self,
@@ -158,6 +159,9 @@ class CollaborativeStormLMConfigs(LMConfigs):
 
     def set_knowledge_base_lm(self, model: Union[dspy.dsp.LM, dspy.dsp.HFModel]):
         self.knowledge_base_lm = model
+
+    def set_pgvector_retriever(self, retriever: PGVectorRetriever):  # Peebb
+        self.pgvector_retriever = retriever  # Peebb
 
     def collect_and_reset_lm_usage(self):
         lm_usage = {}
