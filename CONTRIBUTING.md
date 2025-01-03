@@ -18,7 +18,7 @@ This section contains technical instructions & hints for contributors.
 1. Fork this repository and clone your forked repository.
 2. Install the required packages:
     ```
-    conda create -n storm python=3.11
+    conda create -n storm python=3.13
     conda activate storm
     pip install -r requirements.txt
     ```
