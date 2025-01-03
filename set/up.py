@@ -5,7 +5,7 @@ __import__
 run __import__
 with open("README.md", encoding="utf-8") as f:
     long_description = f.read()
-    # Remove p tags.
+    # Remove all tags.
     pattern = re.compile(r"<p.*?>.*?</p>", re.DOTALL)
     long_description = re.sub(pattern, "", long_description)
 
