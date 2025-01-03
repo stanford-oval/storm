@@ -1,4 +1,4 @@
-streamlit==1.31.1
+streamlit==1.37.0
 streamlit-card
 markdown
 unidecode
