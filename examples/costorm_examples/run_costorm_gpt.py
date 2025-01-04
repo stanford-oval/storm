@@ -24,6 +24,15 @@ from knowledge_storm.rm import YouRM, BingSearch, BraveRM, SerperRM, DuckDuckGoS
 from knowledge_storm.utils import load_api_key
 
 
+def validate_output_files(output_dir, expected_files):
+    for file in expected_files:
+        file_path = os.path.join(output_dir, file)
+        if not os.path.exists(file_path):
+            raise FileNotFoundError(f"Expected output file {file} not found in {output_dir}")
+        if os.path.getsize(file_path) == 0:
+            raise ValueError(f"Output file {file} is empty in {output_dir}")
+
+
 def main(args):
     load_api_key(toml_file_path='secrets.toml')
     lm_config: CollaborativeStormLMConfigs = CollaborativeStormLMConfigs()
@@ -152,6 +161,10 @@ def main(args):
     log_dump = costorm_runner.dump_logging_and_reset()
     with open(os.path.join(args.output_dir, "log.json"), "w") as f:
         json.dump(log_dump, f, indent=2)
+
+    # Validate output files
+    expected_files = ["report.md", "instance_dump.json", "log.json"]
+    validate_output_files(args.output_dir, expected_files)
 
 
 if __name__ == '__main__':
