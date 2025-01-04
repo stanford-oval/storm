@@ -234,6 +234,13 @@ AZURE_API_VERSION="your_azure_api_version"
 YDC_API_KEY="your_youcom_api_key"
 ```
 
+for **Co-STORM**, please also add following
+```
+# if use openai encoder
+ENCODER_API_TYPE="openai"
+# or ENCODER_API_TYPE="azure" if use azure openai encoder
+```
+
 ### STORM examples
 
 **To run STORM with `gpt` family models with default configurations:**
