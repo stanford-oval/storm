@@ -25,6 +25,10 @@ from knowledge_storm.utils import load_api_key
 
 
 def main(args):
+    # Validate `retrieve_top_k`
+    if args.retrieve_top_k <= 0:
+        raise ValueError("`retrieve_top_k` must be greater than 0.")
+
     load_api_key(toml_file_path='secrets.toml')
     lm_config: CollaborativeStormLMConfigs = CollaborativeStormLMConfigs()
     openai_kwargs = {
@@ -106,6 +110,8 @@ def main(args):
             rm = SearXNG(searxng_api_key=os.getenv('SEARXNG_API_KEY'), k=runner_argument.retrieve_top_k)
         case _:
              raise ValueError(f'Invalid retriever: {args.retriever}. Choose either "bing", "you", "brave", "duckduckgo", "serper", "tavily", or "searxng"')
+        case None:
+            raise ValueError("Retriever cannot be None. Please specify a valid retriever.")
 
     costorm_runner = CoStormRunner(lm_config=lm_config,
                                    runner_argument=runner_argument,
@@ -137,7 +143,10 @@ def main(args):
     article = costorm_runner.generate_report()
 
     # save results
-    os.makedirs(args.output_dir, exist_ok=True)
+    try:
+        os.makedirs(args.output_dir, exist_ok=True)
+    except OSError as e:
+        raise RuntimeError(f"Failed to create output directory: {args.output_dir}") from e
 
     # Save article
     with open(os.path.join(args.output_dir, "report.md"), "w") as f:
@@ -161,6 +170,7 @@ if __name__ == '__main__':
                         help='Directory to store the outputs.')
     parser.add_argument('--retriever', type=str, choices=['bing', 'you', 'brave', 'serper', 'duckduckgo', 'tavily', 'searxng'],
                         help='The search engine API to use for retrieving information.')
+    
     # hyperparameters for co-storm
     parser.add_argument(
         '--retrieve_top_k',
