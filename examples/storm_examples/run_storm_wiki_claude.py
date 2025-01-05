@@ -2,7 +2,7 @@
 STORM Wiki pipeline powered by Claude family models and You.com search engine.
 You need to set up the following environment variables to run this script:
     - ANTHROPIC_API_KEY: Anthropic API key
-    - YDC_API_KEY: You.com API key; BING_SEARCH_API_KEY: Bing Search API key, SERPER_API_KEY: Serper API key, BRAVE_API_KEY: Brave API key, or TAVILY_API_KEY: Tavily API key
+    - YDC_API_KEY: You.com API key; BING_SEARCH_API_KEY: Bing Search API key, SERPER_API_KEY: Serper API key, BRAVE_API_KEY: Brave API key, TAVILY_API_KEY: Tavily API key, PGVECTOR_DB_URL: PGVector database URL, GRAPH_RAG_DATA: GraphRAG data in JSON format
 
 Output will be structured as below
 args.output_dir/
@@ -21,7 +21,7 @@ from argparse import ArgumentParser
 
 from knowledge_storm import STORMWikiRunnerArguments, STORMWikiRunner, STORMWikiLMConfigs
 from knowledge_storm.lm import ClaudeModel
-from knowledge_storm.rm import YouRM, BingSearch, BraveRM, SerperRM, DuckDuckGoSearchRM, TavilySearchRM, SearXNG
+from knowledge_storm.rm import YouRM, BingSearch, BraveRM, SerperRM, DuckDuckGoSearchRM, TavilySearchRM, SearXNG, PGVectorRM, GraphRAGRM
 from knowledge_storm.utils import load_api_key
 
 
@@ -76,8 +76,12 @@ def main(args):
             rm = TavilySearchRM(tavily_search_api_key=os.getenv('TAVILY_API_KEY'), k=engine_args.search_top_k, include_raw_content=True)
         case 'searxng':
             rm = SearXNG(searxng_api_key=os.getenv('SEARXNG_API_KEY'), k=engine_args.search_top_k)
+        case 'pgvector':
+            rm = PGVectorRM(db_url=os.getenv('PGVECTOR_DB_URL'), table_name='documents', embedding_model='BAAI/bge-m3', k=engine_args.search_top_k)
+        case 'graphrag':
+            rm = GraphRAGRM(graph_data=os.getenv('GRAPH_RAG_DATA'), embedding_model='BAAI/bge-m3', k=engine_args.search_top_k)
         case _:
-             raise ValueError(f'Invalid retriever: {args.retriever}. Choose either "bing", "you", "brave", "duckduckgo", "serper", "tavily", or "searxng"')
+             raise ValueError(f'Invalid retriever: {args.retriever}. Choose either "bing", "you", "brave", "duckduckgo", "serper", "tavily", "searxng", "pgvector", or "graphrag"')
     
     runner = STORMWikiRunner(engine_args, lm_configs, rm)
 
@@ -102,7 +106,7 @@ if __name__ == '__main__':
                         help='Maximum number of threads to use. The information seeking part and the article generation'
                              'part can speed up by using multiple threads. Consider reducing it if keep getting '
                              '"Exceed rate limit" error when calling LM API.')
-    parser.add_argument('--retriever', type=str, choices=['bing', 'you', 'brave', 'serper', 'duckduckgo', 'tavily', 'searxng'],
+    parser.add_argument('--retriever', type=str, choices=['bing', 'you', 'brave', 'serper', 'duckduckgo', 'tavily', 'searxng', 'pgvector', 'graphrag'],
                         help='The search engine API to use for retrieving information.')
     # stage of the pipeline
     parser.add_argument('--do-research', action='store_true',
