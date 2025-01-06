@@ -387,7 +387,7 @@ class StormArticle(Article):
                     pre_order_find_index(child)
 
         pre_order_find_index(self.root)
-        # constrcut index mapping
+        # construct index mapping
         ref_index_mapping = {}
         for ref_index in ref_indices:
             if ref_index not in ref_index_mapping:

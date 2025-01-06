@@ -81,7 +81,7 @@ def handle_final_writing():
 
             # update status bar
             st.session_state["page3_write_article_state"] = "prepare_to_show_result"
-            status.update(label="information snythesis complete!", state="complete")
+            status.update(label="information synthesis complete!", state="complete")
 
 def handle_prepare_to_show_result():
     if st.session_state["page3_write_article_state"] == "prepare_to_show_result":
