@@ -3,7 +3,6 @@ from pydantic import BaseModel
 from knowledge_storm import STORMWikiRunnerArguments, STORMWikiRunner, STORMWikiLMConfigs
 from knowledge_storm.lm import OpenAIModel
 import os
-import json
 
 app = FastAPI()
 
@@ -38,7 +37,7 @@ def get_storm_runner(with_retrieval=False, search_top_k=3):
     lm_configs.set_article_polish_lm(article_polish_lm)
 
     engine_args = STORMWikiRunnerArguments(
-        output_dir="./results",
+        output_dir=None,  # No file output needed
         max_conv_turn=3,
         max_perspective=3,
         search_top_k=search_top_k if with_retrieval else 0,
@@ -64,15 +63,9 @@ def extract_topic(article_text: str, lm_config: STORMWikiLMConfigs) -> str:
     response = lm_config.conv_simulator_lm.complete(prompt)
     return response.strip()
 
-def ensure_results_dir():
-    """Ensure the results directory exists"""
-    os.makedirs("./results", exist_ok=True)
-
 @app.post("/generate-with-citations")
 async def generate_with_citations(request: ArticleRequest):
     try:
-        ensure_results_dir()
-        
         # Initialize STORM with retrieval enabled
         runner = get_storm_runner(with_retrieval=True, search_top_k=request.search_top_k)
         
@@ -81,60 +74,25 @@ async def generate_with_citations(request: ArticleRequest):
         if not topic:
             topic = extract_topic(request.article_text, runner.lm_configs)
         
-        # Save the article to a temporary file
-        output_dir = os.path.join("./results", topic.replace(" ", "_").lower())
-        os.makedirs(output_dir, exist_ok=True)
-        
-        article_path = os.path.join(output_dir, "input_article.txt")
-        with open(article_path, "w") as f:
-            f.write(request.article_text)
-            
-        # Create initial conversation log
-        conv_log_path = os.path.join(output_dir, "conversation_log.json")
-        if not os.path.exists(conv_log_path):
-            with open(conv_log_path, "w") as f:
-                json.dump([], f)
-        
-        # Run the full pipeline
-        runner.run(
+        # Run STORM pipeline and get results directly
+        results = runner.run(
             topic=topic,
+            article_text=request.article_text,
             do_research=True,
             do_generate_outline=True,
             do_generate_article=True,
             do_polish_article=request.do_polish_article,
+            return_results=True  # Get results directly instead of writing files
         )
         
-        # Collect all results
-        response = {
+        return {
             "topic": topic,
-            "original_text": request.article_text
+            "original_text": request.article_text,
+            "outline": results.get("outline"),
+            "generated_article": results.get("article"),
+            "citations": results.get("citations", []),
+            "message": f"Found {len(results.get('citations', []))} citations"
         }
-        
-        # Get the outline
-        try:
-            with open(os.path.join(output_dir, "storm_gen_outline.txt")) as f:
-                response["outline"] = f.read()
-        except FileNotFoundError:
-            response["outline"] = None
-            
-        # Get the generated article
-        try:
-            article_file = "storm_gen_article_polished.txt" if request.do_polish_article else "storm_gen_article.txt"
-            with open(os.path.join(output_dir, article_file)) as f:
-                response["generated_article"] = f.read()
-        except FileNotFoundError:
-            response["generated_article"] = None
-            
-        # Get the citations/search results
-        try:
-            with open(os.path.join(output_dir, "raw_search_results.json"), "r") as f:
-                response["citations"] = json.load(f)
-        except FileNotFoundError:
-            response["citations"] = []
-            
-        response["message"] = f"Found {len(response.get('citations', []))} citations"
-        
-        return response
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
