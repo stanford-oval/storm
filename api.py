@@ -6,11 +6,14 @@ import os
 
 app = FastAPI()
 
-class ArticleRequest(BaseModel):
+class GenerateRequest(BaseModel):
+    topic: str
+    do_polish_article: bool = True
+
+class CitationRequest(BaseModel):
     article_text: str
     search_top_k: int = 5
     topic: str = None
-    do_polish_article: bool = True
 
 def get_storm_runner(with_retrieval=False, search_top_k=3):
     lm_configs = STORMWikiLMConfigs()
@@ -63,8 +66,33 @@ def extract_topic(article_text: str, lm_config: STORMWikiLMConfigs) -> str:
     response = lm_config.conv_simulator_lm.complete(prompt)
     return response.strip()
 
-@app.post("/generate-with-citations")
-async def generate_with_citations(request: ArticleRequest):
+@app.post("/generate")
+async def generate_article(request: GenerateRequest):
+    try:
+        # Initialize STORM without retrieval
+        runner = get_storm_runner(with_retrieval=False)
+        
+        # Generate article
+        results = runner.run(
+            topic=request.topic,
+            do_research=False,
+            do_generate_outline=True,
+            do_generate_article=True,
+            do_polish_article=request.do_polish_article,
+            return_results=True
+        )
+        
+        return {
+            "topic": request.topic,
+            "outline": results.get("outline"),
+            "article": results.get("article")
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/find-citations")
+async def find_citations(request: CitationRequest):
     try:
         # Initialize STORM with retrieval enabled
         runner = get_storm_runner(with_retrieval=True, search_top_k=request.search_top_k)
@@ -74,22 +102,19 @@ async def generate_with_citations(request: ArticleRequest):
         if not topic:
             topic = extract_topic(request.article_text, runner.lm_configs)
         
-        # Run STORM pipeline and get results directly
+        # Run research to find citations
         results = runner.run(
             topic=topic,
             article_text=request.article_text,
             do_research=True,
-            do_generate_outline=True,
-            do_generate_article=True,
-            do_polish_article=request.do_polish_article,
-            return_results=True  # Get results directly instead of writing files
+            do_generate_outline=False,
+            do_generate_article=False,
+            do_polish_article=False,
+            return_results=True
         )
         
         return {
             "topic": topic,
-            "original_text": request.article_text,
-            "outline": results.get("outline"),
-            "generated_article": results.get("article"),
             "citations": results.get("citations", []),
             "message": f"Found {len(results.get('citations', []))} citations"
         }
