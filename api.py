@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from knowledge_storm import STORMWikiRunnerArguments, STORMWikiRunner, STORMWikiLMConfigs
 from knowledge_storm.lm import OpenAIModel
 import os
+import tempfile
 
 app = FastAPI()
 
@@ -39,8 +40,11 @@ def get_storm_runner(with_retrieval=False, search_top_k=3):
     lm_configs.set_article_gen_lm(article_gen_lm)
     lm_configs.set_article_polish_lm(article_polish_lm)
 
+    # Create temporary directory for STORM outputs
+    temp_dir = tempfile.mkdtemp()
+    
     engine_args = STORMWikiRunnerArguments(
-        output_dir=None,  # No file output needed
+        output_dir=temp_dir,
         max_conv_turn=3,
         max_perspective=3,
         search_top_k=search_top_k if with_retrieval else 0,
