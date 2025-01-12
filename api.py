@@ -73,19 +73,17 @@ async def generate_article(request: GenerateRequest):
         runner = get_storm_runner(with_retrieval=False)
         
         # Generate article
-        results = runner.run(
+        article = runner.run(
             topic=request.topic,
             do_research=False,
             do_generate_outline=True,
             do_generate_article=True,
-            do_polish_article=request.do_polish_article,
-            return_results=True
+            do_polish_article=request.do_polish_article
         )
         
         return {
             "topic": request.topic,
-            "outline": results.get("outline"),
-            "article": results.get("article")
+            "article": article
         }
         
     except Exception as e:
@@ -103,20 +101,26 @@ async def find_citations(request: CitationRequest):
             topic = extract_topic(request.article_text, runner.lm_configs)
         
         # Run research to find citations
-        results = runner.run(
+        search_results = runner.run_knowledge_curation_module(
             topic=topic,
-            article_text=request.article_text,
-            do_research=True,
-            do_generate_outline=False,
-            do_generate_article=False,
-            do_polish_article=False,
-            return_results=True
+            article_text=request.article_text
         )
+        
+        citations = []
+        if search_results:
+            citations = [
+                {
+                    "url": result.url,
+                    "title": result.title,
+                    "snippet": result.snippet
+                }
+                for result in search_results.results
+            ]
         
         return {
             "topic": topic,
-            "citations": results.get("citations", []),
-            "message": f"Found {len(results.get('citations', []))} citations"
+            "citations": citations,
+            "message": f"Found {len(citations)} citations"
         }
         
     except Exception as e:
