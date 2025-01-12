@@ -17,7 +17,7 @@ class CitationRequest(BaseModel):
     search_top_k: int = 5
     topic: str = None
 
-def get_storm_runner(with_retrieval=False, search_top_k=3):
+def get_storm_runner(with_retrieval=False, search_top_k=3, topic=None):
     lm_configs = STORMWikiLMConfigs()
     openai_kwargs = {
         'api_key': os.getenv("OPENAI_API_KEY"),
@@ -44,14 +44,9 @@ def get_storm_runner(with_retrieval=False, search_top_k=3):
     # Create temporary directory for STORM outputs
     temp_dir = tempfile.mkdtemp()
     
-    # Create topic directory
-    os.makedirs(os.path.join(temp_dir), exist_ok=True)
-    
-    # Create initial conversation log
-    conv_log_path = os.path.join(temp_dir, "conversation_log.json")
-    if not os.path.exists(conv_log_path):
-        with open(conv_log_path, "w") as f:
-            json.dump([], f)
+    # If topic is provided, set up topic directory
+    if topic:
+        setup_topic_directory(temp_dir, topic)
     
     engine_args = STORMWikiRunnerArguments(
         output_dir=temp_dir,
@@ -85,7 +80,7 @@ def setup_topic_directory(temp_dir: str, topic: str):
     topic_dir = os.path.join(temp_dir, topic.replace(" ", "_"))
     os.makedirs(topic_dir, exist_ok=True)
     
-    # Create initial conversation log
+    # Create initial conversation log in topic directory
     conv_log_path = os.path.join(topic_dir, "conversation_log.json")
     if not os.path.exists(conv_log_path):
         with open(conv_log_path, "w") as f:
@@ -96,16 +91,13 @@ def setup_topic_directory(temp_dir: str, topic: str):
 @app.post("/generate")
 async def generate_article(request: GenerateRequest):
     try:
-        # Initialize STORM without retrieval
-        runner = get_storm_runner(with_retrieval=False)
-        
-        # Setup topic directory
-        topic_dir = setup_topic_directory(runner.engine_args.output_dir, request.topic)
+        # Initialize STORM without retrieval, passing the topic
+        runner = get_storm_runner(with_retrieval=False, topic=request.topic)
         
         # Generate article
         article = runner.run(
             topic=request.topic,
-            do_research=True,  # Enable research to create conversation log
+            do_research=True,
             do_generate_outline=True,
             do_generate_article=True,
             do_polish_article=request.do_polish_article
@@ -122,16 +114,17 @@ async def generate_article(request: GenerateRequest):
 @app.post("/find-citations")
 async def find_citations(request: CitationRequest):
     try:
-        # Initialize STORM with retrieval enabled
-        runner = get_storm_runner(with_retrieval=True, search_top_k=request.search_top_k)
-        
         # Extract topic if not provided
         topic = request.topic
         if not topic:
             topic = extract_topic(request.article_text, runner.lm_configs)
             
-        # Setup topic directory
-        topic_dir = setup_topic_directory(runner.engine_args.output_dir, topic)
+        # Initialize STORM with retrieval enabled and topic
+        runner = get_storm_runner(
+            with_retrieval=True, 
+            search_top_k=request.search_top_k,
+            topic=topic
+        )
         
         # Run research to find citations
         search_results = runner.run_knowledge_curation_module(
