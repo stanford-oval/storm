@@ -3,19 +3,15 @@ from pydantic import BaseModel
 from knowledge_storm import STORMWikiRunnerArguments, STORMWikiRunner, STORMWikiLMConfigs
 from knowledge_storm.lm import OpenAIModel
 import os
+import json
 
 app = FastAPI()
 
 class ArticleRequest(BaseModel):
-    topic: str
-    do_generate_outline: bool = True
-    do_generate_article: bool = True
-    do_polish_article: bool = True
-
-class CitationRequest(BaseModel):
     article_text: str
-    search_top_k: int = 5  # Number of search results to consider
-    topic: str = None  # Make topic optional
+    search_top_k: int = 5
+    topic: str = None
+    do_polish_article: bool = True
 
 def get_storm_runner(with_retrieval=False, search_top_k=3):
     lm_configs = STORMWikiLMConfigs()
@@ -68,9 +64,15 @@ def extract_topic(article_text: str, lm_config: STORMWikiLMConfigs) -> str:
     response = lm_config.conv_simulator_lm.complete(prompt)
     return response.strip()
 
-@app.post("/find-citations")
-async def find_citations(request: CitationRequest):
+def ensure_results_dir():
+    """Ensure the results directory exists"""
+    os.makedirs("./results", exist_ok=True)
+
+@app.post("/generate-with-citations")
+async def generate_with_citations(request: ArticleRequest):
     try:
+        ensure_results_dir()
+        
         # Initialize STORM with retrieval enabled
         runner = get_storm_runner(with_retrieval=True, search_top_k=request.search_top_k)
         
@@ -86,53 +88,51 @@ async def find_citations(request: CitationRequest):
         article_path = os.path.join(output_dir, "input_article.txt")
         with open(article_path, "w") as f:
             f.write(request.article_text)
+            
+        # Create initial conversation log
+        conv_log_path = os.path.join(output_dir, "conversation_log.json")
+        if not os.path.exists(conv_log_path):
+            with open(conv_log_path, "w") as f:
+                json.dump([], f)
         
-        # Run research phase to gather citations
+        # Run the full pipeline
         runner.run(
             topic=topic,
-            do_research=True,  # Enable research to find citations
-            do_generate_outline=False,
-            do_generate_article=False,
-            do_polish_article=False,
-        )
-        
-        # Get the search results and citations
-        with open(os.path.join(output_dir, "raw_search_results.json"), "r") as f:
-            import json
-            search_results = json.load(f)
-            
-        return {
-            "topic": topic,
-            "citations": search_results,
-            "message": f"Found {len(search_results)} potential citations"
-        }
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/generate")
-async def generate_article(request: ArticleRequest):
-    try:
-        runner = get_storm_runner()
-        runner.run(
-            topic=request.topic,
-            do_research=False,
-            do_generate_outline=request.do_generate_outline,
-            do_generate_article=request.do_generate_article,
+            do_research=True,
+            do_generate_outline=True,
+            do_generate_article=True,
             do_polish_article=request.do_polish_article,
         )
         
-        output_dir = os.path.join("./results", request.topic.replace(" ", "_").lower())
-        response = {"topic": request.topic}
+        # Collect all results
+        response = {
+            "topic": topic,
+            "original_text": request.article_text
+        }
         
-        if request.do_generate_outline:
+        # Get the outline
+        try:
             with open(os.path.join(output_dir, "storm_gen_outline.txt")) as f:
                 response["outline"] = f.read()
-                
-        if request.do_generate_article:
+        except FileNotFoundError:
+            response["outline"] = None
+            
+        # Get the generated article
+        try:
             article_file = "storm_gen_article_polished.txt" if request.do_polish_article else "storm_gen_article.txt"
             with open(os.path.join(output_dir, article_file)) as f:
-                response["article"] = f.read()
+                response["generated_article"] = f.read()
+        except FileNotFoundError:
+            response["generated_article"] = None
+            
+        # Get the citations/search results
+        try:
+            with open(os.path.join(output_dir, "raw_search_results.json"), "r") as f:
+                response["citations"] = json.load(f)
+        except FileNotFoundError:
+            response["citations"] = []
+            
+        response["message"] = f"Found {len(response.get('citations', []))} citations"
         
         return response
         
