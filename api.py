@@ -13,9 +13,9 @@ class ArticleRequest(BaseModel):
     do_polish_article: bool = True
 
 class CitationRequest(BaseModel):
-    topic: str
     article_text: str
     search_top_k: int = 5  # Number of search results to consider
+    topic: str = None  # Make topic optional
 
 def get_storm_runner(with_retrieval=False, search_top_k=3):
     lm_configs = STORMWikiLMConfigs()
@@ -57,14 +57,30 @@ def get_storm_runner(with_retrieval=False, search_top_k=3):
 
     return STORMWikiRunner(engine_args, lm_configs, rm=rm)
 
+def extract_topic(article_text: str, lm_config: STORMWikiLMConfigs) -> str:
+    """Extract main topic from article text using LLM."""
+    prompt = f"""Extract the main topic or subject from this text in 2-3 words:
+    
+    {article_text[:1000]}...
+    
+    Topic:"""
+    
+    response = lm_config.conv_simulator_lm.complete(prompt)
+    return response.strip()
+
 @app.post("/find-citations")
 async def find_citations(request: CitationRequest):
     try:
         # Initialize STORM with retrieval enabled
         runner = get_storm_runner(with_retrieval=True, search_top_k=request.search_top_k)
         
+        # Extract topic if not provided
+        topic = request.topic
+        if not topic:
+            topic = extract_topic(request.article_text, runner.lm_configs)
+        
         # Save the article to a temporary file
-        output_dir = os.path.join("./results", request.topic.replace(" ", "_").lower())
+        output_dir = os.path.join("./results", topic.replace(" ", "_").lower())
         os.makedirs(output_dir, exist_ok=True)
         
         article_path = os.path.join(output_dir, "input_article.txt")
@@ -73,7 +89,7 @@ async def find_citations(request: CitationRequest):
         
         # Run research phase to gather citations
         runner.run(
-            topic=request.topic,
+            topic=topic,
             do_research=True,  # Enable research to find citations
             do_generate_outline=False,
             do_generate_article=False,
@@ -86,7 +102,7 @@ async def find_citations(request: CitationRequest):
             search_results = json.load(f)
             
         return {
-            "topic": request.topic,
+            "topic": topic,
             "citations": search_results,
             "message": f"Found {len(search_results)} potential citations"
         }
