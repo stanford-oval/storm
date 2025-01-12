@@ -17,6 +17,19 @@ class CitationRequest(BaseModel):
     search_top_k: int = 5
     topic: str = None
 
+def setup_topic_directory(temp_dir: str, topic: str):
+    """Setup directory structure for a topic"""
+    topic_dir = os.path.join(temp_dir, topic.replace(" ", "_"))
+    os.makedirs(topic_dir, exist_ok=True)
+    
+    # Create initial conversation log in topic directory
+    conv_log_path = os.path.join(topic_dir, "conversation_log.json")
+    if not os.path.exists(conv_log_path):
+        with open(conv_log_path, "w") as f:
+            json.dump([], f)
+    
+    return topic_dir
+
 def get_storm_runner(with_retrieval=False, search_top_k=3, topic=None):
     lm_configs = STORMWikiLMConfigs()
     openai_kwargs = {
@@ -44,10 +57,17 @@ def get_storm_runner(with_retrieval=False, search_top_k=3, topic=None):
     # Create temporary directory for STORM outputs
     temp_dir = tempfile.mkdtemp()
     
-    # If topic is provided, set up topic directory
+    # Create topic directory if provided
     if topic:
         setup_topic_directory(temp_dir, topic)
     
+    # Initialize retrieval module if needed
+    rm = None
+    if with_retrieval:
+        from knowledge_storm.rm import YouRM
+        rm = YouRM(ydc_api_key=os.getenv('YDC_API_KEY'), k=search_top_k)
+
+    # Create engine arguments
     engine_args = STORMWikiRunnerArguments(
         output_dir=temp_dir,
         max_conv_turn=3,
@@ -56,13 +76,7 @@ def get_storm_runner(with_retrieval=False, search_top_k=3, topic=None):
         max_thread_num=3,
     )
 
-    # Initialize retrieval module if needed
-    rm = None
-    if with_retrieval:
-        from knowledge_storm.rm import YouRM
-        rm = YouRM(ydc_api_key=os.getenv('YDC_API_KEY'), k=search_top_k)
-
-    return STORMWikiRunner(engine_args, lm_configs, rm=rm)
+    return STORMWikiRunner(engine_args, lm_configs, rm=rm), temp_dir
 
 def extract_topic(article_text: str, lm_config: STORMWikiLMConfigs) -> str:
     """Extract main topic from article text using LLM."""
@@ -75,24 +89,11 @@ def extract_topic(article_text: str, lm_config: STORMWikiLMConfigs) -> str:
     response = lm_config.conv_simulator_lm.complete(prompt)
     return response.strip()
 
-def setup_topic_directory(temp_dir: str, topic: str):
-    """Setup directory structure for a topic"""
-    topic_dir = os.path.join(temp_dir, topic.replace(" ", "_"))
-    os.makedirs(topic_dir, exist_ok=True)
-    
-    # Create initial conversation log in topic directory
-    conv_log_path = os.path.join(topic_dir, "conversation_log.json")
-    if not os.path.exists(conv_log_path):
-        with open(conv_log_path, "w") as f:
-            json.dump([], f)
-    
-    return topic_dir
-
 @app.post("/generate")
 async def generate_article(request: GenerateRequest):
     try:
-        # Initialize STORM without retrieval, passing the topic
-        runner = get_storm_runner(with_retrieval=False, topic=request.topic)
+        # Initialize STORM without retrieval
+        runner, temp_dir = get_storm_runner(with_retrieval=False, topic=request.topic)
         
         # Generate article
         article = runner.run(
@@ -114,13 +115,15 @@ async def generate_article(request: GenerateRequest):
 @app.post("/find-citations")
 async def find_citations(request: CitationRequest):
     try:
-        # Extract topic if not provided
-        topic = request.topic
-        if not topic:
-            topic = extract_topic(request.article_text, runner.lm_configs)
+        # Create temporary runner to extract topic if needed
+        if not request.topic:
+            temp_runner, _ = get_storm_runner()
+            topic = extract_topic(request.article_text, temp_runner.lm_configs)
+        else:
+            topic = request.topic
             
-        # Initialize STORM with retrieval enabled and topic
-        runner = get_storm_runner(
+        # Initialize STORM with retrieval enabled
+        runner, temp_dir = get_storm_runner(
             with_retrieval=True, 
             search_top_k=request.search_top_k,
             topic=topic
