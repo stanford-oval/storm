@@ -10,7 +10,7 @@ import requests
 from dsp import ERRORS, backoff_hdlr, giveup_hdlr
 from dsp.modules.hf import openai_to_hf
 from dsp.modules.hf_client import send_hftgi_request_v01_wrapped
-from openai import OpenAI
+from openai import OpenAI, AzureOpenAI
 from transformers import AutoTokenizer
 
 try:
@@ -204,53 +204,138 @@ class DeepSeekModel(dspy.OpenAI):
         return completions
 
 
-class AzureOpenAIModel(dspy.AzureOpenAI):
-    """A wrapper class for dspy.AzureOpenAI."""
+class AzureOpenAIModel(dspy.LM):
+    """A wrapper class of Azure OpenAI endpoint.
+
+    Note: param::model should match the deployment_id on your Azure platform.
+    """
 
     def __init__(
         self,
-        api_base: Optional[str] = None,
-        api_version: Optional[str] = None,
-        model: str = "gpt-4o-mini",
-        api_key: Optional[str] = None,
+        azure_endpoint: str,
+        api_version: str,
+        model: str,
+        api_key: str,
         model_type: Literal["chat", "text"] = "chat",
         **kwargs,
     ):
-        super().__init__(
-            api_base=api_base,
-            api_version=api_version,
-            model=model,
-            api_key=api_key,
-            model_type=model_type,
-            **kwargs,
-        )
+        super().__init__(model=model)
         self._token_usage_lock = threading.Lock()
         self.prompt_tokens = 0
         self.completion_tokens = 0
+        self.model = model
+        self.provider = "azure"
+        self.model_type = model_type
+
+        self.client = AzureOpenAI(
+            azure_endpoint=azure_endpoint,
+            api_key=api_key,
+            api_version=api_version,
+        )
+        self.prompt_tokens = 0
+        self.completion_tokens = 0
+
+        self.kwargs = {
+            "model": model,
+            "temperature": 0.0,
+            "max_tokens": 150,
+            "top_p": 1,
+            "frequency_penalty": 0,
+            "presence_penalty": 0,
+            "n": 1,
+            **kwargs,
+        }
+
+    @backoff.on_exception(
+        backoff.expo,
+        ERRORS,
+        max_time=1000,
+        on_backoff=backoff_hdlr,
+        giveup=giveup_hdlr,
+    )
+    def basic_request(self, prompt: str, **kwargs) -> Any:
+        kwargs = {**self.kwargs, **kwargs}
+
+        try:
+            if self.model_type == "chat":
+                messages = [{"role": "user", "content": prompt}]
+
+                response = self.client.chat.completions.create(
+                    messages=messages, **kwargs
+                )
+            else:
+                response = self.client.completions.create(prompt=prompt, **kwargs)
+
+            self.log_usage(response)
+
+            history_entry = {
+                "prompt": prompt,
+                "response": dict(response),
+                "kwargs": kwargs,
+            }
+            self.history.append(history_entry)
+
+            return response
+
+        except Exception as e:
+            logging.error(f"Error making request to Azure OpenAI: {str(e)}")
+            raise
+
+    def _get_choice_text(self, choice: Any) -> str:
+        """Extract text from a choice object based on model type."""
+        if self.model_type == "chat":
+            return choice.message.content
+        return choice.text
 
     def log_usage(self, response):
-        """Log the total tokens from the OpenAI API response.
-        Override log_usage() in dspy.AzureOpenAI for tracking accumulated token usage.
-        """
-        usage_data = response.get("usage")
+        """Log the total tokens from response."""
+        usage_data = response.usage
         if usage_data:
             with self._token_usage_lock:
-                self.prompt_tokens += usage_data.get("prompt_tokens", 0)
-                self.completion_tokens += usage_data.get("completion_tokens", 0)
+                self.prompt_tokens += usage_data.prompt_tokens
+                self.completion_tokens += usage_data.completion_tokens
 
     def get_usage_and_reset(self):
         """Get the total tokens used and reset the token usage."""
         usage = {
-            self.kwargs.get("model")
-            or self.kwargs.get("engine"): {
+            self.model: {
                 "prompt_tokens": self.prompt_tokens,
                 "completion_tokens": self.completion_tokens,
             }
         }
         self.prompt_tokens = 0
         self.completion_tokens = 0
-
         return usage
+
+    def __call__(
+        self,
+        prompt: str,
+        only_completed: bool = True,
+        return_sorted: bool = False,
+        **kwargs,
+    ) -> list[str]:
+        """Get completions from Azure OpenAI.
+
+        Args:
+            prompt: The prompt to send to the model
+            only_completed: Only return completed responses
+            return_sorted: Sort completions by probability (not implemented)
+            **kwargs: Additional arguments to pass to the API
+
+        Returns:
+            List of completion strings
+        """
+        response = self.basic_request(prompt, **kwargs)
+
+        choices = response.choices
+        completed_choices = [c for c in choices if c.finish_reason != "length"]
+
+        if only_completed and completed_choices:
+            choices = completed_choices
+
+        completions = [self._get_choice_text(c) for c in choices]
+
+        return completions
 
 
 class GroqModel(dspy.OpenAI):
