@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from openai import OpenAI
-from typing import List, Optional
+from typing import List, Optional, Dict
 import wikipedia
 from knowledge_storm.utils import load_api_key
 import toml
@@ -106,6 +106,13 @@ async def find_citations(request: CitationRequest):
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/health")
+async def health_check() -> Dict[str, str]:
+    return {
+        "status": "healthy",
+        "message": "API is running"
+    }
 
 if __name__ == "__main__":
     import uvicorn
