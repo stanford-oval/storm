@@ -126,18 +126,17 @@ class CitationRequest(BaseModel):
 # V2 Models
 class StormArticleRequest(BaseModel):
     topic: str
-    length: Optional[int] = 100  # Default to 100 words
     do_research: bool = True
     do_generate_outline: bool = True
     do_generate_article: bool = True
     do_polish_article: bool = True
 
 class StormArticleResponse(BaseModel):
-    content: str
-    outline: Optional[str]
-    sources: Dict[str, Any]
-    polished_content: Optional[str]
-    error: Optional[str] = None
+    content: str            # The main generated article text
+    outline: Optional[str]  # The article outline (if do_generate_outline=True)
+    sources: Dict[str, Any] # Sources/references used in the article
+    polished_content: Optional[str]  # Polished version of the article (if do_polish_article=True)
+    error: Optional[str]    # Any error message if something went wrong
 
 class StormCitationRequest(BaseModel):
     text: str
@@ -238,7 +237,7 @@ async def generate_article_v2(request: StormArticleRequest):
         logger.info(f"Created directory: {topic_dir}")
         
         try:
-            # Run STORM pipeline with length control
+            # Run STORM pipeline
             runner.run(
                 topic=request.topic,
                 do_research=request.do_research,
@@ -246,28 +245,6 @@ async def generate_article_v2(request: StormArticleRequest):
                 do_generate_article=request.do_generate_article,
                 do_polish_article=request.do_polish_article,
             )
-
-            # If length is specified, we'll trim the article using GPT
-            if request.do_generate_article and request.length:
-                article_path = topic_dir / "storm_gen_article.txt"
-                if article_path.exists():
-                    original_content = article_path.read_text()
-                    
-                    # Use GPT to create a shorter version
-                    response = client.chat.completions.create(
-                        model="gpt-4",
-                        messages=[
-                            {"role": "system", "content": "You are an expert at summarizing articles while maintaining key information and citations."},
-                            {"role": "user", "content": f"Summarize this article in approximately {request.length} words while preserving key points and any citations:\n\n{original_content}"}
-                        ]
-                    )
-                    
-                    shortened_content = response.choices[0].message.content
-                    
-                    # Save the shortened version
-                    with open(article_path, 'w') as f:
-                        f.write(shortened_content)
-                    logger.info(f"Successfully shortened article to ~{request.length} words")
 
         except Exception as e:
             logger.error(f"Error in STORM pipeline: {str(e)}\n{traceback.format_exc()}")
@@ -308,14 +285,18 @@ async def generate_article_v2(request: StormArticleRequest):
             if sources_path.exists():
                 sources = json.loads(sources_path.read_text())
                 logger.info(f"Successfully loaded sources data")
+            else:
+                logger.warning("No sources file found, using empty sources")
+                sources = {}
         except Exception as e:
             logger.error(f"Error reading results: {str(e)}\n{traceback.format_exc()}")
         
         return StormArticleResponse(
-            content=content,
+            content=content if content else "No content generated",
             outline=outline if outline else None,
             sources=sources,
-            polished_content=polished_content if polished_content else None
+            polished_content=polished_content if polished_content else None,
+            error=None
         )
         
     except Exception as e:

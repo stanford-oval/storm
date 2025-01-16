@@ -371,7 +371,7 @@ curl -X POST "http://localhost:8000/generate-article" -H "Content-Type: applicat
 Find citations:
 
 ```
-curl -X POST "http://localhost:8000/find_citations" -H "Content-Type: application/json" -d '{"text": "The quick brown fox jumps over the lazy dog."}'
+curl -X POST "http://localhost:8000/find-citations" -H "Content-Type: application/json" -d '{"text": "The quick brown fox jumps over the lazy dog."}'
 ```
 
 ## V2 with you.com search engine:
