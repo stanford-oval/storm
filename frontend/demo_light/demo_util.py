@@ -15,7 +15,7 @@ import streamlit as st
 # sys.path.append('../../')
 from knowledge_storm import STORMWikiRunnerArguments, STORMWikiRunner, STORMWikiLMConfigs
 from knowledge_storm.lm import OpenAIModel
-from knowledge_storm.rm import YouRM
+from knowledge_storm.rm import YouRM, BingSearch, BraveRM
 from knowledge_storm.storm_wiki.modules.callback import BaseCallbackHandler
 from knowledge_storm.utils import truncate_filename
 from stoc import stoc
@@ -515,8 +515,13 @@ def set_storm_runner():
         search_top_k=3,
         retrieve_top_k=5
     )
-
-    rm = YouRM(ydc_api_key=st.secrets['YDC_API_KEY'], k=engine_args.search_top_k)
+    
+    if st.secrets['RETRIEVER'] == 'bing':
+        rm = BingSearch(bing_search_api=st.secrets['BING_SEARCH_API_KEY'], k=engine_args.search_top_k)
+    elif st.secrets['RETRIEVER'] == 'you':
+        rm = YouRM(ydc_api_key=st.secrets['YDC_API_KEY'], k=engine_args.search_top_k)
+    elif st.secrets['RETRIEVER'] == 'brave':
+        rm = BraveRM(brave_search_api_key=st.secrets['BRAVE_SEARCH_API_KEY'], k=engine_args.search_top_k)
 
     runner = STORMWikiRunner(engine_args, llm_configs, rm)
     st.session_state["runner"] = runner

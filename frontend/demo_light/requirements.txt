@@ -8,3 +8,12 @@ deprecation==2.1.0
 st-pages==0.4.5
 streamlit-float
 streamlit-option-menu
+dspy_ai==2.4.9
+wikipedia==1.4.0
+sentence_transformers
+toml
+langchain-text-splitters
+trafilatura
+langchain-huggingface
+qdrant-client
+langchain-qdrant
