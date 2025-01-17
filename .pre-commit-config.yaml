@@ -1,0 +1,10 @@
+repos:
+  - repo: https://github.com/psf/black
+    rev: 24.8.0
+    hooks:
+      - id: black
+        name: Format Python code with black
+        entry: black
+        args: ["knowledge_storm/"]
+        language: python
+        pass_filenames: true

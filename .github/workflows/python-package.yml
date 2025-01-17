@@ -1,0 +1,40 @@
+name: Build and upload Python package
+
+on:
+  workflow_dispatch:  # Allows manual triggering of the workflow
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@master
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.11"
+      - name: Compare versions in setup.py and knowledge_storm/__init__.py
+        run: |
+          VERSION_SETUP=$(grep -oP '(?<=version=\").*(?=\")' setup.py)
+          VERSION_INIT=$(grep -oP '(?<=__version__ = \").*(?=\")' knowledge_storm/__init__.py)
+          echo "Version in setup.py: $VERSION_SETUP"
+          echo "Version in __init__.py: $VERSION_INIT"
+          if [ "$VERSION_SETUP" != "$VERSION_INIT" ]; then
+            echo "Error: Version mismatch between setup.py ($VERSION_SETUP) and knowledge_storm/__init__.py ($VERSION_INIT)"
+            exit 1
+          fi
+        shell: bash
+      - name: Install dependencies
+        run: python3 -m pip install setuptools wheel twine
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip setuptools wheel
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Build a binary wheel
+        run: python3 setup.py sdist bdist_wheel
+      - name: Publish package to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}

@@ -1,0 +1,16 @@
+name: Check Python formatting with Black
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+      - uses: psf/black@stable
+        with:
+          black_args: "knowledge_storm --check"

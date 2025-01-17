@@ -35,13 +35,15 @@ def main():
     menu_container = st.container()
     with menu_container:
         pages = ["My Articles", "Create New Article"]
+        styles={
+                                         "container": {"padding": "0.2rem 0", 
+                                                       "background-color": "#22222200"},
+                                     }
         menu_selection = option_menu(None, pages,
                                      icons=['house', 'search'],
                                      menu_icon="cast", default_index=0, orientation="horizontal",
                                      manual_select=st.session_state.selected_page,
-                                     styles={
-                                         "container": {"padding": "0.2rem 0", "background-color": "#22222200"},
-                                     },
+                                     styles=styles,
                                      key='menu_selection')
         if st.session_state.get("manual_selection_override", False):
             menu_selection = pages[st.session_state["selected_page"]]
