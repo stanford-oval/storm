@@ -942,3 +942,121 @@ class GoogleModel(dspy.dsp.modules.lm.LM):
             completions.append(response.parts[0].text)
 
         return completions
+
+
+class RekaModel(dspy.dsp.modules.lm.LM):
+    """A wrapper class for dspy.LM using Reka."""
+
+    def __init__(self, model: str, api_key: Optional[str] = None, **kwargs):
+        """Initialize the Reka model.
+
+        Args:
+            model: The name of the Reka model to use
+            api_key: Optional API key for authentication
+            **kwargs: Additional arguments passed to the model
+        """
+        super().__init__(model)
+        try:
+            from reka.client import Reka
+        except ImportError as err:
+            raise ImportError("Reka requires `pip install reka-api`.") from err
+
+        self.provider = "reka"
+        self.api_key = api_key = (
+            os.environ.get("REKA_API_KEY") if api_key is None else api_key
+        )
+
+        self.kwargs = {
+            "temperature": kwargs.get("temperature", 0.0),
+            "max_tokens": min(kwargs.get("max_tokens", 4096), 4096),
+            "top_p": kwargs.get("top_p", 1.0),
+            "top_k": kwargs.get("top_k", 1),
+            "n": kwargs.pop("n", kwargs.pop("num_generations", 1)),
+            **kwargs,
+            "model": model,
+        }
+        self.history: list[dict[str, Any]] = []
+        self.client = Reka(api_key=api_key)
+        self.model = model
+
+        self._token_usage_lock = threading.Lock()
+        self.prompt_tokens = 0
+        self.completion_tokens = 0
+
+    def log_usage(self, response):
+        """Log the total tokens from the Reka API response."""
+        usage_data = response.usage
+        if usage_data:
+            with self._token_usage_lock:
+                self.prompt_tokens += usage_data.input_tokens
+                self.completion_tokens += usage_data.output_tokens
+
+    def get_usage_and_reset(self):
+        """Get the total tokens used and reset the token usage."""
+        usage = {
+            self.model: {
+                "prompt_tokens": self.prompt_tokens,
+                "completion_tokens": self.completion_tokens,
+            }
+        }
+        self.prompt_tokens = 0
+        self.completion_tokens = 0
+        return usage
+
+    def basic_request(self, prompt: str, **kwargs):
+        raw_kwargs = kwargs
+        kwargs = {**self.kwargs, **kwargs}
+        # caching mechanism requires hashable kwargs
+        kwargs["messages"] = [{"role": "user", "content": prompt}]
+        kwargs.pop("n")
+        response = self.client.chat.create(**kwargs)
+
+        json_serializable_history = {
+            "prompt": prompt,
+            "response": {
+                "text": response.responses[0].message.content,
+                "model": response.model,
+                "usage": {
+                    "prompt_tokens": response.usage.input_tokens,
+                    "completion_tokens": response.usage.output_tokens,
+                },
+            },
+            "kwargs": kwargs,
+            "raw_kwargs": raw_kwargs,
+        }
+        self.history.append(json_serializable_history)
+        return response
+
+    @backoff.on_exception(
+        backoff.expo,
+        (Exception,),
+        max_time=1000,
+        max_tries=8,
+        on_backoff=backoff_hdlr,
+        giveup=giveup_hdlr,
+    )
+    def request(self, prompt: str, **kwargs):
+        """Handles retrieval of completions from Reka whilst handling API errors."""
+        return self.basic_request(prompt, **kwargs)
+
+    def __call__(self, prompt: str, only_completed=True, return_sorted=False, **kwargs):
+        """Retrieves completions from Reka.
+
+        Args:
+            prompt (str): prompt to send to Reka
+            only_completed (bool, optional): return only completed responses. Defaults to True.
+            return_sorted (bool, optional): sort completion choices by probability. Defaults to False.
+
+        Returns:
+            list[str]: list of completion choices
+        """
+        assert only_completed, "for now"
+        assert return_sorted is False, "for now"
+
+        n = kwargs.pop("n", 1)
+        completions = []
+        for _ in range(n):
+            response = self.request(prompt, **kwargs)
+            self.log_usage(response)
+            completions = [choice.message.content for choice in response.responses]
+        return completions
