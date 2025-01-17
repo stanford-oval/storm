@@ -988,8 +988,8 @@ class RekaModel(dspy.dsp.modules.lm.LM):
         usage_data = response.usage
         if usage_data:
             with self._token_usage_lock:
-                self.prompt_tokens += usage_data.prompt_tokens
-                self.completion_tokens += usage_data.completion_tokens
+                self.prompt_tokens += usage_data.input_tokens
+                self.completion_tokens += usage_data.output_tokens
 
     def get_usage_and_reset(self):
         """Get the total tokens used and reset the token usage."""
@@ -1009,16 +1009,16 @@ class RekaModel(dspy.dsp.modules.lm.LM):
         # caching mechanism requires hashable kwargs
         kwargs["messages"] = [{"role": "user", "content": prompt}]
         kwargs.pop("n")
-        response = self.client.completions.create(**kwargs)
+        response = self.client.chat.create(**kwargs)
 
         json_serializable_history = {
             "prompt": prompt,
             "response": {
-                "text": response.choices[0].text,
+                "text": response.responses[0].message.content,
                 "model": response.model,
                 "usage": {
-                    "prompt_tokens": response.usage.prompt_tokens,
-                    "completion_tokens": response.usage.completion_tokens,
+                    "prompt_tokens": response.usage.input_tokens,
+                    "completion_tokens": response.usage.output_tokens,
                 },
             },
             "kwargs": kwargs,
@@ -1058,5 +1058,5 @@ class RekaModel(dspy.dsp.modules.lm.LM):
         for _ in range(n):
             response = self.request(prompt, **kwargs)
             self.log_usage(response)
-            completions = [choice.text for choice in response.choices]
+            completions = [choice.message.content for choice in response.responses]
         return completions
