@@ -1229,8 +1229,9 @@ class AzureAISearch(dspy.Retrieve):
 
         return collected_results
 
+
 class ElasticSearchRM(dspy.Retrieve):
-    def __init__(self, es_hosts=None, index_name=None, k=3):
+    def __init__(self, api_host=None, api_key=None, index_name=None, k=3):
         super().__init__(k=k)
         try:
             from elasticsearch import Elasticsearch
@@ -1238,11 +1239,13 @@ class ElasticSearchRM(dspy.Retrieve):
             raise ImportError(
                 "Elasticsearch requires `pip install elasticsearch`."
             ) from err
-        if not es_hosts:
-            raise RuntimeError("You must supply es_hosts")
+        if not api_host:
+            raise RuntimeError("You must supply api_host")
+        if not api_key:
+            raise RuntimeError("You must supply api_key")
         if not index_name:
             raise RuntimeError("You must supply index_name")
-        self.es = Elasticsearch(es_hosts)
+        self.es = Elasticsearch(api_host, api_key=api_key)
         self.index_name = index_name
         self.usage = 0
 
@@ -1261,12 +1264,12 @@ class ElasticSearchRM(dspy.Retrieve):
         collected_results = []
         for query in queries:
             try:
-                results = self.es.search(index=self.index_name, body={"query": {"match": {"content": query}}})
+                results = self.es.search(index=self.index_name, body={"query": {"match": {"body": query}}})
                 for hit in results['hits']['hits']:
                     if hit['_source']['url'] not in exclude_urls:
                         collected_results.append({
                             "description": hit['_source'].get('description', ''),
-                            "snippets": [hit['_source'].get('content', '')],
+                            "snippets": [hit['_source'].get('body', '')],
                             "title": hit['_source'].get('title', ''),
                             "url": hit['_source'].get('url', '')
                         })
