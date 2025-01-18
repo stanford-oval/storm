@@ -17,3 +17,5 @@ trafilatura
 langchain-huggingface
 qdrant-client
 langchain-qdrant
+knowledge_storm
+lxml_html_clean
