@@ -53,6 +53,7 @@ class Encoder:
         Refer to the LiteLLM documentation for details on supported embedding models:
         https://docs.litellm.ai/docs/embedding/supported_embedding
     """
+
     def __init__(
         self,
         encoder_type: Optional[str] = None,
