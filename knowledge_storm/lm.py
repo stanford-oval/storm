@@ -37,7 +37,7 @@ with warnings.catch_warnings():
     litellm.drop_params = True
     litellm.telemetry = False
 
-from litellm.caching import Cache
+from litellm.caching.caching import Cache
 
 disk_cache_dir = os.path.join(Path.home(), ".storm_local_cache")
 litellm.cache = Cache(disk_cache_dir=disk_cache_dir, type="disk")
