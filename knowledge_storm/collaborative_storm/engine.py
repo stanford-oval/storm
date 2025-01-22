@@ -472,16 +472,16 @@ class DiscourseManager:
         elif self.runner_argument.rag_only_baseline_mode:
             assert self.conversation_history[-1].role == "Guest"
             next_turn_policy.agent = self.pure_rag_agent
+        elif self.next_turn_moderator_override:
+            next_turn_policy.agent = self.moderator
+            if not dry_run:
+                self.next_turn_moderator_override = False
         elif (
             not self.runner_argument.disable_moderator
             and self._should_generate_question(conversation_history)
         ):
             next_turn_policy.agent = self.moderator
             next_turn_policy.should_reorganize_knowledge_base = True
-        elif self.next_turn_moderator_override:
-            next_turn_policy.agent = self.moderator
-            if not dry_run:
-                self.next_turn_moderator_override = False
         # experts RAG gen
         else:
             next_turn_policy.agent = self.general_knowledge_provider
@@ -552,7 +552,7 @@ class CoStormRunner:
         }
 
     @classmethod
-    def from_dict(cls, data):
+    def from_dict(cls, data, callback_handler: BaseCallbackHandler = None):
         # FIXME: does not use the lm_config data but naively use default setting
         lm_config = CollaborativeStormLMConfigs()
         lm_config.init(lm_type=os.getenv("OPENAI_API_TYPE"))
@@ -560,6 +560,7 @@ class CoStormRunner:
             lm_config=lm_config,
             runner_argument=RunnerArgument.from_dict(data["runner_argument"]),
             logging_wrapper=LoggingWrapper(lm_config),
+            callback_handler=callback_handler,
         )
         costorm_runner.encoder = Encoder()
         costorm_runner.conversation_history = [
@@ -615,11 +616,15 @@ class CoStormRunner:
                     warmstart_revised_conv if warmstart_revised_conv else warmstart_conv
                 )
                 self.warmstart_conv_archive = warmstart_conv
-                self.knowledge_base.reorganize()
+                self.knowledge_base.reogranize()
             else:
+
                 if self.knowledge_base is None:
                     self.knowledge_base = KnowledgeBase(
-                        topic=self.runner_argument.topic
+                        topic=self.runner_argument.topic,
+                        knowledge_base_lm=self.lm_config.knowledge_base_lm,
+                        node_expansion_trigger_count=self.runner_argument.node_expansion_trigger_count,
+                        encoder=self.encoder,
                     )
                 if self.conversation_history is None:
                     self.conversation_history = []
@@ -641,7 +646,9 @@ class CoStormRunner:
         Returns:
             str: A string representing the report, with "#" "##" indicating hierarchical sections and [1][2] indicating references.
         """
-        with self.logging_wrapper.log_pipeline_stage("report generation stage"):
+        with self.logging_wrapper.log_pipeline_stage(
+            f"report generation after conv turn: {len(self.conversation_history)}"
+        ):
             with self.logging_wrapper.log_event(
                 "report generation stage: generate report"
             ):
@@ -749,5 +756,5 @@ class CoStormRunner:
                     ):
                         if self.callback_handler is not None:
                             self.callback_handler.on_mindmap_reorg_start()
-                        self.knowledge_base.reorganize()
+                        self.knowledge_base.reogranize()
         return conv_turn
