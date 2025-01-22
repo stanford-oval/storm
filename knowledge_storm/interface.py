@@ -502,9 +502,9 @@ class Engine(ABC):
             logger.info(f"{func.__name__} executed in {execution_time:.4f} seconds")
             self.lm_cost[func.__name__] = self.lm_configs.collect_and_reset_lm_usage()
             if hasattr(self, "retriever"):
-                self.rm_cost[
-                    func.__name__
-                ] = self.retriever.collect_and_reset_rm_usage()
+                self.rm_cost[func.__name__] = (
+                    self.retriever.collect_and_reset_rm_usage()
+                )
             return result
 
         return wrapper

@@ -269,6 +269,7 @@ class LitellmModel(LM):
 # The following language model classes were deprecated after v1.0.2.
 # They remain in this file for backward compatibility but will no longer be maintained.
 
+
 class OpenAIModel(dspy.OpenAI):
     """A wrapper class for dspy.OpenAI."""
 

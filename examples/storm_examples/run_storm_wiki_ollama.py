@@ -15,6 +15,7 @@ args.output_dir/
         storm_gen_article.txt           # Final article generated
         storm_gen_article_polished.txt  # Polished final article (if args.do_polish_article is True)
 """
+
 import os
 import sys
 from argparse import ArgumentParser

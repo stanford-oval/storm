@@ -34,9 +34,9 @@ def handle_not_started():
                 ]:
                     if not st.session_state["page3_topic"].strip():
                         pass_appropriateness_check = False
-                        st.session_state[
-                            "page3_warning_message"
-                        ] = "topic could not be empty"
+                        st.session_state["page3_warning_message"] = (
+                            "topic could not be empty"
+                        )
 
                     st.session_state["page3_topic_name_cleaned"] = (
                         st.session_state["page3_topic"]

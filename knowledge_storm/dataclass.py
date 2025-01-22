@@ -773,9 +773,9 @@ class KnowledgeBase:
     def update_all_info_path(self):
         def _helper(node):
             for citation_idx in node.content:
-                self.info_uuid_to_info_dict[citation_idx].meta[
-                    "placement"
-                ] = " -> ".join(node.get_path_from_root())
+                self.info_uuid_to_info_dict[citation_idx].meta["placement"] = (
+                    " -> ".join(node.get_path_from_root())
+                )
             for child in node.children:
                 _helper(child)
 
