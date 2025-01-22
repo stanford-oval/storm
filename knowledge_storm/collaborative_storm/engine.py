@@ -600,11 +600,13 @@ class CoStormRunner:
                     callback_handler=self.callback_handler,
                 )
 
-                warmstart_conv, warmstart_revised_conv, warmstart_experts = (
-                    warm_start_module.initiate_warm_start(
-                        topic=self.runner_argument.topic,
-                        knowledge_base=self.knowledge_base,
-                    )
+                (
+                    warmstart_conv,
+                    warmstart_revised_conv,
+                    warmstart_experts,
+                ) = warm_start_module.initiate_warm_start(
+                    topic=self.runner_argument.topic,
+                    knowledge_base=self.knowledge_base,
                 )
                 self.discourse_manager.experts = (
                     self.discourse_manager._parse_expert_names_to_agent(
@@ -618,7 +620,6 @@ class CoStormRunner:
                 self.warmstart_conv_archive = warmstart_conv
                 self.knowledge_base.reogranize()
             else:
-
                 if self.knowledge_base is None:
                     self.knowledge_base = KnowledgeBase(
                         topic=self.runner_argument.topic,

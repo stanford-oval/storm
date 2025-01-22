@@ -270,9 +270,10 @@ class InsertInformationModule(dspy.Module):
                     root=insert_root,
                 )
 
-        encoded_outlines, outlines = (
-            knowledge_base.get_knowledge_base_structure_embedding(root=insert_root)
-        )
+        (
+            encoded_outlines,
+            outlines,
+        ) = knowledge_base.get_knowledge_base_structure_embedding(root=insert_root)
         to_return = []
         if not allow_create_new_node:
             # use multi thread as knowledge base structure does not change
@@ -295,10 +296,11 @@ class InsertInformationModule(dspy.Module):
         else:
             # use sequential insert as knowledge base structure might change
             for question, query in intent_to_placement_dict:
-                encoded_outlines, outlines = (
-                    knowledge_base.get_knowledge_base_structure_embedding(
-                        root=insert_root
-                    )
+                (
+                    encoded_outlines,
+                    outlines,
+                ) = knowledge_base.get_knowledge_base_structure_embedding(
+                    root=insert_root
                 )
                 _, placement_prediction = process_intent(question=question, query=query)
                 intent_to_placement_dict[(question, query)] = placement_prediction
