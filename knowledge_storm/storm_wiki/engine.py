@@ -239,7 +239,6 @@ class STORMWikiRunner(Engine):
         information_table: StormInformationTable,
         callback_handler: BaseCallbackHandler = None,
     ) -> StormArticle:
-
         outline, draft_outline = self.storm_outline_generation_module.generate_outline(
             topic=self.topic,
             information_table=information_table,
@@ -257,10 +256,9 @@ class STORMWikiRunner(Engine):
     def run_article_generation_module(
         self,
         outline: StormArticle,
-        information_table: StormInformationTable,
+        information_table=StormInformationTable,
         callback_handler: BaseCallbackHandler = None,
     ) -> StormArticle:
-
         draft_article = self.storm_article_generation.generate_article(
             topic=self.topic,
             information_table=information_table,
@@ -278,7 +276,6 @@ class STORMWikiRunner(Engine):
     def run_article_polishing_module(
         self, draft_article: StormArticle, remove_duplicate: bool = False
     ) -> StormArticle:
-
         polished_article = self.storm_article_polishing_module.polish_article(
             topic=self.topic,
             draft_article=draft_article,
