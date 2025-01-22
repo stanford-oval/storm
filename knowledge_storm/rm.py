@@ -7,10 +7,6 @@ import dspy
 import requests
 from dsp import backoff_hdlr, giveup_hdlr
 
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_qdrant import Qdrant
-from qdrant_client import QdrantClient
-
 from .utils import WebPageHelper
 
 
@@ -199,6 +195,8 @@ class VectorRM(dspy.Retrieve):
         device: str = "mps",
         k: int = 3,
     ):
+        from langchain_huggingface import HuggingFaceEmbeddings
+
         """
         Params:
             collection_name: Name of the Qdrant collection.
@@ -228,6 +226,8 @@ class VectorRM(dspy.Retrieve):
         self.qdrant = None
 
     def _check_collection(self):
+        from langchain_qdrant import Qdrant
+
         """
         Check if the Qdrant collection exists and create it if it does not.
         """
@@ -248,6 +248,8 @@ class VectorRM(dspy.Retrieve):
             )
 
     def init_online_vector_db(self, url: str, api_key: str):
+        from qdrant_client import QdrantClient
+
         """
         Initialize the Qdrant client that is connected to an online vector store with the given URL and API key.
 
@@ -269,6 +271,8 @@ class VectorRM(dspy.Retrieve):
             raise ValueError(f"Error occurs when connecting to the server: {e}")
 
     def init_offline_vector_db(self, vector_store_path: str):
+        from qdrant_client import QdrantClient
+
         """
         Initialize the Qdrant client that is connected to an offline vector store with the given vector store folder path.
 
@@ -336,19 +340,20 @@ class VectorRM(dspy.Retrieve):
 class StanfordOvalArxivRM(dspy.Retrieve):
     """[Alpha] This retrieval class is for internal use only, not intended for the public."""
 
-    def __init__(self, endpoint, k=3):
+    def __init__(self, endpoint, k=3, rerank=True):
         super().__init__(k=k)
         self.endpoint = endpoint
         self.usage = 0
+        self.rerank = rerank
 
     def get_usage_and_reset(self):
         usage = self.usage
         self.usage = 0
 
-        return {"CS224vArxivRM": usage}
+        return {"StanfordOvalArxivRM": usage}
 
     def _retrieve(self, query: str):
-        payload = {"query": query, "num_blocks": self.k}
+        payload = {"query": query, "num_blocks": self.k, "rerank": self.rerank}
 
         response = requests.post(
             self.endpoint, json=payload, headers={"Content-Type": "application/json"}
@@ -356,16 +361,21 @@ class StanfordOvalArxivRM(dspy.Retrieve):
 
         # Check if the request was successful
         if response.status_code == 200:
-            data = response.json()[0]
+            response_data_list = response.json()[0]["results"]
             results = []
-            for i in range(len(data["title"])):
+            for response_data in response_data_list:
                 result = {
-                    "title": data["title"][i],
-                    "url": data["title"][i],
-                    "snippets": [data["text"][i]],
-                    "description": "N/A",
-                    "meta": {"section_title": data["full_section_title"][i]},
+                    "title": response_data["document_title"],
+                    "url": response_data["url"],
+                    "snippets": [response_data["content"]],
+                    "description": response_data.get("description", "N/A"),
+                    "meta": {
+                        key: value
+                        for key, value in response_data.items()
+                        if key not in ["document_title", "url", "content"]
+                    },
                 }
+
                 results.append(result)
 
             return results
@@ -537,9 +547,7 @@ class SerperRM(dspy.Retrieve):
                     snippets = [organic.get("snippet")]
                     if self.ENABLE_EXTRA_SNIPPET_EXTRACTION:
                         snippets.extend(
-                            valid_url_to_snippets.get(url.strip("'"), {}).get(
-                                "snippets", []
-                            )
+                            valid_url_to_snippets.get(url, {}).get("snippets", [])
                         )
                     collected_results.append(
                         {
