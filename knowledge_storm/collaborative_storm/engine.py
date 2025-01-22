@@ -14,6 +14,7 @@ from .modules.co_storm_agents import (
 from .modules.expert_generation import GenerateExpertModule
 from .modules.warmstart_hierarchical_chat import WarmStartModule
 from ..dataclass import ConversationTurn, KnowledgeBase
+from ..encoder import Encoder
 from ..interface import LMConfigs, Agent
 from ..logging_wrapper import LoggingWrapper
 from ..lm import OpenAIModel, AzureOpenAIModel, TogetherClient
@@ -323,6 +324,7 @@ class DiscourseManager:
         lm_config: CollaborativeStormLMConfigs,
         runner_argument: RunnerArgument,
         rm: dspy.Retrieve,
+        encoder: Encoder,
         callback_handler: BaseCallbackHandler,
     ):
         # parameter management
@@ -331,6 +333,7 @@ class DiscourseManager:
         self.logging_wrapper = logging_wrapper
         self.callback_handler = callback_handler
         self.rm = rm
+        self.encoder = encoder
         # role management
         self.experts: List[CoStormExpert] = []
         self.simulated_user: SimulatedUser = SimulatedUser(
@@ -360,6 +363,7 @@ class DiscourseManager:
             lm_config=self.lm_config,
             runner_argument=self.runner_argument,
             logging_wrapper=self.logging_wrapper,
+            encoder=self.encoder,
             callback_handler=self.callback_handler,
         )
         self.general_knowledge_provider = CoStormExpert(
@@ -516,18 +520,21 @@ class CoStormRunner:
             self.rm = BingSearch(k=runner_argument.retrieve_top_k)
         else:
             self.rm = rm
+        self.encoder = Encoder()
         self.conversation_history = []
         self.warmstart_conv_archive = []
         self.knowledge_base = KnowledgeBase(
             topic=self.runner_argument.topic,
             knowledge_base_lm=self.lm_config.knowledge_base_lm,
             node_expansion_trigger_count=self.runner_argument.node_expansion_trigger_count,
+            encoder=self.encoder,
         )
         self.discourse_manager = DiscourseManager(
             lm_config=self.lm_config,
             runner_argument=self.runner_argument,
             logging_wrapper=self.logging_wrapper,
             rm=self.rm,
+            encoder=self.encoder,
             callback_handler=callback_handler,
         )
 
@@ -555,6 +562,7 @@ class CoStormRunner:
             runner_argument=RunnerArgument.from_dict(data["runner_argument"]),
             logging_wrapper=LoggingWrapper(lm_config),
         )
+        costorm_runner.encoder = Encoder()
         costorm_runner.conversation_history = [
             ConversationTurn.from_dict(turn) for turn in data["conversation_history"]
         ]
@@ -567,6 +575,7 @@ class CoStormRunner:
             data=data["knowledge_base"],
             knowledge_base_lm=costorm_runner.lm_config.knowledge_base_lm,
             node_expansion_trigger_count=costorm_runner.runner_argument.node_expansion_trigger_count,
+            encoder=costorm_runner.encoder,
         )
         return costorm_runner
 
