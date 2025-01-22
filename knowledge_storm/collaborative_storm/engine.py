@@ -17,7 +17,7 @@ from ..dataclass import ConversationTurn, KnowledgeBase
 from ..encoder import Encoder
 from ..interface import LMConfigs, Agent
 from ..logging_wrapper import LoggingWrapper
-from ..lm import OpenAIModel, AzureOpenAIModel, TogetherClient
+from ..lm import LitellmModel
 from ..rm import BingSearch
 
 
@@ -46,27 +46,26 @@ class CollaborativeStormLMConfigs(LMConfigs):
         if lm_type and lm_type == "openai":
             openai_kwargs = {
                 "api_key": os.getenv("OPENAI_API_KEY"),
-                "api_provider": "openai",
                 "temperature": temperature,
                 "top_p": top_p,
                 "api_base": None,
             }
-            self.question_answering_lm = OpenAIModel(
+            self.question_answering_lm = LitellmModel(
                 model="gpt-4o-2024-05-13", max_tokens=1000, **openai_kwargs
             )
-            self.discourse_manage_lm = OpenAIModel(
+            self.discourse_manage_lm = LitellmModel(
                 model="gpt-4o-2024-05-13", max_tokens=500, **openai_kwargs
             )
-            self.utterance_polishing_lm = OpenAIModel(
+            self.utterance_polishing_lm = LitellmModel(
                 model="gpt-4o-2024-05-13", max_tokens=2000, **openai_kwargs
             )
-            self.warmstart_outline_gen_lm = OpenAIModel(
+            self.warmstart_outline_gen_lm = LitellmModel(
                 model="gpt-4-1106-preview", max_tokens=500, **openai_kwargs
             )
-            self.question_asking_lm = OpenAIModel(
+            self.question_asking_lm = LitellmModel(
                 model="gpt-4o-2024-05-13", max_tokens=300, **openai_kwargs
             )
-            self.knowledge_base_lm = OpenAIModel(
+            self.knowledge_base_lm = LitellmModel(
                 model="gpt-4o-2024-05-13", max_tokens=1000, **openai_kwargs
             )
         elif lm_type and lm_type == "azure":
@@ -77,23 +76,23 @@ class CollaborativeStormLMConfigs(LMConfigs):
                 "api_base": os.getenv("AZURE_API_BASE"),
                 "api_version": os.getenv("AZURE_API_VERSION"),
             }
-            self.question_answering_lm = AzureOpenAIModel(
-                model="gpt-4o", max_tokens=1000, **azure_kwargs, model_type="chat"
+            self.question_answering_lm = LitellmModel(
+                model="azure/gpt-4o", max_tokens=1000, **azure_kwargs, model_type="chat"
             )
-            self.discourse_manage_lm = AzureOpenAIModel(
-                model="gpt-4o", max_tokens=500, **azure_kwargs, model_type="chat"
+            self.discourse_manage_lm = LitellmModel(
+                model="azure/gpt-4o", max_tokens=500, **azure_kwargs, model_type="chat"
             )
-            self.utterance_polishing_lm = AzureOpenAIModel(
-                model="gpt-4o", max_tokens=2000, **azure_kwargs, model_type="chat"
+            self.utterance_polishing_lm = LitellmModel(
+                model="azure/gpt-4o", max_tokens=2000, **azure_kwargs, model_type="chat"
             )
-            self.warmstart_outline_gen_lm = AzureOpenAIModel(
-                model="gpt-4o", max_tokens=300, **azure_kwargs, model_type="chat"
+            self.warmstart_outline_gen_lm = LitellmModel(
+                model="azure/gpt-4o", max_tokens=300, **azure_kwargs, model_type="chat"
             )
-            self.question_asking_lm = AzureOpenAIModel(
-                model="gpt-4o", max_tokens=300, **azure_kwargs, model_type="chat"
+            self.question_asking_lm = LitellmModel(
+                model="azure/gpt-4o", max_tokens=300, **azure_kwargs, model_type="chat"
             )
-            self.knowledge_base_lm = AzureOpenAIModel(
-                model="gpt-4o", max_tokens=1000, **azure_kwargs, model_type="chat"
+            self.knowledge_base_lm = LitellmModel(
+                model="azure/gpt-4o", max_tokens=1000, **azure_kwargs, model_type="chat"
             )
         elif lm_type and lm_type == "together":
             together_kwargs = {
@@ -101,38 +100,38 @@ class CollaborativeStormLMConfigs(LMConfigs):
                 "temperature": temperature,
                 "top_p": top_p,
             }
-            self.question_answering_lm = TogetherClient(
-                model="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+            self.question_answering_lm = LitellmModel(
+                model="together_ai/meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
                 max_tokens=1000,
                 model_type="chat",
                 **together_kwargs,
             )
-            self.discourse_manage_lm = TogetherClient(
-                model="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+            self.discourse_manage_lm = LitellmModel(
+                model="together_ai/meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
                 max_tokens=500,
                 model_type="chat",
                 **together_kwargs,
             )
-            self.utterance_polishing_lm = TogetherClient(
-                model="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+            self.utterance_polishing_lm = LitellmModel(
+                model="together_ai/meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
                 max_tokens=2000,
                 model_type="chat",
                 **together_kwargs,
             )
-            self.warmstart_outline_gen_lm = TogetherClient(
-                model="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+            self.warmstart_outline_gen_lm = LitellmModel(
+                model="together_ai/meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
                 max_tokens=500,
                 model_type="chat",
                 **together_kwargs,
             )
-            self.question_asking_lm = TogetherClient(
-                model="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+            self.question_asking_lm = LitellmModel(
+                model="together_ai/meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
                 max_tokens=300,
                 model_type="chat",
                 **together_kwargs,
             )
-            self.knowledge_base_lm = TogetherClient(
-                model="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+            self.knowledge_base_lm = LitellmModel(
+                model="together_ai/meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
                 max_tokens=1000,
                 model_type="chat",
                 **together_kwargs,
