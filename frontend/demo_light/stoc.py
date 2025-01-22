@@ -44,9 +44,9 @@ class stoc:
                 for title_size, title in self.toc_items:
                     h = int(title_size.replace("h", ""))
                     markdown_toc += (
-                            " " * 2 * h
-                            + "- "
-                            + f'<a href="#{normalize(title)}" class="toc"> {title}</a> \n'
+                        " " * 2 * h
+                        + "- "
+                        + f'<a href="#{normalize(title)}" class="toc"> {title}</a> \n'
                     )
                 # st.sidebar.write(markdown_toc, unsafe_allow_html=True)
                 st.write(markdown_toc, unsafe_allow_html=True)
@@ -56,27 +56,35 @@ class stoc:
         def increase_heading_depth_and_add_top_heading(markdown_text, new_top_heading):
             lines = markdown_text.splitlines()
             # Increase the depth of each heading by adding an extra '#'
-            increased_depth_lines = ['#' + line if line.startswith('#') else line for line in lines]
+            increased_depth_lines = [
+                "#" + line if line.startswith("#") else line for line in lines
+            ]
             # Add the new top-level heading at the beginning
             increased_depth_lines.insert(0, f"# {new_top_heading}")
             # Re-join the modified lines back into a single string
-            modified_text = '\n'.join(increased_depth_lines)
+            modified_text = "\n".join(increased_depth_lines)
             return modified_text
 
         if topic:
-            markdown_text = increase_heading_depth_and_add_top_heading(markdown_text, topic)
+            markdown_text = increase_heading_depth_and_add_top_heading(
+                markdown_text, topic
+            )
         toc = []
         for line in markdown_text.splitlines():
-            if line.startswith('#'):
+            if line.startswith("#"):
                 # Remove the '#' characters and strip leading/trailing spaces
-                heading_text = line.lstrip('#').strip()
+                heading_text = line.lstrip("#").strip()
                 # Create slug (lowercase, spaces to hyphens, remove non-alphanumeric characters)
-                slug = re.sub(r'[^a-zA-Z0-9\s-]', '', heading_text).lower().replace(' ', '-')
+                slug = (
+                    re.sub(r"[^a-zA-Z0-9\s-]", "", heading_text)
+                    .lower()
+                    .replace(" ", "-")
+                )
                 # Determine heading level for indentation
-                level = line.count('#') - 1
+                level = line.count("#") - 1
                 # Add to the table of contents
-                toc.append('  ' * level + f'- [{heading_text}](#{slug})')
-        return '\n'.join(toc)
+                toc.append("  " * level + f"- [{heading_text}](#{slug})")
+        return "\n".join(toc)
 
     @classmethod
     def from_markdown(cls, text: str, expander=None):

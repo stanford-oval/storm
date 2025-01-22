@@ -213,16 +213,16 @@ class STORMWikiRunner(Engine):
         ground_truth_url: str = "None",
         callback_handler: BaseCallbackHandler = None,
     ) -> StormInformationTable:
-
-        information_table, conversation_log = (
-            self.storm_knowledge_curation_module.research(
-                topic=self.topic,
-                ground_truth_url=ground_truth_url,
-                callback_handler=callback_handler,
-                max_perspective=self.args.max_perspective,
-                disable_perspective=False,
-                return_conversation_log=True,
-            )
+        (
+            information_table,
+            conversation_log,
+        ) = self.storm_knowledge_curation_module.research(
+            topic=self.topic,
+            ground_truth_url=ground_truth_url,
+            callback_handler=callback_handler,
+            max_perspective=self.args.max_perspective,
+            disable_perspective=False,
+            return_conversation_log=True,
         )
 
         FileIOHelper.dump_json(
