@@ -825,7 +825,7 @@ class KnowledgeBase:
     def get_knowledge_base_summary(self):
         return self.gen_summary_module(self)
 
-    def reorganize(self):
+    def reogranize(self):
         """
         Reorganizes the knowledge base through two main processes: top-down expansion and bottom-up cleaning.
 
