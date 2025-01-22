@@ -34,6 +34,25 @@ except ImportError:
 
 
 class Encoder:
+    """
+    A wrapper class for the LiteLLM embedding model, designed to handle embedding
+    generation tasks efficiently. It supports parallel processing and local caching of
+    embedding results for improved performance.
+
+    The Encoder utilizes the LiteLLM library to interact with various embedding models,
+    such as OpenAI and Azure embeddings. Users can specify the desired encoder type and
+    provide relevant API credentials during initialization.
+
+    Features:
+        - Support for multiple embedding models (e.g., OpenAI, Azure).
+        - Parallel processing for faster embedding generation.
+        - Local disk caching to store and reuse embedding results.
+        - Total token usage tracking for cost monitoring.
+
+    Note:
+        Refer to the LiteLLM documentation for details on supported embedding models:
+        https://docs.litellm.ai/docs/embedding/supported_embedding
+    """
     def __init__(
         self,
         encoder_type: Optional[str] = None,

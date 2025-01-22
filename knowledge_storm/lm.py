@@ -184,6 +184,8 @@ def _inspect_history(lm, n: int = 1):
             print(_red(choices_text, end=""))
 
     print("\n\n\n")
+
+
 ############################
 
 
@@ -262,9 +264,11 @@ class LitellmModel(LM):
 
         return outputs
 
+
 # ========================================================================
-# following LM models are deprecated. 
-# Remained in this file for reproduction prorpose
+# The following language model classes were deprecated after v1.0.2.
+# They remain in this file for backward compatibility but will no longer be maintained.
+
 class OpenAIModel(dspy.OpenAI):
     """A wrapper class for dspy.OpenAI."""
 
@@ -1273,4 +1277,6 @@ class GoogleModel(dspy.dsp.modules.lm.LM):
             completions.append(response.parts[0].text)
 
         return completions
+
+
 # ========================================================================
