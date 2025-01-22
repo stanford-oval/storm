@@ -266,7 +266,7 @@ class LitellmModel(LM):
 
 
 # ========================================================================
-# The following language model classes were deprecated after v1.0.2.
+# The following language model classes were deprecated after v1.1.0.
 # They remain in this file for backward compatibility but will no longer be maintained.
 
 

@@ -9,7 +9,7 @@
 </p>
 **Latest News** 🔥
 
-- [2025/01] We add [litellm](https://github.com/BerriAI/litellm) integration for language models and embedding models
+- [2025/01] We add [litellm](https://github.com/BerriAI/litellm) integration for language models and embedding models in `knowledge-storm` v1.1.0.
 
 - [2024/09] Co-STORM codebase is now released and integrated into `knowledge-storm` python package v1.0.0. Run `pip install knowledge-storm --upgrade` to check it out.
 
