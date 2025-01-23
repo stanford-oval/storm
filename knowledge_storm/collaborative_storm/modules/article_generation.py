@@ -21,7 +21,7 @@ class ArticleGenerationModule(dspy.Module):
         self,
         all_citation_index: Set[int],
         knowledge_base: KnowledgeBase,
-        max_words: int = 1500,
+        max_words: int = 4000,
     ):
         information = []
         cur_word_count = 0
