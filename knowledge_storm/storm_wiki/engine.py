@@ -14,7 +14,7 @@ from .modules.outline_generation import StormOutlineGenerationModule
 from .modules.persona_generator import StormPersonaGenerator
 from .modules.storm_dataclass import StormInformationTable, StormArticle
 from ..interface import Engine, LMConfigs, Retriever
-from ..lm import OpenAIModel, AzureOpenAIModel
+from ..lm import LitellmModel
 from ..utils import FileIOHelper, makeStringRed, truncate_filename
 
 
@@ -56,50 +56,49 @@ class STORMWikiLMConfigs(LMConfigs):
 
         openai_kwargs = {
             "api_key": openai_api_key,
-            "api_provider": "openai",
             "temperature": temperature,
             "top_p": top_p,
             "api_base": None,
         }
         if openai_type and openai_type == "openai":
-            self.conv_simulator_lm = OpenAIModel(
+            self.conv_simulator_lm = LitellmModel(
                 model="gpt-4o-mini-2024-07-18", max_tokens=500, **openai_kwargs
             )
-            self.question_asker_lm = OpenAIModel(
+            self.question_asker_lm = LitellmModel(
                 model="gpt-4o-mini-2024-07-18", max_tokens=500, **openai_kwargs
             )
             # 1/12/2024: Update gpt-4 to gpt-4-1106-preview. (Currently keep the original setup when using azure.)
-            self.outline_gen_lm = OpenAIModel(
+            self.outline_gen_lm = LitellmModel(
                 model="gpt-4-0125-preview", max_tokens=400, **openai_kwargs
             )
-            self.article_gen_lm = OpenAIModel(
+            self.article_gen_lm = LitellmModel(
                 model="gpt-4o-2024-05-13", max_tokens=700, **openai_kwargs
             )
-            self.article_polish_lm = OpenAIModel(
+            self.article_polish_lm = LitellmModel(
                 model="gpt-4o-2024-05-13", max_tokens=4000, **openai_kwargs
             )
         elif openai_type and openai_type == "azure":
-            self.conv_simulator_lm = OpenAIModel(
-                model="gpt-4o-mini-2024-07-18", max_tokens=500, **openai_kwargs
+            self.conv_simulator_lm = LitellmModel(
+                model="azure/gpt-4o-mini-2024-07-18", max_tokens=500, **openai_kwargs
             )
-            self.question_asker_lm = AzureOpenAIModel(
-                model="gpt-4o-mini-2024-07-18",
+            self.question_asker_lm = LitellmModel(
+                model="azure/gpt-4o-mini-2024-07-18",
                 max_tokens=500,
                 **azure_kwargs,
                 model_type="chat",
             )
             # use combination of openai and azure-openai as azure-openai does not support gpt-4 in standard deployment
-            self.outline_gen_lm = AzureOpenAIModel(
-                model="gpt-4o", max_tokens=400, **azure_kwargs, model_type="chat"
+            self.outline_gen_lm = LitellmModel(
+                model="azure/gpt-4o", max_tokens=400, **azure_kwargs, model_type="chat"
             )
-            self.article_gen_lm = AzureOpenAIModel(
-                model="gpt-4o-mini-2024-07-18",
+            self.article_gen_lm = LitellmModel(
+                model="azure/gpt-4o-mini-2024-07-18",
                 max_tokens=700,
                 **azure_kwargs,
                 model_type="chat",
             )
-            self.article_polish_lm = AzureOpenAIModel(
-                model="gpt-4o-mini-2024-07-18",
+            self.article_polish_lm = LitellmModel(
+                model="azure/gpt-4o-mini-2024-07-18",
                 max_tokens=4000,
                 **azure_kwargs,
                 model_type="chat",
@@ -214,16 +213,16 @@ class STORMWikiRunner(Engine):
         ground_truth_url: str = "None",
         callback_handler: BaseCallbackHandler = None,
     ) -> StormInformationTable:
-
-        information_table, conversation_log = (
-            self.storm_knowledge_curation_module.research(
-                topic=self.topic,
-                ground_truth_url=ground_truth_url,
-                callback_handler=callback_handler,
-                max_perspective=self.args.max_perspective,
-                disable_perspective=False,
-                return_conversation_log=True,
-            )
+        (
+            information_table,
+            conversation_log,
+        ) = self.storm_knowledge_curation_module.research(
+            topic=self.topic,
+            ground_truth_url=ground_truth_url,
+            callback_handler=callback_handler,
+            max_perspective=self.args.max_perspective,
+            disable_perspective=False,
+            return_conversation_log=True,
         )
 
         FileIOHelper.dump_json(
@@ -240,7 +239,6 @@ class STORMWikiRunner(Engine):
         information_table: StormInformationTable,
         callback_handler: BaseCallbackHandler = None,
     ) -> StormArticle:
-
         outline, draft_outline = self.storm_outline_generation_module.generate_outline(
             topic=self.topic,
             information_table=information_table,
@@ -258,10 +256,9 @@ class STORMWikiRunner(Engine):
     def run_article_generation_module(
         self,
         outline: StormArticle,
-        information_table: StormInformationTable,
+        information_table=StormInformationTable,
         callback_handler: BaseCallbackHandler = None,
     ) -> StormArticle:
-
         draft_article = self.storm_article_generation.generate_article(
             topic=self.topic,
             information_table=information_table,
@@ -279,7 +276,6 @@ class STORMWikiRunner(Engine):
     def run_article_polishing_module(
         self, draft_article: StormArticle, remove_duplicate: bool = False
     ) -> StormArticle:
-
         polished_article = self.storm_article_polishing_module.polish_article(
             topic=self.topic,
             draft_article=draft_article,

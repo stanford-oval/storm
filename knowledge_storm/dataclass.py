@@ -4,7 +4,7 @@ import re
 import threading
 from typing import Set, Dict, List, Optional, Union, Tuple
 
-from .encoder import get_text_embeddings
+from .encoder import Encoder
 from .interface import Information
 
 
@@ -310,6 +310,7 @@ class KnowledgeBase:
         topic: str,
         knowledge_base_lm: Union[dspy.dsp.LM, dspy.dsp.HFModel],
         node_expansion_trigger_count: int,
+        encoder: Encoder,
     ):
         """
         Initializes a KnowledgeBase instance.
@@ -333,9 +334,10 @@ class KnowledgeBase:
         )
 
         self.topic: str = topic
+        self.encoder: Encoder = encoder
 
         self.information_insert_module = InsertInformationModule(
-            engine=knowledge_base_lm
+            engine=knowledge_base_lm, encoder=self.encoder
         )
         self.expand_node_module = ExpandNodeModule(
             engine=knowledge_base_lm,
@@ -353,7 +355,6 @@ class KnowledgeBase:
             "encoded_structure": np.array([[]]),
             "structure_string": "",
         }
-        self.embedding_cache: Dict[str, np.ndarray] = {}
         self.info_uuid_to_info_dict: Dict[int, Information] = {}
         self.info_hash_to_uuid_dict: Dict[int, int] = {}
         self._lock = threading.Lock()
@@ -375,11 +376,13 @@ class KnowledgeBase:
         data: Dict,
         knowledge_base_lm: Union[dspy.dsp.LM, dspy.dsp.HFModel],
         node_expansion_trigger_count: int,
+        encoder: Encoder,
     ):
         knowledge_base = cls(
             topic=data["topic"],
             knowledge_base_lm=knowledge_base_lm,
             node_expansion_trigger_count=node_expansion_trigger_count,
+            encoder=encoder,
         )
         knowledge_base.root = KnowledgeNode.from_dict(data["tree"])
         knowledge_base.info_hash_to_uuid_dict = {
@@ -408,9 +411,7 @@ class KnowledgeBase:
             cleaned_outline_strings = [
                 outline.replace(" -> ", ", ") for outline in outline_strings
             ]
-            encoded_outline, _ = get_text_embeddings(
-                cleaned_outline_strings, embedding_cache=self.embedding_cache
-            )
+            encoded_outline = self.encoder.encode(cleaned_outline_strings)
             self.kb_embedding = {
                 "hash": outline_string_hash,
                 "encoded_structure": encoded_outline,
@@ -545,7 +546,6 @@ class KnowledgeBase:
         cited_indices: Optional[List[int]] = None,
         root: Optional[KnowledgeNode] = None,
     ) -> str:
-
         def find_node_contain_index(node, index):
             """
             Traverses the tree downward from the given node.
@@ -825,7 +825,7 @@ class KnowledgeBase:
     def get_knowledge_base_summary(self):
         return self.gen_summary_module(self)
 
-    def reorganize(self):
+    def reogranize(self):
         """
         Reorganizes the knowledge base through two main processes: top-down expansion and bottom-up cleaning.
 
