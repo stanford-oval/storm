@@ -1041,7 +1041,7 @@ class TogetherClient(dspy.HFModel):
         #     self.use_inst_template = True
         self.apply_tokenizer_chat_template = apply_tokenizer_chat_template
         if self.apply_tokenizer_chat_template:
-            logging.info("Loading huggingface tokenizer.")
+            logging.info("Loading Hugging Face tokenizer.")
             if hf_tokenizer_name is None:
                 hf_tokenizer_name = self.model
             self.tokenizer = AutoTokenizer.from_pretrained(
