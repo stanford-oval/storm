@@ -69,9 +69,7 @@ app = FastAPI(title="CleverWrite API", description="API for article generation a
 
 # Load secrets and configure security
 try:
-    load_api_key(".streamlit/secrets.toml")
-    secrets = toml.load(".streamlit/secrets.toml")
-    API_TOKENS = set(secrets.get("API_TOKENS", []))
+    API_TOKENS = os.getenv("API_TOKENS")
     if not API_TOKENS:
         logger.warning("No API tokens configured in secrets.toml")
     
