@@ -357,7 +357,7 @@ Please cite our paper if you use this code or part of it in your work:
 Start the API server:
 
 ```
-uvicorn api:app --reload
+uvicorn api:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 ## V1 without search engine, openai model only:
@@ -365,13 +365,17 @@ uvicorn api:app --reload
 Generate an article:
 
 ```
-curl -X POST "http://localhost:8000/generate-article" -H "Content-Type: application/json" -d '{"topic": "The quick brown fox jumps over the lazy dog."}'
+curl -X POST "http://localhost:8000/generate-article" -H "Content-Type: application/json"
+     -H "Authorization: Bearer Ap-xvOcEH16cnL6827_a4By_DkooYQFsUdEDWFr1Lh4" \
+     -d '{"topic": "The quick brown fox jumps over the lazy dog."}'
 ```
 
 Find citations:
 
 ```
-curl -X POST "http://localhost:8000/find-citations" -H "Content-Type: application/json" -d '{"text": "The quick brown fox jumps over the lazy dog."}'
+curl -X POST "http://localhost:8000/find-citations" -H "Content-Type: application/json"
+     -H "Authorization: Bearer Ap-xvOcEH16cnL6827_a4By_DkooYQFsUdEDWFr1Lh4" \
+     -d '{"text": "The quick brown fox jumps over the lazy dog."}'
 ```
 
 ## V2 with you.com search engine:
@@ -380,23 +384,25 @@ Generate an article:
 
 ```
 curl -X POST "http://localhost:8000/v2/generate-article" \
--H "Content-Type: application/json" \
--d '{
-    "topic": "AI in Healthcare",
-    "length": 100,
-    "do_research": true,
-    "do_generate_outline": true,
-    "do_generate_article": true,
-    "do_polish_article": true
-}'
+     -H "Authorization: Bearer Ap-xvOcEH16cnL6827_a4By_DkooYQFsUdEDWFr1Lh4" \
+     -H "Content-Type: application/json" \
+     -d '{
+      "topic": "AI in healthcare",
+      "length": 100,
+      "do_research": true,
+      "do_generate_outline": true,
+      "do_generate_article": true,
+     "do_polish_article": true
+     }'
 ```
 
 Find citations:
 
 ```
 curl -X POST "http://localhost:8000/v2/find-citations" \
--H "Content-Type: application/json" \
--d '{
+  -H "Authorization: Bearer Ap-xvOcEH16cnL6827_a4By_DkooYQFsUdEDWFr1Lh4" \
+  -H "Content-Type: application/json" \
+  -d '{
     "text": "AI has revolutionized medical imaging and diagnosis",
     "max_citations": 3
 }'

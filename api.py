@@ -6,6 +6,7 @@ import wikipedia
 from knowledge_storm.utils import load_api_key
 import toml
 import os
+import shutil
 from knowledge_storm import STORMWikiRunnerArguments, STORMWikiRunner, STORMWikiLMConfigs
 from knowledge_storm.lm import OpenAIModel, AzureOpenAIModel
 from knowledge_storm.rm import YouRM
@@ -16,6 +17,25 @@ import traceback
 import time
 import re
 import hashlib
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import Depends, Security
+
+# Security configuration
+security = HTTPBearer()
+API_TOKENS = set()  # Will be populated from secrets
+
+async def verify_token(credentials: HTTPAuthorizationCredentials = Security(security)) -> bool:
+    """
+    Verify that the provided token is valid.
+    Raises HTTPException if token is invalid.
+    """
+    if credentials.credentials not in API_TOKENS:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid authentication token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return True
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -47,9 +67,14 @@ def create_safe_filename(text: str, max_length: int = 50) -> str:
 
 app = FastAPI(title="CleverWrite API", description="API for article generation and citation finding")
 
-# Load secrets
+# Load secrets and configure security
 try:
     load_api_key(".streamlit/secrets.toml")
+    secrets = toml.load(".streamlit/secrets.toml")
+    API_TOKENS = set(secrets.get("API_TOKENS", []))
+    if not API_TOKENS:
+        logger.warning("No API tokens configured in secrets.toml")
+    
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
     ydc_api_key = os.getenv("YDC_API_KEY")
     if not client.api_key:
@@ -148,7 +173,7 @@ class StormCitationResponse(BaseModel):
 
 # V1 Endpoints
 @app.post("/generate-article", response_model=ArticleResponse)
-async def generate_article(request: ArticleRequest):
+async def generate_article(request: ArticleRequest, authenticated: bool = Depends(verify_token)):
     try:
         # Generate article content
         response = client.chat.completions.create(
@@ -189,7 +214,7 @@ async def generate_article(request: ArticleRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/find-citations")
-async def find_citations(request: CitationRequest):
+async def find_citations(request: CitationRequest, authenticated: bool = Depends(verify_token)):
     try:
         # Extract key terms from the text
         response = client.chat.completions.create(
@@ -225,7 +250,8 @@ async def find_citations(request: CitationRequest):
 
 # V2 Endpoints
 @app.post("/v2/generate-article", response_model=StormArticleResponse)
-async def generate_article_v2(request: StormArticleRequest):
+async def generate_article_v2(request: StormArticleRequest, authenticated: bool = Depends(verify_token)):
+    topic_dir = None
     try:
         logger.info(f"Starting article generation for topic: {request.topic}")
         runner = init_storm()
@@ -248,6 +274,8 @@ async def generate_article_v2(request: StormArticleRequest):
 
         except Exception as e:
             logger.error(f"Error in STORM pipeline: {str(e)}\n{traceback.format_exc()}")
+            if topic_dir and topic_dir.exists():
+                shutil.rmtree(topic_dir)
             return StormArticleResponse(
                 content="Error occurred during generation",
                 outline=None,
@@ -291,7 +319,8 @@ async def generate_article_v2(request: StormArticleRequest):
         except Exception as e:
             logger.error(f"Error reading results: {str(e)}\n{traceback.format_exc()}")
         
-        return StormArticleResponse(
+        # Create response object
+        response = StormArticleResponse(
             content=content if content else "No content generated",
             outline=outline if outline else None,
             sources=sources,
@@ -299,18 +328,30 @@ async def generate_article_v2(request: StormArticleRequest):
             error=None
         )
         
+        # Cleanup directory after reading all files
+        if topic_dir and topic_dir.exists():
+            shutil.rmtree(topic_dir)
+            logger.info(f"Cleaned up directory: {topic_dir}")
+        
+        return response
+        
     except Exception as e:
         error_msg = f"Error generating article: {str(e)}\n{traceback.format_exc()}"
         logger.error(error_msg)
+        # Cleanup on error
+        if topic_dir and topic_dir.exists():
+            shutil.rmtree(topic_dir)
+            logger.info(f"Cleaned up directory after error: {topic_dir}")
         raise HTTPException(status_code=500, detail=error_msg)
 
 @app.post("/v2/find-citations", response_model=StormCitationResponse)
-async def find_citations_v2(request: StormCitationRequest):
+async def find_citations_v2(request: StormCitationRequest, authenticated: bool = Depends(verify_token)):
+    base_dir = None
     try:
         logger.info(f"Starting citation search for text: {request.text[:100]}...")
         
         # Create base directory
-        base_dir = Path("./results/api_generated")
+        base_dir = Path("./results/api_generated/citations_temp")
         base_dir.mkdir(parents=True, exist_ok=True)
         
         try:
@@ -354,13 +395,24 @@ async def find_citations_v2(request: StormCitationRequest):
             else:
                 logger.warning("No search results found")
             
-            return StormCitationResponse(
+            response = StormCitationResponse(
                 citations=citations,
                 error=None
             )
             
+            # Cleanup directory
+            if base_dir and base_dir.exists():
+                shutil.rmtree(base_dir)
+                logger.info(f"Cleaned up directory: {base_dir}")
+            
+            return response
+            
         except Exception as e:
             logger.error(f"Error in citation search: {str(e)}\n{traceback.format_exc()}")
+            # Cleanup on error
+            if base_dir and base_dir.exists():
+                shutil.rmtree(base_dir)
+                logger.info(f"Cleaned up directory after error: {base_dir}")
             return StormCitationResponse(
                 citations=[],
                 error=f"Citation search error: {str(e)}"
@@ -369,6 +421,10 @@ async def find_citations_v2(request: StormCitationRequest):
     except Exception as e:
         error_msg = f"Error finding citations: {str(e)}\n{traceback.format_exc()}"
         logger.error(error_msg)
+        # Cleanup on error
+        if base_dir and base_dir.exists():
+            shutil.rmtree(base_dir)
+            logger.info(f"Cleaned up directory after error: {base_dir}")
         raise HTTPException(status_code=500, detail=error_msg)
 
 @app.get("/health")
