@@ -827,7 +827,7 @@ class ClaudeModel(dspy.dsp.modules.lm.LM):
         assert return_sorted is False, "for now"
         # per eg here: https://docs.anthropic.com/claude/reference/messages-examples
         # max tokens can be used as a proxy to return smaller responses
-        # so this cannot be a proper indicator for incomplete response unless it isnt the user-intent.
+        # so this cannot be a proper indicator for incomplete response unless it isn't the user-intent.
         n = kwargs.pop("n", 1)
         completions = []
         for _ in range(n):

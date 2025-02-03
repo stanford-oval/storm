@@ -77,7 +77,7 @@ def main(args):
     # Important to note that tbs(date range is hardcoded values).
     # num is results per pages and is recommended to use in increments of 10(10, 20, etc).
     # page is how many pages will be searched.
-    # h1 is where the google search will orginate from.
+    # h1 is where the google search will originate from.
     topic = input("topic: ")
     data = {"autocorrect": True, "num": 10, "page": 1}
     rm = SerperRM(serper_search_api_key=os.getenv("SERPER_API_KEY"), query_params=data)
