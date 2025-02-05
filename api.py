@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from openai import OpenAI
 from typing import List, Optional, Dict, Any
@@ -67,9 +68,19 @@ def create_safe_filename(text: str, max_length: int = 50) -> str:
 
 app = FastAPI(title="CleverWrite API", description="API for article generation and citation finding")
 
+# Configure CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
 # Load secrets and configure security
 try:
-    API_TOKENS = os.getenv("API_TOKENS")
+    load_api_key(".streamlit/secrets.toml")
+    secrets = toml.load(".streamlit/secrets.toml")
+    API_TOKENS = set(secrets.get("API_TOKENS", []))
     if not API_TOKENS:
         logger.warning("No API tokens configured in secrets.toml")
     
@@ -111,9 +122,9 @@ def init_storm():
 
         engine_args = STORMWikiRunnerArguments(
             output_dir="./results/api_generated",
-            max_conv_turn=3,
-            max_perspective=3,
-            search_top_k=3,
+            max_conv_turn=2,
+            max_perspective=2,
+            search_top_k=2,
             max_thread_num=3,
         )
 
@@ -252,6 +263,10 @@ async def generate_article_v2(request: StormArticleRequest, authenticated: bool 
     topic_dir = None
     try:
         logger.info(f"Starting article generation for topic: {request.topic}")
+        logger.info(f"topic do_research: {request.do_research}")
+        logger.info(f"topic do_generate_outline: {request.do_generate_outline}")
+        logger.info(f"topic do_generate_article: {request.do_generate_article}")
+        logger.info(f"topic do_polish_article: {request.do_polish_article}")
         runner = init_storm()
         
         # Create a unique directory with a safe filename
