@@ -27,6 +27,18 @@ def create_safe_filename(text: str, max_length: int = 50) -> str:
     
     return safe_text
 
+def verify_directory_permissions(path: Path) -> bool:
+    """Verify that the directory exists and is writable."""
+    try:
+        path.mkdir(parents=True, exist_ok=True)
+        test_file = path / '.write_test'
+        test_file.touch()
+        test_file.unlink()
+        return True
+    except (PermissionError, OSError) as e:
+        logger.error(f"Directory permission error at {path}: {str(e)}")
+        return False
+
 @celery_app.task(bind=True)
 def generate_article_task(self, article_params: dict, webhook_url: str, metadata: dict):
     """
@@ -60,9 +72,17 @@ def generate_article_task(self, article_params: dict, webhook_url: str, metadata
         lm_configs.set_article_gen_lm(article_gen_lm)
         lm_configs.set_article_polish_lm(article_polish_lm)
 
-        # Initialize engine arguments
+        # Create base directory for results using absolute path
+        base_dir = Path("/app/results/api_generated")
+        base_dir.mkdir(parents=True, exist_ok=True)
+        logger.info(f"Created/verified base directory at {base_dir}")
+
+        if not verify_directory_permissions(base_dir):
+            raise RuntimeError(f"Cannot write to directory: {base_dir}")
+
+        # Initialize engine arguments with absolute path
         engine_args = STORMWikiRunnerArguments(
-            output_dir="./results/api_generated",
+            output_dir=str(base_dir),  # Convert Path to string
             max_conv_turn=3,
             max_perspective=3,
             search_top_k=3,
@@ -96,8 +116,9 @@ def generate_article_task(self, article_params: dict, webhook_url: str, metadata
         
         # Create a unique directory with a safe filename
         safe_topic = create_safe_filename(article_params['topic'])
-        topic_dir = Path(f"./results/api_generated/{safe_topic}")
+        topic_dir = base_dir / safe_topic
         topic_dir.mkdir(parents=True, exist_ok=True)
+        logger.info(f"Created topic directory at {topic_dir}")
         
         # Run article generation
         result = runner.run(
