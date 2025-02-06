@@ -120,20 +120,32 @@ def generate_article_task(self, article_params: dict, webhook_url: str, metadata
                 article_path = topic_dir / "storm_gen_article.txt"
                 if article_path.exists():
                     content = article_path.read_text()
+                    logger.info(f"Read article content from {article_path}, length: {len(content)} chars")
+                else:
+                    logger.warning(f"Article file not found at {article_path}")
             
             if do_generate_outline:
                 outline_path = topic_dir / "storm_gen_outline.txt"
                 if outline_path.exists():
                     outline = outline_path.read_text()
+                    logger.info(f"Read outline from {outline_path}, length: {len(outline)} chars")
+                else:
+                    logger.warning(f"Outline file not found at {outline_path}")
             
             if do_polish_article:
                 polished_path = topic_dir / "storm_gen_article_polished.txt"
                 if polished_path.exists():
                     polished_content = polished_path.read_text()
+                    logger.info(f"Read polished content from {polished_path}, length: {len(polished_content)} chars")
+                else:
+                    logger.warning(f"Polished article file not found at {polished_path}")
             
             sources_path = topic_dir / "url_to_info.json"
             if sources_path.exists():
                 sources = json.loads(sources_path.read_text())
+                logger.info(f"Read sources from {sources_path}, found {len(sources)} sources")
+            else:
+                logger.warning(f"Sources file not found at {sources_path}")
             
             # Prepare success response
             payload = {
