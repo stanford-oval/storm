@@ -10,6 +10,7 @@ import json
 import shutil
 import re
 import hashlib
+import time
 
 # Load environment variables
 load_dotenv()
@@ -130,6 +131,14 @@ def generate_article_task(self, article_params: dict, webhook_url: str, metadata
             remove_duplicate=remove_duplicate
         )
         
+        # List directory contents after generation
+        logger.info(f"Files in {topic_dir}:")
+        for file in topic_dir.glob('*'):
+            logger.info(f"Found file: {file.name} - Size: {file.stat().st_size} bytes")
+        
+        # Add small delay to ensure file system sync
+        time.sleep(1)
+        
         # Read results from files
         content = ""
         outline = ""
@@ -139,11 +148,16 @@ def generate_article_task(self, article_params: dict, webhook_url: str, metadata
         try:
             if do_generate_article:
                 article_path = topic_dir / "storm_gen_article.txt"
+                logger.info(f"Checking for article at: {article_path}")
                 if article_path.exists():
                     content = article_path.read_text()
                     logger.info(f"Read article content from {article_path}, length: {len(content)} chars")
                 else:
                     logger.warning(f"Article file not found at {article_path}")
+                    # List parent directory contents
+                    logger.info(f"Parent directory contents:")
+                    for file in article_path.parent.glob('*'):
+                        logger.info(f"- {file.name}")
             
             if do_generate_outline:
                 outline_path = topic_dir / "storm_gen_outline.txt"
