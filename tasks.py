@@ -44,7 +44,7 @@ def generate_article_task(self, article_params: dict, webhook_url: str, metadata
 
         # Configure language models
         gpt_35_model_name = 'gpt-3.5-turbo'
-        gpt_4_model_name = 'gpt-4'
+        gpt_4_model_name = 'gpt-4o'
 
         # Initialize different LMs for different components
         conv_simulator_lm = OpenAIModel(model=gpt_35_model_name, max_tokens=10, **openai_kwargs)
