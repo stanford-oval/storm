@@ -62,7 +62,7 @@ def generate_article_task(self, article_params: dict, webhook_url: str, metadata
 
         # Initialize engine arguments
         engine_args = STORMWikiRunnerArguments(
-            output_dir="./results/api_generated",
+            output_dir="/etc/var/results/api_generated",
             max_conv_turn=3,
             max_perspective=3,
             search_top_k=3,
@@ -96,7 +96,7 @@ def generate_article_task(self, article_params: dict, webhook_url: str, metadata
         
         # Create a unique directory with a safe filename
         safe_topic = create_safe_filename(article_params['topic'])
-        topic_dir = Path(f"./results/api_generated/{safe_topic}")
+        topic_dir = Path(f"/etc/var/results/api_generated/{safe_topic}")
         topic_dir.mkdir(parents=True, exist_ok=True)
         
         # Run article generation
