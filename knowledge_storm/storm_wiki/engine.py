@@ -387,7 +387,7 @@ class STORMWikiRunner(Engine):
             self.args.output_dir, self.article_dir_name
         )
         os.makedirs(self.article_output_dir, exist_ok=True)
-
+        print(f"Output directory: {self.article_output_dir}")
         # research module
         information_table: StormInformationTable = None
         if do_research:
