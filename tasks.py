@@ -17,15 +17,10 @@ load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-def create_safe_filename(text: str, max_length: int = 50) -> str:
-    """Create a safe, shortened filename from text."""
-    safe_text = re.sub(r'[^\w\s-]', '', text.lower())
-    safe_text = re.sub(r'[-\s]+', '_', safe_text)
-    
-    if len(safe_text) > max_length:
-        text_hash = hashlib.md5(text.encode()).hexdigest()[:8]
-        safe_text = f"{safe_text[:max_length]}_{text_hash}"
-    
+def create_safe_filename(text: str) -> str:
+    """Match engine's filename creation logic."""
+    safe_text = text.replace(" ", "_").replace("/", "_")
+    logger.info(f"Created safe filename: '{safe_text}' from original: '{text}'")
     return safe_text
 
 def verify_directory_permissions(path: Path) -> bool:
