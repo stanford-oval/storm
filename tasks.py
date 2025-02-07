@@ -74,7 +74,7 @@ def generate_article_task(self, article_params: dict, webhook_url: str, metadata
         lm_configs.set_article_polish_lm(article_polish_lm)
 
         # Create base directory for results using absolute path
-        base_dir = Path("/tmp/results/api_generated")
+        base_dir = Path(f"/app/results/api_generated")
         base_dir.mkdir(parents=True, exist_ok=True)
         logger.info(f"Created/verified base directory at {base_dir}")
 
