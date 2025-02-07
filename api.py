@@ -46,31 +46,6 @@ async def verify_token(credentials: HTTPAuthorizationCredentials = Security(secu
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
-
-def create_safe_filename(text: str, max_length: int = 50) -> str:
-    """
-    Create a safe, shortened filename from text.
-    
-    Args:
-        text: The input text to convert to a filename
-        max_length: Maximum length of the base filename (before hash)
-    
-    Returns:
-        A safe filename string
-    """
-    # Remove special characters and convert spaces to underscores
-    safe_text = re.sub(r'[^\w\s-]', '', text.lower())
-    safe_text = re.sub(r'[-\s]+', '_', safe_text)
-    
-    # If the text is too long, truncate it and add a hash
-    if len(safe_text) > max_length:
-        # Create a hash of the full text to ensure uniqueness
-        text_hash = hashlib.md5(text.encode()).hexdigest()[:8]
-        # Truncate the text and append the hash
-        safe_text = f"{safe_text[:max_length]}_{text_hash}"
-    
-    return safe_text
-
 app = FastAPI(title="CleverWrite API", description="API for article generation and citation finding")
 
 # Configure CORS
