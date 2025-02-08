@@ -58,8 +58,8 @@ def generate_article_task(self, article_params: dict, webhook_url: str, metadata
         conv_simulator_lm = OpenAIModel(model=gpt_35_model_name, max_tokens=10, **openai_kwargs)
         question_asker_lm = OpenAIModel(model=gpt_35_model_name, max_tokens=10, **openai_kwargs)
         outline_gen_lm = OpenAIModel(model=gpt_4_model_name, max_tokens=100, **openai_kwargs)
-        article_gen_lm = OpenAIModel(model=gpt_4_model_name, max_tokens=150, **openai_kwargs)
-        article_polish_lm = OpenAIModel(model=gpt_4_model_name, max_tokens=150, **openai_kwargs)
+        article_gen_lm = OpenAIModel(model=gpt_4_model_name, max_tokens=200, **openai_kwargs)
+        article_polish_lm = OpenAIModel(model=gpt_4_model_name, max_tokens=200, **openai_kwargs)
 
         # Set LM configurations
         lm_configs.set_conv_simulator_lm(conv_simulator_lm)
