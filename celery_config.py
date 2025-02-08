@@ -30,7 +30,8 @@ celery_app.conf.update(
 
 def generate_webhook_signature(payload: dict, secret_key: str) -> str:
     """Generate HMAC SHA256 signature for webhook payload"""
-    message = json.dumps(payload, sort_keys=True).encode('utf-8')
+    # Convert payload to JSON string without sorting keys to match raw body
+    message = json.dumps(payload).encode('utf-8')
     signature = hmac.new(
         secret_key.encode('utf-8'),
         message,
