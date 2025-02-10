@@ -166,7 +166,7 @@ async def find_citations_v2(request: StormCitationRequest, authenticated: bool =
                             'url': result.get('url', ''),
                             'title': result.get('title', ''),
                             'snippet': result.get('description', '')[:500] if result.get('description') else '',
-                            'relevance_score': 1.0  # You.com results are already sorted by relevance
+                            'relevance_score': result.get('score', 1.0)
                         }
                         
                         # Only add if we have at least a title and URL
