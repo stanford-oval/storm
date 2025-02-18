@@ -509,6 +509,7 @@ class CoStormRunner:
         runner_argument: RunnerArgument,
         logging_wrapper: LoggingWrapper,
         rm: Optional[dspy.Retrieve] = None,
+        encoder: Optional[Encoder] = None,
         callback_handler: BaseCallbackHandler = None,
     ):
         self.runner_argument = runner_argument
@@ -519,7 +520,10 @@ class CoStormRunner:
             self.rm = BingSearch(k=runner_argument.retrieve_top_k)
         else:
             self.rm = rm
-        self.encoder = Encoder()
+        if encoder is None:
+            self.encoder = Encoder()
+        else:
+            self.encoder = encoder
         self.conversation_history = []
         self.warmstart_conv_archive = []
         self.knowledge_base = KnowledgeBase(
