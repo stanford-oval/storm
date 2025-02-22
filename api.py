@@ -60,13 +60,19 @@ app.add_middleware(
 # V2 Models
 class StormArticleRequest(BaseModel):
     topic: str
-    webhook_url: Optional[HttpUrl] = None  # Made optional
+    webhook_url: Optional[HttpUrl] = None
     do_research: bool = True
     do_generate_outline: bool = True
     do_generate_article: bool = True
     do_polish_article: bool = True
     remove_duplicate: bool = False
     metadata: Dict[str, Any] = {}
+    # Add new token configuration fields with defaults
+    conv_simulator_max_tokens: Optional[int] = 500
+    question_asker_max_tokens: Optional[int] = 500
+    outline_gen_max_tokens: Optional[int] = 400
+    article_gen_max_tokens: Optional[int] = 700
+    article_polish_max_tokens: Optional[int] = 700
 
 class StormArticleResponse(BaseModel):
     content: str            # The main generated article text
@@ -106,7 +112,12 @@ async def generate_article_v2(request: StormArticleRequest, authenticated: bool 
             "do_generate_outline": request.do_generate_outline,
             "do_generate_article": request.do_generate_article,
             "do_polish_article": request.do_polish_article,
-            "remove_duplicate": request.remove_duplicate
+            "remove_duplicate": request.remove_duplicate,
+            "conv_simulator_max_tokens": request.conv_simulator_max_tokens,
+            "question_asker_max_tokens": request.question_asker_max_tokens,
+            "outline_gen_max_tokens": request.outline_gen_max_tokens,
+            "article_gen_max_tokens": request.article_gen_max_tokens,
+            "article_polish_max_tokens": request.article_polish_max_tokens
         }
         
         generate_article_task.delay(

@@ -55,11 +55,31 @@ def generate_article_task(self, article_params: dict, webhook_url: str, metadata
         gpt_4_model_name = 'gpt-4o'
 
         # Initialize different LMs for different components
-        conv_simulator_lm = OpenAIModel(model=gpt_35_model_name, max_tokens=500, **openai_kwargs)
-        question_asker_lm = OpenAIModel(model=gpt_35_model_name, max_tokens=500, **openai_kwargs)
-        outline_gen_lm = OpenAIModel(model=gpt_4_model_name, max_tokens=400, **openai_kwargs)
-        article_gen_lm = OpenAIModel(model=gpt_4_model_name, max_tokens=700, **openai_kwargs)
-        article_polish_lm = OpenAIModel(model=gpt_4_model_name, max_tokens=700, **openai_kwargs)
+        conv_simulator_lm = OpenAIModel(
+            model=gpt_35_model_name, 
+            max_tokens=article_params.get('conv_simulator_max_tokens', 500), 
+            **openai_kwargs
+        )
+        question_asker_lm = OpenAIModel(
+            model=gpt_35_model_name, 
+            max_tokens=article_params.get('question_asker_max_tokens', 500), 
+            **openai_kwargs
+        )
+        outline_gen_lm = OpenAIModel(
+            model=gpt_4_model_name, 
+            max_tokens=article_params.get('outline_gen_max_tokens', 400), 
+            **openai_kwargs
+        )
+        article_gen_lm = OpenAIModel(
+            model=gpt_4_model_name, 
+            max_tokens=article_params.get('article_gen_max_tokens', 700), 
+            **openai_kwargs
+        )
+        article_polish_lm = OpenAIModel(
+            model=gpt_4_model_name, 
+            max_tokens=article_params.get('article_polish_max_tokens', 700), 
+            **openai_kwargs
+        )
 
         # Set LM configurations
         lm_configs.set_conv_simulator_lm(conv_simulator_lm)
