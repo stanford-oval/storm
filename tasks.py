@@ -2,6 +2,7 @@ from celery_config import celery_app, send_webhook_with_retry
 from knowledge_storm import STORMWikiRunner, STORMWikiRunnerArguments, STORMWikiLMConfigs
 from knowledge_storm.rm import SerperRM, YouRM
 from knowledge_storm.lm import OpenAIModel
+from knowledge_storm.utils import truncate_filename
 import logging
 import os
 from dotenv import load_dotenv
@@ -17,11 +18,18 @@ load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-def create_safe_filename(text: str) -> str:
-    """Match engine's filename creation logic."""
-    safe_text = text.replace(" ", "_").replace("/", "_")
-    logger.info(f"Created safe filename: '{safe_text}' from original: '{text}'")
-    return safe_text
+def sanitize_topic(topic: str) -> str:
+    """
+    Sanitize the topic name for use in file names.
+    Remove or replace characters that are not allowed in file names.
+    """
+    # Replace spaces with underscores and forward slashes with underscores
+    topic = topic.replace(" ", "_").replace("/", "_")
+    # Truncate to avoid filesystem limits
+    topic = truncate_filename(topic, max_length=125)
+    
+    logger.info(f"Sanitized topic: '{topic}' from original: '{topic}'")
+    return topic
 
 def verify_directory_permissions(path: Path) -> bool:
     """Verify that the directory exists and is writable."""
@@ -130,8 +138,8 @@ def generate_article_task(self, article_params: dict, webhook_url: str, metadata
         do_polish_article = article_params.get('do_polish_article', True)
         remove_duplicate = article_params.get('remove_duplicate', False)
         
-        # Create a unique directory with a safe filename
-        safe_topic = create_safe_filename(article_params['topic'])
+        # Create a unique directory with a sanitized topic name
+        safe_topic = sanitize_topic(article_params['topic'])
         topic_dir = base_dir / safe_topic
         topic_dir.mkdir(parents=True, exist_ok=True)
         logger.info(f"Created topic directory at {topic_dir}")
