@@ -206,34 +206,6 @@ class CollaborativeStormLMConfigs(LMConfigs):
 
                 config_dict[attr_name] = model_info
 
-
-        # For each LM attribute
-        for attr_name, attr_value in self.__dict__.items():
-            if attr_name.endswith("_lm") and attr_value is not None:
-                # Store the model information directly
-                model_info = {
-                    "type": attr_value.__class__.__name__,
-                    "module": attr_value.__class__.__module__,
-                    "model": getattr(attr_value, "model", None),
-                    "max_tokens": getattr(attr_value, "max_tokens", None),
-                }
-
-                # Check for additional important attributes
-                for param in ["temperature", "top_p"]:
-                    if hasattr(attr_value, param):
-                        model_info[param] = getattr(attr_value, param)
-
-                # Check if the model has a kwargs dictionary
-                if hasattr(attr_value, "kwargs"):
-                    # Make a copy to avoid reference issues
-                    model_info["kwargs"] = {**attr_value.kwargs}
-
-                    # Don't include sensitive info or large objects in serialization
-                    if "extra_headers" in model_info["kwargs"]:
-                        model_info["kwargs"]["extra_headers"] = "AUTH_HEADERS_PRESENT"
-
-                config_dict[attr_name] = model_info
-
         return config_dict
 
     @classmethod
@@ -667,7 +639,6 @@ class CoStormRunner:
             callback_handler=callback_handler,
         )
         self.report = None  # Initialize the report attribute
-        self.report = None  # Initialize the report attribute
 
     def to_dict(self):
         result = {
@@ -682,12 +653,6 @@ class CoStormRunner:
             "experts": self.discourse_manager.serialize_experts(),
             "knowledge_base": self.knowledge_base.to_dict(),
         }
-
-        # Include the report if it exists
-        if hasattr(self, "report") and self.report is not None:
-            result["report"] = self.report
-
-        return result
 
         # Include the report if it exists
         if hasattr(self, "report") and self.report is not None:
@@ -794,7 +759,7 @@ class CoStormRunner:
         user to catch up with system's knowledge about the topic.
         """
         with self.logging_wrapper.log_pipeline_stage(
-            pipeline_stage="warm start stage"
+            pipeline_stage=f"warm start stage"
         ):
             if not self.runner_argument.rag_only_baseline_mode:
                 warm_start_module = WarmStartModule(
@@ -860,8 +825,6 @@ class CoStormRunner:
             ):
                 self.report = self.knowledge_base.to_report()
                 return self.report
-                self.report = self.knowledge_base.to_report()
-                return self.report
 
     def dump_logging_and_reset(self):
         return self.logging_wrapper.dump_logging_and_reset()
@@ -920,7 +883,7 @@ class CoStormRunner:
                     f"{cur_turn_name}: get turn policy"
                 ):
                     if self.callback_handler is not None:
-                        self.callback_handler.on_turn_policy_planning_start()   
+                        self.callback_handler.on_turn_policy_planning_start()
                     turn_policy = self.discourse_manager.get_next_turn_policy(
                         conversation_history=self.conversation_history,
                         simulate_user=simulate_user,
