@@ -671,7 +671,6 @@ class CoStormRunner:
 
     def to_dict(self):
         result = {
-        result = {
             "runner_argument": self.runner_argument.to_dict(),
             "lm_config": self.lm_config.to_dict(),
             "conversation_history": [
@@ -751,11 +750,7 @@ class CoStormRunner:
             runner_argument=runner_args,
             logging_wrapper=logging_wrapper,
             rm=retriever,
-            runner_argument=runner_args,
-            logging_wrapper=logging_wrapper,
-            rm=retriever,
             callback_handler=callback_handler,
-            encoder=encoder,
             encoder=encoder,
         )
 
@@ -799,7 +794,7 @@ class CoStormRunner:
         user to catch up with system's knowledge about the topic.
         """
         with self.logging_wrapper.log_pipeline_stage(
-            pipeline_stage=f"warm start stage"
+            pipeline_stage="warm start stage"
         ):
             if not self.runner_argument.rag_only_baseline_mode:
                 warm_start_module = WarmStartModule(
