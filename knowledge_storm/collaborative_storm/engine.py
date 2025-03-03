@@ -176,14 +176,167 @@ class CollaborativeStormLMConfigs(LMConfigs):
     def to_dict(self):
         """
         Converts the CollaborativeStormLMConfigs instance to a dictionary representation.
-
-        Returns:
-            dict: The dictionary representation of the CollaborativeStormLMConfigs.
         """
         config_dict = {}
-        for attr_name in self.__dict__:
-            config_dict[attr_name] = getattr(self, attr_name).kwargs
+
+        # For each LM attribute
+        for attr_name, attr_value in self.__dict__.items():
+            if attr_name.endswith("_lm") and attr_value is not None:
+                # Store the model information directly
+                model_info = {
+                    "type": attr_value.__class__.__name__,
+                    "module": attr_value.__class__.__module__,
+                    "model": getattr(attr_value, "model", None),
+                    "max_tokens": getattr(attr_value, "max_tokens", None),
+                }
+
+                # Check for additional important attributes
+                for param in ["temperature", "top_p"]:
+                    if hasattr(attr_value, param):
+                        model_info[param] = getattr(attr_value, param)
+
+                # Check if the model has a kwargs dictionary
+                if hasattr(attr_value, "kwargs"):
+                    # Make a copy to avoid reference issues
+                    model_info["kwargs"] = {**attr_value.kwargs}
+
+                    # Don't include sensitive info or large objects in serialization
+                    if "extra_headers" in model_info["kwargs"]:
+                        model_info["kwargs"]["extra_headers"] = "AUTH_HEADERS_PRESENT"
+
+                config_dict[attr_name] = model_info
+
         return config_dict
+
+    @classmethod
+    def from_dict(cls, data):
+        """
+        Constructs a CollaborativeStormLMConfigs instance from a dictionary representation.
+        """
+        config = cls()
+
+        # Skip if no data
+        if not data:
+            # Initialize with default settings
+            from knowledge_storm.lm import LM
+
+            # Recreate the auth headers
+            client_id = os.getenv("AZURE_OPENAI_CLIENT_ID")
+            client_secret = os.getenv("AZURE_OPENAI_CLIENT_SECRET")
+            tenant_id = os.getenv("AZURE_OPENAI_TENANT_ID")
+            api_key = os.getenv("AZURE_OPENAI_API_KEY")
+
+            if all([client_id, client_secret, tenant_id]):
+                from azure.identity import ClientSecretCredential
+
+                token = (
+                    ClientSecretCredential(
+                        client_id=client_id,
+                        client_secret=client_secret,
+                        tenant_id=tenant_id,
+                    )
+                    .get_token("https://cognitiveservices.azure.com/.default")
+                    .token
+                )
+
+                auth_headers = {"api-key": api_key, "Authorization": f"Bearer {token}"}
+
+                # Azure configuration
+                azure_kwargs = {
+                    "api_key": None,
+                    "extra_headers": auth_headers,
+                    "temperature": 1.0,
+                    "api_base": os.getenv("AZURE_OPENAI_ENDPOINT"),
+                }
+
+                # Default model name
+                model_name = "azure/gpt-4o"
+
+                # Create default models
+                config.question_answering_lm = LM(
+                    model=model_name, max_tokens=1000, **azure_kwargs
+                )
+                config.discourse_manage_lm = LM(
+                    model=model_name, max_tokens=500, **azure_kwargs
+                )
+                config.utterance_polishing_lm = LM(
+                    model=model_name, max_tokens=2000, **azure_kwargs
+                )
+                config.warmstart_outline_gen_lm = LM(
+                    model=model_name, max_tokens=500, **azure_kwargs
+                )
+                config.question_asking_lm = LM(
+                    model=model_name, max_tokens=300, **azure_kwargs
+                )
+                config.knowledge_base_lm = LM(
+                    model=model_name, max_tokens=1000, **azure_kwargs
+                )
+
+            return config
+
+        # Create the LM class if saved in the data, otherwise import it
+        if (
+            "question_answering_lm" in data
+            and "module" in data["question_answering_lm"]
+        ):
+            module_name = data["question_answering_lm"]["module"]
+            class_name = data["question_answering_lm"]["type"]
+
+            try:
+                module = __import__(module_name, fromlist=[class_name])
+                LMClass = getattr(module, class_name)
+            except (ImportError, AttributeError):
+                # Fallback to default LM class
+                from knowledge_storm.lm import LM
+
+                LMClass = LM
+        else:
+            from knowledge_storm.lm import LM
+
+            LMClass = LM
+
+        # Recreate the auth headers
+        client_id = os.getenv("AZURE_OPENAI_CLIENT_ID")
+        client_secret = os.getenv("AZURE_OPENAI_CLIENT_SECRET")
+        tenant_id = os.getenv("AZURE_OPENAI_TENANT_ID")
+        api_key = os.getenv("AZURE_OPENAI_API_KEY")
+
+        if all([client_id, client_secret, tenant_id]):
+            from azure.identity import ClientSecretCredential
+
+            token = (
+                ClientSecretCredential(
+                    client_id=client_id,
+                    client_secret=client_secret,
+                    tenant_id=tenant_id,
+                )
+                .get_token("https://cognitiveservices.azure.com/.default")
+                .token
+            )
+
+            auth_headers = {"api-key": api_key, "Authorization": f"Bearer {token}"}
+
+            # Azure configuration
+            azure_kwargs = {
+                "api_key": None,
+                "extra_headers": auth_headers,
+                "temperature": 1.0,
+                "api_base": os.getenv("AZURE_OPENAI_ENDPOINT"),
+            }
+
+        # Reconstruct each LM
+        for attr_name, model_info in data.items():
+            if attr_name.endswith("_lm") and model_info:
+                model = model_info.get("model", "azure/gpt-4o")
+                max_tokens = model_info.get("max_tokens", 1000)
+
+                # Create a new LM with the saved configuration
+                new_lm = LMClass(model=model, max_tokens=max_tokens, **azure_kwargs)
+
+                # Set it on the config
+                setattr(config, attr_name, new_lm)
+
+        return config
 
 
 @dataclass
@@ -540,9 +693,10 @@ class CoStormRunner:
             encoder=self.encoder,
             callback_handler=callback_handler,
         )
+        self.report = None  # Initialize the report attribute
 
     def to_dict(self):
-        return {
+        result = {
             "runner_argument": self.runner_argument.to_dict(),
             "lm_config": self.lm_config.to_dict(),
             "conversation_history": [
@@ -555,18 +709,93 @@ class CoStormRunner:
             "knowledge_base": self.knowledge_base.to_dict(),
         }
 
+        # Include the report if it exists
+        if hasattr(self, "report") and self.report is not None:
+            result["report"] = self.report
+
+        return result
+
     @classmethod
     def from_dict(cls, data, callback_handler: BaseCallbackHandler = None):
-        # FIXME: does not use the lm_config data but naively use default setting
-        lm_config = CollaborativeStormLMConfigs()
-        lm_config.init(lm_type=os.getenv("OPENAI_API_TYPE"))
+        # Create a new LM config and populate it from the saved data
+        lm_config = CollaborativeStormLMConfigs.from_dict(data.get("lm_config", {}))
+
+        # Import the LM class
+        from knowledge_storm.lm import LM
+
+        # Set up Azure authentication
+        client_id = os.getenv("AZURE_OPENAI_CLIENT_ID")
+        client_secret = os.getenv("AZURE_OPENAI_CLIENT_SECRET")
+        tenant_id = os.getenv("AZURE_OPENAI_TENANT_ID")
+        api_key = os.getenv("AZURE_OPENAI_API_KEY")
+
+        if all([client_id, client_secret, tenant_id, api_key]):
+            from azure.identity import ClientSecretCredential
+
+            token = (
+                ClientSecretCredential(
+                    client_id=client_id,
+                    client_secret=client_secret,
+                    tenant_id=tenant_id,
+                )
+                .get_token("https://cognitiveservices.azure.com/.default")
+                .token
+            )
+
+            auth_headers = {"api-key": api_key, "Authorization": f"Bearer {token}"}
+
+            # Azure configuration
+            azure_kwargs = {
+                "api_key": None,
+                "extra_headers": auth_headers,
+                "temperature": 1.0,
+                "api_base": os.getenv("AZURE_OPENAI_ENDPOINT"),
+            }
+
+            # Recreate all LM models from the saved configuration
+            if "lm_config" in data:
+                lm_data = data["lm_config"]
+
+                for attr_name, model_info in lm_data.items():
+                    if attr_name.endswith("_lm") and model_info:
+                        model = model_info.get("model", "azure/gpt-4o")
+                        max_tokens = model_info.get("kwargs", {}).get(
+                            "max_tokens", 1000
+                        )
+
+                        # Create new model
+                        new_lm = LM(model=model, max_tokens=max_tokens, **azure_kwargs)
+                        setattr(lm_config, attr_name, new_lm)
+
+        # Create logging wrapper
+        logging_wrapper = LoggingWrapper(lm_config)
+
+        # Create encoder
+        if all([client_id, client_secret, tenant_id, api_key]):
+            encoder = Encoder(
+                api_key=None,
+                api_base=os.getenv("AZURE_OPENAI_ENDPOINT"),
+                extra_headers=auth_headers,
+            )
+        else:
+            encoder = Encoder()
+
+        # Create runner
+        runner_args = RunnerArgument.from_dict(data["runner_argument"])
+        retriever = BingSearch(
+            bing_search_api_key=os.getenv("BING_SEARCH_API_KEY"), k=5
+        )
+
         costorm_runner = cls(
             lm_config=lm_config,
-            runner_argument=RunnerArgument.from_dict(data["runner_argument"]),
-            logging_wrapper=LoggingWrapper(lm_config),
+            runner_argument=runner_args,
+            logging_wrapper=logging_wrapper,
+            rm=retriever,
             callback_handler=callback_handler,
+            encoder=encoder,
         )
-        costorm_runner.encoder = Encoder()
+
+        # Load conversation history and experts
         costorm_runner.conversation_history = [
             ConversationTurn.from_dict(turn) for turn in data["conversation_history"]
         ]
@@ -575,12 +804,19 @@ class CoStormRunner:
             for turn in data.get("warmstart_conv_archive", [])
         ]
         costorm_runner.discourse_manager.deserialize_experts(data["experts"])
+
+        # Load knowledge base
         costorm_runner.knowledge_base = KnowledgeBase.from_dict(
             data=data["knowledge_base"],
             knowledge_base_lm=costorm_runner.lm_config.knowledge_base_lm,
             node_expansion_trigger_count=costorm_runner.runner_argument.node_expansion_trigger_count,
             encoder=costorm_runner.encoder,
         )
+
+        # Load report if it exists
+        if "report" in data:
+            costorm_runner.report = data["report"]
+
         return costorm_runner
 
     def warm_start(self):
@@ -657,7 +893,8 @@ class CoStormRunner:
             with self.logging_wrapper.log_event(
                 "report generation stage: generate report"
             ):
-                return self.knowledge_base.to_report()
+                self.report = self.knowledge_base.to_report()
+                return self.report
 
     def dump_logging_and_reset(self):
         return self.logging_wrapper.dump_logging_and_reset()
@@ -716,7 +953,7 @@ class CoStormRunner:
                     f"{cur_turn_name}: get turn policy"
                 ):
                     if self.callback_handler is not None:
-                        self.callback_handler.on_turn_policy_planning_start()
+                        self.callback_handler.on_turn_policy_planning_start()   
                     turn_policy = self.discourse_manager.get_next_turn_policy(
                         conversation_history=self.conversation_history,
                         simulate_user=simulate_user,
