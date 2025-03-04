@@ -6,228 +6,40 @@ import dspy
 from ...interface import Retriever, Information
 from ...utils import ArticleTextProcessing
 
+import json
+import os
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
 # Internet source restrictions according to Wikipedia standard:
 # https://en.wikipedia.org/wiki/Wikipedia:Reliable_sources/Perennial_sources
-GENERALLY_UNRELIABLE = {
-    "112_Ukraine",
-    "Ad_Fontes_Media",
-    "AlterNet",
-    "Amazon",
-    "Anadolu_Agency_(controversial_topics)",
-    "Ancestry.com",
-    "Answers.com",
-    "Antiwar.com",
-    "Anti-Defamation_League",
-    "arXiv",
-    "Atlas_Obscura_places",
-    "Bild",
-    "Blaze_Media",
-    "Blogger",
-    "BroadwayWorld",
-    "California_Globe",
-    "The_Canary",
-    "CelebrityNetWorth",
-    "CESNUR",
-    "ChatGPT",
-    "CNET_(November_2022\u2013present)",
-    "CoinDesk",
-    "Consortium_News",
-    "CounterPunch",
-    "Correo_del_Orinoco",
-    "Cracked.com",
-    "Daily_Express",
-    "Daily_Kos",
-    "Daily_Sabah",
-    "The_Daily_Wire",
-    "Discogs",
-    "Distractify",
-    "The_Electronic_Intifada",
-    "Encyclopaedia_Metallum",
-    "Ethnicity_of_Celebs",
-    "Facebook",
-    "FamilySearch",
-    "Fandom",
-    "The_Federalist",
-    "Find_a_Grave",
-    "Findmypast",
-    "Flags_of_the_World",
-    "Flickr",
-    "Forbes.com_contributors",
-    "Fox_News_(politics_and_science)",
-    "Fox_News_(talk_shows)",
-    "Gawker",
-    "GB_News",
-    "Geni.com",
-    "gnis-class",
-    "gns-class",
-    "GlobalSecurity.org",
-    "Goodreads",
-    "Guido_Fawkes",
-    "Heat_Street",
-    "History",
-    "HuffPost_contributors",
-    "IMDb",
-    "Independent_Media_Center",
-    "Inquisitr",
-    "International_Business_Times",
-    "Investopedia",
-    "Jewish_Virtual_Library",
-    "Joshua_Project",
-    "Know_Your_Meme",
-    "Land_Transport_Guru",
-    "LinkedIn",
-    "LiveJournal",
-    "Marquis_Who's_Who",
-    "Mashable_sponsored_content",
-    "MEAWW",
-    "Media_Bias/Fact_Check",
-    "Media_Research_Center",
-    "Medium",
-    "metal-experience",
-    "Metro",
-    "The_New_American",
-    "New_York_Post",
-    "NGO_Monitor",
-    "The_Onion",
-    "Our_Campaigns",
-    "PanAm_Post",
-    "Patheos",
-    "An_Phoblacht",
-    "The_Post_Millennial",
-    "arXiv",
-    "bioRxiv",
-    "medRxiv",
-    "PeerJ Preprints",
-    "Preprints.org",
-    "SSRN",
-    "PR_Newswire",
-    "Quadrant",
-    "Quillette",
-    "Quora",
-    "Raw_Story",
-    "Reddit",
-    "RedState",
-    "ResearchGate",
-    "Rolling_Stone_(politics_and_society,_2011\u2013present)",
-    "Rolling_Stone_(Culture_Council)",
-    "Scribd",
-    "Scriptural_texts",
-    "Simple_Flying",
-    "Sixth_Tone_(politics)",
-    "The_Skwawkbox",
-    "SourceWatch",
-    "Spirit_of_Metal",
-    "Sportskeeda",
-    "Stack_Exchange",
-    "Stack_Overflow",
-    "MathOverflow",
-    "Ask_Ubuntu",
-    "starsunfolded.com",
-    "Statista",
-    "TASS",
-    "The_Truth_About_Guns",
-    "TV.com",
-    "TV_Tropes",
-    "Twitter",
-    "X.com",
-    "Urban_Dictionary",
-    "Venezuelanalysis",
-    "VGChartz",
-    "VoC",
-    "Washington_Free_Beacon",
-    "Weather2Travel",
-    "The_Western_Journal",
-    "We_Got_This_Covered",
-    "WhatCulture",
-    "Who's_Who_(UK)",
-    "WhoSampled",
-    "Wikidata",
-    "WikiLeaks",
-    "Wikinews",
-    "Wikipedia",
-    "WordPress.com",
-    "Worldometer",
-    "YouTube",
-    "ZDNet",
-}
-DEPRECATED = {
-    "Al_Mayadeen",
-    "ANNA_News",
-    "Baidu_Baike",
-    "China_Global_Television_Network",
-    "The_Cradle",
-    "Crunchbase",
-    "The_Daily_Caller",
-    "Daily_Mail",
-    "Daily_Star",
-    "The_Epoch_Times",
-    "FrontPage_Magazine",
-    "The_Gateway_Pundit",
-    "Global_Times",
-    "The_Grayzone",
-    "HispanTV",
-    "Jihad_Watch",
-    "Last.fm",
-    "LifeSiteNews",
-    "The_Mail_on_Sunday",
-    "MintPress_News",
-    "National_Enquirer",
-    "New_Eastern_Outlook",
-    "News_Break",
-    "NewsBlaze",
-    "News_of_the_World",
-    "Newsmax",
-    "NNDB",
-    "Occupy_Democrats",
-    "Office_of_Cuba_Broadcasting",
-    "One_America_News_Network",
-    "Peerage_websites",
-    "Press_TV",
-    "Project_Veritas",
-    "Rate_Your_Music",
-    "Republic_TV",
-    "Royal_Central",
-    "RT",
-    "Sputnik",
-    "The_Sun",
-    "Taki's_Magazine",
-    "Tasnim_News_Agency",
-    "Telesur",
-    "The_Unz_Review",
-    "VDARE",
-    "Voltaire_Network",
-    "WorldNetDaily",
-    "Zero_Hedge",
-}
-BLACKLISTED = {
-    "Advameg",
-    "bestgore.com",
-    "Breitbart_News",
-    "Centre_for_Research_on_Globalization",
-    "Examiner.com",
-    "Famous_Birthdays",
-    "Healthline",
-    "InfoWars",
-    "Lenta.ru",
-    "LiveLeak",
-    "Lulu.com",
-    "MyLife",
-    "Natural_News",
-    "OpIndia",
-    "The_Points_Guy",
-    "The_Points_Guy_(sponsored_content)",
-    "Swarajya",
-    "Veterans_Today",
-    "ZoomInfo",
-}
+file_path = os.path.join(current_dir, 'wikipedia_unreliable_sources.json')
 
+def load_unreliable_sources(file_path):
+    with open(file_path, 'r') as file:
+        data = json.load(file)
+    return data
 
 def is_valid_wikipedia_source(url):
     parsed_url = urlparse(url)
-    # Check if the URL is from a reliable domain
-    combined_set = GENERALLY_UNRELIABLE | DEPRECATED | BLACKLISTED
-    for domain in combined_set:
-        if domain in parsed_url.netloc:
-            return False
-
+    domain = parsed_url.netloc
+    data = load_unreliable_sources(file_path)
+    # Remove 'www.' if the URL domain starts with 'www.'
+    if domain.startswith('www.'):
+        domain = domain[4:]
+    # Check if domain partially matches any pattern in the 'Use' column of the JSON data
+    for entry in data:
+        for pattern in entry['Use']:
+            if domain in pattern:
+                return False
     return True
+
+# # Example usage
+# url_to_check = "https://theblaze.com"
+# if is_source_reliable(url_to_check):
+#     print(f"The URL {url_to_check} is considered reliable.")
+# else:
+#     print(f"The URL {url_to_check} is considered unreliable.")
+#
+# # Expected output
+# > The URL https://theblaze.com is considered unreliable.
