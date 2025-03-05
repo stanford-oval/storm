@@ -363,7 +363,8 @@ class StormArticle(Article):
         def preorder_traverse(node, level):
             prefix = "#" * level
             result.append(f"{prefix} {node.section_name}".strip())
-            result.append(node.content)
+            # Handle None content by converting to empty string
+            result.append(node.content if node.content is not None else "")
             for child in node.children:
                 preorder_traverse(child, level + 1)
 
