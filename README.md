@@ -4,13 +4,19 @@ The Storm CW API provides endpoints for article generation and citation finding.
 
 ## Getting Started
 
-
-
 Start the API server:
 
 ```bash
 uvicorn api:app --host 0.0.0.0 --port 8000 --reload
 ```
+
+Dev background worker
+
+```bash
+celery -A tasks worker --pool=solo --loglevel=info
+```
+
+Production background worker doesn't need to be run with solo pool.
 
 ## Authentication
 
@@ -108,7 +114,8 @@ POST /v2/find-citations
 {
   "text": "string",
   "max_citations": 3,
-  "exclude_urls": ["string"]
+  "exclude_urls": ["string"],
+  "use_scholar": true
 }
 ```
 
@@ -166,11 +173,12 @@ curl -X POST "http://localhost:8000/v2/generate-article" \
 Find citations:
 
 ```bash
-curl -X POST "http://localhost:8000/v2/find-citations"
-  -H "Authorization: Bearer Ap-xvOcEH16cnL6827_a4By_DkooYQFsUdEDWFr1Lh4"
-  -H "Content-Type: application/json"
-  -d '{
-    "text": "AI has revolutionized medical imaging and diagnosis",
-    "max_citations": 3
-}'
+curl -X POST "http://localhost:8000/v2/find-citations" \
+  -H "Authorization: Bearer Ap-xvOcEH16cnL6827_a4By_DkooYQFsUdEDWFr1Lh4" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"text\": \"Greenhouse gases act similarly to the glass in a greenhouse: they absorb the sun's heat that radiates from the Earth's surface, trap it in the atmosphere and prevent it from escaping into space. The greenhouse effect keeps the Earth's temperature warmer than it would otherwise be, supporting life on Earth. Many greenhouse gases occur naturally in the atmosphere, but human activity contributes to their accumulation. As a result, the greenhouse effect in the atmosphere is boosted and it alters our planet's climate, leading to shifts in snow and rainfall patterns, a rise in average temperatures and more extreme climate events such as heatwaves and floods.\",
+    \"max_citations\": 10,
+    \"use_scholar\": true
+}"
 ```

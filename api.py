@@ -85,6 +85,7 @@ class StormCitationRequest(BaseModel):
     text: str
     max_citations: Optional[int] = 3
     exclude_urls: Optional[List[str]] = []
+    use_scholar: Optional[bool] = False
 
 class StormCitationResponse(BaseModel):
     citations: List[Dict[str, Any]]
@@ -152,17 +153,36 @@ async def find_citations_v2(request: StormCitationRequest, authenticated: bool =
             serper_api_key = os.getenv("SERPER_API_KEY")
             ydc_api_key = os.getenv("YDC_API_KEY")
             if serper_api_key:
+                # Set up query parameters based on whether to use scholar search
+                if request.use_scholar:
+                    query_params = {
+                        'autocorrect': True, 
+                        'num': 10, 
+                        'page': 1,
+                        'type': 'scholar',
+                        'engine': 'google-scholar'
+                    }
+                    logger.info("Using Google Scholar search")
+                else:
+                    query_params = {
+                        'autocorrect': True, 
+                        'num': 10, 
+                        'page': 1,
+                        'type': 'search',
+                        'engine': 'google'
+                    }
+                    logger.info("Using regular Google search")
+                
                 rm = SerperRM(
-                serper_search_api_key=serper_api_key,
-                query_params={'autocorrect': True, 'num': 10, 'page': 1}
-            )
+                    serper_search_api_key=serper_api_key,
+                    query_params=query_params
+                )
             elif ydc_api_key: 
                 rm = YouRM(ydc_api_key=ydc_api_key, k=request.max_citations * 2)
             else:
                 raise ValueError("SERPER_API_KEY or YDC_API_KEY not found in environment variables")
 
             
-            # Search using YouRM's forward method
             logger.info("Starting search")
             search_results = rm.forward(request.text, exclude_urls=request.exclude_urls)
             logger.info(f"Got {len(search_results) if search_results else 0} search results")

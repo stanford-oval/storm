@@ -507,8 +507,13 @@ class SerperRM(dspy.Retrieve):
             # Sets the json value for query to be the query that is being parsed.
             query_params["q"] = query
 
-            # Sets the type to be search, can be images, video, places, maps etc that Google provides.
-            query_params["type"] = "search"
+            # Sets the type to be search if not already specified
+            if "type" not in query_params:
+                query_params["type"] = "search"
+                
+            # Set engine to google if not already specified
+            if "engine" not in query_params:
+                query_params["engine"] = "google"
 
             self.result = self.serper_runner(query_params)
             self.results.append(self.result)
