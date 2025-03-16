@@ -49,9 +49,10 @@ class Information:
         snippets (list): List of brief excerpts or snippets.
         title (str): The title or headline of the information.
         url (str): The unique URL (serving as UUID) of the information.
+        authors (str): The author(s) of the information.
     """
 
-    def __init__(self, url, description, snippets, title, meta=None):
+    def __init__(self, url, description, snippets, title, authors=None, meta=None):
         """Initialize the Information object with detailed attributes.
 
         Args:
@@ -59,11 +60,14 @@ class Information:
             description (str): Detailed description.
             snippets (list): List of brief excerpts or snippet.
             title (str): The title or headline of the information.
+            authors (str, optional): The author(s) of the information. Defaults to None.
+            meta (dict, optional): Additional metadata. Defaults to None.
         """
         self.description = description
         self.snippets = snippets
         self.title = title
         self.url = url
+        self.authors = authors if authors is not None else ""
         self.meta = meta if meta is not None else {}
         self.citation_uuid = -1
 
@@ -117,6 +121,7 @@ class Information:
             description=info_dict["description"],
             snippets=info_dict["snippets"],
             title=info_dict["title"],
+            authors=info_dict.get("authors", None),
             meta=info_dict.get("meta", None),
         )
         info.citation_uuid = int(info_dict.get("citation_uuid", -1))
@@ -128,6 +133,7 @@ class Information:
             "description": self.description,
             "snippets": self.snippets,
             "title": self.title,
+            "authors": self.authors,
             "meta": self.meta,
             "citation_uuid": self.citation_uuid,
         }
@@ -303,6 +309,8 @@ class Retriever:
                     data["snippets"][i] = ArticleTextProcessing.remove_citations(
                         data["snippets"][i]
                     )
+                # Create Information object from the data dictionary
+                # The from_dict method will handle the author field if it exists
                 storm_info = Information.from_dict(data)
                 storm_info.meta["query"] = q
                 local_to_return.append(storm_info)

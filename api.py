@@ -85,7 +85,7 @@ class StormCitationRequest(BaseModel):
     text: str
     max_citations: Optional[int] = 3
     exclude_urls: Optional[List[str]] = []
-    use_scholar: Optional[bool] = False
+    use_scholar: Optional[bool] = True
 
 class StormCitationResponse(BaseModel):
     citations: List[Dict[str, Any]]

@@ -488,6 +488,7 @@ class SerperRM(dspy.Retrieve):
 
         Returns:
             a list of dictionaries, each dictionary has keys of 'description', 'snippets' (list of strings), 'title', 'url'
+            and optionally 'authors' when using Google Scholar search.
         """
         queries = (
             [query_or_queries]
@@ -538,6 +539,7 @@ class SerperRM(dspy.Retrieve):
                 # An array of dictionaries that contains the snippets, title of the document and url that will be used.
                 organic_results = result.get("organic")
                 knowledge_graph = result.get("knowledgeGraph")
+                
                 for organic in organic_results:
                     snippets = [organic.get("snippet")]
                     if self.ENABLE_EXTRA_SNIPPET_EXTRACTION:
@@ -546,19 +548,25 @@ class SerperRM(dspy.Retrieve):
                                 "snippets", []
                             )
                         )
-                    collected_results.append(
-                        {
-                            "snippets": snippets,
-                            "title": organic.get("title"),
-                            "url": organic.get("link"),
-                            "description": (
-                                knowledge_graph.get("description")
-                                if knowledge_graph is not None
-                                else ""
-                            ),
-                        }
-                    )
-            except:
+                    
+                    # Create the base result dictionary
+                    result_dict = {
+                        "snippets": snippets,
+                        "title": organic.get("title"),
+                        "url": organic.get("link"),
+                        "description": (
+                            knowledge_graph.get("description")
+                            if knowledge_graph is not None
+                            else ""
+                        ),
+                    }
+                    # Extract author information if available (for Google Scholar)
+                    if organic.get("publicationInfo"):
+                        result_dict["authors"] = organic.get("publicationInfo")
+                    
+                    collected_results.append(result_dict)
+            except Exception as e:
+                logging.error(f"Error processing search result: {e}")
                 continue
 
         return collected_results

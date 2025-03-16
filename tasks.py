@@ -119,7 +119,13 @@ def generate_article_task(self, article_params: dict, webhook_url: str, metadata
         if serper_api_key:
             rm = SerperRM(
             serper_search_api_key=serper_api_key,
-            query_params={'autocorrect': True, 'num': 10, 'page': 1}
+            query_params={
+                'autocorrect': True, 
+                'num': 10, 
+                'page': 1,
+                'type': 'scholar',
+                'engine': 'google-scholar'
+            }
         )
         elif ydc_api_key:
             rm = YouRM(ydc_api_key=ydc_api_key, k=engine_args.search_top_k)

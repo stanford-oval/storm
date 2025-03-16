@@ -28,7 +28,7 @@ def extract_storm_info_snippet(info: Information, snippet_index: int) -> Informa
 
     new_snippets = [info.snippets[snippet_index]]
     new_storm_info = Information(
-        info.url, info.description, new_snippets, info.title, info.meta
+        info.url, info.description, new_snippets, info.title, info.authors, info.meta
     )
     return new_storm_info
 
