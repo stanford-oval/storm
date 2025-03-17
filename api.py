@@ -200,6 +200,14 @@ async def find_citations_v2(request: StormCitationRequest, authenticated: bool =
                             'relevance_score': result.get('score', 1.0)
                         }
                         
+                        # Add author information if available (from Google Scholar results)
+                        if result.get('authors'):
+                            pub_info = result.get('authors')
+                            if isinstance(pub_info, dict) and 'authors' in pub_info:
+                                citation['authors'] = pub_info['authors']
+                            else:
+                                citation['authors'] = pub_info
+                        
                         # Only add if we have at least a title and URL
                         if citation['title'] and citation['url']:
                             citations.append(citation)
@@ -218,6 +226,7 @@ async def find_citations_v2(request: StormCitationRequest, authenticated: bool =
                 citations=citations,
                 error=None
             )
+            logger.info(f"Response: {response}")
             
             # Cleanup directory
             if base_dir and base_dir.exists():
