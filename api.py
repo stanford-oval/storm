@@ -197,7 +197,8 @@ async def find_citations_v2(request: StormCitationRequest, authenticated: bool =
                             'url': result.get('url', ''),
                             'title': result.get('title', ''),
                             'snippet': result.get('description', '')[:500] if result.get('description') else '',
-                            'relevance_score': result.get('score', 1.0)
+                            'relevance_score': result.get('score', 1.0),
+                            'year': result.get('year', '2025')
                         }
                         
                         # Add author information if available (from Google Scholar results)

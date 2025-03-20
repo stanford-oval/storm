@@ -50,6 +50,7 @@ class Information:
         title (str): The title or headline of the information.
         url (str): The unique URL (serving as UUID) of the information.
         authors (str): The author(s) of the information.
+        year (str): The year of the publication.
     """
 
     def __init__(self, url, description, snippets, title, authors=None, meta=None):
@@ -61,6 +62,7 @@ class Information:
             snippets (list): List of brief excerpts or snippet.
             title (str): The title or headline of the information.
             authors (str, optional): The author(s) of the information. Defaults to None.
+            year (str, optional): The year of the publication. Defaults to None.
             meta (dict, optional): Additional metadata. Defaults to None.
         """
         self.description = description
@@ -68,6 +70,7 @@ class Information:
         self.title = title
         self.url = url
         self.authors = authors if authors is not None else ""
+        self.year = year if year is not None else ""
         self.meta = meta if meta is not None else {}
         self.citation_uuid = -1
 
@@ -122,6 +125,7 @@ class Information:
             snippets=info_dict["snippets"],
             title=info_dict["title"],
             authors=info_dict.get("authors", None),
+            year=info_dict.get("year", None),
             meta=info_dict.get("meta", None),
         )
         info.citation_uuid = int(info_dict.get("citation_uuid", -1))
@@ -134,6 +138,7 @@ class Information:
             "snippets": self.snippets,
             "title": self.title,
             "authors": self.authors,
+            "year": self.year,
             "meta": self.meta,
             "citation_uuid": self.citation_uuid,
         }

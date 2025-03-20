@@ -488,7 +488,7 @@ class SerperRM(dspy.Retrieve):
 
         Returns:
             a list of dictionaries, each dictionary has keys of 'description', 'snippets' (list of strings), 'title', 'url'
-            and optionally 'authors' when using Google Scholar search.
+            and optionally 'authors' and 'year' when using Google Scholar search.
         """
         queries = (
             [query_or_queries]
@@ -563,6 +563,8 @@ class SerperRM(dspy.Retrieve):
                     # Extract author information if available (for Google Scholar)
                     if organic.get("publicationInfo"):
                         result_dict["authors"] = organic.get("publicationInfo")
+                    if organic.get("year"):
+                        result_dict["year"] = organic.get("year")
                     
                     collected_results.append(result_dict)
             except Exception as e:
