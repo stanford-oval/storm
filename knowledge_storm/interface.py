@@ -53,7 +53,7 @@ class Information:
         year (str): The year of the publication.
     """
 
-    def __init__(self, url, description, snippets, title, authors=None, meta=None):
+    def __init__(self, url, description, snippets, title, authors=None, year=None, meta=None):
         """Initialize the Information object with detailed attributes.
 
         Args:
