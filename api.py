@@ -193,7 +193,6 @@ async def find_citations_v2(request: StormCitationRequest, authenticated: bool =
                 for result in search_results:
                     try:
                         # Extract relevant information from search result
-                        logger.info(f"Processing result: {result}")
                         citation = {
                             'url': result.get('url', ''),
                             'title': result.get('title', ''),
