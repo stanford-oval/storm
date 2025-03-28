@@ -193,36 +193,16 @@ async def find_citations_v2(request: StormCitationRequest, authenticated: bool =
                 for result in search_results:
                     try:
                         # Extract relevant information from search result
+                        logger.info(f"Processing result: {result}")
                         citation = {
                             'url': result.get('url', ''),
                             'title': result.get('title', ''),
                             'snippet': result.get('description', '')[:500] if result.get('description') else '',
-                            'relevance_score': result.get('score', 1.0)
+                            'relevance_score': result.get('score', 1.0),
+                            'year': result.get('year', '2025'),
+                            'authors': result.get('authors', ''),
+                            'publication_info': result.get('publication_info', '')
                         }
-                        
-                        # Add author information if available (from Google Scholar results)
-                        if result.get('authors'):
-                            pub_info = result.get('authors')
-                            if isinstance(pub_info, dict) and 'authors' in pub_info:
-                                citation['authors'] = pub_info['authors']
-                            else:
-                                citation['authors'] = pub_info
-                        
-                        # Add year information if available
-                        # For Google Scholar results, publication info often contains the year
-                        if result.get('publication_info'):
-                            # Try to extract year from publication info
-                            pub_info = result.get('publication_info', '')
-                            # Look for year pattern in publication info string
-                            year_match = re.search(r'\b(19|20)\d{2}\b', str(pub_info))
-                            if year_match:
-                                citation['year'] = year_match.group(0)
-                        
-                        # If we couldn't find the year in publication_info, try to extract from the description
-                        if 'year' not in citation and result.get('description'):
-                            year_match = re.search(r'\b(19|20)\d{2}\b', result.get('description', ''))
-                            if year_match:
-                                citation['year'] = year_match.group(0)
                         
                         # Only add if we have at least a title and URL
                         if citation['title'] and citation['url']:
