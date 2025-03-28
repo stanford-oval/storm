@@ -208,6 +208,7 @@ def generate_article_task(self, article_params: dict, webhook_url: str, metadata
             if sources_path.exists():
                 sources = json.loads(sources_path.read_text())
                 logger.info(f"Read sources from {sources_path}, found {len(sources)} sources")
+                logger.info(f"Sources: {sources}")
             else:
                 logger.warning(f"Sources file not found at {sources_path}")
             
