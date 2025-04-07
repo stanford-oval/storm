@@ -14,9 +14,10 @@ from .modules.co_storm_agents import (
 from .modules.expert_generation import GenerateExpertModule
 from .modules.warmstart_hierarchical_chat import WarmStartModule
 from ..dataclass import ConversationTurn, KnowledgeBase
+from ..encoder import Encoder
 from ..interface import LMConfigs, Agent
 from ..logging_wrapper import LoggingWrapper
-from ..lm import OpenAIModel, AzureOpenAIModel, TogetherClient
+from ..lm import LitellmModel
 from ..rm import BingSearch
 
 
@@ -45,27 +46,26 @@ class CollaborativeStormLMConfigs(LMConfigs):
         if lm_type and lm_type == "openai":
             openai_kwargs = {
                 "api_key": os.getenv("OPENAI_API_KEY"),
-                "api_provider": "openai",
                 "temperature": temperature,
                 "top_p": top_p,
                 "api_base": None,
             }
-            self.question_answering_lm = OpenAIModel(
+            self.question_answering_lm = LitellmModel(
                 model="gpt-4o-2024-05-13", max_tokens=1000, **openai_kwargs
             )
-            self.discourse_manage_lm = OpenAIModel(
+            self.discourse_manage_lm = LitellmModel(
                 model="gpt-4o-2024-05-13", max_tokens=500, **openai_kwargs
             )
-            self.utterance_polishing_lm = OpenAIModel(
+            self.utterance_polishing_lm = LitellmModel(
                 model="gpt-4o-2024-05-13", max_tokens=2000, **openai_kwargs
             )
-            self.warmstart_outline_gen_lm = OpenAIModel(
+            self.warmstart_outline_gen_lm = LitellmModel(
                 model="gpt-4-1106-preview", max_tokens=500, **openai_kwargs
             )
-            self.question_asking_lm = OpenAIModel(
+            self.question_asking_lm = LitellmModel(
                 model="gpt-4o-2024-05-13", max_tokens=300, **openai_kwargs
             )
-            self.knowledge_base_lm = OpenAIModel(
+            self.knowledge_base_lm = LitellmModel(
                 model="gpt-4o-2024-05-13", max_tokens=1000, **openai_kwargs
             )
         elif lm_type and lm_type == "azure":
@@ -76,23 +76,23 @@ class CollaborativeStormLMConfigs(LMConfigs):
                 "api_base": os.getenv("AZURE_API_BASE"),
                 "api_version": os.getenv("AZURE_API_VERSION"),
             }
-            self.question_answering_lm = AzureOpenAIModel(
-                model="gpt-4o", max_tokens=1000, **azure_kwargs, model_type="chat"
+            self.question_answering_lm = LitellmModel(
+                model="azure/gpt-4o", max_tokens=1000, **azure_kwargs, model_type="chat"
             )
-            self.discourse_manage_lm = AzureOpenAIModel(
-                model="gpt-4o", max_tokens=500, **azure_kwargs, model_type="chat"
+            self.discourse_manage_lm = LitellmModel(
+                model="azure/gpt-4o", max_tokens=500, **azure_kwargs, model_type="chat"
             )
-            self.utterance_polishing_lm = AzureOpenAIModel(
-                model="gpt-4o", max_tokens=2000, **azure_kwargs, model_type="chat"
+            self.utterance_polishing_lm = LitellmModel(
+                model="azure/gpt-4o", max_tokens=2000, **azure_kwargs, model_type="chat"
             )
-            self.warmstart_outline_gen_lm = AzureOpenAIModel(
-                model="gpt-4o", max_tokens=300, **azure_kwargs, model_type="chat"
+            self.warmstart_outline_gen_lm = LitellmModel(
+                model="azure/gpt-4o", max_tokens=300, **azure_kwargs, model_type="chat"
             )
-            self.question_asking_lm = AzureOpenAIModel(
-                model="gpt-4o", max_tokens=300, **azure_kwargs, model_type="chat"
+            self.question_asking_lm = LitellmModel(
+                model="azure/gpt-4o", max_tokens=300, **azure_kwargs, model_type="chat"
             )
-            self.knowledge_base_lm = AzureOpenAIModel(
-                model="gpt-4o", max_tokens=1000, **azure_kwargs, model_type="chat"
+            self.knowledge_base_lm = LitellmModel(
+                model="azure/gpt-4o", max_tokens=1000, **azure_kwargs, model_type="chat"
             )
         elif lm_type and lm_type == "together":
             together_kwargs = {
@@ -100,38 +100,38 @@ class CollaborativeStormLMConfigs(LMConfigs):
                 "temperature": temperature,
                 "top_p": top_p,
             }
-            self.question_answering_lm = TogetherClient(
-                model="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+            self.question_answering_lm = LitellmModel(
+                model="together_ai/meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
                 max_tokens=1000,
                 model_type="chat",
                 **together_kwargs,
             )
-            self.discourse_manage_lm = TogetherClient(
-                model="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+            self.discourse_manage_lm = LitellmModel(
+                model="together_ai/meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
                 max_tokens=500,
                 model_type="chat",
                 **together_kwargs,
             )
-            self.utterance_polishing_lm = TogetherClient(
-                model="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+            self.utterance_polishing_lm = LitellmModel(
+                model="together_ai/meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
                 max_tokens=2000,
                 model_type="chat",
                 **together_kwargs,
             )
-            self.warmstart_outline_gen_lm = TogetherClient(
-                model="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+            self.warmstart_outline_gen_lm = LitellmModel(
+                model="together_ai/meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
                 max_tokens=500,
                 model_type="chat",
                 **together_kwargs,
             )
-            self.question_asking_lm = TogetherClient(
-                model="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+            self.question_asking_lm = LitellmModel(
+                model="together_ai/meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
                 max_tokens=300,
                 model_type="chat",
                 **together_kwargs,
             )
-            self.knowledge_base_lm = TogetherClient(
-                model="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+            self.knowledge_base_lm = LitellmModel(
+                model="together_ai/meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
                 max_tokens=1000,
                 model_type="chat",
                 **together_kwargs,
@@ -323,6 +323,7 @@ class DiscourseManager:
         lm_config: CollaborativeStormLMConfigs,
         runner_argument: RunnerArgument,
         rm: dspy.Retrieve,
+        encoder: Encoder,
         callback_handler: BaseCallbackHandler,
     ):
         # parameter management
@@ -331,6 +332,7 @@ class DiscourseManager:
         self.logging_wrapper = logging_wrapper
         self.callback_handler = callback_handler
         self.rm = rm
+        self.encoder = encoder
         # role management
         self.experts: List[CoStormExpert] = []
         self.simulated_user: SimulatedUser = SimulatedUser(
@@ -360,6 +362,7 @@ class DiscourseManager:
             lm_config=self.lm_config,
             runner_argument=self.runner_argument,
             logging_wrapper=self.logging_wrapper,
+            encoder=self.encoder,
             callback_handler=self.callback_handler,
         )
         self.general_knowledge_provider = CoStormExpert(
@@ -469,16 +472,16 @@ class DiscourseManager:
         elif self.runner_argument.rag_only_baseline_mode:
             assert self.conversation_history[-1].role == "Guest"
             next_turn_policy.agent = self.pure_rag_agent
+        elif self.next_turn_moderator_override:
+            next_turn_policy.agent = self.moderator
+            if not dry_run:
+                self.next_turn_moderator_override = False
         elif (
             not self.runner_argument.disable_moderator
             and self._should_generate_question(conversation_history)
         ):
             next_turn_policy.agent = self.moderator
             next_turn_policy.should_reorganize_knowledge_base = True
-        elif self.next_turn_moderator_override:
-            next_turn_policy.agent = self.moderator
-            if not dry_run:
-                self.next_turn_moderator_override = False
         # experts RAG gen
         else:
             next_turn_policy.agent = self.general_knowledge_provider
@@ -516,18 +519,21 @@ class CoStormRunner:
             self.rm = BingSearch(k=runner_argument.retrieve_top_k)
         else:
             self.rm = rm
+        self.encoder = Encoder()
         self.conversation_history = []
         self.warmstart_conv_archive = []
         self.knowledge_base = KnowledgeBase(
             topic=self.runner_argument.topic,
             knowledge_base_lm=self.lm_config.knowledge_base_lm,
             node_expansion_trigger_count=self.runner_argument.node_expansion_trigger_count,
+            encoder=self.encoder,
         )
         self.discourse_manager = DiscourseManager(
             lm_config=self.lm_config,
             runner_argument=self.runner_argument,
             logging_wrapper=self.logging_wrapper,
             rm=self.rm,
+            encoder=self.encoder,
             callback_handler=callback_handler,
         )
 
@@ -546,7 +552,7 @@ class CoStormRunner:
         }
 
     @classmethod
-    def from_dict(cls, data):
+    def from_dict(cls, data, callback_handler: BaseCallbackHandler = None):
         # FIXME: does not use the lm_config data but naively use default setting
         lm_config = CollaborativeStormLMConfigs()
         lm_config.init(lm_type=os.getenv("OPENAI_API_TYPE"))
@@ -554,7 +560,9 @@ class CoStormRunner:
             lm_config=lm_config,
             runner_argument=RunnerArgument.from_dict(data["runner_argument"]),
             logging_wrapper=LoggingWrapper(lm_config),
+            callback_handler=callback_handler,
         )
+        costorm_runner.encoder = Encoder()
         costorm_runner.conversation_history = [
             ConversationTurn.from_dict(turn) for turn in data["conversation_history"]
         ]
@@ -567,6 +575,7 @@ class CoStormRunner:
             data=data["knowledge_base"],
             knowledge_base_lm=costorm_runner.lm_config.knowledge_base_lm,
             node_expansion_trigger_count=costorm_runner.runner_argument.node_expansion_trigger_count,
+            encoder=costorm_runner.encoder,
         )
         return costorm_runner
 
@@ -591,11 +600,13 @@ class CoStormRunner:
                     callback_handler=self.callback_handler,
                 )
 
-                warmstart_conv, warmstart_revised_conv, warmstart_experts = (
-                    warm_start_module.initiate_warm_start(
-                        topic=self.runner_argument.topic,
-                        knowledge_base=self.knowledge_base,
-                    )
+                (
+                    warmstart_conv,
+                    warmstart_revised_conv,
+                    warmstart_experts,
+                ) = warm_start_module.initiate_warm_start(
+                    topic=self.runner_argument.topic,
+                    knowledge_base=self.knowledge_base,
                 )
                 self.discourse_manager.experts = (
                     self.discourse_manager._parse_expert_names_to_agent(
@@ -607,11 +618,14 @@ class CoStormRunner:
                     warmstart_revised_conv if warmstart_revised_conv else warmstart_conv
                 )
                 self.warmstart_conv_archive = warmstart_conv
-                self.knowledge_base.reorganize()
+                self.knowledge_base.reogranize()
             else:
                 if self.knowledge_base is None:
                     self.knowledge_base = KnowledgeBase(
-                        topic=self.runner_argument.topic
+                        topic=self.runner_argument.topic,
+                        knowledge_base_lm=self.lm_config.knowledge_base_lm,
+                        node_expansion_trigger_count=self.runner_argument.node_expansion_trigger_count,
+                        encoder=self.encoder,
                     )
                 if self.conversation_history is None:
                     self.conversation_history = []
@@ -633,7 +647,9 @@ class CoStormRunner:
         Returns:
             str: A string representing the report, with "#" "##" indicating hierarchical sections and [1][2] indicating references.
         """
-        with self.logging_wrapper.log_pipeline_stage("report generation stage"):
+        with self.logging_wrapper.log_pipeline_stage(
+            f"report generation after conv turn: {len(self.conversation_history)}"
+        ):
             with self.logging_wrapper.log_event(
                 "report generation stage: generate report"
             ):
@@ -741,5 +757,5 @@ class CoStormRunner:
                     ):
                         if self.callback_handler is not None:
                             self.callback_handler.on_mindmap_reorg_start()
-                        self.knowledge_base.reorganize()
+                        self.knowledge_base.reogranize()
         return conv_turn

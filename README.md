@@ -135,12 +135,20 @@ POST /v2/find-citations
 }
 ```
 
-### 3. Health Check
+### STORM examples
 
-Check if the API is running.
+**To run STORM with `gpt` family models with default configurations:**
 
-```http
-GET /health
+Run the following command.
+
+```bash
+python examples/storm_examples/run_storm_wiki_gpt.py \
+    --output-dir $OUTPUT_DIR \
+    --retriever you \
+    --do-research \
+    --do-generate-outline \
+    --do-generate-article \
+    --do-polish-article
 ```
 
 **Response:**
@@ -157,28 +165,89 @@ GET /health
 Generate an article:
 
 ```bash
-curl -X POST "http://localhost:8000/v2/generate-article" \
-     -H "Authorization: Bearer Ap-xvOcEH16cnL6827_a4By_DkooYQFsUdEDWFr1Lh4" \
-     -H "Content-Type: application/json" \
-     -d '{
-      "topic": "AI in healthcare",
-      "length": 100,
-      "do_research": true,
-      "do_generate_outline": true,
-      "do_generate_article": false,
-      "do_polish_article": false
-     }'
+python examples/costorm_examples/run_costorm_gpt.py \
+    --output-dir $OUTPUT_DIR \
+    --retriever bing
 ```
 
-Find citations:
+## Customization of the Pipeline
 
-```bash
-curl -X POST "http://localhost:8000/v2/find-citations" \
-  -H "Authorization: Bearer Ap-xvOcEH16cnL6827_a4By_DkooYQFsUdEDWFr1Lh4" \
-  -H "Content-Type: application/json" \
-  -d "{
-    \"text\": \"Greenhouse gases act similarly to the glass in a greenhouse: they absorb the sun's heat that radiates from the Earth's surface, trap it in the atmosphere and prevent it from escaping into space. The greenhouse effect keeps the Earth's temperature warmer than it would otherwise be, supporting life on Earth. Many greenhouse gases occur naturally in the atmosphere, but human activity contributes to their accumulation. As a result, the greenhouse effect in the atmosphere is boosted and it alters our planet's climate, leading to shifts in snow and rainfall patterns, a rise in average temperatures and more extreme climate events such as heatwaves and floods.\",
-    \"max_citations\": 10,
-    \"use_scholar\": true
-}"
+### STORM
+
+If you have installed the source code, you can customize STORM based on your own use case. STORM engine consists of 4 modules:
+
+1. Knowledge Curation Module: Collects a broad coverage of information about the given topic.
+2. Outline Generation Module: Organizes the collected information by generating a hierarchical outline for the curated knowledge.
+3. Article Generation Module: Populates the generated outline with the collected information.
+4. Article Polishing Module: Refines and enhances the written article for better presentation.
+
+The interface for each module is defined in `knowledge_storm/interface.py`, while their implementations are instantiated in `knowledge_storm/storm_wiki/modules/*`. These modules can be customized according to your specific requirements (e.g., generating sections in bullet point format instead of full paragraphs).
+
+### Co-STORM
+
+If you have installed the source code, you can customize Co-STORM based on your own use case
+
+1. Co-STORM introduces multiple LLM agent types (i.e. Co-STORM experts and Moderator). LLM agent interface is defined in `knowledge_storm/interface.py` , while its implementation is instantiated in `knowledge_storm/collaborative_storm/modules/co_storm_agents.py`. Different LLM agent policies can be customized.
+2. Co-STORM introduces a collaborative discourse protocol, with its core function centered on turn policy management. We provide an example implementation of turn policy management through `DiscourseManager` in `knowledge_storm/collaborative_storm/engine.py`. It can be customized and further improved.
+
+## Datasets
+
+To facilitate the study of automatic knowledge curation and complex information seeking, our project releases the following datasets:
+
+### FreshWiki
+
+The FreshWiki Dataset is a collection of 100 high-quality Wikipedia articles focusing on the most-edited pages from February 2022 to September 2023. See Section 2.1 in [STORM paper](https://arxiv.org/abs/2402.14207) for more details.
+
+You can download the dataset from [huggingface](https://huggingface.co/datasets/EchoShao8899/FreshWiki) directly. To ease the data contamination issue, we archive the [source code](https://github.com/stanford-oval/storm/tree/NAACL-2024-code-backup/FreshWiki) for the data construction pipeline that can be repeated at future dates.
+
+### WildSeek
+
+To study users’ interests in complex information seeking tasks in the wild, we utilized data collected from the web research preview to create the WildSeek dataset. We downsampled the data to ensure the diversity of the topics and the quality of the data. Each data point is a pair comprising a topic and the user’s goal for conducting deep search on the topic. For more details, please refer to Section 2.2 and Appendix A of [Co-STORM paper](https://www.arxiv.org/abs/2408.15232).
+
+The WildSeek dataset is available [here](https://huggingface.co/datasets/YuchengJiang/WildSeek).
+
+## Replicate STORM & Co-STORM paper result
+
+For STORM paper experiments, please switch to the branch `NAACL-2024-code-backup` [here](https://github.com/stanford-oval/storm/tree/NAACL-2024-code-backup).
+
+For Co-STORM paper experiments, please switch to the branch `EMNLP-2024-code-backup` (placeholder for now, will be updated soon).
+
+## Roadmap & Contributions
+
+Our team is actively working on:
+
+1. Human-in-the-Loop Functionalities: Supporting user participation in the knowledge curation process.
+2. Information Abstraction: Developing abstractions for curated information to support presentation formats beyond the Wikipedia-style report.
+
+If you have any questions or suggestions, please feel free to open an issue or pull request. We welcome contributions to improve the system and the codebase!
+
+Contact person: [Yijia Shao](mailto:shaoyj@stanford.edu) and [Yucheng Jiang](mailto:yuchengj@stanford.edu)
+
+## Acknowledgement
+
+We would like to thank Wikipedia for its excellent open-source content. The FreshWiki dataset is sourced from Wikipedia, licensed under the Creative Commons Attribution-ShareAlike (CC BY-SA) license.
+
+We are very grateful to [Michelle Lam](https://michelle123lam.github.io/) for designing the logo for this project and [Dekun Ma](https://dekun.me) for leading the UI development.
+
+## Citation
+
+Please cite our paper if you use this code or part of it in your work:
+
+```bibtex
+@misc{jiang2024unknownunknowns,
+      title={Into the Unknown Unknowns: Engaged Human Learning through Participation in Language Model Agent Conversations},
+      author={Yucheng Jiang and Yijia Shao and Dekun Ma and Sina J. Semnani and Monica S. Lam},
+      year={2024},
+      eprint={2408.15232},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2408.15232},
+}
+
+@inproceedings{shao2024assisting,
+      title={{Assisting in Writing Wikipedia-like Articles From Scratch with Large Language Models}},
+      author={Yijia Shao and Yucheng Jiang and Theodore A. Kanell and Peter Xu and Omar Khattab and Monica S. Lam},
+      year={2024},
+      booktitle={Proceedings of the 2024 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers)}
+}
 ```

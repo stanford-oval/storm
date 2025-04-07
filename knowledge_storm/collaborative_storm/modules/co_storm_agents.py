@@ -13,7 +13,7 @@ from .costorm_expert_utterance_generator import CoStormExpertUtteranceGeneration
 from .grounded_question_generation import GroundedQuestionGenerationModule
 from .simulate_user import GenSimulatedUserUtterance
 from ...dataclass import ConversationTurn, KnowledgeBase
-from ...encoder import get_text_embeddings
+from ...encoder import Encoder
 from ...interface import Agent, Information, LMConfigs
 from ...logging_wrapper import LoggingWrapper
 
@@ -174,6 +174,7 @@ class Moderator(Agent):
         lm_config: LMConfigs,
         runner_argument: "RunnerArgument",
         logging_wrapper: LoggingWrapper,
+        encoder: Encoder,
         callback_handler: BaseCallbackHandler = None,
     ):
         super().__init__(topic, role_name, role_description)
@@ -184,6 +185,7 @@ class Moderator(Agent):
             engine=self.lm_config.question_asking_lm
         )
         self.callback_handler = callback_handler
+        self.encoder = encoder
 
     def _get_conv_turn_unused_information(
         self, conv_turn: ConversationTurn, knowledge_base: KnowledgeBase
@@ -211,19 +213,12 @@ class Moderator(Agent):
         # extract snippets to get embeddings
         unused_information_snippets = [info.snippets[0] for info in unused_information]
         # get embeddings
-        cache = knowledge_base.embedding_cache
-        unused_snippets_embeddings, _ = get_text_embeddings(
-            unused_information_snippets, embedding_cache=cache, max_workers=100
+        unused_snippets_embeddings = self.encoder.encode(
+            unused_information_snippets, max_workers=20
         )
-        claim_embedding, _ = get_text_embeddings(
-            conv_turn.claim_to_make, embedding_cache=cache
-        )
-        query_embedding, _ = get_text_embeddings(
-            conv_turn.queries, embedding_cache=cache
-        )
-        cited_snippets_embedding, _ = get_text_embeddings(
-            cited_snippets, embedding_cache=cache
-        )
+        claim_embedding = self.encoder.encode(conv_turn.claim_to_make)
+        query_embedding = self.encoder.encode(conv_turn.queries)
+        cited_snippets_embedding = self.encoder.encode(cited_snippets)
         # calculate similarity
         query_similarities = cosine_similarity(
             unused_snippets_embeddings, query_embedding
@@ -270,8 +265,7 @@ class Moderator(Agent):
             )
             batch_snippets.append(conv_turn.claim_to_make)
             batch_snippets.extend(conv_turn.queries)
-        cache = knowledge_base.embedding_cache
-        get_text_embeddings(batch_snippets, embedding_cache=cache, max_workers=300)
+        self.encoder.encode(batch_snippets, max_workers=20)
 
         # get sorted unused snippets for each turn
         sorted_snippets = []
