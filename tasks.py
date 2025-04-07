@@ -12,6 +12,8 @@ import shutil
 import re
 import hashlib
 import time
+import uuid
+from datetime import datetime
 
 # Load environment variables
 load_dotenv()
@@ -43,19 +45,28 @@ def verify_directory_permissions(path: Path) -> bool:
         logger.error(f"Directory permission error at {path}: {str(e)}")
         return False
 
+def generate_unique_dir_name(topic: str) -> str:
+    """
+    Generate a unique directory name using topic, timestamp and UUID.
+    """
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    unique_id = str(uuid.uuid4())[:8]  # Use first 8 chars of UUID for brevity
+    return f"{timestamp}_{unique_id}"
+
 @celery_app.task(bind=True)
 def generate_article_task(self, article_params: dict, webhook_url: str, metadata: dict):
     """
     Celery task for article generation
     """
-    topic_dir = None
+    base_dir = None
+    task_dir = None
     try:
         # Initialize LM configurations
         lm_configs = STORMWikiLMConfigs()
         
         # Common parameters for language models
         openai_kwargs = {
-            'api_key': os.getenv("OPENAI_API_KEY"),
+            'api_key': os.getenv("OPENROUTER_API_KEY"),
             'temperature': 1.0,
             'top_p': 0.9,
         }
@@ -64,8 +75,8 @@ def generate_article_task(self, article_params: dict, webhook_url: str, metadata
         
         # Configure model names based on provider
         # Default to OpenAI
-        gpt_35_model_name = 'gpt-3.5-turbo'
-        gpt_4_model_name = 'gpt-4o'
+        gpt_35_model_name = 'openrouter/openai/gpt-3.5-turbo'
+        gpt_4_model_name = 'openrouter/openai/gpt-4o'
         
         logger.info(f"Using LLM provider: {llm_provider} with models {gpt_35_model_name} and {gpt_4_model_name}")
         
@@ -111,9 +122,16 @@ def generate_article_task(self, article_params: dict, webhook_url: str, metadata
         if not verify_directory_permissions(base_dir):
             raise RuntimeError(f"Cannot write to directory: {base_dir}")
 
+        # Create a unique task directory
+        unique_dir = generate_unique_dir_name(article_params['topic'])
+        task_dir = base_dir / unique_dir
+        task_dir.mkdir(parents=True, exist_ok=True)
+        logger.info(f"Created task directory at {task_dir}")
+
+
         # Initialize engine arguments with absolute path
         engine_args = STORMWikiRunnerArguments(
-            output_dir=str(base_dir),  # Convert Path to string
+            output_dir=str(task_dir),
             max_conv_turn=3,
             max_perspective=3,
             search_top_k=3,
@@ -162,12 +180,6 @@ def generate_article_task(self, article_params: dict, webhook_url: str, metadata
         do_polish_article = article_params.get('do_polish_article', True)
         remove_duplicate = article_params.get('remove_duplicate', False)
         
-        # Create a unique directory with a sanitized topic name
-        safe_topic = sanitize_topic(article_params['topic'])
-        topic_dir = base_dir / safe_topic
-        topic_dir.mkdir(parents=True, exist_ok=True)
-        logger.info(f"Created topic directory at {topic_dir}")
-        
         # Run article generation
         result = runner.run(
             topic=topic,
@@ -179,8 +191,8 @@ def generate_article_task(self, article_params: dict, webhook_url: str, metadata
         )
         
         # List directory contents after generation
-        logger.info(f"Files in {topic_dir}:")
-        for file in topic_dir.glob('*'):
+        logger.info(f"Files in {task_dir}:")
+        for file in task_dir.glob('*'):
             logger.info(f"Found file: {file.name} - Size: {file.stat().st_size} bytes")
         
         # Add small delay to ensure file system sync
@@ -194,7 +206,7 @@ def generate_article_task(self, article_params: dict, webhook_url: str, metadata
         
         try:
             if do_generate_article:
-                article_path = topic_dir / "storm_gen_article.txt"
+                article_path = task_dir / sanitize_topic(topic) / "storm_gen_article.txt"
                 logger.info(f"Checking for article at: {article_path}")
                 if article_path.exists():
                     content = article_path.read_text()
@@ -207,7 +219,7 @@ def generate_article_task(self, article_params: dict, webhook_url: str, metadata
                         logger.info(f"- {file.name}")
             
             if do_generate_outline:
-                outline_path = topic_dir / "storm_gen_outline.txt"
+                outline_path = task_dir / sanitize_topic(topic) / "storm_gen_outline.txt"
                 if outline_path.exists():
                     outline = outline_path.read_text()
                     logger.info(f"Read outline from {outline_path}, length: {len(outline)} chars")
@@ -215,18 +227,17 @@ def generate_article_task(self, article_params: dict, webhook_url: str, metadata
                     logger.warning(f"Outline file not found at {outline_path}")
             
             if do_polish_article:
-                polished_path = topic_dir / "storm_gen_article_polished.txt"
+                polished_path = task_dir / sanitize_topic(topic) / "storm_gen_article_polished.txt"
                 if polished_path.exists():
                     polished_content = polished_path.read_text()
                     logger.info(f"Read polished content from {polished_path}, length: {len(polished_content)} chars")
                 else:
                     logger.warning(f"Polished article file not found at {polished_path}")
             
-            sources_path = topic_dir / "url_to_info.json"
+            sources_path = task_dir / sanitize_topic(topic) / "url_to_info.json"
             if sources_path.exists():
                 sources = json.loads(sources_path.read_text())
                 logger.info(f"Read sources from {sources_path}, found {len(sources)} sources")
-                logger.info(f"Sources: {sources}")
             else:
                 logger.warning(f"Sources file not found at {sources_path}")
             
@@ -273,9 +284,9 @@ def generate_article_task(self, article_params: dict, webhook_url: str, metadata
     
     finally:
         # Cleanup directory after reading all files
-        if topic_dir and topic_dir.exists():
-            shutil.rmtree(topic_dir)
-            logger.info(f"Cleaned up directory: {topic_dir}")
+        if task_dir and task_dir.exists():
+            shutil.rmtree(task_dir)
+            logger.info(f"Cleaned up directory: {task_dir}")
     
     # Send webhook with retries
     send_webhook_with_retry(webhook_url, payload) 
