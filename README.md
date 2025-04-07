@@ -57,6 +57,17 @@ POST /v2/generate-article
 - `do_polish_article` (boolean, optional): When `true`, refines the generated article by adding a summary section and optionally removing duplicate content.
 - `remove_duplicate` (boolean, optional): When `true`, removes any duplicate content during the polishing phase.
 - `metadata` (object, optional): Additional metadata to be included with the request.
+- `use_scholar` (boolean, optional, default: true): When `true`, uses Google Scholar search for research; otherwise uses regular Google search.
+- `llm_provider` (string, optional, default: "openai"): Specifies the LLM provider to use. Supported options:
+  - `"openai"`: Uses OpenAI models (default)
+
+**Token Configuration Parameters:**
+
+- `conv_simulator_max_tokens` (integer, optional, default: 500): Maximum tokens for conversation simulation
+- `question_asker_max_tokens` (integer, optional, default: 500): Maximum tokens for question generation
+- `outline_gen_max_tokens` (integer, optional, default: 400): Maximum tokens for outline generation
+- `article_gen_max_tokens` (integer, optional, default: 700): Maximum tokens for article generation
+- `article_polish_max_tokens` (integer, optional, default: 700): Maximum tokens for article polishing
 
 **Request Body:**
 
@@ -69,7 +80,14 @@ POST /v2/generate-article
   "do_generate_article": false,
   "do_polish_article": false,
   "remove_duplicate": false,
-  "metadata": {}
+  "metadata": {},
+  "use_scholar": true,
+  "llm_provider": "openai",
+  "conv_simulator_max_tokens": 500,
+  "question_asker_max_tokens": 500,
+  "outline_gen_max_tokens": 400,
+  "article_gen_max_tokens": 700,
+  "article_polish_max_tokens": 700
 }
 ```
 
@@ -202,7 +220,7 @@ You can download the dataset from [huggingface](https://huggingface.co/datasets/
 
 ### WildSeek
 
-To study users’ interests in complex information seeking tasks in the wild, we utilized data collected from the web research preview to create the WildSeek dataset. We downsampled the data to ensure the diversity of the topics and the quality of the data. Each data point is a pair comprising a topic and the user’s goal for conducting deep search on the topic. For more details, please refer to Section 2.2 and Appendix A of [Co-STORM paper](https://www.arxiv.org/abs/2408.15232).
+To study users' interests in complex information seeking tasks in the wild, we utilized data collected from the web research preview to create the WildSeek dataset. We downsampled the data to ensure the diversity of the topics and the quality of the data. Each data point is a pair comprising a topic and the user's goal for conducting deep search on the topic. For more details, please refer to Section 2.2 and Appendix A of [Co-STORM paper](https://www.arxiv.org/abs/2408.15232).
 
 The WildSeek dataset is available [here](https://huggingface.co/datasets/YuchengJiang/WildSeek).
 

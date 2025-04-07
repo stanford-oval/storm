@@ -1,7 +1,7 @@
 from celery_config import celery_app, send_webhook_with_retry
 from knowledge_storm import STORMWikiRunner, STORMWikiRunnerArguments, STORMWikiLMConfigs
 from knowledge_storm.rm import SerperRM, YouRM
-from knowledge_storm.lm import OpenAIModel
+from knowledge_storm.lm import LitellmModel
 from knowledge_storm.utils import truncate_filename
 import logging
 import os
@@ -52,40 +52,47 @@ def generate_article_task(self, article_params: dict, webhook_url: str, metadata
     try:
         # Initialize LM configurations
         lm_configs = STORMWikiLMConfigs()
+        
+        # Common parameters for language models
         openai_kwargs = {
             'api_key': os.getenv("OPENAI_API_KEY"),
             'temperature': 1.0,
             'top_p': 0.9,
         }
 
-        # Configure language models
+        llm_provider = article_params.get('openai')
+        
+        # Configure model names based on provider
+        # Default to OpenAI
         gpt_35_model_name = 'gpt-3.5-turbo'
         gpt_4_model_name = 'gpt-4o'
-
-        # Initialize different LMs for different components
-        conv_simulator_lm = OpenAIModel(
+        
+        logger.info(f"Using LLM provider: {llm_provider} with models {gpt_35_model_name} and {gpt_4_model_name}")
+        
+        # Use LitellmModel instead of OpenAIModel for better provider compatibility
+        conv_simulator_lm = LitellmModel(
             model=gpt_35_model_name, 
             max_tokens=article_params.get('conv_simulator_max_tokens', 500), 
             **openai_kwargs
         )
-        question_asker_lm = OpenAIModel(
+        question_asker_lm = LitellmModel(
             model=gpt_35_model_name, 
             max_tokens=article_params.get('question_asker_max_tokens', 500), 
             **openai_kwargs
         )
-        outline_gen_lm = OpenAIModel(
+        outline_gen_lm = LitellmModel(
             model=gpt_4_model_name, 
             max_tokens=article_params.get('outline_gen_max_tokens', 400), 
             **openai_kwargs
         )
-        article_gen_lm = OpenAIModel(
+        article_gen_lm = LitellmModel(
             model=gpt_4_model_name, 
             max_tokens=article_params.get('article_gen_max_tokens', 700), 
             **openai_kwargs
         )
-        article_polish_lm = OpenAIModel(
+        article_polish_lm = LitellmModel(
             model=gpt_4_model_name, 
-            max_tokens=article_params.get('article_polish_max_tokens', 700), 
+            max_tokens=article_params.get('article_polish_max_tokens', 1000), 
             **openai_kwargs
         )
 
@@ -117,16 +124,27 @@ def generate_article_task(self, article_params: dict, webhook_url: str, metadata
         serper_api_key = os.getenv("SERPER_API_KEY")
         ydc_api_key = os.getenv("YDC_API_KEY")
         if serper_api_key:
+            if article_params.get('use_scholar', False):
+                query_params = {
+                    'autocorrect': True, 
+                    'num': 10, 
+                    'page': 1,
+                    'type': 'scholar',
+                    'engine': 'google-scholar'
+                }
+                logger.info("Using Google Scholar search for research")
+            else:
+                query_params = {
+                    'autocorrect': True, 
+                    'num': 10, 
+                    'page': 1,
+                    'type': 'search',
+                    'engine': 'google'
+                }
             rm = SerperRM(
-            serper_search_api_key=serper_api_key,
-            query_params={
-                'autocorrect': True, 
-                'num': 10, 
-                'page': 1,
-                'type': 'scholar',
-                'engine': 'google-scholar'
-            }
-        )
+                serper_search_api_key=serper_api_key,
+                query_params=query_params
+            )
         elif ydc_api_key:
             rm = YouRM(ydc_api_key=ydc_api_key, k=engine_args.search_top_k)
         else:

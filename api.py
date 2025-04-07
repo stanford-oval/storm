@@ -3,21 +3,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, HttpUrl
 from openai import OpenAI
 from typing import List, Optional, Dict, Any
-import wikipedia
 from knowledge_storm.utils import load_api_key
-import toml
 import os
 import shutil
 from knowledge_storm import STORMWikiRunnerArguments, STORMWikiRunner, STORMWikiLMConfigs
-from knowledge_storm.lm import OpenAIModel, AzureOpenAIModel
 from knowledge_storm.rm import YouRM, SerperRM
-import json
 from pathlib import Path
 import logging
 import traceback
-import time
-import re
-import hashlib
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi import Depends, Security
 from dotenv import load_dotenv
@@ -73,6 +66,10 @@ class StormArticleRequest(BaseModel):
     outline_gen_max_tokens: Optional[int] = 400
     article_gen_max_tokens: Optional[int] = 700
     article_polish_max_tokens: Optional[int] = 700
+    # Add Google Scholar option
+    use_scholar: Optional[bool] = True
+    # Add LLM provider options
+    llm_provider: Optional[str] = "openai"  # Options: openai, azure, etc.
 
 class StormArticleResponse(BaseModel):
     content: str            # The main generated article text
@@ -118,7 +115,9 @@ async def generate_article_v2(request: StormArticleRequest, authenticated: bool 
             "question_asker_max_tokens": request.question_asker_max_tokens,
             "outline_gen_max_tokens": request.outline_gen_max_tokens,
             "article_gen_max_tokens": request.article_gen_max_tokens,
-            "article_polish_max_tokens": request.article_polish_max_tokens
+            "article_polish_max_tokens": request.article_polish_max_tokens,
+            "use_scholar": request.use_scholar,
+            "llm_provider": request.llm_provider
         }
         
         generate_article_task.delay(
@@ -182,7 +181,6 @@ async def find_citations_v2(request: StormCitationRequest, authenticated: bool =
             else:
                 raise ValueError("SERPER_API_KEY or YDC_API_KEY not found in environment variables")
 
-            
             logger.info("Starting search")
             search_results = rm.forward(request.text, exclude_urls=request.exclude_urls)
             logger.info(f"Got {len(search_results) if search_results else 0} search results")
@@ -198,7 +196,7 @@ async def find_citations_v2(request: StormCitationRequest, authenticated: bool =
                             'title': result.get('title', ''),
                             'snippet': result.get('description', '')[:500] if result.get('description') else '',
                             'relevance_score': result.get('score', 1.0),
-                            'year': result.get('year', '2025'),
+                            'year': result.get('year', ''),
                             'authors': result.get('authors', ''),
                             'publication_info': result.get('publication_info', '')
                         }
@@ -206,7 +204,6 @@ async def find_citations_v2(request: StormCitationRequest, authenticated: bool =
                         # Only add if we have at least a title and URL
                         if citation['title'] and citation['url']:
                             citations.append(citation)
-                            logger.info(f"Added citation: {citation['title']}")
                     except Exception as e:
                         logger.error(f"Error processing result: {str(e)}")
                         continue
@@ -221,7 +218,6 @@ async def find_citations_v2(request: StormCitationRequest, authenticated: bool =
                 citations=citations,
                 error=None
             )
-            logger.info(f"Response: {response}")
             
             # Cleanup directory
             if base_dir and base_dir.exists():
