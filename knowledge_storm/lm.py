@@ -1,22 +1,276 @@
+import backoff
+import dspy
+import functools
 import logging
 import os
 import random
+import requests
 import threading
 from typing import Optional, Literal, Any
+import ujson
+from pathlib import Path
 
-import backoff
-import dspy
-import requests
+
 from dsp import ERRORS, backoff_hdlr, giveup_hdlr
 from dsp.modules.hf import openai_to_hf
 from dsp.modules.hf_client import send_hftgi_request_v01_wrapped
-from openai import OpenAI
+from openai import OpenAI, AzureOpenAI
 from transformers import AutoTokenizer
 
 try:
     from anthropic import RateLimitError
 except ImportError:
     RateLimitError = None
+
+############################
+# Code copied from https://github.com/stanfordnlp/dspy/blob/main/dspy/clients/lm.py on Sep 29, 2024
+
+# try:
+import warnings
+
+with warnings.catch_warnings():
+    warnings.filterwarnings("ignore", category=UserWarning)
+    if "LITELLM_LOCAL_MODEL_COST_MAP" not in os.environ:
+        os.environ["LITELLM_LOCAL_MODEL_COST_MAP"] = "True"
+    import litellm
+
+    litellm.drop_params = True
+    litellm.telemetry = False
+
+from litellm.caching.caching import Cache
+
+disk_cache_dir = os.path.join(Path.home(), ".storm_local_cache")
+litellm.cache = Cache(disk_cache_dir=disk_cache_dir, type="disk")
+
+# except ImportError:
+
+#     class LitellmPlaceholder:
+#         def __getattr__(self, _):
+#             raise ImportError(
+#                 "The LiteLLM package is not installed. Run `pip install litellm`."
+#             )
+
+# litellm = LitellmPlaceholder()
+LM_LRU_CACHE_MAX_SIZE = 3000
+
+
+class LM:
+    def __init__(
+        self,
+        model,
+        model_type="chat",
+        temperature=0.0,
+        max_tokens=1000,
+        cache=True,
+        **kwargs,
+    ):
+        self.model = model
+        self.model_type = model_type
+        self.cache = cache
+        self.kwargs = dict(temperature=temperature, max_tokens=max_tokens, **kwargs)
+        self.history = []
+
+        if "o1-" in model:
+            assert (
+                max_tokens >= 5000 and temperature == 1.0
+            ), "OpenAI's o1-* models require passing temperature=1.0 and max_tokens >= 5000 to `dspy.LM(...)`"
+
+    def __call__(self, prompt=None, messages=None, **kwargs):
+        # Build the request.
+        cache = kwargs.pop("cache", self.cache)
+        messages = messages or [{"role": "user", "content": prompt}]
+        kwargs = {**self.kwargs, **kwargs}
+
+        # Make the request and handle LRU & disk caching.
+        if self.model_type == "chat":
+            completion = cached_litellm_completion if cache else litellm_completion
+        else:
+            completion = (
+                cached_litellm_text_completion if cache else litellm_text_completion
+            )
+
+        response = completion(
+            ujson.dumps(dict(model=self.model, messages=messages, **kwargs))
+        )
+        outputs = [
+            c.message.content if hasattr(c, "message") else c["text"]
+            for c in response["choices"]
+        ]
+
+        # Logging, with removed api key & where `cost` is None on cache hit.
+        kwargs = {k: v for k, v in kwargs.items() if not k.startswith("api_")}
+        entry = dict(prompt=prompt, messages=messages, kwargs=kwargs, response=response)
+        entry = dict(**entry, outputs=outputs, usage=dict(response["usage"]))
+        entry = dict(
+            **entry, cost=response.get("_hidden_params", {}).get("response_cost")
+        )
+        self.history.append(entry)
+
+        return outputs
+
+    def inspect_history(self, n: int = 1):
+        _inspect_history(self, n)
+
+
+@functools.lru_cache(maxsize=LM_LRU_CACHE_MAX_SIZE)
+def cached_litellm_completion(request):
+    return litellm_completion(request, cache={"no-cache": False, "no-store": False})
+
+
+def litellm_completion(request, cache={"no-cache": True, "no-store": True}):
+    kwargs = ujson.loads(request)
+    return litellm.completion(cache=cache, **kwargs)
+
+
+@functools.lru_cache(maxsize=LM_LRU_CACHE_MAX_SIZE)
+def cached_litellm_text_completion(request):
+    return litellm_text_completion(
+        request, cache={"no-cache": False, "no-store": False}
+    )
+
+
+def litellm_text_completion(request, cache={"no-cache": True, "no-store": True}):
+    kwargs = ujson.loads(request)
+
+    # Extract the provider and model from the model string.
+    model = kwargs.pop("model").split("/", 1)
+    provider, model = model[0] if len(model) > 1 else "openai", model[-1]
+
+    # Use the API key and base from the kwargs, or from the environment.
+    api_key = kwargs.pop("api_key", None) or os.getenv(f"{provider}_API_KEY")
+    api_base = kwargs.pop("api_base", None) or os.getenv(f"{provider}_API_BASE")
+
+    # Build the prompt from the messages.
+    prompt = "\n\n".join(
+        [x["content"] for x in kwargs.pop("messages")] + ["BEGIN RESPONSE:"]
+    )
+
+    return litellm.text_completion(
+        cache=cache,
+        model=f"text-completion-openai/{model}",
+        api_key=api_key,
+        api_base=api_base,
+        prompt=prompt,
+        **kwargs,
+    )
+
+
+def _green(text: str, end: str = "\n"):
+    return "\x1b[32m" + str(text).lstrip() + "\x1b[0m" + end
+
+
+def _red(text: str, end: str = "\n"):
+    return "\x1b[31m" + str(text) + "\x1b[0m" + end
+
+
+def _inspect_history(lm, n: int = 1):
+    """Prints the last n prompts and their completions."""
+
+    for item in lm.history[-n:]:
+        messages = item["messages"] or [{"role": "user", "content": item["prompt"]}]
+        outputs = item["outputs"]
+
+        print("\n\n\n")
+        for msg in messages:
+            print(_red(f"{msg['role'].capitalize()} message:"))
+            print(msg["content"].strip())
+            print("\n")
+
+        print(_red("Response:"))
+        print(_green(outputs[0].strip()))
+
+        if len(outputs) > 1:
+            choices_text = f" \t (and {len(outputs)-1} other completions)"
+            print(_red(choices_text, end=""))
+
+    print("\n\n\n")
+
+
+############################
+
+
+class LitellmModel(LM):
+    """A wrapper class for LiteLLM.
+
+    Check out https://docs.litellm.ai/docs/providers for usage details.
+    """
+
+    def __init__(
+        self,
+        model: str = "openai/gpt-4o-mini",
+        api_key: Optional[str] = None,
+        model_type: Literal["chat", "text"] = "chat",
+        **kwargs,
+    ):
+        super().__init__(model=model, api_key=api_key, model_type=model_type, **kwargs)
+        self._token_usage_lock = threading.Lock()
+        self.prompt_tokens = 0
+        self.completion_tokens = 0
+
+    def log_usage(self, response):
+        """Log the total tokens from the OpenAI API response."""
+        usage_data = response.get("usage")
+        if usage_data:
+            with self._token_usage_lock:
+                self.prompt_tokens += usage_data.get("prompt_tokens", 0)
+                self.completion_tokens += usage_data.get("completion_tokens", 0)
+
+    def get_usage_and_reset(self):
+        """Get the total tokens used and reset the token usage."""
+        usage = {
+            self.model
+            or self.kwargs.get("model")
+            or self.kwargs.get("engine"): {
+                "prompt_tokens": self.prompt_tokens,
+                "completion_tokens": self.completion_tokens,
+            }
+        }
+        self.prompt_tokens = 0
+        self.completion_tokens = 0
+
+        return usage
+
+    def __call__(self, prompt=None, messages=None, **kwargs):
+        # Build the request.
+        cache = kwargs.pop("cache", self.cache)
+        messages = messages or [{"role": "user", "content": prompt}]
+        kwargs = {**self.kwargs, **kwargs}
+
+        # Make the request and handle LRU & disk caching.
+        if self.model_type == "chat":
+            completion = cached_litellm_completion if cache else litellm_completion
+        else:
+            completion = (
+                cached_litellm_text_completion if cache else litellm_text_completion
+            )
+
+        response = completion(
+            ujson.dumps(dict(model=self.model, messages=messages, **kwargs))
+        )
+        response_dict = response.json()
+        self.log_usage(response_dict)
+        outputs = [
+            c.message.content if hasattr(c, "message") else c["text"]
+            for c in response["choices"]
+        ]
+
+        # Logging, with removed api key & where `cost` is None on cache hit.
+        kwargs = {k: v for k, v in kwargs.items() if not k.startswith("api_")}
+        entry = dict(
+            prompt=prompt, messages=messages, kwargs=kwargs, response=response_dict
+        )
+        entry = dict(**entry, outputs=outputs, usage=dict(response_dict["usage"]))
+        entry = dict(
+            **entry, cost=response.get("_hidden_params", {}).get("response_cost")
+        )
+        self.history.append(entry)
+
+        return outputs
+
+
+# ========================================================================
+# The following language model classes were deprecated after v1.1.0.
+# They remain in this file for backward compatibility but will no longer be maintained.
 
 
 class OpenAIModel(dspy.OpenAI):
@@ -204,53 +458,138 @@ class DeepSeekModel(dspy.OpenAI):
         return completions
 
 
-class AzureOpenAIModel(dspy.AzureOpenAI):
-    """A wrapper class for dspy.AzureOpenAI."""
+class AzureOpenAIModel(dspy.LM):
+    """A wrapper class of Azure OpenAI endpoint.
+
+    Note: param::model should match the deployment_id on your Azure platform.
+    """
 
     def __init__(
         self,
-        api_base: Optional[str] = None,
-        api_version: Optional[str] = None,
-        model: str = "gpt-4o-mini",
-        api_key: Optional[str] = None,
+        azure_endpoint: str,
+        api_version: str,
+        model: str,
+        api_key: str,
         model_type: Literal["chat", "text"] = "chat",
         **kwargs,
     ):
-        super().__init__(
-            api_base=api_base,
-            api_version=api_version,
-            model=model,
-            api_key=api_key,
-            model_type=model_type,
-            **kwargs,
-        )
+        super().__init__(model=model)
         self._token_usage_lock = threading.Lock()
         self.prompt_tokens = 0
         self.completion_tokens = 0
+        self.model = model
+        self.provider = "azure"
+        self.model_type = model_type
+
+        self.client = AzureOpenAI(
+            azure_endpoint=azure_endpoint,
+            api_key=api_key,
+            api_version=api_version,
+        )
+        self.prompt_tokens = 0
+        self.completion_tokens = 0
+
+        self.kwargs = {
+            "model": model,
+            "temperature": 0.0,
+            "max_tokens": 150,
+            "top_p": 1,
+            "frequency_penalty": 0,
+            "presence_penalty": 0,
+            "n": 1,
+            **kwargs,
+        }
+
+    @backoff.on_exception(
+        backoff.expo,
+        ERRORS,
+        max_time=1000,
+        on_backoff=backoff_hdlr,
+        giveup=giveup_hdlr,
+    )
+    def basic_request(self, prompt: str, **kwargs) -> Any:
+        kwargs = {**self.kwargs, **kwargs}
+
+        try:
+            if self.model_type == "chat":
+                messages = [{"role": "user", "content": prompt}]
+
+                response = self.client.chat.completions.create(
+                    messages=messages, **kwargs
+                )
+            else:
+                response = self.client.completions.create(prompt=prompt, **kwargs)
+
+            self.log_usage(response)
+
+            history_entry = {
+                "prompt": prompt,
+                "response": dict(response),
+                "kwargs": kwargs,
+            }
+            self.history.append(history_entry)
+
+            return response
+
+        except Exception as e:
+            logging.error(f"Error making request to Azure OpenAI: {str(e)}")
+            raise
+
+    def _get_choice_text(self, choice: Any) -> str:
+        """Extract text from a choice object based on model type."""
+        if self.model_type == "chat":
+            return choice.message.content
+        return choice.text
 
     def log_usage(self, response):
-        """Log the total tokens from the OpenAI API response.
-        Override log_usage() in dspy.AzureOpenAI for tracking accumulated token usage.
-        """
-        usage_data = response.get("usage")
+        """Log the total tokens from response."""
+        usage_data = response.usage
         if usage_data:
             with self._token_usage_lock:
-                self.prompt_tokens += usage_data.get("prompt_tokens", 0)
-                self.completion_tokens += usage_data.get("completion_tokens", 0)
+                self.prompt_tokens += usage_data.prompt_tokens
+                self.completion_tokens += usage_data.completion_tokens
 
     def get_usage_and_reset(self):
         """Get the total tokens used and reset the token usage."""
         usage = {
-            self.kwargs.get("model")
-            or self.kwargs.get("engine"): {
+            self.model: {
                 "prompt_tokens": self.prompt_tokens,
                 "completion_tokens": self.completion_tokens,
             }
         }
         self.prompt_tokens = 0
         self.completion_tokens = 0
-
         return usage
+
+    def __call__(
+        self,
+        prompt: str,
+        only_completed: bool = True,
+        return_sorted: bool = False,
+        **kwargs,
+    ) -> list[str]:
+        """Get completions from Azure OpenAI.
+
+        Args:
+            prompt: The prompt to send to the model
+            only_completed: Only return completed responses
+            return_sorted: Sort completions by probability (not implemented)
+            **kwargs: Additional arguments to pass to the API
+
+        Returns:
+            List of completion strings
+        """
+        response = self.basic_request(prompt, **kwargs)
+
+        choices = response.choices
+        completed_choices = [c for c in choices if c.finish_reason != "length"]
+
+        if only_completed and completed_choices:
+            choices = completed_choices
+
+        completions = [self._get_choice_text(c) for c in choices]
+
+        return completions
 
 
 class GroqModel(dspy.OpenAI):
@@ -942,3 +1281,6 @@ class GoogleModel(dspy.dsp.modules.lm.LM):
             completions.append(response.parts[0].text)
 
         return completions
+
+
+# ========================================================================

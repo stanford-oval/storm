@@ -486,7 +486,6 @@ class LMConfigs(ABC):
         return model_name_to_usage
 
     def log(self):
-
         return OrderedDict(
             {
                 attr_name: getattr(self, attr_name).kwargs

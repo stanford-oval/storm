@@ -114,9 +114,7 @@ class StormInformationTable(InformationTable):
             for snippet in information.snippets:
                 self.collected_urls.append(url)
                 self.collected_snippets.append(snippet)
-        self.encoded_snippets = self.encoder.encode(
-            self.collected_snippets, show_progress_bar=False
-        )
+        self.encoded_snippets = self.encoder.encode(self.collected_snippets)
 
     def retrieve_information(
         self, queries: Union[List[str], str], search_top_k
@@ -126,7 +124,7 @@ class StormInformationTable(InformationTable):
         if type(queries) is str:
             queries = [queries]
         for query in queries:
-            encoded_query = self.encoder.encode(query, show_progress_bar=False)
+            encoded_query = self.encoder.encode(query)
             sim = cosine_similarity([encoded_query], self.encoded_snippets)[0]
             sorted_indices = np.argsort(sim)
             for i in sorted_indices[-search_top_k:][::-1]:
