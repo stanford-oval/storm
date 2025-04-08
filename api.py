@@ -181,10 +181,10 @@ async def find_citations_v2(request: StormCitationRequest, authenticated: bool =
                 
                 # Add language to search query parameters
                 # For Portuguese, setting gl parameter to 'br' (Brazil) or 'pt' (Portugal)
-                # and hl parameter to 'pt' (Portuguese language)
+                # and hl parameter to 'pt-br' (Portuguese language)
                 if language == 'pt':
                     query_params['gl'] = 'br'  # Country: Brazil
-                    query_params['hl'] = 'pt'  # Language: Portuguese
+                    query_params['hl'] = 'pt-br'  # Language: Portuguese
                 elif language != 'en':
                     # Handle other languages
                     query_params['hl'] = language

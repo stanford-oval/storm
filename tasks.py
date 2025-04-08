@@ -170,7 +170,7 @@ def generate_article_task(self, article_params: dict, webhook_url: str, metadata
             # and hl parameter to 'pt' (Portuguese language)
             if language == 'pt':
                 query_params['gl'] = 'br'  # Country: Brazil
-                query_params['hl'] = 'pt'  # Language: Portuguese
+                query_params['hl'] = 'pt-br'  # Language: Portuguese
             elif language != 'en':
                 # Handle other languages
                 query_params['hl'] = language
