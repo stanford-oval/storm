@@ -70,6 +70,8 @@ class StormArticleRequest(BaseModel):
     use_scholar: Optional[bool] = True
     # Add LLM provider options
     llm_provider: Optional[str] = "openai"  # Options: openai, azure, etc.
+    # Add language option
+    language: Optional[str] = "en"  # Options: "en", "pt", etc.
 
 class StormArticleResponse(BaseModel):
     content: str            # The main generated article text
@@ -83,6 +85,7 @@ class StormCitationRequest(BaseModel):
     max_citations: Optional[int] = 3
     exclude_urls: Optional[List[str]] = []
     use_scholar: Optional[bool] = True
+    language: Optional[str] = "en"  # Options: "en", "pt", etc.
 
 class StormCitationResponse(BaseModel):
     citations: List[Dict[str, Any]]
@@ -117,7 +120,8 @@ async def generate_article_v2(request: StormArticleRequest, authenticated: bool 
             "article_gen_max_tokens": request.article_gen_max_tokens,
             "article_polish_max_tokens": request.article_polish_max_tokens,
             "use_scholar": request.use_scholar,
-            "llm_provider": request.llm_provider
+            "llm_provider": request.llm_provider,
+            "language": request.language
         }
         
         generate_article_task.delay(
@@ -147,7 +151,6 @@ async def find_citations_v2(request: StormCitationRequest, authenticated: bool =
         base_dir.mkdir(parents=True, exist_ok=True)
         
         try:
-
             # Configure Serper RM with API key from environment
             serper_api_key = os.getenv("SERPER_API_KEY")
             ydc_api_key = os.getenv("YDC_API_KEY")
@@ -171,6 +174,20 @@ async def find_citations_v2(request: StormCitationRequest, authenticated: bool =
                         'engine': 'google'
                     }
                     logger.info("Using regular Google search")
+                
+                # Add language parameter if specified
+                language = request.language
+                logger.info(f"Using language: {language}")
+                
+                # Add language to search query parameters
+                # For Portuguese, setting gl parameter to 'br' (Brazil) or 'pt' (Portugal)
+                # and hl parameter to 'pt' (Portuguese language)
+                if language == 'pt':
+                    query_params['gl'] = 'br'  # Country: Brazil
+                    query_params['hl'] = 'pt'  # Language: Portuguese
+                elif language != 'en':
+                    # Handle other languages
+                    query_params['hl'] = language
                 
                 rm = SerperRM(
                     serper_search_api_key=serper_api_key,

@@ -58,36 +58,43 @@ POST /v2/generate-article
 - `remove_duplicate` (boolean, optional): When `true`, removes any duplicate content during the polishing phase.
 - `metadata` (object, optional): Additional metadata to be included with the request.
 - `use_scholar` (boolean, optional, default: true): When `true`, uses Google Scholar search for research; otherwise uses regular Google search.
-- `llm_provider` (string, optional, default: "openai"): Specifies the LLM provider to use. Supported options:
-  - `"openai"`: Uses OpenAI models (default)
+- `language` (string, optional, default: "en"): The language to generate the article and find citations in. Currently supports "en" (English) and "pt" (Portuguese).
 
-**Token Configuration Parameters:**
-
-- `conv_simulator_max_tokens` (integer, optional, default: 500): Maximum tokens for conversation simulation
-- `question_asker_max_tokens` (integer, optional, default: 500): Maximum tokens for question generation
-- `outline_gen_max_tokens` (integer, optional, default: 400): Maximum tokens for outline generation
-- `article_gen_max_tokens` (integer, optional, default: 700): Maximum tokens for article generation
-- `article_polish_max_tokens` (integer, optional, default: 700): Maximum tokens for article polishing
-
-**Request Body:**
+**Example Request:**
 
 ```json
 {
-  "topic": "string",
-  "webhook_url": "string (optional)",
+  "topic": "Artificial Intelligence in Healthcare",
+  "webhook_url": "https://your-callback-url.com/callback",
   "do_research": true,
-  "do_generate_outline": false,
-  "do_generate_article": false,
-  "do_polish_article": false,
-  "remove_duplicate": false,
-  "metadata": {},
+  "do_generate_outline": true,
+  "do_generate_article": true,
+  "do_polish_article": true,
+  "remove_duplicate": true,
+  "metadata": {
+    "user_id": "123456"
+  },
   "use_scholar": true,
-  "llm_provider": "openai",
-  "conv_simulator_max_tokens": 500,
-  "question_asker_max_tokens": 500,
-  "outline_gen_max_tokens": 400,
-  "article_gen_max_tokens": 700,
-  "article_polish_max_tokens": 700
+  "language": "en"
+}
+```
+
+**Example Portuguese Request:**
+
+```json
+{
+  "topic": "Inteligência Artificial na Saúde",
+  "webhook_url": "https://your-callback-url.com/callback",
+  "do_research": true,
+  "do_generate_outline": true,
+  "do_generate_article": true,
+  "do_polish_article": true,
+  "remove_duplicate": true,
+  "metadata": {
+    "user_id": "123456"
+  },
+  "use_scholar": true,
+  "language": "pt"
 }
 ```
 
@@ -120,20 +127,41 @@ The final result will be sent to the specified webhook URL with the following st
 
 ### 2. Find Citations (v2)
 
-Find relevant citations for a given text.
+Find citations for a given text.
 
 ```http
 POST /v2/find-citations
 ```
 
-**Request Body:**
+**Request Body Parameters:**
+
+- `text` (string, required): The text to find citations for
+- `max_citations` (integer, optional, default: 3): Maximum number of citations to return
+- `exclude_urls` (array of strings, optional): URLs to exclude from the search
+- `use_scholar` (boolean, optional, default: true): When `true`, uses Google Scholar; otherwise uses regular search
+- `language` (string, optional, default: "en"): The language to search for citations in. Currently supports "en" (English) and "pt" (Portuguese).
+
+**Example Request:**
 
 ```json
 {
-  "text": "string",
-  "max_citations": 3,
-  "exclude_urls": ["string"],
-  "use_scholar": true
+  "text": "Artificial intelligence has shown promising results in medical diagnosis, particularly in radiology.",
+  "max_citations": 5,
+  "exclude_urls": ["https://example.com"],
+  "use_scholar": true,
+  "language": "en"
+}
+```
+
+**Example Portuguese Request:**
+
+```json
+{
+  "text": "A inteligência artificial tem mostrado resultados promissores no diagnóstico médico, particularmente na radiologia.",
+  "max_citations": 5,
+  "exclude_urls": ["https://example.com"],
+  "use_scholar": true,
+  "language": "pt"
 }
 ```
 
@@ -143,13 +171,11 @@ POST /v2/find-citations
 {
   "citations": [
     {
-      "url": "string",
-      "title": "string",
-      "snippet": "string",
-      "relevance_score": 1.0
+      "snippet": "...",
+      "title": "...",
+      "url": "..."
     }
-  ],
-  "error": "string (if any)"
+  ]
 }
 ```
 

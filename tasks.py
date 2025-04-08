@@ -73,6 +73,7 @@ def generate_article_task(self, article_params: dict, webhook_url: str, metadata
 
         llm_provider = article_params.get('openai')
         
+        logger.info(f"Using webhook url: {webhook_url}")
         # Configure model names based on provider
         # Default to OpenAI
         gpt_35_model_name = 'openrouter/openai/gpt-3.5-turbo'
@@ -138,6 +139,10 @@ def generate_article_task(self, article_params: dict, webhook_url: str, metadata
             max_thread_num=3,
         )
         
+        # Get the language parameter, defaulting to 'en' if not specified
+        language = article_params.get('language', 'en')
+        logger.info(f"Using language: {language}")
+        
         # Configure Serper RM with API key from environment
         serper_api_key = os.getenv("SERPER_API_KEY")
         ydc_api_key = os.getenv("YDC_API_KEY")
@@ -159,6 +164,17 @@ def generate_article_task(self, article_params: dict, webhook_url: str, metadata
                     'type': 'search',
                     'engine': 'google'
                 }
+                
+            # Add language to search query parameters
+            # For Portuguese, setting gl parameter to 'br' (Brazil) or 'pt' (Portugal)
+            # and hl parameter to 'pt' (Portuguese language)
+            if language == 'pt':
+                query_params['gl'] = 'br'  # Country: Brazil
+                query_params['hl'] = 'pt'  # Language: Portuguese
+            elif language != 'en':
+                # Handle other languages
+                query_params['hl'] = language
+                
             rm = SerperRM(
                 serper_search_api_key=serper_api_key,
                 query_params=query_params
@@ -179,6 +195,9 @@ def generate_article_task(self, article_params: dict, webhook_url: str, metadata
         do_generate_article = article_params.get('do_generate_article', True)
         do_polish_article = article_params.get('do_polish_article', True)
         remove_duplicate = article_params.get('remove_duplicate', False)
+        
+        # Pass language info to runner context
+        runner.language = language
         
         # Run article generation
         result = runner.run(

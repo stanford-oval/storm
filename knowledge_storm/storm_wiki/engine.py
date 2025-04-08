@@ -177,6 +177,7 @@ class STORMWikiRunner(Engine):
         super().__init__(lm_configs=lm_configs)
         self.args = args
         self.lm_configs = lm_configs
+        self.language = 'en'  # Default language is English
 
         self.retriever = Retriever(rm=rm, max_thread=self.args.max_thread_num)
         storm_persona_generator = StormPersonaGenerator(
@@ -245,12 +246,14 @@ class STORMWikiRunner(Engine):
             return_draft_outline=True,
             callback_handler=callback_handler,
         )
-        outline.dump_outline_to_file(
-            os.path.join(self.article_output_dir, "storm_gen_outline.txt")
-        )
-        draft_outline.dump_outline_to_file(
-            os.path.join(self.article_output_dir, "direct_gen_outline.txt")
-        )
+        
+        outline_path = os.path.join(self.article_output_dir, "storm_gen_outline.txt")
+        draft_outline_path = os.path.join(self.article_output_dir, "direct_gen_outline.txt")
+        
+        outline.dump_outline_to_file(outline_path)
+        
+        draft_outline.dump_outline_to_file(draft_outline_path)
+        
         return outline
 
     def run_article_generation_module(
@@ -265,12 +268,14 @@ class STORMWikiRunner(Engine):
             article_with_outline=outline,
             callback_handler=callback_handler,
         )
-        draft_article.dump_article_as_plain_text(
-            os.path.join(self.article_output_dir, "storm_gen_article.txt")
-        )
-        draft_article.dump_reference_to_file(
-            os.path.join(self.article_output_dir, "url_to_info.json")
-        )
+        
+        article_path = os.path.join(self.article_output_dir, "storm_gen_article.txt")
+        ref_path = os.path.join(self.article_output_dir, "url_to_info.json")
+
+        draft_article.dump_article_as_plain_text(article_path)
+        
+        draft_article.dump_reference_to_file(ref_path)
+        
         return draft_article
 
     def run_article_polishing_module(
@@ -281,10 +286,10 @@ class STORMWikiRunner(Engine):
             draft_article=draft_article,
             remove_duplicate=remove_duplicate,
         )
-        FileIOHelper.write_str(
-            polished_article.to_string(),
-            os.path.join(self.article_output_dir, "storm_gen_article_polished.txt"),
-        )
+        
+        polished_path = os.path.join(self.article_output_dir, "storm_gen_article_polished.txt")
+        FileIOHelper.write_str(polished_article.to_string(), polished_path)
+        
         return polished_article
 
     def post_run(self):
@@ -349,23 +354,18 @@ class STORMWikiRunner(Engine):
         remove_duplicate: bool = False,
         callback_handler: BaseCallbackHandler = BaseCallbackHandler(),
     ):
-        """
-        Run the STORM pipeline.
+        """Run the STORM Wiki pipeline.
 
         Args:
-            topic: The topic to research.
-            ground_truth_url: A ground truth URL including a curated article about the topic. The URL will be excluded.
-            do_research: If True, research the topic through information-seeking conversation;
-             if False, expect conversation_log.json and raw_search_results.json to exist in the output directory.
-            do_generate_outline: If True, generate an outline for the topic;
-             if False, expect storm_gen_outline.txt to exist in the output directory.
-            do_generate_article: If True, generate a curated article for the topic;
-             if False, expect storm_gen_article.txt to exist in the output directory.
-            do_polish_article: If True, polish the article by adding a summarization section and (optionally) removing
-             duplicated content.
-            remove_duplicate: If True, remove duplicated content.
-            callback_handler: A callback handler to handle the intermediate results.
-        """
+            topic (str): The topic to be researched.
+            ground_truth_url (str, optional): Ground truth URL for knowledge curation. Defaults to "".
+            do_research (bool, optional): Whether to run knowledge curation module. Defaults to True.
+            do_generate_outline (bool, optional): Whether to run outline generation module. Defaults to True.
+            do_generate_article (bool, optional): Whether to run article generation module. Defaults to True.
+            do_polish_article (bool, optional): Whether to run article polishing module. Defaults to True.
+            remove_duplicate (bool, optional): Whether to remove duplicates in article polishing. Defaults to False.
+            callback_handler (BaseCallbackHandler, optional): Callback handler. Defaults to BaseCallbackHandler().
+        """ 
         assert (
             do_research
             or do_generate_outline
@@ -373,8 +373,7 @@ class STORMWikiRunner(Engine):
             or do_polish_article
         ), makeStringRed(
             "No action is specified. Please set at least one of --do-research, --do-generate-outline, --do-generate-article, --do-polish-article"
-        )
-
+        )        
         self.topic = topic
         self.article_dir_name = truncate_filename(
             topic.replace(" ", "_").replace("/", "_")
@@ -384,26 +383,32 @@ class STORMWikiRunner(Engine):
         )
         os.makedirs(self.article_output_dir, exist_ok=True)
         print(f"Output directory: {self.article_output_dir}")
-        # research module
-        information_table: StormInformationTable = None
+
+        # knowledge curation module
+        information_table = None
+        outline = None
+        draft_article = None
+
         if do_research:
+            # Log the start of the research phase, potentially mentioning language context if needed elsewhere
             information_table = self.run_knowledge_curation_module(
-                ground_truth_url=ground_truth_url, callback_handler=callback_handler
+                ground_truth_url=ground_truth_url,
+                callback_handler=callback_handler, # Pass the original handler
             )
+
         # outline generation module
-        outline: StormArticle = None
         if do_generate_outline:
-            # load information table if it's not initialized
             if information_table is None:
                 information_table = self._load_information_table_from_local_fs(
                     os.path.join(self.article_output_dir, "conversation_log.json")
                 )
+            
             outline = self.run_outline_generation_module(
-                information_table=information_table, callback_handler=callback_handler
+                information_table=information_table,
+                callback_handler=callback_handler, # Pass the original handler
             )
 
         # article generation module
-        draft_article: StormArticle = None
         if do_generate_article:
             if information_table is None:
                 information_table = self._load_information_table_from_local_fs(
@@ -416,10 +421,11 @@ class STORMWikiRunner(Engine):
                         self.article_output_dir, "storm_gen_outline.txt"
                     ),
                 )
+            
             draft_article = self.run_article_generation_module(
                 outline=outline,
                 information_table=information_table,
-                callback_handler=callback_handler,
+                callback_handler=callback_handler, # Pass the original handler
             )
 
         # article polishing module
@@ -436,6 +442,9 @@ class STORMWikiRunner(Engine):
                     draft_article_path=draft_article_path,
                     url_to_info_path=url_to_info_path,
                 )
+            
             self.run_article_polishing_module(
-                draft_article=draft_article, remove_duplicate=remove_duplicate
+                draft_article=draft_article, 
+                remove_duplicate=remove_duplicate,
+                # callback_handler=callback_handler # Polishing module might need update if it expects a callback
             )
