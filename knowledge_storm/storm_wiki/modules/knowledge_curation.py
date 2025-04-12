@@ -161,7 +161,7 @@ class QuestionToQuery(dspy.Signature):
 
     topic = dspy.InputField(prefix="Topic you are discussing about: ", format=str)
     question = dspy.InputField(prefix="Question you want to answer: ", format=str)
-    queries = dspy.OutputField(format=str)
+    queries = dspy.OutputField(format=list, desc="list of query strings")
 
 
 class AnswerQuestion(dspy.Signature):
@@ -205,10 +205,6 @@ class TopicExpert(dspy.Module):
         with dspy.settings.context(lm=self.engine, show_guidelines=False):
             # Identify: Break down question into queries.
             queries = self.generate_queries(topic=topic, question=question).queries
-            queries = [
-                q.replace("-", "").strip().strip('"').strip('"').strip()
-                for q in queries.split("\n")
-            ]
             queries = queries[: self.max_search_queries]
             # Search
             searched_results: List[Information] = self.retriever.retrieve(
