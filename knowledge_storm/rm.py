@@ -1007,6 +1007,9 @@ class GoogleSearch(dspy.Retrieve):
         super().__init__(k=k)
         try:
             from googleapiclient.discovery import build
+            from googleapiclient.http import HttpRequest
+            import httplib2
+            
         except ImportError as err:
             raise ImportError(
                 "GoogleSearch requires `pip install google-api-python-client`."
@@ -1030,8 +1033,11 @@ class GoogleSearch(dspy.Retrieve):
         else:
             self.is_valid_source = lambda x: True
 
+        def build_request(http, *args, **kwargs):
+            return HttpRequest(httplib2.Http(), *args, **kwargs)
+        
         self.service = build(
-            "customsearch", "v1", developerKey=self.google_search_api_key
+            "customsearch", "v1", developerKey=self.google_search_api_key, requestBuilder=build_request
         )
         self.webpage_helper = WebPageHelper(
             min_char_count=min_char_count,
