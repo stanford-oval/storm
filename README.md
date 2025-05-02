@@ -323,6 +323,8 @@ We would like to thank Wikipedia for its excellent open-source content. The Fres
 
 We are very grateful to [Michelle Lam](https://michelle123lam.github.io/) for designing the logo for this project and [Dekun Ma](https://dekun.me) for leading the UI development.
 
+Thanks to Vercel for their support of [open-source software](https://storm.genie.stanford.edu)
+
 ## Citation
 Please cite our paper if you use this code or part of it in your work:
 ```bibtex
