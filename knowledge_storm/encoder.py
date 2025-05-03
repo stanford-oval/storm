@@ -60,6 +60,7 @@ class Encoder:
         api_key: Optional[str] = None,
         api_base: Optional[str] = None,
         api_version: Optional[str] = None,
+        extra_headers: Optional[Dict[str, str]] = None,
     ):
         """
         Initializes the Encoder with the appropriate embedding model.
@@ -69,6 +70,7 @@ class Encoder:
             api_key (Optional[str]): API key for the encoder service.
             api_base (Optional[str]): API base URL for the encoder service.
             api_version (Optional[str]): API version for the encoder service.
+            extra_headers (Optional[Dict[str, str]]): Additional headers for the encoder service.
         """
         self.embedding_model_name = None
         self.kargs = {}
@@ -88,6 +90,7 @@ class Encoder:
                 "api_key": api_key or os.getenv("AZURE_API_KEY"),
                 "api_base": api_base or os.getenv("AZURE_API_BASE"),
                 "api_version": api_version or os.getenv("AZURE_API_VERSION"),
+                "extra_headers": extra_headers,
             }
         else:
             raise ValueError(
