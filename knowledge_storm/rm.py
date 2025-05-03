@@ -1067,6 +1067,9 @@ class GoogleSearch(dspy.Retrieve):
         url_to_results = {}
 
         for query in queries:
+            if not query or query.isspace():
+                logging.warning(f"Skipping empty or whitespace query.")
+                continue # Skip this iteration if query is invalid
             try:
                 response = (
                     self.service.cse()
