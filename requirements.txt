@@ -7,6 +7,6 @@ trafilatura
 langchain-huggingface
 qdrant-client
 langchain-qdrant
-numpy==1.26.4
+numpy>=1.17.3,<1.25.0
 litellm==1.59.3
 diskcache
