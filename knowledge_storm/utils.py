@@ -166,7 +166,7 @@ class QdrantVectorStoreManager:
         embedding_model: str = "BAAI/bge-m3",
         device: str = "mps",
     ):
-        from qdrant_client import Document
+        from qdrant_client.models import PointStruct # switch to new version of library
 
         """
         Takes a CSV file and adds each row in the CSV file to the Qdrant collection.
@@ -239,7 +239,7 @@ class QdrantVectorStoreManager:
         # read the csv file
         import pandas as pd
 
-        df = pd.read_csv(file_path)
+        df = pd.read_csv(file_path, sep="|", encoding="utf-8") # in example separator is "|"
         # check that content column exists and url column exists
         if content_column not in df.columns:
             raise ValueError(
@@ -249,18 +249,29 @@ class QdrantVectorStoreManager:
             raise ValueError(f"URL column {url_column} not found in the csv file.")
 
         documents = [
-            Document(
-                page_content=row[content_column],
-                metadata={
+            PointStruct(
+                id=index,  
+                vector=[],
+                payload={
+                    "content": row[content_column],
                     "title": row.get(title_column, ""),
                     "url": row[url_column],
                     "description": row.get(desc_column, ""),
                 },
             )
-            for row in df.to_dict(orient="records")
+            for index, row in enumerate(df.to_dict(orient="records"))
         ]
 
         # split the documents
+        from langchain.schema import Document as LangchainDocument
+        documents_langchain = [
+            LangchainDocument(
+                page_content=doc.payload["content"],
+                metadata=doc.payload
+            )
+            for doc in documents
+        ]
+
         from langchain_text_splitters import RecursiveCharacterTextSplitter
 
         text_splitter = RecursiveCharacterTextSplitter(
@@ -282,7 +293,7 @@ class QdrantVectorStoreManager:
                 "",
             ],
         )
-        split_documents = text_splitter.split_documents(documents)
+        split_documents = text_splitter.split_documents(documents_langchain)
 
         # update and save the vector store
         num_batches = (len(split_documents) + batch_size - 1) // batch_size
