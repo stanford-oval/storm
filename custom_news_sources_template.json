@@ -1,0 +1,47 @@
+[
+    {
+        "title": "Climate Change Impact on Coastal Communities Worse Than Expected",
+        "url": "https://example.com/news/climate-impact-coastal",
+        "snippets": [
+            "New research published in Environmental Science Journal shows that coastal communities are experiencing accelerated erosion rates, with some areas losing up to 3 feet of shoreline annually.",
+            "Dr. Jane Smith, lead researcher, states: 'What we're seeing is far worse than our models predicted even five years ago. The combination of rising sea levels and more frequent storm surges is creating a perfect storm for coastal regions.'",
+            "Local economies dependent on tourism and fishing are particularly vulnerable, with economic losses estimated at $3.2 billion annually across affected regions."
+        ],
+        "metadata": {
+            "source": "Environmental News Daily",
+            "date": "2023-08-15",
+            "author": "Michael Johnson",
+            "importance": "high"
+        }
+    },
+    {
+        "title": "Tech Company Accused of Privacy Violations in New App Launch",
+        "url": "https://example.com/news/tech-privacy-violations",
+        "snippets": [
+            "TechGiant's new social media application has been collecting user location data even when the app is closed, according to an investigation by Digital Rights Watch.",
+            "The company's privacy policy does not clearly disclose the extent of data collection, potentially violating consumer protection laws in multiple countries.",
+            "A spokesperson for TechGiant responded: 'We take user privacy seriously and are investigating these claims. Our app complies with all applicable regulations.'"
+        ],
+        "metadata": {
+            "source": "Tech Insider",
+            "date": "2023-09-02",
+            "author": "Sarah Williams",
+            "importance": "medium"
+        }
+    },
+    {
+        "title": "Revolutionary Medical Device Approved After Successful Trials",
+        "url": "https://example.com/news/medical-device-approval",
+        "snippets": [
+            "The FDA has granted approval for the NovaHeart device after clinical trials showed a 78% improvement in patient outcomes compared to traditional treatments.",
+            "The device, which monitors heart function in real-time and adjusts medication delivery automatically, could benefit over 2.3 million patients with chronic heart conditions.",
+            "Healthcare economists project the technology could reduce hospitalization costs by up to $4.5 billion annually while improving quality of life for patients."
+        ],
+        "metadata": {
+            "source": "Medical News Today",
+            "date": "2023-07-21",
+            "author": "Dr. Robert Chen",
+            "importance": "high"
+        }
+    }
+] 

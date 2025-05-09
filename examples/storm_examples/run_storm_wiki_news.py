@@ -69,20 +69,15 @@ def load_custom_news_sources(file_path):
     with open(file_path, 'r') as f:
         custom_sources_data = json.load(f)
     
-    # Safety check - limit to max 10 sources to prevent memory issues
-    if len(custom_sources_data) > 10:
-        print(f"⚠️ Warning: Limiting custom sources to 10 (out of {len(custom_sources_data)}) to prevent memory issues")
-        custom_sources_data = custom_sources_data[:10]
-    
     custom_sources = []
     for idx, source in enumerate(custom_sources_data):
         # Create Information object with the correct parameters
         info = Information(
             url=source.get("url", f"custom-source-{idx}"),
-            description=source.get("description", f"Custom news source {idx+1}"),  # Description is required
+            description=f"Custom news source {idx+1}",  
             snippets=source.get("snippets", []),
             title=source.get("title", "Custom Article"),
-            meta=source.get("metadata", {})  # 'meta' not 'metadata'
+            meta=source.get("metadata", {}) 
         )
         
         # Optionally add query information to meta
@@ -243,10 +238,10 @@ if __name__ == "__main__":
     parser.add_argument(
         "--max-thread-num",
         type=int,
-        default=2,
+        default=3,
         help="Maximum number of threads to use. The information seeking part and the article generation"
         "part can speed up by using multiple threads. Consider reducing it if keep getting "
-        '"Exceed rate limit" error when calling LM API or memory issues.',
+        '"Exceed rate limit" error when calling LM API.',
     )
     parser.add_argument(
         "--retriever",
