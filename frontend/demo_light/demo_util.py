@@ -144,11 +144,9 @@ class DemoFileIOHelper:
 
         for file_path in file_paths:
             modification_timestamp = os.path.getmtime(file_path)
-            modification_time_utc = datetime.datetime.utcfromtimestamp(
-                modification_timestamp
-            )
-            modification_time_utc = modification_time_utc.replace(
-                tzinfo=datetime.timezone.utc
+            modification_time_utc = datetime.datetime.fromtimestamp(
+                modification_timestamp,
+                datetime.timezone.utc
             )
             modification_time_california = modification_time_utc.astimezone(
                 california_tz
