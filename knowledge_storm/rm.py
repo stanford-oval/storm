@@ -938,11 +938,12 @@ class TavilySearchRM(dspy.Retrieve):
 
         for query in queries:
             args = {
+                "query": query,
                 "max_results": self.k,
                 "include_raw_contents": self.include_raw_content,
             }
             #  list of dicts that will be parsed to return
-            responseData = self.tavily_client.search(query)
+            responseData = self.tavily_client.search(**args)
             results = responseData.get("results")
             for d in results:
                 # assert d is dict
