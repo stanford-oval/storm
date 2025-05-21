@@ -166,7 +166,7 @@ class QdrantVectorStoreManager:
         embedding_model: str = "BAAI/bge-m3",
         device: str = "mps",
     ):
-        from qdrant_client import Document
+        from langchain_core.documents.base import Document
 
         """
         Takes a CSV file and adds each row in the CSV file to the Qdrant collection.
