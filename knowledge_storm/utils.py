@@ -166,7 +166,7 @@ class QdrantVectorStoreManager:
         embedding_model: str = "BAAI/bge-m3",
         device: str = "mps",
     ):
-        from qdrant_client import Document
+        from langchain_core.documents.base import Document
 
         """
         Takes a CSV file and adds each row in the CSV file to the Qdrant collection.
@@ -278,7 +278,7 @@ class QdrantVectorStoreManager:
                 "\uff0c",  # Fullwidth comma
                 "\u3001",  # Ideographic comma
                 " ",
-                "\u200B",  # Zero-width space
+                "\u200b",  # Zero-width space
                 "",
             ],
         )
@@ -666,7 +666,7 @@ class WebPageHelper:
                 "\uff0c",  # Fullwidth comma
                 "\u3001",  # Ideographic comma
                 " ",
-                "\u200B",  # Zero-width space
+                "\u200b",  # Zero-width space
                 "",
             ],
         )
