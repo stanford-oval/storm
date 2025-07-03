@@ -67,6 +67,7 @@ def generate_article_task(self, article_params: dict, webhook_url: str, metadata
         # Common parameters for language models
         openai_kwargs = {
             'api_key': os.getenv("OPENROUTER_API_KEY"),
+            'api_base': "https://openrouter.ai/api/v1",
             'temperature': 1.0,
             'top_p': 0.9,
         }
@@ -75,9 +76,9 @@ def generate_article_task(self, article_params: dict, webhook_url: str, metadata
         
         logger.info(f"Using webhook url: {webhook_url}")
         # Configure model names based on provider
-        # Default to OpenAI
-        gpt_35_model_name = 'openrouter/openai/gpt-3.5-turbo'
-        gpt_4_model_name = 'openrouter/openai/gpt-4o'
+        # For OpenRouter, use the model name without the openrouter/ prefix
+        gpt_35_model_name = 'openai/gpt-3.5-turbo'
+        gpt_4_model_name = 'openai/gpt-4o'
         
         logger.info(f"Using LLM provider: {llm_provider} with models {gpt_35_model_name} and {gpt_4_model_name}")
         
