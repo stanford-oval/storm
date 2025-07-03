@@ -77,19 +77,19 @@ def generate_article_task(self, article_params: dict, webhook_url: str, metadata
         logger.info(f"Using webhook url: {webhook_url}")
         # Configure model names based on provider
         # For OpenRouter, use the model name without the openrouter/ prefix
-        gpt_35_model_name = 'openai/gpt-4o-mini'
+        gpt_4o_mini_model_name = 'openai/gpt-4o-mini'
         gpt_4_model_name = 'openai/gpt-4o'
         
-        logger.info(f"Using LLM provider: {llm_provider} with models {gpt_35_model_name} and {gpt_4_model_name}")
+        logger.info(f"Using LLM provider: {llm_provider} with models {gpt_4o_mini_model_name} and {gpt_4_model_name}")
         
         # Use LitellmModel instead of OpenAIModel for better provider compatibility
         conv_simulator_lm = LitellmModel(
-            model=gpt_35_model_name, 
+            model=gpt_4o_mini_model_name, 
             max_tokens=article_params.get('conv_simulator_max_tokens', 500), 
             **openai_kwargs
         )
         question_asker_lm = LitellmModel(
-            model=gpt_35_model_name, 
+            model=gpt_4o_mini_model_name, 
             max_tokens=article_params.get('question_asker_max_tokens', 500), 
             **openai_kwargs
         )
