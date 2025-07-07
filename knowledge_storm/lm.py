@@ -4,6 +4,7 @@ import functools
 import logging
 import os
 import random
+import re
 import requests
 import threading
 from typing import Optional, Literal, Any
@@ -264,6 +265,10 @@ class LitellmModel(LM):
             **entry, cost=response.get("_hidden_params", {}).get("response_cost")
         )
         self.history.append(entry)
+
+        # remove everything within <think></think>
+        outputs = [re.sub("<think>.*?(</think>|$)", " ", output, flags=re.DOTALL)
+            for output in outputs]
 
         return outputs
 
