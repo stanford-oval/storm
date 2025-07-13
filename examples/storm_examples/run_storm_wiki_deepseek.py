@@ -49,13 +49,13 @@ def sanitize_topic(topic):
     topic = topic.replace(" ", "_")
 
     # Remove any character that isn't alphanumeric, underscore, or hyphen
-    topic = re.sub(r"[^a-zA-Z0-9_-]", "", topic)
+    topic = re.sub(r'[^a-zA-Z0-9_\-\s]', '', topic)
 
     # Ensure the topic isn't empty after sanitization
     if not topic:
         topic = "unnamed_topic"
 
-    return topic
+    return topic[:100] if topic else "unnamed_topic" 
 
 
 def main(args):
