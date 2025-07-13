@@ -152,8 +152,8 @@ def main(args):
     try:
         runner.run(
             topic=sanitized_topic,
-            do_research=args.do_research,
-            do_generate_outline=args.do_generate_outline,
+            do_research=args.do_research and bool(sanitized_topic.strip()),
+            do_generate_outline=args.do_generate_outline and bool(sanitized_topic.strip()),
             do_generate_article=args.do_generate_article,
             do_polish_article=args.do_polish_article,
             remove_duplicate=args.remove_duplicate,
