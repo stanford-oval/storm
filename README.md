@@ -7,8 +7,9 @@
 <p align="center">
 | <a href="http://storm.genie.stanford.edu"><b>Research preview</b></a> | <a href="https://arxiv.org/abs/2402.14207"><b>STORM Paper</b></a>| <a href="https://www.arxiv.org/abs/2408.15232"><b>Co-STORM Paper</b></a>  | <a href="https://storm-project.stanford.edu/"><b>Website</b></a> |
 </p>
-
 **Latest News** 🔥
+
+- [2025/01] We add [litellm](https://github.com/BerriAI/litellm) integration for language models and embedding models in `knowledge-storm` v1.1.0.
 
 - [2024/09] Co-STORM codebase is now released and integrated into `knowledge-storm` python package v1.0.0. Run `pip install knowledge-storm --upgrade` to check it out.
 
@@ -92,10 +93,11 @@ You could also install the source code which allows you to modify the behavior o
 
 Currently, our package support:
 
-- `OpenAIModel`, `AzureOpenAIModel`, `ClaudeModel`, `VLLMClient`, `TGIClient`, `TogetherClient`, `OllamaClient`, `GoogleModel`, `DeepSeekModel`, `GroqModel` as language model components
-- `YouRM`, `BingSearch`, `VectorRM`, `SerperRM`, `BraveRM`, `SearXNG`, `DuckDuckGoSearchRM`, `TavilySearchRM`, `GoogleSearch`, and `AzureAISearch` as retrieval module components
+- Language model components: All language models supported by litellm as listed [here](https://docs.litellm.ai/docs/providers)
+- Embedding model components: All embedding models supported by litellm as listed [here](https://docs.litellm.ai/docs/embedding/supported_embedding)
+- retrieval module components: `YouRM`, `BingSearch`, `VectorRM`, `SerperRM`, `BraveRM`, `SearXNG`, `DuckDuckGoSearchRM`, `TavilySearchRM`, `GoogleSearch`, and `AzureAISearch` as 
 
-:star2: **PRs for integrating more language models into [knowledge_storm/lm.py](knowledge_storm/lm.py) and search engines/retrievers into [knowledge_storm/rm.py](knowledge_storm/rm.py) are highly appreciated!**
+:star2: **PRs for integrating more search engines/retrievers into [knowledge_storm/rm.py](knowledge_storm/rm.py) are highly appreciated!**
 
 Both STORM and Co-STORM are working in the information curation layer, you need to set up the information retrieval module and language model module to create their `Runner` classes respectively.
 
@@ -106,7 +108,7 @@ The STORM knowledge curation engine is defined as a simple Python `STORMWikiRunn
 ```python
 import os
 from knowledge_storm import STORMWikiRunnerArguments, STORMWikiRunner, STORMWikiLMConfigs
-from knowledge_storm.lm import OpenAIModel
+from knowledge_storm.lm import LitellmModel
 from knowledge_storm.rm import YouRM
 
 lm_configs = STORMWikiLMConfigs()
@@ -118,8 +120,8 @@ openai_kwargs = {
 # STORM is a LM system so different components can be powered by different models to reach a good balance between cost and quality.
 # For a good practice, choose a cheaper/faster model for `conv_simulator_lm` which is used to split queries, synthesize answers in the conversation.
 # Choose a more powerful model for `article_gen_lm` to generate verifiable text with citations.
-gpt_35 = OpenAIModel(model='gpt-3.5-turbo', max_tokens=500, **openai_kwargs)
-gpt_4 = OpenAIModel(model='gpt-4o', max_tokens=3000, **openai_kwargs)
+gpt_35 = LitellmModel(model='gpt-3.5-turbo', max_tokens=500, **openai_kwargs)
+gpt_4 = LitellmModel(model='gpt-4o', max_tokens=3000, **openai_kwargs)
 lm_configs.set_conv_simulator_lm(gpt_35)
 lm_configs.set_question_asker_lm(gpt_35)
 lm_configs.set_outline_gen_lm(gpt_4)
@@ -155,7 +157,7 @@ The Co-STORM knowledge curation engine is defined as a simple Python `CoStormRun
 
 ```python
 from knowledge_storm.collaborative_storm.engine import CollaborativeStormLMConfigs, RunnerArgument, CoStormRunner
-from knowledge_storm.lm import OpenAIModel
+from knowledge_storm.lm import LitellmModel
 from knowledge_storm.logging_wrapper import LoggingWrapper
 from knowledge_storm.rm import BingSearch
 
@@ -168,12 +170,12 @@ openai_kwargs = {
     "top_p": 0.9,
     "api_base": None,
 } 
-question_answering_lm = OpenAIModel(model=gpt_4o_model_name, max_tokens=1000, **openai_kwargs)
-discourse_manage_lm = OpenAIModel(model=gpt_4o_model_name, max_tokens=500, **openai_kwargs)
-utterance_polishing_lm = OpenAIModel(model=gpt_4o_model_name, max_tokens=2000, **openai_kwargs)
-warmstart_outline_gen_lm = OpenAIModel(model=gpt_4o_model_name, max_tokens=500, **openai_kwargs)
-question_asking_lm = OpenAIModel(model=gpt_4o_model_name, max_tokens=300, **openai_kwargs)
-knowledge_base_lm = OpenAIModel(model=gpt_4o_model_name, max_tokens=1000, **openai_kwargs)
+question_answering_lm = LitellmModel(model=gpt_4o_model_name, max_tokens=1000, **openai_kwargs)
+discourse_manage_lm = LitellmModel(model=gpt_4o_model_name, max_tokens=500, **openai_kwargs)
+utterance_polishing_lm = LitellmModel(model=gpt_4o_model_name, max_tokens=2000, **openai_kwargs)
+warmstart_outline_gen_lm = LitellmModel(model=gpt_4o_model_name, max_tokens=500, **openai_kwargs)
+question_asking_lm = LitellmModel(model=gpt_4o_model_name, max_tokens=300, **openai_kwargs)
+knowledge_base_lm = LitellmModel(model=gpt_4o_model_name, max_tokens=1000, **openai_kwargs)
 
 lm_config.set_question_answering_lm(question_answering_lm)
 lm_config.set_discourse_manage_lm(discourse_manage_lm)
@@ -222,6 +224,7 @@ We provide scripts in our [examples folder](examples) as a quick start to run ST
 We suggest using `secrets.toml` to set up the API keys. Create a file `secrets.toml` under the root directory and add the following content:
 
 ```shell
+# ============ language model configurations ============ 
 # Set up OpenAI API key.
 OPENAI_API_KEY="your_openai_api_key"
 # If you are using the API service provided by OpenAI, include the following line:
@@ -230,15 +233,10 @@ OPENAI_API_TYPE="openai"
 OPENAI_API_TYPE="azure"
 AZURE_API_BASE="your_azure_api_base_url"
 AZURE_API_VERSION="your_azure_api_version"
-# Set up You.com search API key.
-YDC_API_KEY="your_youcom_api_key"
-```
-
-for **Co-STORM**, please also add following
-```
-# if use openai encoder
-ENCODER_API_TYPE="openai"
-# or ENCODER_API_TYPE="azure" if use azure openai encoder
+# ============ retriever configurations ============ 
+BING_SEARCH_API_KEY="your_bing_search_api_key" # if using bing search
+# ============ encoder configurations ============ 
+ENCODER_API_TYPE="openai" # if using openai encoder
 ```
 
 ### STORM examples
@@ -249,7 +247,7 @@ Run the following command.
 ```bash
 python examples/storm_examples/run_storm_wiki_gpt.py \
     --output-dir $OUTPUT_DIR \
-    --retriever you \
+    --retriever bing \
     --do-research \
     --do-generate-outline \
     --do-generate-article \
@@ -325,23 +323,49 @@ We would like to thank Wikipedia for its excellent open-source content. The Fres
 
 We are very grateful to [Michelle Lam](https://michelle123lam.github.io/) for designing the logo for this project and [Dekun Ma](https://dekun.me) for leading the UI development.
 
+Thanks to Vercel for their support of [open-source software](https://storm.genie.stanford.edu)
+
 ## Citation
 Please cite our paper if you use this code or part of it in your work:
 ```bibtex
-@misc{jiang2024unknownunknowns,
-      title={Into the Unknown Unknowns: Engaged Human Learning through Participation in Language Model Agent Conversations}, 
-      author={Yucheng Jiang and Yijia Shao and Dekun Ma and Sina J. Semnani and Monica S. Lam},
-      year={2024},
-      eprint={2408.15232},
-      archivePrefix={arXiv},
-      primaryClass={cs.CL},
-      url={https://arxiv.org/abs/2408.15232}, 
+@inproceedings{jiang-etal-2024-unknown,
+    title = "Into the Unknown Unknowns: Engaged Human Learning through Participation in Language Model Agent Conversations",
+    author = "Jiang, Yucheng  and
+      Shao, Yijia  and
+      Ma, Dekun  and
+      Semnani, Sina  and
+      Lam, Monica",
+    editor = "Al-Onaizan, Yaser  and
+      Bansal, Mohit  and
+      Chen, Yun-Nung",
+    booktitle = "Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing",
+    month = nov,
+    year = "2024",
+    address = "Miami, Florida, USA",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2024.emnlp-main.554/",
+    doi = "10.18653/v1/2024.emnlp-main.554",
+    pages = "9917--9955",
 }
 
-@inproceedings{shao2024assisting,
-      title={{Assisting in Writing Wikipedia-like Articles From Scratch with Large Language Models}}, 
-      author={Yijia Shao and Yucheng Jiang and Theodore A. Kanell and Peter Xu and Omar Khattab and Monica S. Lam},
-      year={2024},
-      booktitle={Proceedings of the 2024 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers)}
+@inproceedings{shao-etal-2024-assisting,
+    title = "Assisting in Writing {W}ikipedia-like Articles From Scratch with Large Language Models",
+    author = "Shao, Yijia  and
+      Jiang, Yucheng  and
+      Kanell, Theodore  and
+      Xu, Peter  and
+      Khattab, Omar  and
+      Lam, Monica",
+    editor = "Duh, Kevin  and
+      Gomez, Helena  and
+      Bethard, Steven",
+    booktitle = "Proceedings of the 2024 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies (Volume 1: Long Papers)",
+    month = jun,
+    year = "2024",
+    address = "Mexico City, Mexico",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2024.naacl-long.347/",
+    doi = "10.18653/v1/2024.naacl-long.347",
+    pages = "6252--6278",
 }
 ```

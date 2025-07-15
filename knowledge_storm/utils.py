@@ -1,4 +1,6 @@
 import concurrent.futures
+import dspy
+import httpx
 import json
 import logging
 import os
@@ -6,21 +8,14 @@ import pickle
 import re
 import regex
 import sys
-import time
-from typing import List, Dict
-
-import httpx
-import pandas as pd
 import toml
-from langchain_core.documents import Document
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_qdrant import Qdrant
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from qdrant_client import QdrantClient, models
+from typing import List, Dict
 from tqdm import tqdm
+
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from trafilatura import extract
 
-from .lm import OpenAIModel
+from .lm import LitellmModel
 
 logging.getLogger("httpx").setLevel(logging.WARNING)  # Disable INFO logging for httpx.
 
@@ -72,8 +67,11 @@ class QdrantVectorStoreManager:
 
     @staticmethod
     def _check_create_collection(
-        client: QdrantClient, collection_name: str, model: HuggingFaceEmbeddings
+        client: "QdrantClient", collection_name: str, model: "HuggingFaceEmbeddings"
     ):
+        from langchain_qdrant import Qdrant
+        from qdrant_client import models
+
         """Check if the Qdrant collection exists and create it if it does not."""
         if client is None:
             raise ValueError("Qdrant client is not initialized.")
@@ -103,8 +101,10 @@ class QdrantVectorStoreManager:
 
     @staticmethod
     def _init_online_vector_db(
-        url: str, api_key: str, collection_name: str, model: HuggingFaceEmbeddings
+        url: str, api_key: str, collection_name: str, model: "HuggingFaceEmbeddings"
     ):
+        from qdrant_client import QdrantClient
+
         """Initialize the Qdrant client that is connected to an online vector store with the given URL and API key.
 
         Args:
@@ -128,8 +128,10 @@ class QdrantVectorStoreManager:
 
     @staticmethod
     def _init_offline_vector_db(
-        vector_store_path: str, collection_name: str, model: HuggingFaceEmbeddings
+        vector_store_path: str, collection_name: str, model: "HuggingFaceEmbeddings"
     ):
+        from qdrant_client import QdrantClient
+
         """Initialize the Qdrant client that is connected to an offline vector store with the given vector store folder path.
 
         Args:
@@ -164,6 +166,8 @@ class QdrantVectorStoreManager:
         embedding_model: str = "BAAI/bge-m3",
         device: str = "mps",
     ):
+        from qdrant_client import Document
+
         """
         Takes a CSV file and adds each row in the CSV file to the Qdrant collection.
 
@@ -192,6 +196,8 @@ class QdrantVectorStoreManager:
 
         model_kwargs = {"device": device}
         encode_kwargs = {"normalize_embeddings": True}
+        from langchain_huggingface import HuggingFaceEmbeddings
+
         model = HuggingFaceEmbeddings(
             model_name=embedding_model,
             model_kwargs=model_kwargs,
@@ -231,6 +237,8 @@ class QdrantVectorStoreManager:
             raise ValueError("Qdrant client is not initialized.")
 
         # read the csv file
+        import pandas as pd
+
         df = pd.read_csv(file_path)
         # check that content column exists and url column exists
         if content_column not in df.columns:
@@ -704,10 +712,8 @@ class WebPageHelper:
 
 
 def user_input_appropriateness_check(user_input):
-    my_openai_model = OpenAIModel(
-        api_key=os.getenv("OPENAI_API_KEY"),
-        api_provider="openai",
-        model="gpt-4o-mini-2024-07-18",
+    my_openai_model = LitellmModel(
+        model="azure/gpt-4o-mini",
         max_tokens=10,
         temperature=0.0,
         top_p=0.9,
@@ -761,10 +767,8 @@ User input: {user_input}"""
 
 
 def purpose_appropriateness_check(user_input):
-    my_openai_model = OpenAIModel(
-        api_key=os.getenv("OPENAI_API_KEY"),
-        api_provider="openai",
-        model="gpt-4o-mini-2024-07-18",
+    my_openai_model = LitellmModel(
+        model="azure/gpt-4o-mini",
         max_tokens=10,
         temperature=0.0,
         top_p=0.9,

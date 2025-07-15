@@ -9,7 +9,7 @@ from typing import List, Union, Dict, Optional
 
 from .collaborative_storm_utils import trim_output_after_hint
 from ...dataclass import KnowledgeNode, KnowledgeBase
-from ...encoder import get_text_embeddings
+from ...encoder import Encoder
 from ...interface import Information
 
 
@@ -51,8 +51,9 @@ class InsertInformationCandidateChoice(dspy.Signature):
 
 
 class InsertInformationModule(dspy.Module):
-    def __init__(self, engine: Union[dspy.dsp.LM, dspy.dsp.HFModel]):
+    def __init__(self, engine: Union[dspy.dsp.LM, dspy.dsp.HFModel], encoder: Encoder):
         self.engine = engine
+        self.encoder = encoder
         self.insert_info = dspy.ChainOfThought(InsertInformation)
         self.candidate_choosing = dspy.Predict(InsertInformationCandidateChoice)
 
@@ -153,7 +154,7 @@ class InsertInformationModule(dspy.Module):
         query: str,
     ):
         if encoded_outline is not None and encoded_outline.size > 0:
-            encoded_query, token_usage = get_text_embeddings(f"{question}, {query}")
+            encoded_query = self.encoder.encode(f"{question}, {query}")
             sim = cosine_similarity([encoded_query], encoded_outline)[0]
             sorted_indices = np.argsort(sim)
             sorted_outlines = np.array(outlines)[sorted_indices[::-1]]
@@ -226,7 +227,6 @@ class InsertInformationModule(dspy.Module):
         insert_root: Optional[KnowledgeNode] = None,
         skip_candidate_from_embedding: bool = False,
     ):
-
         if not isinstance(information, List):
             information = [information]
         intent_to_placement_dict: Dict = self._info_list_to_intent_mapping(
@@ -270,9 +270,10 @@ class InsertInformationModule(dspy.Module):
                     root=insert_root,
                 )
 
-        encoded_outlines, outlines = (
-            knowledge_base.get_knowledge_base_structure_embedding(root=insert_root)
-        )
+        (
+            encoded_outlines,
+            outlines,
+        ) = knowledge_base.get_knowledge_base_structure_embedding(root=insert_root)
         to_return = []
         if not allow_create_new_node:
             # use multi thread as knowledge base structure does not change
@@ -295,10 +296,11 @@ class InsertInformationModule(dspy.Module):
         else:
             # use sequential insert as knowledge base structure might change
             for question, query in intent_to_placement_dict:
-                encoded_outlines, outlines = (
-                    knowledge_base.get_knowledge_base_structure_embedding(
-                        root=insert_root
-                    )
+                (
+                    encoded_outlines,
+                    outlines,
+                ) = knowledge_base.get_knowledge_base_structure_embedding(
+                    root=insert_root
                 )
                 _, placement_prediction = process_intent(question=question, query=query)
                 intent_to_placement_dict[(question, query)] = placement_prediction

@@ -88,7 +88,6 @@ class StormArticleGenerationModule(ArticleGenerationModule):
             )
             section_output_dict_collection = [section_output_dict]
         else:
-
             with concurrent.futures.ThreadPoolExecutor(
                 max_workers=self.max_thread_num
             ) as executor:
