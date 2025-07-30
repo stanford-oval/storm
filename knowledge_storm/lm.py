@@ -1283,4 +1283,126 @@ class GoogleModel(dspy.dsp.modules.lm.LM):
         return completions
 
 
+import json
+
+
+class ModelScopeModel(dspy.OpenAI):
+    """A wrapper class for ModelScope API, compatible with dspy.OpenAI."""
+
+    def __init__(
+        self,
+        model: str = "Qwen/Qwen3-235B-A22B-Instruct-2507",
+        api_key: Optional[str] = None,
+        api_base: str = "https://api-inference.modelscope.cn/v1",
+        **kwargs,
+    ):
+        super().__init__(model=model, api_key=api_key, api_base=api_base, **kwargs)
+        self._token_usage_lock = threading.Lock()
+        self.prompt_tokens = 0
+        self.completion_tokens = 0
+        self.model = model
+        self.api_key = api_key or os.getenv("MODELSCOPE_API_KEY")
+        self.api_base = api_base
+        if not self.api_key:
+            raise ValueError(
+                "ModelScope API key must be provided either as an argument or as an environment variable MODELSCOPE_API_KEY"
+            )
+
+    def log_usage(self, response):
+        """Log the total tokens from the ModelScope API response."""
+        usage_data = response.get("usage")
+        if usage_data:
+            with self._token_usage_lock:
+                self.prompt_tokens += usage_data.get("prompt_tokens", 0)
+                self.completion_tokens += usage_data.get("completion_tokens", 0)
+
+    def get_usage_and_reset(self):
+        """Get the total tokens used and reset the token usage."""
+        usage = {
+            self.model: {
+                "prompt_tokens": self.prompt_tokens,
+                "completion_tokens": self.completion_tokens,
+            }
+        }
+        self.prompt_tokens = 0
+        self.completion_tokens = 0
+        return usage
+
+    @backoff.on_exception(
+        backoff.expo,
+        ERRORS,
+        max_time=1000,
+        on_backoff=backoff_hdlr,
+        giveup=giveup_hdlr,
+    )
+    def _create_completion(self, prompt: str, **kwargs):
+        """Create a completion using the ModelScope API."""
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self.api_key}",
+        }
+        data = {
+            "model": self.model,
+            "messages": [{"role": "user", "content": prompt}],
+            "stream": True,
+            **kwargs,
+        }
+        response = requests.post(
+            f"{self.api_base}/chat/completions", headers=headers, json=data, stream=True
+        )
+        response.raise_for_status()
+        full_content = ""
+        for line in response.iter_lines():
+            if line:
+                decoded_line = line.decode("utf-8").strip()
+                if decoded_line.startswith("data: "):
+                    json_str = decoded_line[6:]
+                    if json_str == "[DONE]":
+                        break
+                    try:
+                        event_data = json.loads(json_str)
+                        choices = event_data.get("choices", [])
+                        if choices:
+                            delta = choices[0].get("delta", {})
+                            content_chunk = delta.get("content", "")
+                            full_content += content_chunk
+                            if "usage" in event_data:
+                                self.log_usage(event_data)
+                    except json.JSONDecodeError:
+                        continue
+
+        return {
+            "choices": [{"message": {"role": "assistant", "content": full_content}}],
+            "usage": {"prompt_tokens": 0, "completion_tokens": 0},
+        }
+
+    def __call__(
+        self,
+        prompt: str,
+        only_completed: bool = True,
+        return_sorted: bool = False,
+        **kwargs,
+    ) -> list[dict[str, Any]]:
+        """Call the ModelScope API to generate completions."""
+        assert only_completed, "for now"
+        assert return_sorted is False, "for now"
+
+        response = self._create_completion(prompt, **kwargs)
+
+        # Log the token usage from the ModelScope API response.
+        self.log_usage(response)
+
+        choices = response["choices"]
+        completions = [choice["message"]["content"] for choice in choices]
+
+        history = {
+            "prompt": prompt,
+            "response": response,
+            "kwargs": kwargs,
+        }
+        self.history.append(history)
+
+        return completions
+
+
 # ========================================================================
