@@ -211,9 +211,9 @@ def main(args):
             "--model",
             type=str,
             # choices=["Qwen/Qwen3-235B-A22B-Instruct-2507", "Qwen/Qwen2.5-72B-Instruct", "Qwen/Qwen3-Coder-480B-A35B-Instruct", "Qwen/Qwen3-32B", "deepseek-ai/DeepSeek-R1-0528", "Qwen/QwQ-32B","Qwen/Qwen2.5-72B-Instruct"],
-            choices=["Qwen/QwQ-32B"],
-            default="Qwen/QwQ-32B",
-            help="MoodelScope model to use.",
+            choices=["Qwen/Qwen3-235B-A22B-Instruct-2507", "Qwen/Qwen2.5-72B-Instruct", "Qwen/Qwen3-Coder-480B-A35B-Instruct", "Qwen/Qwen3-32B", "deepseek-ai/DeepSeek-R1-0528", "Qwen/QwQ-32B","Qwen/Qwen2.5-72B-Instruct", "Qwen/Qwen3-8B"],
+            default="Qwen/Qwen3-8B",
+            help="ModelScope model to use.",
         )
         parser.add_argument(
             "--temperature",
