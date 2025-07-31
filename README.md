@@ -233,6 +233,8 @@ OPENAI_API_TYPE="openai"
 OPENAI_API_TYPE="azure"
 AZURE_API_BASE="your_azure_api_base_url"
 AZURE_API_VERSION="your_azure_api_version"
+# If you are using the API service provided by ModelScope, include the following line:
+MODELSCOPE_API_KEY="your_modelscope_api_key"
 # ============ retriever configurations ============ 
 BING_SEARCH_API_KEY="your_bing_search_api_key" # if using bing search
 # ============ encoder configurations ============ 
