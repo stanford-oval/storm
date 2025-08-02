@@ -13,8 +13,13 @@ from demo_util import (
 
 def handle_not_started():
     if st.session_state["page3_write_article_state"] == "not started":
-        _, search_form_column, _ = st.columns([2, 5, 2])
-        with search_form_column:
+        _, center_col, _ = st.columns([1, 2, 1])
+        with center_col:
+            st.image(os.path.join(demo_util.get_demo_dir(), '../../assets/logo.svg'), width=100)
+            st.title("Fastogo")
+            st.markdown("A new UI for your ears")
+            st.markdown("This is a demo of the STORM system, a novel method for generating Wikipedia-style articles on any topic.")
+
             with st.form(key="search_form"):
                 # Text input for the search topic
                 DemoUIHelper.st_markdown_adjust_size(
@@ -150,6 +155,27 @@ def handle_completed():
 
 def create_new_article_page():
     demo_util.clear_other_page_session_state(page_index=3)
+
+    st.markdown("""
+    <style>
+    /* Style for the text input */
+    div[data-testid="stTextInput"] input {
+        border-radius: 20px;
+        padding: 10px 20px;
+        border: 1px solid #ccc;
+    }
+
+    /* Style for the submit button */
+    div[data-testid="stFormSubmitButton"] button {
+        background-color: #FF4B4B;
+        color: white;
+        border-radius: 20px;
+        padding: 10px 20px;
+        border: none;
+        width: 100%;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
     if "page3_write_article_state" not in st.session_state:
         st.session_state["page3_write_article_state"] = "not started"
