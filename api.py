@@ -64,8 +64,8 @@ class StormArticleRequest(BaseModel):
     conv_simulator_max_tokens: Optional[int] = 500
     question_asker_max_tokens: Optional[int] = 500
     outline_gen_max_tokens: Optional[int] = 400
-    article_gen_max_tokens: Optional[int] = 700
-    article_polish_max_tokens: Optional[int] = 700
+    article_gen_max_tokens: Optional[int] = 1000
+    article_polish_max_tokens: Optional[int] = 4000
     # Add Google Scholar option
     use_scholar: Optional[bool] = True
     # Add LLM provider options
