@@ -26,6 +26,7 @@ class StormOutlineGenerationModule(OutlineGenerationModule):
         old_outline: Optional[StormArticle] = None,
         callback_handler: BaseCallbackHandler = None,
         return_draft_outline=False,
+        language: str = "en",
     ) -> Union[StormArticle, Tuple[StormArticle, StormArticle]]:
         """
         Generates an outline for an article based on the specified topic and the information
@@ -60,6 +61,7 @@ class StormOutlineGenerationModule(OutlineGenerationModule):
             topic=topic,
             dlg_history=concatenated_dialogue_turns,
             callback_handler=callback_handler,
+            language=language,
         )
         article_with_outline_only = StormArticle.from_outline_str(
             topic=topic, outline_str=result.outline
@@ -87,6 +89,7 @@ class WriteOutline(dspy.Module):
         dlg_history,
         old_outline: Optional[str] = None,
         callback_handler: BaseCallbackHandler = None,
+        language: str = "en",
     ):
         trimmed_dlg_history = []
         for turn in dlg_history:
@@ -108,7 +111,7 @@ class WriteOutline(dspy.Module):
         with dspy.settings.context(lm=self.engine):
             if old_outline is None:
                 old_outline = ArticleTextProcessing.clean_up_outline(
-                    self.draft_page_outline(topic=topic).outline
+                    self.draft_page_outline(topic=topic, language=language).outline
                 )
                 if callback_handler:
                     callback_handler.on_direct_outline_generation_end(
@@ -131,9 +134,11 @@ class WritePageOutline(dspy.Signature):
     1. Use "#" Title" to indicate section title, "##" Title" to indicate subsection title, "###" Title" to indicate subsubsection title, and so on.
     2. Do not include other information.
     3. Do not include topic name itself in the outline.
+    IMPORTANT: Write the outline section titles in the specified language. If language is 'pt' (Portuguese), write in Portuguese. If 'en' (English), write in English.
     """
 
     topic = dspy.InputField(prefix="The topic you want to write: ", format=str)
+    language = dspy.InputField(prefix="Language for outline (e.g., 'en' for English, 'pt' for Portuguese): ", format=str)
     outline = dspy.OutputField(prefix="Write the Wikipedia page outline:\n", format=str)
 
 

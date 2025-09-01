@@ -224,6 +224,7 @@ class STORMWikiRunner(Engine):
             max_perspective=self.args.max_perspective,
             disable_perspective=False,
             return_conversation_log=True,
+            language=self.language,
         )
 
         FileIOHelper.dump_json(
@@ -245,6 +246,7 @@ class STORMWikiRunner(Engine):
             information_table=information_table,
             return_draft_outline=True,
             callback_handler=callback_handler,
+            language=self.language,
         )
         
         outline_path = os.path.join(self.article_output_dir, "storm_gen_outline.txt")
@@ -261,12 +263,14 @@ class STORMWikiRunner(Engine):
         outline: StormArticle,
         information_table=StormInformationTable,
         callback_handler: BaseCallbackHandler = None,
+        language: str = "en",
     ) -> StormArticle:
         draft_article = self.storm_article_generation.generate_article(
             topic=self.topic,
             information_table=information_table,
             article_with_outline=outline,
             callback_handler=callback_handler,
+            language=language,
         )
         
         article_path = os.path.join(self.article_output_dir, "storm_gen_article.txt")
@@ -279,12 +283,13 @@ class STORMWikiRunner(Engine):
         return draft_article
 
     def run_article_polishing_module(
-        self, draft_article: StormArticle, remove_duplicate: bool = False
+        self, draft_article: StormArticle, remove_duplicate: bool = False, language: str = "en"
     ) -> StormArticle:
         polished_article = self.storm_article_polishing_module.polish_article(
             topic=self.topic,
             draft_article=draft_article,
             remove_duplicate=remove_duplicate,
+            language=language,
         )
         
         polished_path = os.path.join(self.article_output_dir, "storm_gen_article_polished.txt")
@@ -426,6 +431,7 @@ class STORMWikiRunner(Engine):
                 outline=outline,
                 information_table=information_table,
                 callback_handler=callback_handler, # Pass the original handler
+                language=self.language,
             )
 
         # article polishing module
@@ -446,5 +452,6 @@ class STORMWikiRunner(Engine):
             self.run_article_polishing_module(
                 draft_article=draft_article, 
                 remove_duplicate=remove_duplicate,
+                language=self.language,
                 # callback_handler=callback_handler # Polishing module might need update if it expects a callback
             )

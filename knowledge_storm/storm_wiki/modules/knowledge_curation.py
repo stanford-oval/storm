@@ -50,6 +50,7 @@ class ConvSimulator(dspy.Module):
         persona: str,
         ground_truth_url: str,
         callback_handler: BaseCallbackHandler,
+        language: str = "en",
     ):
         """
         topic: The topic to research.
@@ -59,7 +60,7 @@ class ConvSimulator(dspy.Module):
         dlg_history: List[DialogueTurn] = []
         for _ in range(self.max_turn):
             user_utterance = self.wiki_writer(
-                topic=topic, persona=persona, dialogue_turns=dlg_history
+                topic=topic, persona=persona, dialogue_turns=dlg_history, language=language
             ).question
             if user_utterance == "":
                 logging.error("Simulated Wikipedia writer utterance is empty.")
@@ -67,7 +68,7 @@ class ConvSimulator(dspy.Module):
             if user_utterance.startswith("Thank you so much for your help!"):
                 break
             expert_output = self.topic_expert(
-                topic=topic, question=user_utterance, ground_truth_url=ground_truth_url
+                topic=topic, question=user_utterance, ground_truth_url=ground_truth_url, language=language
             )
             dlg_turn = DialogueTurn(
                 agent_utterance=expert_output.answer,
@@ -98,6 +99,7 @@ class WikiWriter(dspy.Module):
         persona: str,
         dialogue_turns: List[DialogueTurn],
         draft_page=None,
+        language: str = "en",
     ):
         conv = []
         for turn in dialogue_turns[:-4]:
@@ -115,11 +117,11 @@ class WikiWriter(dspy.Module):
         with dspy.settings.context(lm=self.engine):
             if persona is not None and len(persona.strip()) > 0:
                 question = self.ask_question_with_persona(
-                    topic=topic, persona=persona, conv=conv
+                    topic=topic, persona=persona, conv=conv, language=language
                 ).question
             else:
                 question = self.ask_question(
-                    topic=topic, persona=persona, conv=conv
+                    topic=topic, conv=conv, language=language
                 ).question
 
         return dspy.Prediction(question=question)
@@ -129,10 +131,12 @@ class AskQuestion(dspy.Signature):
     """You are an experienced Wikipedia writer. You are chatting with an expert to get information for the topic you want to contribute. Ask good questions to get more useful information relevant to the topic.
     When you have no more question to ask, say "Thank you so much for your help!" to end the conversation.
     Please only ask a question at a time and don't ask what you have asked before. Your questions should be related to the topic you want to write.
+    IMPORTANT: Respond in the same language as the topic. If the topic is in Portuguese, respond in Portuguese. If in English, respond in English.
     """
 
     topic = dspy.InputField(prefix="Topic you want to write: ", format=str)
     conv = dspy.InputField(prefix="Conversation history:\n", format=str)
+    language = dspy.InputField(prefix="Language for output (e.g., 'en' for English, 'pt' for Portuguese): ", format=str)
     question = dspy.OutputField(format=str)
 
 
@@ -141,6 +145,7 @@ class AskQuestionWithPersona(dspy.Signature):
     Now, you are chatting with an expert to get information. Ask good questions to get more useful information.
     When you have no more question to ask, say "Thank you so much for your help!" to end the conversation.
     Please only ask a question at a time and don't ask what you have asked before. Your questions should be related to the topic you want to write.
+    IMPORTANT: Respond in the same language as the topic. If the topic is in Portuguese, respond in Portuguese. If in English, respond in English.
     """
 
     topic = dspy.InputField(prefix="Topic you want to write: ", format=str)
@@ -148,6 +153,7 @@ class AskQuestionWithPersona(dspy.Signature):
         prefix="Your persona besides being a Wikipedia writer: ", format=str
     )
     conv = dspy.InputField(prefix="Conversation history:\n", format=str)
+    language = dspy.InputField(prefix="Language for output (e.g., 'en' for English, 'pt' for Portuguese): ", format=str)
     question = dspy.OutputField(format=str)
 
 
@@ -166,12 +172,14 @@ class QuestionToQuery(dspy.Signature):
 
 class AnswerQuestion(dspy.Signature):
     """You are an expert who can use information effectively. You are chatting with a Wikipedia writer who wants to write a Wikipedia page on topic you know. You have gathered the related information and will now use the information to form a response.
-    Make your response as informative as possible, ensuring that every sentence is supported by the gathered information. If the [gathered information] is not directly related to the [topic] or [question], provide the most relevant answer based on the available information. If no appropriate answer can be formulated, respond with, “I cannot answer this question based on the available information,” and explain any limitations or gaps.
+    Make your response as informative as possible, ensuring that every sentence is supported by the gathered information. If the [gathered information] is not directly related to the [topic] or [question], provide the most relevant answer based on the available information. If no appropriate answer can be formulated, respond with, "I cannot answer this question based on the available information," and explain any limitations or gaps.
+    IMPORTANT: Respond in the specified language. If language is 'pt' (Portuguese), respond in Portuguese. If 'en' (English), respond in English.
     """
 
     topic = dspy.InputField(prefix="Topic you are discussing about:", format=str)
     conv = dspy.InputField(prefix="Question:\n", format=str)
     info = dspy.InputField(prefix="Gathered information:\n", format=str)
+    language = dspy.InputField(prefix="Language for response (e.g., 'en' for English, 'pt' for Portuguese): ", format=str)
     answer = dspy.OutputField(
         prefix="Now give your response. (Try to use as many different sources as possible and add do not hallucinate.)\n",
         format=str,
@@ -201,7 +209,7 @@ class TopicExpert(dspy.Module):
         self.max_search_queries = max_search_queries
         self.search_top_k = search_top_k
 
-    def forward(self, topic: str, question: str, ground_truth_url: str):
+    def forward(self, topic: str, question: str, ground_truth_url: str, language: str = "en"):
         with dspy.settings.context(lm=self.engine, show_guidelines=False):
             # Identify: Break down question into queries.
             queries = self.generate_queries(topic=topic, question=question).queries
@@ -227,7 +235,7 @@ class TopicExpert(dspy.Module):
 
                 try:
                     answer = self.answer_question(
-                        topic=topic, conv=question, info=info
+                        topic=topic, conv=question, info=info, language=language
                     ).answer
                     answer = ArticleTextProcessing.remove_uncompleted_sentences_with_citations(
                         answer
@@ -290,6 +298,7 @@ class StormKnowledgeCurationModule(KnowledgeCurationModule):
         ground_truth_url,
         considered_personas,
         callback_handler: BaseCallbackHandler,
+        language: str = "en",
     ) -> List[Tuple[str, List[DialogueTurn]]]:
         """
         Executes multiple conversation simulations concurrently, each with a different persona,
@@ -320,6 +329,7 @@ class StormKnowledgeCurationModule(KnowledgeCurationModule):
                 ground_truth_url=ground_truth_url,
                 persona=persona,
                 callback_handler=callback_handler,
+                language=language,
             )
 
         max_workers = min(self.max_thread_num, len(considered_personas))
@@ -352,6 +362,7 @@ class StormKnowledgeCurationModule(KnowledgeCurationModule):
         max_perspective: int = 0,
         disable_perspective: bool = True,
         return_conversation_log=False,
+        language: str = "en",
     ) -> Union[StormInformationTable, Tuple[StormInformationTable, Dict]]:
         """
         Curate information and knowledge for the given topic
@@ -382,6 +393,7 @@ class StormKnowledgeCurationModule(KnowledgeCurationModule):
             ground_truth_url=ground_truth_url,
             considered_personas=considered_personas,
             callback_handler=callback_handler,
+            language=language,
         )
 
         information_table = StormInformationTable(conversations)

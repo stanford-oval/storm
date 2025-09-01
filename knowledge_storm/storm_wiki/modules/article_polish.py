@@ -27,7 +27,7 @@ class StormArticlePolishingModule(ArticlePolishingModule):
         )
 
     def polish_article(
-        self, topic: str, draft_article: StormArticle, remove_duplicate: bool = False
+        self, topic: str, draft_article: StormArticle, remove_duplicate: bool = False, language: str = "en"
     ) -> StormArticle:
         """
         Polish article.
@@ -40,7 +40,7 @@ class StormArticlePolishingModule(ArticlePolishingModule):
 
         article_text = draft_article.to_string()
         polish_result = self.polish_page(
-            topic=topic, draft_page=article_text, polish_whole_page=remove_duplicate
+            topic=topic, draft_page=article_text, polish_whole_page=remove_duplicate, language=language
         )
         lead_section = f"# summary\n{polish_result.lead_section}"
         polished_article = "\n\n".join([lead_section, polish_result.page])
@@ -58,10 +58,12 @@ class WriteLeadSection(dspy.Signature):
     1. The lead should stand on its own as a concise overview of the article's topic. It should identify the topic, establish context, explain why the topic is notable, and summarize the most important points, including any prominent controversies.
     2. The lead section should be concise and contain no more than four well-composed paragraphs.
     3. The lead section should be carefully sourced as appropriate. Add inline citations (e.g., "Washington, D.C., is the capital of the United States.[1][3].") where necessary.
+    IMPORTANT: Write the lead section in the specified language. If language is 'pt' (Portuguese), write in Portuguese. If 'en' (English), write in English.
     """
 
     topic = dspy.InputField(prefix="The topic of the page: ", format=str)
     draft_page = dspy.InputField(prefix="The draft page:\n", format=str)
+    language = dspy.InputField(prefix="Language for writing (e.g., 'en' for English, 'pt' for Portuguese): ", format=str)
     lead_section = dspy.OutputField(prefix="Write the lead section:\n", format=str)
 
 
@@ -84,11 +86,11 @@ class PolishPageModule(dspy.Module):
         self.write_lead = dspy.Predict(WriteLeadSection)
         self.polish_page = dspy.Predict(PolishPage)
 
-    def forward(self, topic: str, draft_page: str, polish_whole_page: bool = True):
+    def forward(self, topic: str, draft_page: str, polish_whole_page: bool = True, language: str = "en"):
         # NOTE: Change show_guidelines to false to make the generation more robust to different LM families.
         with dspy.settings.context(lm=self.write_lead_engine, show_guidelines=False):
             lead_section = self.write_lead(
-                topic=topic, draft_page=draft_page
+                topic=topic, draft_page=draft_page, language=language
             ).lead_section
             if "The lead section:" in lead_section:
                 lead_section = lead_section.split("The lead section:")[1].strip()
