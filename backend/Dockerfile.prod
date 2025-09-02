@@ -1,0 +1,195 @@
+# STORM Backend Production Dockerfile
+# Multi-stage build for optimal security and performance
+
+# ============================================================
+# Stage 1: Build stage
+# ============================================================
+FROM python:3.11-slim as builder
+
+# Install system dependencies for building
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    git \
+    gcc \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Create virtual environment
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Upgrade pip and install wheel
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel
+
+# Copy requirements first for better Docker layer caching
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy parent directory requirements for STORM
+COPY ../requirements.txt ./storm_requirements.txt
+RUN pip install --no-cache-dir -r storm_requirements.txt
+
+# Install STORM from parent directory
+COPY ../ ./storm/
+RUN pip install -e ./storm/
+
+# ============================================================
+# Stage 2: Production runtime
+# ============================================================
+FROM python:3.11-slim as production
+
+# Install runtime dependencies and security updates
+RUN apt-get update && apt-get install -y \
+    curl \
+    wget \
+    ca-certificates \
+    && apt-get upgrade -y \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# Create non-root user
+RUN groupadd --gid 1001 storm && \
+    useradd --uid 1001 --gid storm --shell /bin/bash --create-home storm
+
+# Set working directory
+WORKDIR /app
+
+# Copy virtual environment from builder
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Copy application code
+COPY --chown=storm:storm . .
+
+# Create necessary directories
+RUN mkdir -p /app/data /app/logs /app/uploads && \
+    chown -R storm:storm /app
+
+# Set environment variables
+ENV PYTHONPATH=/app
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONIOENCODING=utf-8
+
+# Switch to non-root user
+USER storm
+
+# Expose port
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Default command
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+
+# ============================================================
+# Stage 3: Development runtime
+# ============================================================
+FROM python:3.11-slim as development
+
+# Install system dependencies including dev tools
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    wget \
+    git \
+    ca-certificates \
+    vim \
+    htop \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN groupadd --gid 1001 storm && \
+    useradd --uid 1001 --gid storm --shell /bin/bash --create-home storm
+
+# Set working directory
+WORKDIR /app
+
+# Copy virtual environment from builder
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Install development dependencies
+RUN pip install --no-cache-dir \
+    debugpy \
+    ipdb \
+    black \
+    isort \
+    flake8 \
+    mypy
+
+# Copy application code
+COPY --chown=storm:storm . .
+
+# Create necessary directories
+RUN mkdir -p /app/data /app/logs /app/uploads && \
+    chown -R storm:storm /app
+
+# Set environment variables
+ENV PYTHONPATH=/app
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONIOENCODING=utf-8
+
+# Switch to non-root user
+USER storm
+
+# Expose ports (8000 for app, 5678 for debugger)
+EXPOSE 8000 5678
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Development command with hot reload
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+# ============================================================
+# Stage 4: Testing stage
+# ============================================================
+FROM development as test
+
+# Switch to root to install additional test dependencies
+USER root
+
+# Install additional test tools
+RUN pip install --no-cache-dir \
+    pytest-cov \
+    pytest-xdist \
+    pytest-benchmark \
+    locust
+
+# Switch back to non-root user
+USER storm
+
+# Run tests
+RUN python -m pytest tests/ -v --cov=. --cov-report=xml --cov-report=html
+
+# Default test command
+CMD ["python", "-m", "pytest", "tests/", "-v"]
+
+# ============================================================
+# Stage 5: Worker stage (for Celery workers)
+# ============================================================
+FROM production as worker
+
+# Install Celery and worker dependencies
+USER root
+RUN pip install --no-cache-dir celery[redis] flower
+
+USER storm
+
+# Health check for Celery worker
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD celery -A main.celery_app inspect ping || exit 1
+
+# Worker command
+CMD ["celery", "-A", "main.celery_app", "worker", "--loglevel=info", "--concurrency=2"]

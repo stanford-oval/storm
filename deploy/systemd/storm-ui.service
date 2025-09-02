@@ -1,0 +1,78 @@
+[Unit]
+Description=STORM UI Application Stack
+Documentation=https://github.com/stanford-oval/storm
+After=docker.service
+Requires=docker.service
+PartOf=multi-user.target
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=forking
+RemainAfterExit=yes
+WorkingDirectory=/opt/storm-ui
+User=storm
+Group=storm
+
+# Environment
+Environment=COMPOSE_PROJECT_NAME=storm-ui
+Environment=COMPOSE_FILE=docker-compose.yml
+Environment=DOCKER_CLIENT_TIMEOUT=120
+Environment=COMPOSE_HTTP_TIMEOUT=120
+
+# Start command
+ExecStartPre=-/usr/bin/docker-compose -f docker-compose.yml down
+ExecStartPre=/usr/bin/docker-compose -f docker-compose.yml pull --quiet
+ExecStart=/usr/bin/docker-compose -f docker-compose.yml up -d --remove-orphans
+ExecStartPost=/bin/bash -c 'timeout 60s bash -c "until curl -f http://localhost/health; do sleep 2; done"'
+
+# Stop command
+ExecStop=/usr/bin/docker-compose -f docker-compose.yml down
+ExecStopPost=-/usr/bin/docker system prune -f --filter "until=24h"
+
+# Reload command
+ExecReload=/usr/bin/docker-compose -f docker-compose.yml restart
+
+# Health check
+ExecReload=/bin/bash -c 'curl -f http://localhost/health || (echo "Health check failed, restarting..." && systemctl restart storm-ui)'
+
+# Security settings
+PrivateNetwork=false
+PrivateDevices=false
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/storm-ui
+NoNewPrivileges=true
+CapabilityBoundingSet=
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+LimitFSIZE=infinity
+LimitCORE=0
+LimitSTACK=8M
+MemoryAccounting=true
+MemoryMax=8G
+TasksMax=4096
+
+# Restart policy
+Restart=always
+RestartSec=10
+StartLimitInterval=60
+StartLimitBurst=3
+
+# Process management
+TimeoutStartSec=300
+TimeoutStopSec=120
+TimeoutAbortSec=30
+KillMode=mixed
+KillSignal=SIGTERM
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=storm-ui
+
+[Install]
+WantedBy=multi-user.target
+Alias=storm.service

@@ -1,0 +1,34 @@
+# FastAPI and server dependencies
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+
+# Data processing and validation
+pydantic==2.5.0
+python-frontmatter==1.0.0
+
+# Date and time utilities
+python-dateutil==2.8.2
+
+# File handling and utilities
+aiofiles==23.2.1
+pathlib2==2.3.7.post1
+
+# Background task processing
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+
+# STORM dependencies (assumed to be installed separately)
+# knowledge-storm should be installed from the parent directory
+# pip install -e ../
+
+# Development dependencies (optional)
+pytest==7.4.3
+pytest-asyncio==0.21.1
+httpx==0.25.2
+black==23.11.0
+isort==5.12.0
+mypy==1.7.1
+
+# Additional utilities
+typing-extensions==4.8.0

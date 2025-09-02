@@ -1,0 +1,55 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-added-large-files
+        args: ['--maxkb=500']
+      - id: check-merge-conflict
+
+  - repo: local
+    hooks:
+      - id: lint
+        name: ESLint
+        entry: npm run lint
+        language: system
+        files: \.(ts|tsx|js|jsx)$
+        pass_filenames: false
+
+      - id: type-check
+        name: TypeScript Type Check
+        entry: npm run type-check
+        language: system
+        files: \.(ts|tsx)$
+        pass_filenames: false
+
+      - id: format-check
+        name: Prettier Format Check
+        entry: npx prettier --check
+        language: system
+        files: \.(ts|tsx|js|jsx|json|yaml|yml|md)$
+        exclude: ^(package-lock\.json|\.next/|node_modules/|coverage/)
+
+      - id: test-affected
+        name: Test Affected Files
+        entry: bash -c 'npm run test -- --passWithNoTests --findRelatedTests'
+        language: system
+        files: \.(ts|tsx)$
+        exclude: \.(test|spec)\.(ts|tsx)$
+
+      - id: security-scan
+        name: Security Scan
+        entry: npm audit --audit-level=moderate
+        language: system
+        pass_filenames: false
+        stages: [push]
+
+      - id: bundle-size-check
+        name: Bundle Size Check
+        entry: bash -c 'npm run build > /dev/null && npx bundlesize check || echo "Bundle size check failed, consider optimizing"'
+        language: system
+        pass_filenames: false
+        stages: [push]

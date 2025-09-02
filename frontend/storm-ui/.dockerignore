@@ -1,0 +1,117 @@
+# Dependencies
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Next.js
+.next/
+out/
+.vercel/
+.cache/
+
+# Production build
+dist/
+build/
+
+# Development files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# Testing
+coverage/
+.nyc_output/
+*.lcov
+test-results/
+playwright-report/
+playwright/.cache/
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+.circleci/
+
+# Documentation
+README.md
+CHANGELOG.md
+CONTRIBUTING.md
+LICENSE
+*.md
+docs/
+
+# Storybook
+.storybook/
+storybook-static/
+chromatic-builds/
+
+# ESLint and Prettier
+.eslintcache
+.prettierrc
+.eslintrc.json
+.pre-commit-config.yaml
+
+# TypeScript
+*.tsbuildinfo
+tsconfig.json
+tsconfig.*.json
+
+# Jest
+jest.config.js
+jest.setup.js
+
+# Playwright
+playwright.config.ts
+e2e/
+
+# Husky
+.husky/
+
+# Lock files (we copy package-lock.json explicitly when needed)
+yarn.lock
+pnpm-lock.yaml
+
+# Environment and secrets
+.env*
+secrets.toml
+config/secrets/
+
+# Analytics and monitoring
+.next-bundle-analyzer/

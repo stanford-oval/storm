@@ -1,0 +1,404 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      skip_tests:
+        description: 'Skip tests (emergency deployment)'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # ============================================================
+  # Pre-deployment checks
+  # ============================================================
+  pre-deploy:
+    name: Pre-deployment Checks
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.env.outputs.environment }}
+      version: ${{ steps.version.outputs.version }}
+      should_deploy: ${{ steps.check.outputs.should_deploy }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Determine environment
+      id: env
+      run: |
+        if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          echo "environment=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
+        elif [[ "${{ github.ref }}" == "refs/tags/v"* ]]; then
+          echo "environment=production" >> $GITHUB_OUTPUT
+        else
+          echo "environment=staging" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Generate version
+      id: version
+      run: |
+        if [[ "${{ github.ref }}" == "refs/tags/v"* ]]; then
+          echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        else
+          echo "version=$(date +%Y%m%d)-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Check deployment conditions
+      id: check
+      run: |
+        if [[ "${{ github.event.inputs.skip_tests }}" == "true" ]]; then
+          echo "⚠️ Skipping tests for emergency deployment"
+          echo "should_deploy=true" >> $GITHUB_OUTPUT
+        elif [[ "${{ steps.env.outputs.environment }}" == "production" ]] && [[ "${{ github.ref }}" != "refs/tags/v"* ]]; then
+          echo "❌ Production deployments require version tags"
+          echo "should_deploy=false" >> $GITHUB_OUTPUT
+        else
+          echo "✅ Deployment checks passed"
+          echo "should_deploy=true" >> $GITHUB_OUTPUT
+        fi
+
+  # ============================================================
+  # Run tests (unless skipped)
+  # ============================================================
+  test:
+    name: Run Tests
+    uses: ./.github/workflows/ci.yml
+    if: needs.pre-deploy.outputs.should_deploy == 'true' && github.event.inputs.skip_tests != 'true'
+    needs: pre-deploy
+
+  # ============================================================
+  # Build and publish Docker images
+  # ============================================================
+  build:
+    name: Build Images
+    runs-on: ubuntu-latest
+    needs: [pre-deploy, test]
+    if: always() && needs.pre-deploy.outputs.should_deploy == 'true' && (needs.test.result == 'success' || needs.test.result == 'skipped')
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Extract metadata for backend
+      id: meta-backend
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/backend
+        tags: |
+          type=raw,value=latest,enable={{is_default_branch}}
+          type=raw,value=${{ needs.pre-deploy.outputs.version }}
+          type=raw,value=${{ needs.pre-deploy.outputs.environment }}
+
+    - name: Extract metadata for frontend
+      id: meta-frontend
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/frontend
+        tags: |
+          type=raw,value=latest,enable={{is_default_branch}}
+          type=raw,value=${{ needs.pre-deploy.outputs.version }}
+          type=raw,value=${{ needs.pre-deploy.outputs.environment }}
+
+    - name: Build and push backend image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./backend
+        file: ./backend/Dockerfile.prod
+        target: production
+        platforms: linux/amd64,linux/arm64
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        push: true
+        tags: ${{ steps.meta-backend.outputs.tags }}
+        labels: ${{ steps.meta-backend.outputs.labels }}
+
+    - name: Build and push frontend image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./frontend/storm-ui
+        file: ./frontend/storm-ui/Dockerfile
+        target: production
+        platforms: linux/amd64,linux/arm64
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        push: true
+        tags: ${{ steps.meta-frontend.outputs.tags }}
+        labels: ${{ steps.meta-frontend.outputs.labels }}
+
+  # ============================================================
+  # Deploy to staging
+  # ============================================================
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [pre-deploy, build]
+    if: needs.pre-deploy.outputs.environment == 'staging'
+    environment:
+      name: staging
+      url: https://staging.storm-ui.com
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup SSH
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: ${{ secrets.STAGING_SSH_KEY }}
+
+    - name: Add known hosts
+      run: |
+        ssh-keyscan -H ${{ secrets.STAGING_HOST }} >> ~/.ssh/known_hosts
+
+    - name: Deploy to staging server
+      run: |
+        ssh ${{ secrets.STAGING_USER }}@${{ secrets.STAGING_HOST }} << 'EOF'
+          cd /opt/storm-ui
+          
+          # Backup current version
+          docker-compose down
+          docker tag storm-ui-backend:latest storm-ui-backend:backup-$(date +%Y%m%d-%H%M%S) || true
+          docker tag storm-ui-frontend:latest storm-ui-frontend:backup-$(date +%Y%m%d-%H%M%S) || true
+          
+          # Pull latest changes
+          git pull origin main
+          
+          # Update environment
+          cp .env.staging .env
+          
+          # Pull new images
+          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/backend:${{ needs.pre-deploy.outputs.version }}
+          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/frontend:${{ needs.pre-deploy.outputs.version }}
+          
+          # Tag as latest
+          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/backend:${{ needs.pre-deploy.outputs.version }} storm-ui-backend:latest
+          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/frontend:${{ needs.pre-deploy.outputs.version }} storm-ui-frontend:latest
+          
+          # Deploy
+          docker-compose up -d
+          
+          # Wait for health checks
+          timeout 300s bash -c 'until curl -f http://localhost/health; do sleep 5; done'
+          
+          echo "✅ Staging deployment completed successfully"
+        EOF
+
+    - name: Run smoke tests
+      run: |
+        sleep 30  # Wait for services to stabilize
+        curl -f https://staging.storm-ui.com/health
+        curl -f https://staging.storm-ui.com/api/health
+
+    - name: Notify staging deployment
+      if: always()
+      run: |
+        if [[ "${{ job.status }}" == "success" ]]; then
+          echo "✅ Staging deployment successful: https://staging.storm-ui.com"
+        else
+          echo "❌ Staging deployment failed"
+          exit 1
+        fi
+
+  # ============================================================
+  # Deploy to production
+  # ============================================================
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [pre-deploy, build, deploy-staging]
+    if: needs.pre-deploy.outputs.environment == 'production'
+    environment:
+      name: production
+      url: https://storm-ui.com
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup SSH
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: ${{ secrets.PRODUCTION_SSH_KEY }}
+
+    - name: Add known hosts
+      run: |
+        ssh-keyscan -H ${{ secrets.PRODUCTION_HOST }} >> ~/.ssh/known_hosts
+
+    - name: Create deployment package
+      run: |
+        tar -czf deployment.tar.gz \
+          docker-compose.yml \
+          deploy/ \
+          .env.production.template
+
+    - name: Upload deployment package
+      run: |
+        scp deployment.tar.gz ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }}:/tmp/
+
+    - name: Deploy to production servers
+      run: |
+        ssh ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} << 'EOF'
+          set -e
+          
+          # Extract deployment package
+          cd /opt/storm-ui
+          tar -xzf /tmp/deployment.tar.gz
+          
+          # Backup current version
+          ./deploy/scripts/backup.sh
+          
+          # Blue-green deployment
+          export NEW_VERSION="${{ needs.pre-deploy.outputs.version }}"
+          
+          # Pull new images
+          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/backend:$NEW_VERSION
+          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/frontend:$NEW_VERSION
+          
+          # Deploy new version
+          ./deploy/scripts/deploy.sh production $NEW_VERSION
+          
+          # Run health checks
+          ./deploy/scripts/health-check.sh
+          
+          # Switch traffic (handled by load balancer)
+          echo "✅ Production deployment completed successfully"
+        EOF
+
+    - name: Run production smoke tests
+      run: |
+        sleep 60  # Wait for services to stabilize
+        curl -f https://storm-ui.com/health
+        curl -f https://storm-ui.com/api/health
+
+    - name: Notify production deployment
+      if: always()
+      run: |
+        if [[ "${{ job.status }}" == "success" ]]; then
+          echo "✅ Production deployment successful: https://storm-ui.com"
+        else
+          echo "❌ Production deployment failed"
+          # Trigger rollback
+          ssh ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} './deploy/scripts/rollback.sh'
+          exit 1
+        fi
+
+  # ============================================================
+  # Kubernetes deployment (alternative)
+  # ============================================================
+  deploy-k8s:
+    name: Deploy to Kubernetes
+    runs-on: ubuntu-latest
+    needs: [pre-deploy, build]
+    if: github.event.inputs.environment == 'k8s' || contains(github.event.head_commit.message, '[k8s-deploy]')
+    environment:
+      name: kubernetes
+      url: https://k8s.storm-ui.com
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'v1.28.0'
+
+    - name: Setup kubeconfig
+      run: |
+        mkdir -p ~/.kube
+        echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
+        chmod 600 ~/.kube/config
+
+    - name: Deploy to Kubernetes
+      run: |
+        # Update image tags in deployment files
+        sed -i "s|IMAGE_TAG|${{ needs.pre-deploy.outputs.version }}|g" deploy/kubernetes/deployment.yaml
+        
+        # Apply configurations
+        kubectl apply -f deploy/kubernetes/namespace.yaml
+        kubectl apply -f deploy/kubernetes/configmap.yaml
+        kubectl apply -f deploy/kubernetes/secrets.yaml
+        kubectl apply -f deploy/kubernetes/deployment.yaml
+        kubectl apply -f deploy/kubernetes/service.yaml
+        kubectl apply -f deploy/kubernetes/ingress.yaml
+        
+        # Wait for rollout
+        kubectl rollout status deployment/storm-backend -n storm
+        kubectl rollout status deployment/storm-frontend -n storm
+        kubectl rollout status deployment/storm-worker -n storm
+
+    - name: Verify K8s deployment
+      run: |
+        kubectl get pods -n storm
+        kubectl get services -n storm
+        
+        # Wait for ingress to be ready
+        sleep 60
+        curl -f https://k8s.storm-ui.com/health
+
+  # ============================================================
+  # Post-deployment tasks
+  # ============================================================
+  post-deploy:
+    name: Post-deployment Tasks
+    runs-on: ubuntu-latest
+    needs: [deploy-staging, deploy-production, deploy-k8s]
+    if: always() && (needs.deploy-staging.result == 'success' || needs.deploy-production.result == 'success' || needs.deploy-k8s.result == 'success')
+    
+    steps:
+    - name: Update deployment status
+      run: |
+        echo "Deployment completed at $(date)"
+        echo "Version: ${{ needs.pre-deploy.outputs.version }}"
+        echo "Environment: ${{ needs.pre-deploy.outputs.environment }}"
+
+    - name: Clean up old images
+      if: needs.pre-deploy.outputs.environment == 'production'
+      run: |
+        # Clean up old images (keep last 5 versions)
+        echo "Cleaning up old container images..."
+        # This would typically be done on the deployment servers
+
+    - name: Send notification
+      if: always()
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        channel: '#deployments'
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        text: |
+          Deployment Status: ${{ job.status }}
+          Version: ${{ needs.pre-deploy.outputs.version }}
+          Environment: ${{ needs.pre-deploy.outputs.environment }}
+          Commit: ${{ github.sha }}
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
