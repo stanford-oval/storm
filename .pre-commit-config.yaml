@@ -1,10 +1,20 @@
 repos:
   - repo: https://github.com/psf/black
-    rev: 24.8.0
+    rev: 25.1.0
     hooks:
       - id: black
-        name: Format Python code with black
-        entry: black
-        args: ["knowledge_storm/"]
-        language: python
-        pass_filenames: true
+        language_version: python3.11
+        args: [--line-length=88]
+        files: ^(knowledge_storm/.*\.py|backend/.*\.py)$
+  
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        files: ^(knowledge_storm/.*\.py|backend/.*\.py)$
+      - id: end-of-file-fixer
+        files: ^(knowledge_storm/.*\.py|backend/.*\.py)$
+      - id: check-yaml
+      - id: check-json
+      - id: check-added-large-files
+        args: ['--maxkb=1000']

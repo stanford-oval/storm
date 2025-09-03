@@ -278,7 +278,7 @@ class QdrantVectorStoreManager:
                 "\uff0c",  # Fullwidth comma
                 "\u3001",  # Ideographic comma
                 " ",
-                "\u200B",  # Zero-width space
+                "\u200b",  # Zero-width space
                 "",
             ],
         )
@@ -666,7 +666,7 @@ class WebPageHelper:
                 "\uff0c",  # Fullwidth comma
                 "\u3001",  # Ideographic comma
                 " ",
-                "\u200B",  # Zero-width space
+                "\u200b",  # Zero-width space
                 "",
             ],
         )
@@ -775,11 +775,11 @@ def purpose_appropriateness_check(user_input):
     )
 
     prompt = f"""
-    Here is a purpose input into a report generation engine that can create a long-form report on any topic of interest. 
-    Please judge whether the provided purpose is valid for using this service. 
+    Here is a purpose input into a report generation engine that can create a long-form report on any topic of interest.
+    Please judge whether the provided purpose is valid for using this service.
     Try to judge if given purpose is non-sense like random words or just try to get around the sanity check.
     You should not make the rule too strict.
-    
+
     If the purpose is valid, output "Yes."; otherwise, output "No" followed by reason.
     User input: {user_input}
     """

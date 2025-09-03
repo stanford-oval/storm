@@ -19,14 +19,15 @@ async def lifespan(app: FastAPI):
     """Application lifespan management."""
     # Startup: Initialize storage directories
     os.makedirs("storm-projects/projects", exist_ok=True)
-    
+
     # Create projects index if it doesn't exist
     projects_index = "storm-projects/projects.json"
     if not os.path.exists(projects_index):
         import json
-        with open(projects_index, 'w') as f:
+
+        with open(projects_index, "w") as f:
             json.dump({"projects": []}, f)
-    
+
     yield
     # Shutdown: Any cleanup if needed
 
@@ -38,7 +39,7 @@ app = FastAPI(
     docs_url="/api/docs",
     redoc_url="/api/redoc",
     openapi_url="/api/openapi.json",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 # CORS configuration for Next.js frontend
@@ -48,7 +49,7 @@ app.add_middleware(
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "http://localhost:3001",
-        "http://127.0.0.1:3001"
+        "http://127.0.0.1:3001",
     ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -67,7 +68,7 @@ async def health_check():
     return {
         "status": "healthy",
         "message": "STORM UI Backend is running",
-        "version": "1.0.0"
+        "version": "1.0.0",
     }
 
 
@@ -77,10 +78,11 @@ async def system_info():
     try:
         # Check if STORM is available
         import knowledge_storm
+
         storm_version = knowledge_storm.__version__
     except ImportError:
         storm_version = "not installed"
-    
+
     return {
         "storm_version": storm_version,
         "python_version": os.sys.version,
@@ -88,8 +90,8 @@ async def system_info():
         "features": {
             "file_storage": True,
             "storm_integration": storm_version != "not installed",
-            "background_tasks": True
-        }
+            "background_tasks": True,
+        },
     }
 
 
@@ -101,10 +103,5 @@ async def root():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(
-        "main:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=True,
-        log_level="info"
-    )
+
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True, log_level="info")
