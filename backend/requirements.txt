@@ -32,3 +32,5 @@ mypy==1.7.1
 
 # Additional utilities
 typing-extensions==4.8.0
+# Export functionality
+markdown2>=2.4.0  # For HTML export

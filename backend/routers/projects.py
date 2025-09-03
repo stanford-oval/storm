@@ -304,13 +304,17 @@ async def get_project_progress(project_id: str):
 
 @router.get("/{project_id}/export")
 async def export_project(
-    project_id: str, format: str = Query("markdown", regex="^(markdown|json)$")
+    project_id: str, format: str = Query("markdown", regex="^(markdown|json|html|pdf)$")
 ):
     """Export project content."""
     try:
         content = file_service.export_project(project_id, format)
 
         if content is None:
+            if format == "pdf":
+                raise HTTPException(
+                    status_code=501, detail="PDF export not yet implemented"
+                )
             raise HTTPException(
                 status_code=404, detail="Project not found or export failed"
             )
@@ -324,7 +328,13 @@ async def export_project(
         )
 
         # Return appropriate content type
-        media_type = "text/markdown" if format == "markdown" else "application/json"
+        media_types = {
+            "markdown": "text/markdown",
+            "json": "application/json",
+            "html": "text/html",
+            "pdf": "application/pdf",
+        }
+        media_type = media_types.get(format, "text/plain")
 
         return {
             "content": content,
@@ -396,8 +406,13 @@ async def get_projects_stats():
 
 
 @router.get("/{project_id}/conversations")
-async def get_project_conversations(project_id: str):
-    """Get project research conversations."""
+async def get_project_conversations(project_id: str, live: bool = Query(False)):
+    """Get project research conversations.
+
+    Args:
+        project_id: Project ID
+        live: If True, returns partial conversations during active research
+    """
     import json
     import os
     from pathlib import Path

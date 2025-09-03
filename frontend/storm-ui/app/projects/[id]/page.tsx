@@ -274,6 +274,44 @@ export default function ProjectDetailPage() {
     }
   };
 
+  const handleExport = async (format: 'markdown' | 'html' | 'json') => {
+    if (!project) return;
+    
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+      const response = await fetch(`${apiUrl}/projects/${project.id}/export?format=${format}`);
+      
+      if (!response.ok) {
+        throw new Error(`Export failed: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      
+      // Create blob and download
+      const blob = new Blob([data.content], { type: data.media_type });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = data.filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      
+      addNotification({
+        type: 'success',
+        title: 'Export Successful',
+        message: `Article exported as ${format.toUpperCase()}`,
+      });
+    } catch (error) {
+      addNotification({
+        type: 'error',
+        title: 'Export Failed',
+        message: error instanceof Error ? error.message : 'Failed to export article',
+      });
+    }
+  };
+
 
   if (loading) {
     return (
@@ -627,10 +665,28 @@ export default function ProjectDetailPage() {
                       <Badge variant="outline">
                         {project?.metadata?.word_count || 0} words
                       </Badge>
-                      <Button variant="outline" size="sm">
-                        <Download className="h-4 w-4 mr-2" />
-                        Export
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="outline" size="sm">
+                            <Download className="h-4 w-4 mr-2" />
+                            Export
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleExport('markdown')}>
+                            <FileText className="h-4 w-4 mr-2" />
+                            Markdown (.md)
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleExport('html')}>
+                            <FileText className="h-4 w-4 mr-2" />
+                            HTML (.html)
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleExport('json')}>
+                            <FileText className="h-4 w-4 mr-2" />
+                            JSON (.json)
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   )}
                 </div>
@@ -712,7 +768,15 @@ export default function ProjectDetailPage() {
           <TabsContent value="outline">
             <Card>
               <CardHeader>
-                <CardTitle>Article Outline</CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Article Outline</CardTitle>
+                  {isRunning && pipelineProgress?.stage === 'outline_generation' && (
+                    <Badge variant="default" className="animate-pulse">
+                      <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse mr-1" />
+                      Generating Outline
+                    </Badge>
+                  )}
+                </div>
               </CardHeader>
               <CardContent>
                 {project.outline ? (

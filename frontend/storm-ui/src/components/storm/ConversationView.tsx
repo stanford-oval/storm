@@ -52,23 +52,42 @@ export const ConversationView: React.FC<ConversationViewProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [expandedPerspectives, setExpandedPerspectives] = useState<Set<number>>(new Set([0]));
   const [selectedPerspective, setSelectedPerspective] = useState(0);
+  const [isLive, setIsLive] = useState(false);
 
   useEffect(() => {
     fetchConversations();
+    
+    // Set up polling for live updates during research
+    const pollInterval = setInterval(() => {
+      fetchConversations(true);
+    }, 3000); // Poll every 3 seconds
+    
+    return () => clearInterval(pollInterval);
   }, [projectId]);
 
-  const fetchConversations = async () => {
+  const fetchConversations = async (silent = false) => {
     try {
-      setLoading(true);
-      const response = await fetch(`http://localhost:8000/api/projects/${projectId}/conversations`);
+      if (!silent) setLoading(true);
+      const response = await fetch(`http://localhost:8000/api/projects/${projectId}/conversations?live=true`);
       if (!response.ok) throw new Error('Failed to fetch conversations');
       
       const data = await response.json();
-      setConversations(data.conversations || []);
+      const newConversations = data.conversations || [];
+      
+      // Check if we're getting live updates (conversations are being added)
+      if (newConversations.length > conversations.length) {
+        setIsLive(true);
+      } else if (data.status === 'completed') {
+        setIsLive(false);
+      }
+      
+      setConversations(newConversations);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load conversations');
+      if (!silent) {
+        setError(err instanceof Error ? err.message : 'Failed to load conversations');
+      }
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
@@ -148,6 +167,12 @@ export const ConversationView: React.FC<ConversationViewProps> = ({
               <CardTitle className="flex items-center gap-2">
                 <Sparkles className="h-5 w-5 text-primary" />
                 Multi-Perspective Research Conversations
+                {isLive && (
+                  <Badge variant="default" className="ml-2 animate-pulse">
+                    <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse mr-1" />
+                    Live Updates
+                  </Badge>
+                )}
               </CardTitle>
               <p className="text-sm text-muted-foreground">
                 {conversations.length} expert perspectives explored this topic through {
