@@ -6,12 +6,14 @@ import { PipelineProgress } from '@/components/storm/PipelineProgress';
 import { ConfigurationPanel } from '@/components/storm/ConfigurationPanel';
 import { ResearchView } from '@/components/storm/ResearchView';
 import { OutlineEditor } from '@/components/storm/OutlineEditor';
+import { ConversationView } from '@/components/storm/ConversationView';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Markdown } from '@/components/ui/markdown';
+import { Progress } from '@/components/ui/progress';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -68,8 +70,7 @@ export default function ProjectDetailPage() {
     cancelPipeline, 
     runningPipelines,
     getPipelineExecution,
-    updatePipelineProgress,
-    archivePipeline
+    updatePipelineProgress
   } = usePipelineStore();
   
   const { addNotification } = useNotificationStore();
@@ -77,17 +78,39 @@ export default function ProjectDetailPage() {
   const [activeTab, setActiveTab] = useState<string>('overview');
   const [isConfiguring, setIsConfiguring] = useState(false);
 
-  // Load project on mount
+  // Load project on mount and ensure fresh data
   useEffect(() => {
     if (projectId) {
-      loadProject(projectId);
+      // Force fresh load from backend
+      const loadFreshProject = async () => {
+        try {
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+          const response = await fetch(`${apiUrl}/projects/${projectId}`);
+          if (response.ok) {
+            const freshProject = await response.json();
+            // Update store with fresh data
+            const { setCurrentProject } = useProjectStore.getState();
+            setCurrentProject(freshProject);
+            
+            // The setCurrentProject method already updates the projects array
+          }
+        } catch (error) {
+          console.error('Error loading fresh project data:', error);
+          // Fall back to regular load
+          loadProject(projectId);
+        }
+      };
+      
+      loadFreshProject();
     }
-  }, [projectId, loadProject]);
+  }, [projectId]);
 
   const project = currentProject || projects?.find(p => p.id === projectId);
   const runningPipeline = Object.values(runningPipelines).find(p => p.projectId === projectId);
   const isRunning = !!runningPipeline;
-  const progress = runningPipeline?.progress?.overall || project?.progress || 0;
+  const pipelineProgress = runningPipeline?.progress;
+  
+  
 
   // Poll for pipeline progress updates
   useEffect(() => {
@@ -101,8 +124,8 @@ export default function ProjectDetailPage() {
           const status = await response.json();
           
           // Update progress in store if pipeline is running
-          if (status.is_running && status.progress) {
-            updatePipelineProgress(projectId, {
+          if (status.is_running && status.progress && runningPipeline) {
+            updatePipelineProgress(runningPipeline.id, {
               stage: status.progress.stage || 'running',
               stageProgress: status.progress.stage_progress || 0,
               overallProgress: status.progress.overall_progress || 0,
@@ -114,11 +137,26 @@ export default function ProjectDetailPage() {
           
           // If pipeline completed, reload the full project
           if (!status.is_running && runningPipeline) {
+            // Force reload the project to get updated data including word_count
             await loadProject(projectId);
-            // Archive the completed pipeline
-            if (runningPipeline.status !== 'running') {
-              archivePipeline(runningPipeline.id);
+            
+            // Also refresh from API directly to ensure we have latest data
+            try {
+              const projectResponse = await fetch(`http://localhost:8000/api/projects/${projectId}`);
+              if (projectResponse.ok) {
+                const updatedProject = await projectResponse.json();
+                // Update the project in the store with fresh data
+                const { setCurrentProject } = useProjectStore.getState();
+                setCurrentProject(updatedProject);
+              }
+            } catch (err) {
+              console.error('Error refreshing project data:', err);
             }
+            
+            // Update pipeline status to completed which will move it to history
+            // and remove it from runningPipelines
+            const { setPipelineStatus } = usePipelineStore.getState();
+            setPipelineStatus(runningPipeline.id, 'completed');
           }
         }
       } catch (error) {
@@ -133,7 +171,7 @@ export default function ProjectDetailPage() {
     const interval = setInterval(checkProgress, 2000);
     
     return () => clearInterval(interval);
-  }, [projectId, isRunning, runningPipeline, loadProject, updatePipelineProgress, archivePipeline]);
+  }, [projectId, isRunning, runningPipeline, loadProject, updatePipelineProgress]);
 
   // Handle pipeline actions
   const handleStartPipeline = async () => {
@@ -313,7 +351,11 @@ export default function ProjectDetailPage() {
                 Run Pipeline
               </Button>
             ) : (
-              <Button onClick={handleStopPipeline} variant="destructive">
+              <Button 
+                onClick={handleStopPipeline} 
+                variant="destructive"
+                disabled={runningPipeline?.status !== 'running'}
+              >
                 <Square className="h-4 w-4 mr-2" />
                 Stop Pipeline
               </Button>
@@ -360,15 +402,31 @@ export default function ProjectDetailPage() {
           </div>
         </div>
 
-        {/* Pipeline Progress */}
-        {(isRunning || progress) && (
+        {/* Pipeline Progress or Status */}
+        {(pipelineProgress || project?.status === 'completed') && (
           <Card>
             <CardContent className="pt-6">
-              <PipelineProgress
-                progress={progress!}
-                showDetails={true}
-                onCancel={isRunning ? handleStopPipeline : undefined}
-              />
+              {pipelineProgress ? (
+                <PipelineProgress
+                  progress={pipelineProgress}
+                  showDetails={true}
+                  onCancel={isRunning ? handleStopPipeline : undefined}
+                />
+              ) : (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold">Pipeline Status</h3>
+                    <Badge className="bg-green-500/10 text-green-600 border-green-500/20">
+                      <CheckCircle className="h-3 w-3 mr-1" />
+                      Completed
+                    </Badge>
+                  </div>
+                  <Progress value={100} className="h-2" />
+                  <div className="text-sm text-muted-foreground">
+                    Article generated successfully with {(project?.metadata?.word_count || 0).toLocaleString()} words
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         )}
@@ -457,7 +515,7 @@ export default function ProjectDetailPage() {
                   <CardContent className="space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Research</span>
-                      {project.config?.pipeline?.doResearch ? (
+                      {project.config?.do_research ? (
                         <CheckCircle className="h-4 w-4 text-green-500" />
                       ) : (
                         <div className="h-4 w-4 rounded-full bg-muted" />
@@ -465,7 +523,7 @@ export default function ProjectDetailPage() {
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Generate Outline</span>
-                      {project.config?.pipeline?.doGenerateOutline ? (
+                      {project.config?.do_generate_outline ? (
                         <CheckCircle className="h-4 w-4 text-green-500" />
                       ) : (
                         <div className="h-4 w-4 rounded-full bg-muted" />
@@ -473,7 +531,7 @@ export default function ProjectDetailPage() {
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Write Article</span>
-                      {project.config?.pipeline?.doGenerateArticle ? (
+                      {project.config?.do_generate_article ? (
                         <CheckCircle className="h-4 w-4 text-green-500" />
                       ) : (
                         <div className="h-4 w-4 rounded-full bg-muted" />
@@ -481,7 +539,7 @@ export default function ProjectDetailPage() {
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Polish Article</span>
-                      {project.config?.pipeline?.doPolishArticle ? (
+                      {project.config?.do_polish_article ? (
                         <CheckCircle className="h-4 w-4 text-green-500" />
                       ) : (
                         <div className="h-4 w-4 rounded-full bg-muted" />
@@ -499,19 +557,19 @@ export default function ProjectDetailPage() {
                     <div className="flex justify-between">
                       <span className="text-xs text-muted-foreground">Language Model</span>
                       <Badge variant="secondary" className="text-xs">
-                        {project.config?.llm?.model || 'Not configured'}
+                        {project.config?.llm_model || project.config?.llm?.model || 'Not configured'}
                       </Badge>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-xs text-muted-foreground">Provider</span>
                       <Badge variant="outline" className="text-xs">
-                        {project.config?.llm?.provider || 'Not configured'}
+                        {project.config?.llm_provider || project.config?.llm?.provider || 'Not configured'}
                       </Badge>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-xs text-muted-foreground">Retriever</span>
                       <Badge variant="outline" className="text-xs">
-                        {project.config?.retriever?.type || 'Not configured'}
+                        {project.config?.retriever_type || project.config?.retriever?.type || 'Not configured'}
                       </Badge>
                     </div>
                   </CardContent>
@@ -540,7 +598,7 @@ export default function ProjectDetailPage() {
                         <>
                           <div className="flex justify-between">
                             <span className="text-xs text-muted-foreground">Word Count</span>
-                            <span className="text-xs">{project.article.wordCount}</span>
+                            <span className="text-xs">{project?.metadata?.word_count || 0}</span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-xs text-muted-foreground">Sections</span>
@@ -562,12 +620,79 @@ export default function ProjectDetailPage() {
           <TabsContent value="article">
             <Card>
               <CardHeader>
-                <CardTitle>Generated Article</CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Generated Article</CardTitle>
+                  {project.content && (
+                    <div className="flex items-center space-x-2">
+                      <Badge variant="outline">
+                        {project?.metadata?.word_count || 0} words
+                      </Badge>
+                      <Button variant="outline" size="sm">
+                        <Download className="h-4 w-4 mr-2" />
+                        Export
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </CardHeader>
               <CardContent>
                 {project.content ? (
-                  <div className="max-w-none">
-                    <Markdown content={project.content} />
+                  <div className="space-y-6">
+                    <div className="max-w-none prose prose-gray dark:prose-invert">
+                      <Markdown content={project.contentWithLinks || project.content} />
+                    </div>
+                    {/* References section */}
+                    {project.references && Object.keys(project.references).length > 0 && (
+                      <div className="border-t pt-6">
+                        <h3 className="text-lg font-semibold mb-4">References</h3>
+                        <div className="space-y-3">
+                          {(() => {
+                            const urlToIndex = project.references.url_to_unified_index || {};
+                            const urlToInfo = project.references.url_to_info || {};
+                            
+                            // Create sorted list of references
+                            const references = Object.entries(urlToIndex)
+                              .map(([url, index]) => ({
+                                index: index as number,
+                                url,
+                                info: urlToInfo[url] || {}
+                              }))
+                              .sort((a, b) => a.index - b.index);
+                            
+                            if (references.length > 0) {
+                              return references.map(ref => (
+                                <div key={ref.index} className="border-l-2 border-muted pl-4 py-2">
+                                  <div className="flex items-start gap-2">
+                                    <span className="font-medium text-sm min-w-[2rem]">[{ref.index}]</span>
+                                    <div className="flex-1">
+                                      <a 
+                                        href={ref.url} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="text-sm text-blue-600 hover:underline break-words"
+                                      >
+                                        {ref.info.title || ref.url}
+                                      </a>
+                                      {ref.info.snippet && (
+                                        <p className="text-xs text-muted-foreground mt-1">
+                                          {ref.info.snippet.substring(0, 200)}{ref.info.snippet.length > 200 ? '...' : ''}
+                                        </p>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              ));
+                            } else {
+                              return (
+                                <p className="text-sm text-muted-foreground">
+                                  No reference details available.
+                                </p>
+                              );
+                            }
+                          })()}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="text-center py-8 text-muted-foreground">
@@ -581,58 +706,66 @@ export default function ProjectDetailPage() {
           </TabsContent>
 
           <TabsContent value="research">
-            {project.research ? (
-              <ResearchView
-                research={project.research}
-                showFilters={true}
-              />
-            ) : (
-              <Card>
-                <CardContent className="flex flex-col items-center justify-center py-12">
-                  <Search className="h-12 w-12 text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No Research Data</h3>
-                  <p className="text-muted-foreground text-center mb-4">
-                    Run the pipeline to start the research phase and gather information about your topic.
-                  </p>
-                  <Button onClick={handleStartPipeline}>
-                    <Play className="h-4 w-4 mr-2" />
-                    Start Research
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
+            <ConversationView projectId={params.id} />
           </TabsContent>
 
           <TabsContent value="outline">
-            {project.outline ? (
-              <OutlineEditor
-                outline={project.outline}
-                onChange={async (outline) => {
-                  await updateProject({ id: project.id, outline });
-                }}
-                onSave={async () => {
-                  addNotification({
-                    type: 'success',
-                    title: 'Outline Saved',
-                    message: 'Article outline has been updated',
-                  });
-                }}
-              />
-            ) : (
-              <Card>
-                <CardContent className="flex flex-col items-center justify-center py-12">
-                  <Brain className="h-12 w-12 text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No Outline Available</h3>
-                  <p className="text-muted-foreground text-center mb-4">
-                    Complete the research phase and run outline generation to create the article structure.
-                  </p>
-                  <Button onClick={handleStartPipeline} disabled={!project.research}>
-                    <Play className="h-4 w-4 mr-2" />
-                    Generate Outline
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
+            <Card>
+              <CardHeader>
+                <CardTitle>Article Outline</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {project.outline ? (
+                  <OutlineEditor
+                    outline={project.outline}
+                    onChange={async (outline) => {
+                      await updateProject({ id: project.id, outline });
+                    }}
+                    onSave={async () => {
+                      addNotification({
+                        type: 'success',
+                        title: 'Outline Saved',
+                        message: 'Article outline has been updated',
+                      });
+                    }}
+                  />
+                ) : project.status === 'completed' && project.content ? (
+                  <div className="space-y-4">
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Article structure extracted from the generated content:
+                    </p>
+                    <div className="space-y-2">
+                      {project.content.split('\n').filter(line => line.startsWith('#')).map((heading, index) => {
+                        const level = heading.match(/^#+/)?.[0].length || 1;
+                        const text = heading.replace(/^#+\s*/, '');
+                        return (
+                          <div 
+                            key={index} 
+                            className="flex items-center space-x-2 py-1"
+                            style={{ paddingLeft: `${(level - 1) * 1.5}rem` }}
+                          >
+                            <div className="h-1.5 w-1.5 rounded-full bg-primary/50" />
+                            <span className="text-sm">{text}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-12">
+                    <Brain className="h-12 w-12 text-muted-foreground mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">No Outline Available</h3>
+                    <p className="text-muted-foreground text-center mb-4">
+                      Complete the research phase and run outline generation to create the article structure.
+                    </p>
+                    <Button onClick={handleStartPipeline} disabled={!project.research}>
+                      <Play className="h-4 w-4 mr-2" />
+                      Generate Outline
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="settings">

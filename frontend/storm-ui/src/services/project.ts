@@ -13,7 +13,7 @@ import {
 import { createProjectWebSocket } from '../lib/websocket';
 
 export class ProjectService extends BaseApiService {
-  private readonly basePath = '/v1/projects';
+  private readonly basePath = '/api/projects';
 
   /**
    * Get all projects with optional filtering and pagination
@@ -98,7 +98,7 @@ export class ProjectService extends BaseApiService {
    */
   async duplicateProject(request: DuplicateProjectRequest): Promise<ApiResponse<StormProject>> {
     return this.post<StormProject>(`${this.basePath}/${request.projectId}/duplicate`, {
-      title: request.title,
+      new_title: request.title,
       description: request.description
     });
   }

@@ -143,9 +143,9 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
               <span>No configuration</span>
             )}
           </div>
-          {(project.article?.wordCount || project.word_count) ? (
+          {project.word_count ? (
             <span className="text-xs text-muted-foreground">
-              {(project.article?.wordCount || project.word_count || 0).toLocaleString()} words
+              {(project.word_count || 0).toLocaleString()} words
             </span>
           ) : null}
         </div>

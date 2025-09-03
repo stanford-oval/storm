@@ -42,7 +42,7 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
   allowSaveWithoutChanges = false,
 }) => {
   // Initialize config with environment variables if API keys are not set
-  const initializeConfig = (baseConfig: StormConfig): StormConfig => {
+  const initializeConfig = React.useCallback((baseConfig: StormConfig): StormConfig => {
     // Ensure config has proper structure with defaults
     const newConfig: StormConfig = {
       llm: baseConfig?.llm || {
@@ -65,25 +65,12 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
       }
     };
     
-    console.log('🔧 Initializing config:', {
-      llmProvider: newConfig.llm.provider,
-      retrieverType: newConfig.retriever.type,
-      hasLlmApiKey: !!newConfig.llm.apiKey,
-      hasRetrieverApiKey: !!newConfig.retriever.apiKey
-    });
-    
     // Auto-fill LLM API key from environment if not set
     if (!newConfig.llm.apiKey) {
       const llmConfig = getLLMConfig(newConfig.llm.provider);
-      console.log('📝 LLM Config from environment:', llmConfig ? {
-        provider: llmConfig.provider,
-        hasApiKey: !!llmConfig.apiKey,
-        apiKeyPreview: llmConfig.apiKey ? `${llmConfig.apiKey.substring(0, 10)}...` : 'NOT SET'
-      } : 'NOT FOUND');
       
       if (llmConfig?.apiKey) {
         newConfig.llm.apiKey = llmConfig.apiKey;
-        console.log('✅ Set LLM API key from environment');
       }
       if (llmConfig?.baseUrl) {
         newConfig.llm.baseUrl = llmConfig.baseUrl;
@@ -93,29 +80,47 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
     // Auto-fill retriever API key from environment if not set
     if (!newConfig.retriever.apiKey && newConfig.retriever.type !== 'duckduckgo') {
       const retrieverConfig = getRetrieverConfig(newConfig.retriever.type);
-      console.log('📝 Retriever Config from environment:', retrieverConfig ? {
-        type: retrieverConfig.type,
-        hasApiKey: !!retrieverConfig.apiKey,
-        apiKeyPreview: retrieverConfig.apiKey ? `${retrieverConfig.apiKey.substring(0, 10)}...` : 'NOT SET'
-      } : 'NOT FOUND');
       
       if (retrieverConfig?.apiKey) {
         newConfig.retriever.apiKey = retrieverConfig.apiKey;
-        console.log('✅ Set Retriever API key from environment');
       }
     }
     
-    console.log('🎯 Final config state:', {
-      hasLlmApiKey: !!newConfig.llm.apiKey,
-      hasRetrieverApiKey: !!newConfig.retriever.apiKey
-    });
-    
     return newConfig;
-  };
+  }, []);
   
   const [localConfig, setLocalConfig] = React.useState<StormConfig>(() => initializeConfig(config));
   const [showApiKeys, setShowApiKeys] = React.useState(false);
   const [hasChanges, setHasChanges] = React.useState(false);
+
+  // Log configuration details after mount to avoid setState during render
+  React.useEffect(() => {
+    console.log('🔧 Initializing config:', {
+      llmProvider: localConfig.llm.provider,
+      retrieverType: localConfig.retriever.type,
+      hasLlmApiKey: !!localConfig.llm.apiKey,
+      hasRetrieverApiKey: !!localConfig.retriever.apiKey
+    });
+    
+    const llmConfig = getLLMConfig(localConfig.llm.provider);
+    console.log('📝 LLM Config from environment:', llmConfig ? {
+      provider: llmConfig.provider,
+      hasApiKey: !!llmConfig.apiKey,
+      apiKeyPreview: llmConfig.apiKey ? `${llmConfig.apiKey.substring(0, 10)}...` : 'NOT SET'
+    } : 'NOT FOUND');
+    
+    const retrieverConfig = getRetrieverConfig(localConfig.retriever.type);
+    console.log('📝 Retriever Config from environment:', retrieverConfig ? {
+      type: retrieverConfig.type,
+      hasApiKey: !!retrieverConfig.apiKey,
+      apiKeyPreview: retrieverConfig.apiKey ? `${retrieverConfig.apiKey.substring(0, 10)}...` : 'NOT SET'
+    } : 'NOT FOUND');
+    
+    console.log('🎯 Final config state:', {
+      hasLlmApiKey: !!localConfig.llm.apiKey,
+      hasRetrieverApiKey: !!localConfig.retriever.apiKey
+    });
+  }, []); // Run only once on mount
 
   // Track changes
   React.useEffect(() => {

@@ -128,7 +128,7 @@ export const ResponsiveContainer = forwardRef<HTMLDivElement, ResponsiveContaine
 }, ref) => {
   const breakpoint = useBreakpoint();
   
-  // Get responsive values
+  // Always call all hooks to maintain consistent order
   const currentPadding = useBreakpointValue(padding || {});
   const currentMargin = useBreakpointValue(margin || {});
   const currentMaxWidth = useBreakpointValue(maxWidth || {});
@@ -138,11 +138,12 @@ export const ResponsiveContainer = forwardRef<HTMLDivElement, ResponsiveContaine
   const currentDirection = useBreakpointValue(direction || {});
   const currentJustify = useBreakpointValue(justify || {});
   const currentAlign = useBreakpointValue(align || {});
+  const responsiveClassName = useBreakpointValue(typeof className === 'object' ? className : {});
   
   // Handle responsive className
   const currentClassName = typeof className === 'string' 
     ? className 
-    : useBreakpointValue(className || {});
+    : responsiveClassName;
 
   // Build styles object
   const styles: React.CSSProperties = {

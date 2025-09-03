@@ -24,6 +24,8 @@ export const PipelineProgress: React.FC<PipelineProgressProps> = ({
 
   // Update elapsed time every second
   React.useEffect(() => {
+    if (!progress.startTime) return;
+    
     const interval = setInterval(() => {
       const elapsed = Date.now() - new Date(progress.startTime).getTime();
       setElapsedTime(elapsed);
@@ -108,10 +110,10 @@ export const PipelineProgress: React.FC<PipelineProgressProps> = ({
           <div className="flex items-center justify-between text-sm">
             <span className="font-medium">Overall Progress</span>
             <span className="text-muted-foreground">
-              {Math.round(progress.overallProgress)}%
+              {Math.round(progress.overallProgress || 0)}%
             </span>
           </div>
-          <Progress value={progress.overallProgress} className="h-2" />
+          <Progress value={progress.overallProgress || 0} className="h-2" />
           {estimatedTimeRemaining && (
             <div className="text-xs text-muted-foreground text-right">
               Est. {formatDuration(estimatedTimeRemaining)} remaining
@@ -133,10 +135,10 @@ export const PipelineProgress: React.FC<PipelineProgressProps> = ({
             <div className="flex items-center justify-between text-sm">
               <span className="font-medium">Stage Progress</span>
               <span className="text-muted-foreground">
-                {Math.round(progress.stageProgress)}%
+                {Math.round(progress.stageProgress || 0)}%
               </span>
             </div>
-            <Progress value={progress.stageProgress} className="h-1.5" />
+            <Progress value={progress.stageProgress || 0} className="h-1.5" />
           </div>
         )}
 

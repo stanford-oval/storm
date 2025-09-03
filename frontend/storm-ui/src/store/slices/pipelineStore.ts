@@ -166,6 +166,12 @@ export const usePipelineStore = create<PipelineStore>()(
           },
 
           pausePipeline: async (pipelineId) => {
+            // Guard against undefined pipelineId
+            if (!pipelineId) {
+              console.warn('pausePipeline called with undefined pipelineId');
+              return;
+            }
+            
             try {
               const response = await fetch(`/api/pipeline/${pipelineId}/pause`, {
                 method: 'POST',
@@ -191,6 +197,12 @@ export const usePipelineStore = create<PipelineStore>()(
           },
 
           resumePipeline: async (pipelineId) => {
+            // Guard against undefined pipelineId
+            if (!pipelineId) {
+              console.warn('resumePipeline called with undefined pipelineId');
+              return;
+            }
+            
             try {
               const response = await fetch(`/api/pipeline/${pipelineId}/resume`, {
                 method: 'POST',
@@ -216,6 +228,12 @@ export const usePipelineStore = create<PipelineStore>()(
           },
 
           cancelPipeline: async (pipelineId) => {
+            // Guard against undefined pipelineId
+            if (!pipelineId) {
+              console.warn('cancelPipeline called with undefined pipelineId');
+              return;
+            }
+            
             try {
               const response = await fetch(`/api/pipeline/${pipelineId}/cancel`, {
                 method: 'POST',

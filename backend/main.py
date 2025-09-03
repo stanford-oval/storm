@@ -11,7 +11,7 @@ from fastapi.responses import FileResponse
 import os
 from contextlib import asynccontextmanager
 
-from routers import projects, pipeline
+from routers import projects, pipeline, docs
 
 
 @asynccontextmanager
@@ -58,6 +58,7 @@ app.add_middleware(
 # Include routers with API prefix
 app.include_router(projects.router, prefix="/api/projects", tags=["projects"])
 app.include_router(pipeline.router, prefix="/api/pipeline", tags=["pipeline"])
+app.include_router(docs.router, tags=["documentation"])
 
 
 @app.get("/api/health")

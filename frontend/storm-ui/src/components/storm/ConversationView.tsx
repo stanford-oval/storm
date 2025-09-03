@@ -1,0 +1,313 @@
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
+import { 
+  User, 
+  Bot, 
+  Search, 
+  MessageCircle, 
+  ChevronDown, 
+  ChevronRight,
+  Globe,
+  FileText,
+  Sparkles,
+  Users
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+interface SearchResult {
+  url: string;
+  title: string;
+  description: string;
+  snippets: string[];
+}
+
+interface DialogueTurn {
+  user_utterance: string;
+  agent_utterance: string;
+  search_queries: string[];
+  search_results: SearchResult[];
+}
+
+interface Conversation {
+  perspective: string;
+  dlg_turns: DialogueTurn[];
+}
+
+interface ConversationViewProps {
+  projectId: string;
+  className?: string;
+}
+
+export const ConversationView: React.FC<ConversationViewProps> = ({ 
+  projectId, 
+  className 
+}) => {
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [expandedPerspectives, setExpandedPerspectives] = useState<Set<number>>(new Set([0]));
+  const [selectedPerspective, setSelectedPerspective] = useState(0);
+
+  useEffect(() => {
+    fetchConversations();
+  }, [projectId]);
+
+  const fetchConversations = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`http://localhost:8000/api/projects/${projectId}/conversations`);
+      if (!response.ok) throw new Error('Failed to fetch conversations');
+      
+      const data = await response.json();
+      setConversations(data.conversations || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load conversations');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const togglePerspective = (index: number) => {
+    const newExpanded = new Set(expandedPerspectives);
+    if (newExpanded.has(index)) {
+      newExpanded.delete(index);
+    } else {
+      newExpanded.add(index);
+    }
+    setExpandedPerspectives(newExpanded);
+  };
+
+  const extractPerspectiveName = (perspective: string) => {
+    const colonIndex = perspective.indexOf(':');
+    return colonIndex > -1 ? perspective.substring(0, colonIndex) : perspective;
+  };
+
+  const extractPerspectiveDescription = (perspective: string) => {
+    const colonIndex = perspective.indexOf(':');
+    return colonIndex > -1 ? perspective.substring(colonIndex + 1).trim() : '';
+  };
+
+  if (loading) {
+    return (
+      <Card className={className}>
+        <CardContent className="flex items-center justify-center py-12">
+          <div className="space-y-4 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto" />
+            <p className="text-sm text-muted-foreground">Loading research conversations...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className={className}>
+        <CardContent className="flex items-center justify-center py-12">
+          <div className="text-center space-y-2">
+            <p className="text-sm text-destructive">{error}</p>
+            <Button onClick={fetchConversations} variant="outline" size="sm">
+              Retry
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!conversations || conversations.length === 0) {
+    return (
+      <Card className={className}>
+        <CardContent className="flex items-center justify-center py-12">
+          <div className="text-center space-y-4">
+            <Users className="h-12 w-12 text-muted-foreground mx-auto" />
+            <div className="space-y-2">
+              <p className="text-sm font-medium">No Research Conversations</p>
+              <p className="text-xs text-muted-foreground">
+                Conversations will appear here once the research phase begins
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className={cn("space-y-4", className)}>
+      {/* Header */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <CardTitle className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-primary" />
+                Multi-Perspective Research Conversations
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                {conversations.length} expert perspectives explored this topic through {
+                  conversations.reduce((acc, conv) => acc + conv.dlg_turns.length, 0)
+                } dialogue turns
+              </p>
+            </div>
+            <Badge variant="secondary" className="text-xs">
+              <MessageCircle className="h-3 w-3 mr-1" />
+              {conversations.reduce((acc, conv) => acc + conv.dlg_turns.length, 0)} Exchanges
+            </Badge>
+          </div>
+        </CardHeader>
+      </Card>
+
+      {/* Conversations */}
+      <Tabs defaultValue="0" className="w-full">
+        <TabsList className="grid w-full" style={{ gridTemplateColumns: `repeat(${Math.min(conversations.length, 4)}, 1fr)` }}>
+          {conversations.slice(0, 4).map((conv, index) => (
+            <TabsTrigger key={index} value={index.toString()} className="text-xs">
+              {extractPerspectiveName(conv.perspective)}
+            </TabsTrigger>
+          ))}
+          {conversations.length > 4 && (
+            <TabsTrigger value="more" className="text-xs">
+              +{conversations.length - 4} more
+            </TabsTrigger>
+          )}
+        </TabsList>
+
+        {conversations.map((conversation, convIndex) => (
+          <TabsContent key={convIndex} value={convIndex.toString()} className="space-y-4">
+            <Card>
+              <CardHeader>
+                <div className="space-y-2">
+                  <div className="flex items-start justify-between">
+                    <div className="space-y-1 flex-1">
+                      <h3 className="font-semibold text-lg flex items-center gap-2">
+                        <Bot className="h-5 w-5 text-primary" />
+                        {extractPerspectiveName(conversation.perspective)}
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        {extractPerspectiveDescription(conversation.perspective)}
+                      </p>
+                    </div>
+                    <Badge variant="outline" className="ml-4">
+                      {conversation.dlg_turns.length} turns
+                    </Badge>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <ScrollArea className="h-[600px] pr-4">
+                  <div className="space-y-6">
+                    {conversation.dlg_turns.map((turn, turnIndex) => (
+                      <div key={turnIndex} className="space-y-4">
+                        {/* Question */}
+                        <div className="flex gap-3">
+                          <div className="mt-1">
+                            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                              <User className="h-4 w-4 text-primary" />
+                            </div>
+                          </div>
+                          <div className="flex-1 space-y-2">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-medium">Question</span>
+                              <Badge variant="secondary" className="text-xs">Turn {turnIndex + 1}</Badge>
+                            </div>
+                            <div className="bg-muted/30 rounded-lg p-3">
+                              <p className="text-sm">{turn.user_utterance}</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Search Queries */}
+                        {turn.search_queries && turn.search_queries.length > 0 && (
+                          <div className="ml-11 space-y-2">
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                              <Search className="h-3 w-3" />
+                              <span>Search Queries Used:</span>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                              {turn.search_queries.map((query, qIndex) => (
+                                <Badge key={qIndex} variant="outline" className="text-xs">
+                                  {query}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Response */}
+                        <div className="flex gap-3">
+                          <div className="mt-1">
+                            <div className="h-8 w-8 rounded-full bg-secondary flex items-center justify-center">
+                              <Bot className="h-4 w-4" />
+                            </div>
+                          </div>
+                          <div className="flex-1 space-y-2">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-medium">Response</span>
+                              {turn.search_results && turn.search_results.length > 0 && (
+                                <Badge variant="outline" className="text-xs">
+                                  <Globe className="h-3 w-3 mr-1" />
+                                  {turn.search_results.length} sources
+                                </Badge>
+                              )}
+                            </div>
+                            <div className="bg-secondary/30 rounded-lg p-3">
+                              <p className="text-sm whitespace-pre-wrap">{turn.agent_utterance}</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Sources */}
+                        {turn.search_results && turn.search_results.length > 0 && (
+                          <div className="ml-11 space-y-2">
+                            <details className="group">
+                              <summary className="cursor-pointer flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors">
+                                <ChevronRight className="h-3 w-3 group-open:rotate-90 transition-transform" />
+                                <FileText className="h-3 w-3" />
+                                <span>View {turn.search_results.length} sources used</span>
+                              </summary>
+                              <div className="mt-3 space-y-2 pl-5">
+                                {turn.search_results.slice(0, 5).map((result, rIndex) => (
+                                  <div key={rIndex} className="border-l-2 border-muted pl-3 py-1">
+                                    <a 
+                                      href={result.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-xs text-blue-600 hover:underline block truncate"
+                                    >
+                                      {result.title || result.url}
+                                    </a>
+                                    {result.snippets && result.snippets[0] && (
+                                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                                        {result.snippets[0]}
+                                      </p>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            </details>
+                          </div>
+                        )}
+
+                        {turnIndex < conversation.dlg_turns.length - 1 && (
+                          <Separator className="my-6" />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        ))}
+      </Tabs>
+    </div>
+  );
+};
+
+export default ConversationView;

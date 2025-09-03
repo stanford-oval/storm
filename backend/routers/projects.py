@@ -44,10 +44,14 @@ class ProjectResponse(BaseModel):
     title: str
     topic: str
     status: str
-    progress: float
+    progress: Optional[Dict[str, Any]] = None
     word_count: int
     created_at: str
     updated_at: str
+    createdAt: Optional[str] = None
+    updatedAt: Optional[str] = None
+    config: Optional[Dict[str, Any]] = None
+    description: Optional[str] = None
     tags: List[str]
     current_stage: str
     pipeline_status: str
@@ -61,9 +65,13 @@ class ProjectDetailResponse(BaseModel):
     status: str
     description: Optional[str] = None
     content: str
+    contentWithLinks: Optional[str] = None
+    references: Optional[Dict[str, Any]] = None
     metadata: Dict[str, Any]
     config: Dict[str, Any]
     progress: Dict[str, Any]
+    createdAt: Optional[str] = None
+    updatedAt: Optional[str] = None
 
 
 class PaginatedProjectResponse(BaseModel):
@@ -356,3 +364,64 @@ async def get_projects_stats():
     except Exception as e:
         logger.error(f"Error getting projects stats: {e}")
         raise HTTPException(status_code=500, detail="Failed to get project statistics")
+
+
+@router.get("/{project_id}/conversations")
+async def get_project_conversations(project_id: str):
+    """Get project research conversations."""
+    import json
+    import os
+    from pathlib import Path
+    
+    try:
+        # Get project to ensure it exists
+        project = file_service.get_project_summary(project_id)
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
+        # Look for conversation log in various possible locations
+        project_path = Path(file_service._get_project_path(project_id))
+        
+        # Try to find conversation log in subdirectories
+        conversation_file = None
+        possible_paths = [
+            project_path / "conversation_log.json",
+            # Also check in topic-named subdirectories
+        ]
+        
+        # Check subdirectories for conversation logs
+        for item in project_path.iterdir():
+            if item.is_dir():
+                conv_path = item / "conversation_log.json"
+                if conv_path.exists():
+                    conversation_file = conv_path
+                    break
+        
+        # Try direct path if not found in subdirs
+        if not conversation_file:
+            for path in possible_paths:
+                if path.exists():
+                    conversation_file = path
+                    break
+        
+        if not conversation_file or not conversation_file.exists():
+            return {
+                "conversations": [],
+                "message": "No conversation data available for this project"
+            }
+        
+        # Load and return conversation data
+        with open(conversation_file, 'r', encoding='utf-8') as f:
+            conversations = json.load(f)
+        
+        return {
+            "project_id": project_id,
+            "conversations": conversations,
+            "conversation_count": len(conversations) if isinstance(conversations, list) else 0
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting project conversations {project_id}: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get project conversations")

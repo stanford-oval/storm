@@ -19,6 +19,7 @@ import { useProjectStore, useUIStore, usePipelineStore } from '@/store';
 import { StormProject, ProjectStatus } from '@/types/storm';
 import { AnimatedPage } from '@/utils/animations/AnimatedPage';
 import { ResponsiveContainer } from '@/components/ux/ResponsiveContainer';
+import { RecentActivity } from '@/components/storm/RecentActivity';
 import { 
   Plus, 
   Search, 
@@ -145,7 +146,7 @@ export default function ProjectsPage() {
   };
 
   const handleDuplicateProject = async (project: StormProject) => {
-    await duplicateProject(project.id, `${project.title} (Copy)`);
+    await duplicateProject(project);
   };
 
   const handleCreateProject = () => {
@@ -294,11 +295,13 @@ export default function ProjectsPage() {
 
         <Separator />
 
-        {/* Projects Grid */}
-        <div className="space-y-4">
+        {/* Main Content with Recent Activity */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Projects Grid */}
+          <div className="lg:col-span-2 space-y-4">
           {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {Array.from({ length: 6 }).map((_, i) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="loading-skeleton h-48 rounded-lg" />
               ))}
             </div>
@@ -322,7 +325,7 @@ export default function ProjectsPage() {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filteredProjects.map((project) => (
                 <ProjectCard
                   key={project.id}
@@ -335,6 +338,12 @@ export default function ProjectsPage() {
               ))}
             </div>
           )}
+          </div>
+
+          {/* Recent Activity Sidebar */}
+          <div className="lg:col-span-1">
+            <RecentActivity maxItems={8} />
+          </div>
         </div>
 
         {/* Bulk Actions */}

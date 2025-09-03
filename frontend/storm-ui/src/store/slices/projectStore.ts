@@ -255,14 +255,38 @@ export const useProjectStore = create<ProjectStore>()(
           },
 
           duplicateProject: async (project) => {
-            const duplicateData: CreateProjectFormData = {
-              title: `${project.title} (Copy)`,
-              topic: project.topic,
-              description: project.description,
-              config: project.config,
-            };
+            try {
+              const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+              
+              const response = await fetch(`${apiUrl}/projects/${project.id}/duplicate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  new_title: `${project.title} (Copy)`,
+                }),
+              });
 
-            return get().createProject(duplicateData);
+              if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'Failed to duplicate project');
+              }
+
+              const duplicatedProject = await response.json();
+              
+              // Add the duplicated project to the list
+              set((draft) => {
+                draft.projects.unshift(duplicatedProject);
+                draft.lastUpdated = new Date();
+              }, 'duplicateProject:success');
+
+              return duplicatedProject;
+            } catch (error) {
+              console.error('Error duplicating project:', error);
+              set((draft) => {
+                draft.error = error instanceof Error ? error.message : 'Failed to duplicate project';
+              }, 'duplicateProject:error');
+              throw error;
+            }
           },
 
           archiveProject: async (projectId) => {
@@ -369,6 +393,11 @@ export const useProjectStore = create<ProjectStore>()(
             set((draft) => {
               draft.currentProject = project;
               if (project) {
+                // Also update the project in the projects array
+                const index = draft.projects.findIndex(p => p.id === project.id);
+                if (index !== -1) {
+                  draft.projects[index] = project;
+                }
                 get().addToRecentProjects(project.id);
               }
             }, 'setCurrentProject');

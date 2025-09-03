@@ -9,6 +9,7 @@ import os
 import json
 import frontmatter
 import shutil
+import re
 from pathlib import Path
 from datetime import datetime
 from typing import List, Optional, Dict, Any
@@ -257,6 +258,7 @@ class FileProjectService:
             return None
         
         progress = self._load_project_progress(project_id)
+        config = self._load_project_config(project_id)
         
         # Count words in content
         word_count = len(post.content.split()) if post.content else 0
@@ -270,15 +272,47 @@ class FileProjectService:
         if isinstance(updated_at, datetime):
             updated_at = updated_at.isoformat()
         
+        # Extract description from content if not in metadata
+        description = post.metadata.get("description", "")
+        if not description and post.content:
+            # Get first paragraph after title as description
+            lines = post.content.split('\n')
+            for line in lines:
+                if line.strip() and not line.startswith('#'):
+                    description = line.strip()[:200]
+                    break
+        
+        # Prepare config for frontend
+        config_dict = {
+            "llm": {
+                "provider": config.llm_provider,
+                "model": config.llm_model
+            },
+            "retriever": {
+                "type": config.retriever_type
+            }
+        }
+        
+        # Prepare progress data for frontend
+        progress_dict = {
+            "overallProgress": progress.overall_progress,
+            "currentTask": progress.current_task,
+            "stage": progress.stage
+        } if progress else None
+        
         return {
             "id": project_id,
             "title": post.metadata.get("title", "Untitled"),
             "topic": post.metadata.get("topic", ""),
             "status": post.metadata.get("status", "draft"),
-            "progress": progress.overall_progress,
+            "description": description,
+            "progress": progress_dict,
             "word_count": word_count,
             "created_at": created_at,
             "updated_at": updated_at,
+            "createdAt": created_at,  # Add camelCase version for frontend
+            "updatedAt": updated_at,  # Add camelCase version for frontend
+            "config": config_dict,  # Include config for display
             "tags": post.metadata.get("tags", []),
             "current_stage": progress.stage,
             "pipeline_status": progress.status
@@ -292,6 +326,26 @@ class FileProjectService:
         
         config = self._load_project_config(project_id)
         progress = self._load_project_progress(project_id)
+        references = self._load_project_references(project_id)
+        
+        # Convert datetime in metadata to ISO strings
+        metadata = dict(post.metadata)
+        if "created_at" in metadata and isinstance(metadata["created_at"], datetime):
+            metadata["created_at"] = metadata["created_at"].isoformat()
+        if "updated_at" in metadata and isinstance(metadata["updated_at"], datetime):
+            metadata["updated_at"] = metadata["updated_at"].isoformat()
+        
+        # Add camelCase versions for frontend compatibility
+        metadata["createdAt"] = metadata.get("created_at")
+        metadata["updatedAt"] = metadata.get("updated_at")
+        
+        # Add clickable links to content if references exist
+        content_with_links = post.content
+        if references:
+            content_with_links = self._add_inline_citation_links(post.content, references)
+        
+        # Calculate word count
+        word_count = len(post.content.split()) if post.content else 0
         
         return {
             "id": project_id,
@@ -300,9 +354,14 @@ class FileProjectService:
             "status": post.metadata.get("status", "draft"),
             "description": post.metadata.get("description", ""),
             "content": post.content,
-            "metadata": post.metadata,
+            "contentWithLinks": content_with_links,
+            "references": references,
+            "metadata": metadata,
             "config": config.model_dump(),
-            "progress": progress.model_dump()
+            "progress": progress.model_dump(),
+            "word_count": word_count,  # Add word count
+            "createdAt": metadata.get("created_at"),  # Add for frontend
+            "updatedAt": metadata.get("updated_at")   # Add for frontend
         }
     
     def update_project(self, project_id: str, updates: Dict[str, Any]) -> bool:
@@ -428,14 +487,95 @@ class FileProjectService:
         
         return files
     
-    def export_project(self, project_id: str, format: str = "markdown") -> Optional[str]:
-        """Export project to specified format."""
+    def _load_project_references(self, project_id: str) -> Dict[str, Any]:
+        """Load project references from url_to_info.json."""
+        project_path = self._get_project_path(project_id)
+        
+        # Try multiple possible locations for the references file
+        possible_paths = [
+            project_path / "url_to_info.json",
+            project_path / "research" / "url_to_info.json",
+            project_path / project_id / "url_to_info.json",
+            # Also check for project name directories
+        ]
+        
+        # Check if there's a subdirectory with the project name or topic
+        for item in project_path.iterdir():
+            if item.is_dir():
+                ref_file = item / "url_to_info.json"
+                if ref_file.exists():
+                    possible_paths.insert(0, ref_file)
+        
+        for ref_path in possible_paths:
+            if ref_path.exists():
+                try:
+                    with open(ref_path, 'r', encoding='utf-8') as f:
+                        return json.load(f)
+                except Exception as e:
+                    print(f"Error loading references from {ref_path}: {e}")
+        
+        return {}
+    
+    def _add_inline_citation_links(self, content: str, references: Dict[str, Any]) -> str:
+        """Convert citation numbers to clickable links."""
+        if not references:
+            return content
+        
+        # Get the URL mapping
+        url_to_unified_index = references.get("url_to_unified_index", {})
+        url_to_info = references.get("url_to_info", {})
+        
+        # Create index to URL mapping
+        index_to_url = {}
+        for url, index in url_to_unified_index.items():
+            index_to_url[index] = url
+        
+        # Pattern to match citations like [1], [2], etc.
+        pattern = r'\[(\d+)\]'
+        
+        def replace_with_link(match):
+            citation_num = int(match.group(1))
+            url = index_to_url.get(citation_num)
+            
+            if url:
+                # Return markdown link format
+                return f'[[{citation_num}]]({url})'
+            else:
+                # Keep original if no URL found
+                return match.group(0)
+        
+        # Replace all citations with links
+        return re.sub(pattern, replace_with_link, content)
+    
+    def get_project_with_references(self, project_id: str) -> Optional[Dict[str, Any]]:
+        """Get project with clickable references."""
         project = self.get_project(project_id)
         if not project:
             return None
         
+        # Load references
+        references = self._load_project_references(project_id)
+        
+        # Add references to project data
+        project["references"] = references
+        
+        # Convert citations to links in content
+        if project.get("content") and references:
+            project["content_with_links"] = self._add_inline_citation_links(
+                project["content"], references
+            )
+        
+        return project
+    
+    def export_project(self, project_id: str, format: str = "markdown") -> Optional[str]:
+        """Export project to specified format."""
+        project = self.get_project_with_references(project_id)
+        if not project:
+            return None
+        
         if format.lower() == "markdown":
-            return project["content"]
+            # Return content with clickable links if available
+            return project.get("content_with_links", project["content"])
         elif format.lower() == "json":
             return json.dumps(project, indent=2, default=str)
         else:
