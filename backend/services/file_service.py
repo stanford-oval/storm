@@ -294,11 +294,8 @@ class FileProjectService:
                     description = line.strip()[:200]
                     break
 
-        # Prepare config for frontend
-        config_dict = {
-            "llm": {"provider": config.llm_provider, "model": config.llm_model},
-            "retriever": {"type": config.retriever_type},
-        }
+        # Return full config data
+        config_dict = config.model_dump()
 
         # Prepare progress data for frontend
         progress_dict = (

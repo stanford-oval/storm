@@ -119,14 +119,14 @@ export default function NewProjectPage() {
   // Handle form submission
   const handleSubmit = async () => {
     // Ensure we're validating the current form data
-    console.log('Submitting with formData:', formData);
+    // console.log('Submitting with formData:', formData);
     
     const formErrors = validateForm(formData);
     setErrors(formErrors);
 
     if (Object.keys(formErrors).length > 0) {
-      console.error('Validation errors:', formErrors);
-      console.error('Form data:', formData);
+      // console.error('Validation errors:', formErrors);
+      // console.error('Form data:', formData);
       
       // If we're on the advanced step and have basic field errors, go back to basic
       if (currentStep === 'advanced' && (formErrors.title || formErrors.topic)) {
@@ -148,18 +148,18 @@ export default function NewProjectPage() {
     }
 
     try {
-      console.log('Calling createProject with:', formData);
+      // console.log('Calling createProject with:', formData);
       const result = await createProject(formData);
-      console.log('Raw result from createProject:', result);
-      console.log('Result type:', typeof result);
-      console.log('Result is null?', result === null);
-      console.log('Result is undefined?', result === undefined);
+      // console.log('Raw result from createProject:', result);
+      // console.log('Result type:', typeof result);
+      // console.log('Result is null?', result === null);
+      // console.log('Result is undefined?', result === undefined);
       
       // Try to get the project from the store after creation
       const store = getProjectStore.getState();
-      console.log('Store state after creation:', store);
+      // console.log('Store state after creation:', store);
       const project = result || store.currentProject;
-      console.log('Project after fallback:', project);
+      // console.log('Project after fallback:', project);
       
       if (!project || !project.id) {
         console.error('Invalid project returned:', project);

@@ -60,7 +60,8 @@ export default function ProjectDetailPage() {
     loading, 
     error,
     loadProject, 
-    updateProject, 
+    updateProject,
+    updateProjectConfig,
     deleteProject,
     duplicateProject 
   } = useProjectStore();
@@ -88,6 +89,47 @@ export default function ProjectDetailPage() {
           const response = await fetch(`${apiUrl}/projects/${projectId}`);
           if (response.ok) {
             const freshProject = await response.json();
+            
+            // Map backend config to frontend format if config exists
+            if (freshProject.config) {
+              // Check if config is already in frontend format (has nested structure)
+              const isBackendFormat = freshProject.config.llm_provider !== undefined || 
+                                     freshProject.config.max_perspective !== undefined ||
+                                     freshProject.config.max_conv_turn !== undefined;
+              
+              if (isBackendFormat) {
+                // Map from backend snake_case to frontend camelCase nested structure
+                freshProject.config = {
+                  ...freshProject.config,
+                  llm: freshProject.config.llm || {
+                    provider: freshProject.config.llm_provider || 'openai',
+                    model: freshProject.config.llm_model || 'gpt-4o',
+                    temperature: freshProject.config.temperature || 0.7,
+                    maxTokens: freshProject.config.max_tokens || 4000,
+                  },
+                  retriever: freshProject.config.retriever || {
+                    type: freshProject.config.retriever_type || 'bing',
+                    maxResults: freshProject.config.max_search_results || 10,
+                    topK: freshProject.config.search_top_k || 3,
+                  },
+                  pipeline: freshProject.config.pipeline || {
+                    maxConvTurns: freshProject.config.max_conv_turn || 3,
+                    maxPerspectives: freshProject.config.max_perspective || 4,
+                    maxSearchQueriesPerTurn: freshProject.config.max_search_queries_per_turn || 3,
+                    doResearch: freshProject.config.do_research !== false,
+                    doGenerateOutline: freshProject.config.do_generate_outline !== false,
+                    doGenerateArticle: freshProject.config.do_generate_article !== false,
+                    doPolishArticle: freshProject.config.do_polish_article !== false,
+                  },
+                  output: freshProject.config.output || {
+                    format: freshProject.config.output_format || 'markdown',
+                    includeCitations: freshProject.config.include_citations !== false,
+                  }
+                };
+              }
+              // If already in frontend format, keep it as is
+            }
+            
             // Update store with fresh data
             const { setCurrentProject } = useProjectStore.getState();
             setCurrentProject(freshProject);
@@ -216,7 +258,7 @@ export default function ProjectDetailPage() {
     if (!project) return;
     
     try {
-      await updateProject({ id: project.id, config });
+      await updateProjectConfig(project.id, config);
       setIsConfiguring(false);
       addNotification({
         type: 'success',
@@ -258,7 +300,7 @@ export default function ProjectDetailPage() {
     if (!project) return;
     
     try {
-      const newProject = await duplicateProject(project.id, `${project.title || 'Untitled Project'} (Copy)`);
+      const newProject = await duplicateProject(project);
       addNotification({
         type: 'success',
         title: 'Project Duplicated',
@@ -783,7 +825,7 @@ export default function ProjectDetailPage() {
                   <OutlineEditor
                     outline={project.outline}
                     onChange={async (outline) => {
-                      await updateProject({ id: project.id, outline });
+                      await updateProject(project.id, { outline });
                     }}
                     onSave={async () => {
                       addNotification({

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Storm/Lightning icon for STORM UI -->
+  <rect width="32" height="32" rx="4" fill="#3b82f6"/>
+  <path d="M18 8L10 18h6l-2 8 10-12h-6z" fill="#ffffff" stroke="#ffffff" stroke-width="0.5" stroke-linejoin="round"/>
+</svg>

@@ -108,10 +108,34 @@ export const usePipelineStore = create<PipelineStore>()(
             }, 'startPipeline:start');
 
             try {
+              // Map frontend config to backend format
+              const backendConfig = config ? {
+                // Map pipeline fields from camelCase to snake_case
+                max_conv_turn: config.pipeline?.maxConvTurns ?? config.max_conv_turn ?? 3,
+                max_perspective: config.pipeline?.maxPerspectives ?? config.max_perspective ?? 4,
+                max_search_queries_per_turn: config.pipeline?.maxSearchQueriesPerTurn ?? config.max_search_queries_per_turn ?? 3,
+                // Map other fields
+                llm_provider: config.llm?.provider ?? config.llm_provider ?? 'openai',
+                llm_model: config.llm?.model ?? config.llm_model ?? 'gpt-4o',
+                temperature: config.llm?.temperature ?? config.temperature ?? 0.7,
+                max_tokens: config.llm?.maxTokens ?? config.max_tokens ?? 4000,
+                retriever_type: config.retriever?.type ?? config.retriever_type ?? 'bing',
+                max_search_results: config.retriever?.maxResults ?? config.max_search_results ?? 10,
+                search_top_k: config.retriever?.topK ?? config.search_top_k ?? 3,
+                // Pipeline flags
+                do_research: config.pipeline?.doResearch ?? config.do_research ?? true,
+                do_generate_outline: config.pipeline?.doGenerateOutline ?? config.do_generate_outline ?? true,
+                do_generate_article: config.pipeline?.doGenerateArticle ?? config.do_generate_article ?? true,
+                do_polish_article: config.pipeline?.doPolishArticle ?? config.do_polish_article ?? true,
+                // Output settings
+                output_format: config.output?.format ?? config.output_format ?? 'markdown',
+                include_citations: config.output?.includeCitations ?? config.include_citations ?? true,
+              } : undefined;
+              
               const response = await fetch(`http://localhost:8000/api/pipeline/${projectId}/run`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ config }),
+                body: JSON.stringify({ config: backendConfig }),
               });
 
               if (!response.ok) {
@@ -119,7 +143,7 @@ export const usePipelineStore = create<PipelineStore>()(
               }
 
               const data = await response.json();
-              const { pipelineId } = data;
+              const pipelineId = data.pipelineId || `pipeline-${projectId}-${Date.now()}`;
 
               const pipelineExecution: PipelineExecution = {
                 id: pipelineId,
@@ -622,14 +646,18 @@ export const usePipelineStore = create<PipelineStore>()(
           },
 
           subscribeToUpdates: (pipelineId) => {
+            if (!pipelineId) {
+              console.warn('Cannot subscribe to updates: pipelineId is undefined');
+              return;
+            }
             // WebSocket subscription logic would be implemented here
             // This is a placeholder for the actual implementation
-            console.log(`Subscribing to updates for pipeline ${pipelineId}`);
+            // console.log(`Subscribing to updates for pipeline ${pipelineId}`);
           },
 
           unsubscribeFromUpdates: (pipelineId) => {
             // WebSocket unsubscription logic would be implemented here
-            console.log(`Unsubscribing from updates for pipeline ${pipelineId}`);
+            // console.log(`Unsubscribing from updates for pipeline ${pipelineId}`);
           },
         }))
       ),

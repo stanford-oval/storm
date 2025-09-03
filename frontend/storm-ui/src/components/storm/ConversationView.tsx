@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -53,32 +53,59 @@ export const ConversationView: React.FC<ConversationViewProps> = ({
   const [expandedPerspectives, setExpandedPerspectives] = useState<Set<number>>(new Set([0]));
   const [selectedPerspective, setSelectedPerspective] = useState(0);
   const [isLive, setIsLive] = useState(false);
+  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     fetchConversations();
     
     // Set up polling for live updates during research
-    const pollInterval = setInterval(() => {
+    pollIntervalRef.current = setInterval(() => {
       fetchConversations(true);
     }, 3000); // Poll every 3 seconds
     
-    return () => clearInterval(pollInterval);
+    return () => {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+        pollIntervalRef.current = null;
+      }
+    };
   }, [projectId]);
 
   const fetchConversations = async (silent = false) => {
     try {
       if (!silent) setLoading(true);
-      const response = await fetch(`http://localhost:8000/api/projects/${projectId}/conversations?live=true`);
-      if (!response.ok) throw new Error('Failed to fetch conversations');
       
-      const data = await response.json();
+      // Also check project status to see if pipeline is still running
+      const [convResponse, projectResponse] = await Promise.all([
+        fetch(`http://localhost:8000/api/projects/${projectId}/conversations?live=true`),
+        fetch(`http://localhost:8000/api/projects/${projectId}`)
+      ]);
+      
+      if (!convResponse.ok) throw new Error('Failed to fetch conversations');
+      
+      const data = await convResponse.json();
       const newConversations = data.conversations || [];
       
+      let pipelineCompleted = false;
+      if (projectResponse.ok) {
+        const projectData = await projectResponse.json();
+        // Check if project status indicates completion
+        pipelineCompleted = projectData.status === 'completed' || 
+                           projectData.pipeline_status === 'completed' ||
+                           projectData.pipeline_status === 'idle';
+      }
+      
       // Check if we're getting live updates (conversations are being added)
-      if (newConversations.length > conversations.length) {
+      if (!pipelineCompleted && newConversations.length > conversations.length) {
         setIsLive(true);
-      } else if (data.status === 'completed') {
+      } else if (pipelineCompleted || (conversations.length > 0 && newConversations.length === conversations.length)) {
+        // Pipeline completed or no new conversations being added
         setIsLive(false);
+        // Stop polling when pipeline is complete
+        if (pollIntervalRef.current && pipelineCompleted) {
+          clearInterval(pollIntervalRef.current);
+          pollIntervalRef.current = null;
+        }
       }
       
       setConversations(newConversations);
@@ -190,17 +217,13 @@ export const ConversationView: React.FC<ConversationViewProps> = ({
 
       {/* Conversations */}
       <Tabs defaultValue="0" className="w-full">
-        <TabsList className="grid w-full" style={{ gridTemplateColumns: `repeat(${Math.min(conversations.length, 4)}, 1fr)` }}>
-          {conversations.slice(0, 4).map((conv, index) => (
+        <TabsList className={conversations.length <= 6 ? "grid w-full" : "flex flex-wrap gap-1"} 
+                  style={conversations.length <= 6 ? { gridTemplateColumns: `repeat(${conversations.length}, 1fr)` } : {}}>
+          {conversations.map((conv, index) => (
             <TabsTrigger key={index} value={index.toString()} className="text-xs">
               {extractPerspectiveName(conv.perspective)}
             </TabsTrigger>
           ))}
-          {conversations.length > 4 && (
-            <TabsTrigger value="more" className="text-xs">
-              +{conversations.length - 4} more
-            </TabsTrigger>
-          )}
         </TabsList>
 
         {conversations.map((conversation, convIndex) => (

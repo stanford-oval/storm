@@ -43,25 +43,46 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
 }) => {
   // Initialize config with environment variables if API keys are not set
   const initializeConfig = React.useCallback((baseConfig: StormConfig): StormConfig => {
+    // Create a deep mutable copy to avoid "object is not extensible" errors
+    const createMutableCopy = (obj: any): any => {
+      if (obj === null || typeof obj !== 'object') return obj;
+      if (obj instanceof Date) return new Date(obj);
+      if (obj instanceof Array) return obj.map(item => createMutableCopy(item));
+      
+      const clonedObj: any = {};
+      for (const key in obj) {
+        if (obj.hasOwnProperty(key)) {
+          clonedObj[key] = createMutableCopy(obj[key]);
+        }
+      }
+      return clonedObj;
+    };
+    
+    // Start with a deep mutable copy of the base config
+    const baseCopy = baseConfig ? createMutableCopy(baseConfig) : {};
+    
     // Ensure config has proper structure with defaults
     const newConfig: StormConfig = {
-      llm: baseConfig?.llm || {
-        model: 'gpt-3.5-turbo',
-        provider: 'openai',
-        temperature: 0.7,
-        maxTokens: 4000
+      llm: {
+        model: baseCopy.llm?.model || 'gpt-3.5-turbo',
+        provider: baseCopy.llm?.provider || 'openai',
+        temperature: baseCopy.llm?.temperature ?? 0.7,
+        maxTokens: baseCopy.llm?.maxTokens || 4000,
+        apiKey: baseCopy.llm?.apiKey,
+        baseUrl: baseCopy.llm?.baseUrl
       },
-      retriever: baseConfig?.retriever || {
-        type: 'tavily',
-        maxResults: 10
+      retriever: {
+        type: baseCopy.retriever?.type || 'tavily',
+        maxResults: baseCopy.retriever?.maxResults || 10,
+        apiKey: baseCopy.retriever?.apiKey
       },
-      pipeline: baseConfig?.pipeline || {
-        doResearch: true,
-        doGenerateOutline: true,
-        doGenerateArticle: true,
-        doPolishArticle: true,
-        maxConvTurns: 3,
-        maxPerspectives: 4
+      pipeline: {
+        doResearch: baseCopy.pipeline?.doResearch ?? true,
+        doGenerateOutline: baseCopy.pipeline?.doGenerateOutline ?? true,
+        doGenerateArticle: baseCopy.pipeline?.doGenerateArticle ?? true,
+        doPolishArticle: baseCopy.pipeline?.doPolishArticle ?? true,
+        maxConvTurns: baseCopy.pipeline?.maxConvTurns || 3,
+        maxPerspectives: baseCopy.pipeline?.maxPerspectives || 4
       }
     };
     
@@ -165,7 +186,7 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
 
   const handleSave = () => {
     onChange(localConfig);
-    onSave();
+    onSave(localConfig);
   };
 
   const handleReset = () => {

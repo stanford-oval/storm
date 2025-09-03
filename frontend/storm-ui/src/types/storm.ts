@@ -176,7 +176,7 @@ export interface PipelineProgressProps {
 export interface ConfigurationPanelProps {
   config: StormConfig;
   onChange: (config: StormConfig) => void;
-  onSave: () => void;
+  onSave: (config: StormConfig) => void;
   onCancel: () => void;
   isLoading?: boolean;
   className?: string;

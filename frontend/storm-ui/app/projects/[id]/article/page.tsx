@@ -74,7 +74,7 @@ export default function ArticlePage() {
     if (!project) return;
     
     try {
-      await updateProject({ id: project.id, article: updatedArticle });
+      await updateProject(project.id, { article: updatedArticle });
       addNotification({
         type: 'success',
         title: 'Article Saved',

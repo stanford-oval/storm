@@ -187,7 +187,7 @@ export const useProjectStore = create<ProjectStore>()(
             try {
               const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
               const response = await fetch(`${apiUrl}/projects/${projectId}`, {
-                method: 'PATCH',
+                method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updates),
               });
@@ -331,6 +331,51 @@ export const useProjectStore = create<ProjectStore>()(
               }
 
               const data = await response.json();
+              
+              // Map backend config to frontend format for each project
+              if (data.projects) {
+                data.projects = data.projects.map((project: any) => {
+                  if (project.config) {
+                    // Check if config is already in frontend format (has nested structure)
+                    const isBackendFormat = project.config.llm_provider !== undefined || 
+                                           project.config.max_perspective !== undefined ||
+                                           project.config.max_conv_turn !== undefined;
+                    
+                    if (isBackendFormat) {
+                      // Map from backend snake_case to frontend camelCase nested structure
+                      project.config = {
+                        ...project.config,
+                        llm: project.config.llm || {
+                          provider: project.config.llm_provider || 'openai',
+                          model: project.config.llm_model || 'gpt-4o',
+                          temperature: project.config.temperature || 0.7,
+                          maxTokens: project.config.max_tokens || 4000,
+                        },
+                        retriever: project.config.retriever || {
+                          type: project.config.retriever_type || 'bing',
+                          maxResults: project.config.max_search_results || 10,
+                          topK: project.config.search_top_k || 3,
+                        },
+                        pipeline: project.config.pipeline || {
+                          maxConvTurns: project.config.max_conv_turn || 3,
+                          maxPerspectives: project.config.max_perspective || 4,
+                          maxSearchQueriesPerTurn: project.config.max_search_queries_per_turn || 3,
+                          doResearch: project.config.do_research !== false,
+                          doGenerateOutline: project.config.do_generate_outline !== false,
+                          doGenerateArticle: project.config.do_generate_article !== false,
+                          doPolishArticle: project.config.do_polish_article !== false,
+                        },
+                        output: project.config.output || {
+                          format: project.config.output_format || 'markdown',
+                          includeCitations: project.config.include_citations !== false,
+                        }
+                      };
+                    }
+                    // If already in frontend format, keep it as is
+                  }
+                  return project;
+                });
+              }
 
               set((draft) => {
                 draft.projects = data.projects;
@@ -361,6 +406,46 @@ export const useProjectStore = create<ProjectStore>()(
               }
 
               const project: StormProject = await response.json();
+              
+              // Map backend config to frontend format if config exists
+              if (project.config) {
+                // Check if config is already in frontend format (has nested structure)
+                const isBackendFormat = project.config.llm_provider !== undefined || 
+                                       project.config.max_perspective !== undefined ||
+                                       project.config.max_conv_turn !== undefined;
+                
+                if (isBackendFormat) {
+                  // Map from backend snake_case to frontend camelCase nested structure
+                  project.config = {
+                    ...project.config,
+                    llm: project.config.llm || {
+                      provider: project.config.llm_provider || 'openai',
+                      model: project.config.llm_model || 'gpt-4o',
+                      temperature: project.config.temperature || 0.7,
+                      maxTokens: project.config.max_tokens || 4000,
+                    },
+                    retriever: project.config.retriever || {
+                      type: project.config.retriever_type || 'bing',
+                      maxResults: project.config.max_search_results || 10,
+                      topK: project.config.search_top_k || 3,
+                    },
+                    pipeline: project.config.pipeline || {
+                      maxConvTurns: project.config.max_conv_turn || 3,
+                      maxPerspectives: project.config.max_perspective || 4,
+                      maxSearchQueriesPerTurn: project.config.max_search_queries_per_turn || 3,
+                      doResearch: project.config.do_research !== false,
+                      doGenerateOutline: project.config.do_generate_outline !== false,
+                      doGenerateArticle: project.config.do_generate_article !== false,
+                      doPolishArticle: project.config.do_polish_article !== false,
+                    },
+                    output: project.config.output || {
+                      format: project.config.output_format || 'markdown',
+                      includeCitations: project.config.include_citations !== false,
+                    }
+                  };
+                }
+                // If already in frontend format, keep it as is
+              }
 
               set((draft) => {
                 const index = draft.projects.findIndex(p => p.id === projectId);
@@ -586,8 +671,68 @@ export const useProjectStore = create<ProjectStore>()(
               throw new Error('Project not found');
             }
 
-            const updatedConfig = { ...project.config, ...config };
-            await get().updateProject(projectId, { config: updatedConfig });
+            try {
+              const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+              
+              // Config from ConfigurationPanel has frontend structure
+              // Map directly from the frontend config to backend format
+              // Note: API keys are not stored in project config on backend
+              const backendConfig = {
+                // Map pipeline fields from camelCase to snake_case
+                max_conv_turn: config.pipeline?.maxConvTurns ?? 3,
+                max_perspective: config.pipeline?.maxPerspectives ?? 4,
+                max_search_queries_per_turn: config.pipeline?.maxSearchQueriesPerTurn ?? 3,
+                // Map other fields
+                llm_provider: config.llm?.provider ?? 'openai',
+                llm_model: config.llm?.model ?? 'gpt-4o',
+                temperature: config.llm?.temperature ?? 0.7,
+                max_tokens: config.llm?.maxTokens ?? 4000,
+                retriever_type: config.retriever?.type ?? 'bing',
+                max_search_results: config.retriever?.maxResults ?? 10,
+                search_top_k: config.retriever?.topK ?? 3,
+                // Pipeline flags
+                do_research: config.pipeline?.doResearch ?? true,
+                do_generate_outline: config.pipeline?.doGenerateOutline ?? true,
+                do_generate_article: config.pipeline?.doGenerateArticle ?? true,
+                do_polish_article: config.pipeline?.doPolishArticle ?? true,
+                // Output settings
+                output_format: config.output?.format ?? 'markdown',
+                include_citations: config.output?.includeCitations ?? true,
+              };
+              
+              console.log('Saving configuration to backend:', {
+                max_conv_turn: backendConfig.max_conv_turn,
+                max_perspective: backendConfig.max_perspective,
+                llm_provider: backendConfig.llm_provider,
+                retriever_type: backendConfig.retriever_type
+              });
+              
+              const response = await fetch(`${apiUrl}/projects/${projectId}/config`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(backendConfig),
+              });
+
+              if (!response.ok) {
+                throw new Error('Failed to update project configuration');
+              }
+
+              // Update local state with the frontend config structure
+              set((draft) => {
+                const index = draft.projects.findIndex(p => p.id === projectId);
+                if (index !== -1) {
+                  draft.projects[index].config = config;
+                }
+                if (draft.currentProject?.id === projectId) {
+                  draft.currentProject.config = config;
+                }
+              }, 'updateProjectConfig:success');
+              
+              // Reload the project to ensure we have the latest data
+              await get().loadProject(projectId);
+            } catch (error) {
+              throw error;
+            }
           },
 
           cloneProjectConfig: async (sourceProjectId, targetProjectId) => {

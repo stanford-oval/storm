@@ -135,6 +135,25 @@ async def run_pipeline(
                 status_code=400, detail="Pipeline is already running for this project"
             )
 
+        # Get project config and merge with request config
+        project_config = file_service._load_project_config(project_id)
+        if request.config:
+            # Merge request config with saved config (request config takes precedence)
+            merged_config = (
+                project_config.model_copy() if project_config else ProjectConfig()
+            )
+            for field, value in request.config.model_dump(exclude_unset=True).items():
+                setattr(merged_config, field, value)
+            final_config = merged_config
+        else:
+            # Use saved project config or default
+            final_config = project_config or ProjectConfig()
+
+        # Log the configuration being used
+        logger.info(f"Running pipeline for project {project_id} with config:")
+        logger.info(f"  max_perspective: {final_config.max_perspective}")
+        logger.info(f"  max_conv_turn: {final_config.max_conv_turn}")
+
         # Progress callback for real-time updates
         async def progress_callback(proj_id: str, progress: ProgressData):
             await manager.send_progress_update(proj_id, progress)
@@ -155,7 +174,7 @@ async def run_pipeline(
         else:
             # Real pipeline execution
             background_tasks.add_task(
-                storm_runner.run_pipeline, project_id, request.config, progress_callback
+                storm_runner.run_pipeline, project_id, final_config, progress_callback
             )
 
             return PipelineResultResponse(
