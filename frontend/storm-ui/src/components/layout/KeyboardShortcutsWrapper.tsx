@@ -8,27 +8,25 @@ export function KeyboardShortcutsWrapper() {
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      // Open keyboard shortcuts with Cmd/Ctrl + K + K
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      // Open keyboard shortcuts with Cmd/Ctrl + /
+      if ((e.metaKey || e.ctrlKey) && e.key === '/') {
         e.preventDefault();
-        // Wait for second K press
-        const handleSecondKey = (e2: KeyboardEvent) => {
-          if (e2.key === 'k') {
-            e2.preventDefault();
-            setIsOpen(true);
-            window.removeEventListener('keydown', handleSecondKey);
-          } else {
-            window.removeEventListener('keydown', handleSecondKey);
-          }
-        };
-        window.addEventListener('keydown', handleSecondKey);
-        setTimeout(() => {
-          window.removeEventListener('keydown', handleSecondKey);
-        }, 1000); // Timeout after 1 second
+        e.stopPropagation();
+        setIsOpen(true);
+        return;
       }
-      // Also allow ? key
-      if (e.key === '?' && !e.target || (e.target as HTMLElement).tagName !== 'INPUT') {
+      
+      // Also allow ? key (Shift + / on most keyboards) when not in an input field
+      const target = e.target as HTMLElement;
+      const isInputField = target && (
+        target.tagName === 'INPUT' || 
+        target.tagName === 'TEXTAREA' || 
+        target.contentEditable === 'true'
+      );
+      
+      if (e.key === '?' && !isInputField) {
         e.preventDefault();
+        e.stopPropagation();
         setIsOpen(true);
       }
     };

@@ -219,7 +219,11 @@ export const KeyboardShortcuts: React.FC<KeyboardShortcutsProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
 
   // Close on escape key
-  useHotkeys('escape', onClose, { enabled: isOpen });
+  useHotkeys('escape', () => {
+    if (isOpen && onClose) {
+      onClose();
+    }
+  }, { enabled: isOpen });
 
   // Filter shortcuts based on category and search
   const filteredShortcuts = shortcuts.filter(shortcut => {
