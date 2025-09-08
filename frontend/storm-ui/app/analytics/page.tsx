@@ -26,8 +26,7 @@ import {
   FileText, 
   Cpu, 
   AlertCircle,
-  Activity,
-  Zap
+  Activity
 } from 'lucide-react';
 import { useProjectStore, usePipelineStore } from '@/store';
 
@@ -109,49 +108,8 @@ export default function AnalyticsPage() {
     }));
   };
 
-  const calculatePipelineMetrics = () => {
-    if (!pipelineHistory || pipelineHistory.length === 0) {
-      // Return default data if no history
-      return [
-        { stage: 'Research', avgTime: 0, successRate: 0 },
-        { stage: 'Outline', avgTime: 0, successRate: 0 },
-        { stage: 'Writing', avgTime: 0, successRate: 0 },
-        { stage: 'Polish', avgTime: 0, successRate: 0 },
-      ];
-    }
-
-    const stages = ['research', 'outline_generation', 'article_generation', 'polishing'];
-    const metrics = stages.map(stage => {
-      const stageExecutions = pipelineHistory.filter(p => 
-        p.progress?.stage === stage || 
-        (p.status === 'completed' && p.progress?.stage === 'completed')
-      );
-      
-      const successCount = stageExecutions.filter(p => p.status === 'completed').length;
-      const totalCount = stageExecutions.length || 1;
-      
-      // Calculate average time (in minutes)
-      const avgTime = stageExecutions.reduce((sum, p) => {
-        if (p.startTime && p.endTime) {
-          const duration = new Date(p.endTime).getTime() - new Date(p.startTime).getTime();
-          return sum + (duration / 60000); // Convert to minutes
-        }
-        return sum;
-      }, 0) / (totalCount || 1);
-      
-      return {
-        stage: stage.split('_').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' '),
-        avgTime: Math.round(avgTime),
-        successRate: Math.round((successCount / totalCount) * 100)
-      };
-    });
-    
-    return metrics;
-  };
-
   const usageData = calculateUsageData();
   const modelUsage = calculateModelUsage();
-  const pipelineMetrics = calculatePipelineMetrics();
 
   const projectStats = {
     total: projects?.length || 0,
@@ -241,7 +199,6 @@ export default function AnalyticsPage() {
         <TabsList>
           <TabsTrigger value="usage">Usage Trends</TabsTrigger>
           <TabsTrigger value="models">Model Distribution</TabsTrigger>
-          <TabsTrigger value="pipeline">Pipeline Performance</TabsTrigger>
           <TabsTrigger value="costs">Cost Analysis</TabsTrigger>
         </TabsList>
 
@@ -252,22 +209,32 @@ export default function AnalyticsPage() {
               <CardDescription>Monthly token consumption and trends</CardDescription>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height="300">
-                <LineChart data={usageData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line 
-                    type="monotone" 
-                    dataKey="tokens" 
-                    stroke="#0ea5e9" 
-                    name="Tokens Used"
-                    strokeWidth={2}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              {usageData && usageData.length > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={usageData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line 
+                      type="monotone" 
+                      dataKey="tokens" 
+                      stroke="#0ea5e9" 
+                      name="Tokens Used"
+                      strokeWidth={2}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-[300px] text-center">
+                  <Activity className="h-12 w-12 text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-medium mb-2">No Usage Data Yet</h3>
+                  <p className="text-sm text-muted-foreground max-w-md">
+                    Token usage will appear here once you start generating articles with the STORM pipeline.
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -280,25 +247,35 @@ export default function AnalyticsPage() {
                 <CardDescription>Breakdown by AI model</CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height="300">
-                  <PieChart>
-                    <Pie
-                      data={modelUsage}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, value }) => `${name}: ${value}%`}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {modelUsage.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
+                {modelUsage && modelUsage.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="300">
+                    <PieChart>
+                      <Pie
+                        data={modelUsage}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, value }) => `${name}: ${value}%`}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {modelUsage.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-[300px] text-center">
+                    <Cpu className="h-12 w-12 text-muted-foreground mb-4" />
+                    <h3 className="text-lg font-medium mb-2">No Model Usage Yet</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Model distribution will appear here once projects are created.
+                    </p>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -339,29 +316,6 @@ export default function AnalyticsPage() {
           </div>
         </TabsContent>
 
-        <TabsContent value="pipeline" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Pipeline Stage Performance</CardTitle>
-              <CardDescription>Average completion time and success rate by stage</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height="300">
-                <BarChart data={pipelineMetrics}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="stage" />
-                  <YAxis yAxisId="left" orientation="left" stroke="#0ea5e9" />
-                  <YAxis yAxisId="right" orientation="right" stroke="#10b981" />
-                  <Tooltip />
-                  <Legend />
-                  <Bar yAxisId="left" dataKey="avgTime" fill="#0ea5e9" name="Avg Time (min)" />
-                  <Bar yAxisId="right" dataKey="successRate" fill="#10b981" name="Success Rate (%)" />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
         <TabsContent value="costs" className="space-y-4">
           <Card>
             <CardHeader>
@@ -369,22 +323,32 @@ export default function AnalyticsPage() {
               <CardDescription>Monthly API costs and projections</CardDescription>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height="300">
-                <LineChart data={usageData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip formatter={(value) => `$${value}`} />
-                  <Legend />
-                  <Line 
-                    type="monotone" 
-                    dataKey="cost" 
-                    stroke="#10b981" 
-                    name="Cost ($)"
-                    strokeWidth={2}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              {usageData && usageData.length > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={usageData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip formatter={(value) => `$${value}`} />
+                    <Legend />
+                    <Line 
+                      type="monotone" 
+                      dataKey="cost" 
+                      stroke="#10b981" 
+                      name="Cost ($)"
+                      strokeWidth={2}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-[300px] text-center">
+                  <DollarSign className="h-12 w-12 text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-medium mb-2">No Cost Data Yet</h3>
+                  <p className="text-sm text-muted-foreground max-w-md">
+                    Cost analysis will appear here once you start using the STORM pipeline.
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
