@@ -22,53 +22,65 @@ interface KeyboardShortcutsProps {
 }
 
 const shortcuts: KeyboardShortcut[] = [
-  // General
+  // General - Using Alt/Option key to avoid conflicts
   {
     id: 'help',
     key: 'cmd+/',
-    description: 'Show this help dialog',
+    description: 'Show keyboard shortcuts',
     category: 'general',
     icon: Keyboard,
   },
   {
     id: 'command-palette',
-    key: 'cmd+k',
+    key: 'cmd+shift+k',
     description: 'Open command palette',
     category: 'general',
     icon: Search,
   },
   {
     id: 'search',
-    key: 'cmd+f',
-    description: 'Search in current view',
+    key: 'ctrl+f',
+    description: 'Search in current view (in-app)',
     category: 'general',
     icon: Search,
   },
 
-  // Navigation
+  // Navigation - Using G prefix (Gmail style)
   {
     id: 'dashboard',
-    key: 'cmd+h',
-    description: 'Go to dashboard',
+    key: 'g then h',
+    description: 'Go to home/dashboard',
     category: 'navigation',
   },
   {
     id: 'projects',
-    key: 'cmd+shift+p',
-    description: 'View projects',
+    key: 'g then p',
+    description: 'Go to projects',
     category: 'navigation',
   },
   {
     id: 'analytics',
-    key: 'cmd+shift+a',
-    description: 'Open analytics',
+    key: 'g then a',
+    description: 'Go to analytics',
+    category: 'navigation',
+  },
+  {
+    id: 'knowledge-base',
+    key: 'g then k',
+    description: 'Go to knowledge base',
+    category: 'navigation',
+  },
+  {
+    id: 'settings',
+    key: 'g then s',
+    description: 'Go to settings',
     category: 'navigation',
   },
 
-  // Editing
+  // Editing - Using Alt/Option for app-specific actions
   {
     id: 'new-project',
-    key: 'cmd+n',
+    key: 'alt+n',
     description: 'Create new project',
     category: 'editing',
   },
@@ -79,90 +91,90 @@ const shortcuts: KeyboardShortcut[] = [
     category: 'editing',
   },
   {
-    id: 'undo',
-    key: 'cmd+z',
-    description: 'Undo last action',
+    id: 'duplicate',
+    key: 'alt+d',
+    description: 'Duplicate current item',
     category: 'editing',
   },
   {
-    id: 'redo',
-    key: 'cmd+shift+z',
-    description: 'Redo last action',
+    id: 'delete',
+    key: 'alt+backspace',
+    description: 'Delete selected item',
     category: 'editing',
   },
   {
-    id: 'copy',
-    key: 'cmd+c',
-    description: 'Copy selection',
-    category: 'editing',
-  },
-  {
-    id: 'paste',
-    key: 'cmd+v',
-    description: 'Paste clipboard',
-    category: 'editing',
-  },
-  {
-    id: 'select-all',
-    key: 'cmd+a',
-    description: 'Select all',
+    id: 'rename',
+    key: 'alt+r',
+    description: 'Rename current item',
     category: 'editing',
   },
 
-  // Pipeline
+  // Pipeline - Using Alt/Option
   {
     id: 'run-pipeline',
-    key: 'cmd+r',
+    key: 'alt+enter',
     description: 'Run STORM pipeline',
     category: 'pipeline',
     icon: Play,
   },
   {
     id: 'stop-pipeline',
-    key: 'cmd+.',
+    key: 'alt+.',
     description: 'Stop pipeline execution',
     category: 'pipeline',
     icon: Square,
   },
   {
     id: 'export',
-    key: 'cmd+e',
-    description: 'Export data',
+    key: 'alt+e',
+    description: 'Export article/data',
     category: 'pipeline',
     icon: Download,
   },
   {
     id: 'import',
-    key: 'cmd+i',
+    key: 'alt+i',
     description: 'Import data',
     category: 'pipeline',
     icon: Upload,
   },
-
-  // System
   {
-    id: 'settings',
+    id: 'refresh-data',
+    key: 'alt+r',
+    description: 'Refresh current data',
+    category: 'pipeline',
+  },
+
+  // System - Using specific non-conflicting combinations
+  {
+    id: 'preferences',
     key: 'cmd+,',
-    description: 'Open settings',
+    description: 'Open preferences',
     category: 'system',
     icon: Settings,
   },
   {
-    id: 'refresh',
-    key: 'cmd+shift+r',
-    description: 'Refresh current view',
-    category: 'system',
-  },
-  {
     id: 'toggle-theme',
-    key: 'cmd+shift+t',
+    key: 'alt+t',
     description: 'Toggle dark/light theme',
     category: 'system',
   },
   {
+    id: 'toggle-sidebar',
+    key: 'alt+s',
+    description: 'Toggle sidebar',
+    category: 'system',
+  },
+  {
     id: 'zen-mode',
-    key: 'cmd+shift+z',
-    description: 'Toggle zen mode',
+    key: 'alt+z',
+    description: 'Toggle zen/focus mode',
+    category: 'system',
+  },
+  {
+    id: 'notifications',
+    key: 'alt+shift+n',
+    description: 'Show notifications',
     category: 'system',
   },
 ];
