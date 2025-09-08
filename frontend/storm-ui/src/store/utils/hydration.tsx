@@ -174,7 +174,7 @@ export interface GlobalHydrationState {
 export const globalHydrationManager = new HydrationManager();
 
 // Hydration middleware for Zustand stores
-export const hydrationMiddleware = <T>(
+export const hydrationMiddleware = <T,>(
   config: any,
   options: {
     storeName: string;
