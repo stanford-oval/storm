@@ -83,6 +83,7 @@ interface UIActions {
   removeShortcut: (key: string) => void;
   addCustomShortcut: (key: string, action: string) => void;
   removeCustomShortcut: (key: string) => void;
+  setCustomShortcuts: (shortcuts: Record<string, string>) => void;
   resetShortcuts: () => void;
   executeShortcut: (key: string) => void;
   
@@ -346,6 +347,13 @@ export const useUIStore = create<UIStore>()(
               delete draft.keyboard.customShortcuts[key];
               draft.lastUpdated = new Date();
             }, 'removeCustomShortcut');
+          },
+
+          setCustomShortcuts: (shortcuts) => {
+            set((draft) => {
+              draft.keyboard.customShortcuts = shortcuts;
+              draft.lastUpdated = new Date();
+            }, 'setCustomShortcuts');
           },
 
           resetShortcuts: () => {
