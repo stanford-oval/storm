@@ -19,7 +19,7 @@ const initialState: ProjectState = {
   sortOrder: 'desc',
   pagination: {
     page: 1,
-    limit: 20,
+    limit: 100,
     total: 0,
   },
   recentProjects: [],
@@ -156,7 +156,7 @@ export const useProjectStore = create<ProjectStore>()(
                 draft.projects.unshift(newProject);
                 draft.currentProject = newProject;
                 if (!draft.pagination) {
-                  draft.pagination = { page: 1, limit: 20, total: 0 };
+                  draft.pagination = { page: 1, limit: 100, total: 0 };
                 }
                 draft.pagination.total += 1;
                 draft.loading = false;
@@ -301,7 +301,7 @@ export const useProjectStore = create<ProjectStore>()(
           },
 
           // Project loading
-          loadProjects: async (filters, page = 1, limit = 20) => {
+          loadProjects: async (filters, page = 1, limit = 100) => {
             set((draft) => {
               draft.loading = true;
               draft.error = null;

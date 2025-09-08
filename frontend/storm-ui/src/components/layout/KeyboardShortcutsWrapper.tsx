@@ -2,38 +2,30 @@
 
 import { useState, useEffect } from 'react';
 import { KeyboardShortcuts } from '@/components/ux/KeyboardShortcuts';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { useUIStore } from '@/store';
 
 export function KeyboardShortcutsWrapper() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const openDialogs = useUIStore(state => state.openDialogs);
+  const closeDialog = useUIStore(state => state.closeDialog);
+  
+  // Use the keyboard shortcuts hook to handle all shortcuts
+  useKeyboardShortcuts();
+  
+  // Check if keyboard shortcuts dialog is open
+  const isOpen = openDialogs.includes('keyboard-shortcuts');
 
   useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      // Open keyboard shortcuts with Cmd/Ctrl + /
-      if ((e.metaKey || e.ctrlKey) && e.key === '/') {
-        e.preventDefault();
-        e.stopPropagation();
-        setIsOpen(true);
-        return;
-      }
-      
-      // Also allow ? key (Shift + / on most keyboards) when not in an input field
-      const target = e.target as HTMLElement;
-      const isInputField = target && (
-        target.tagName === 'INPUT' || 
-        target.tagName === 'TEXTAREA' || 
-        target.contentEditable === 'true'
-      );
-      
-      if (e.key === '?' && !isInputField) {
-        e.preventDefault();
-        e.stopPropagation();
-        setIsOpen(true);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
+    setMounted(true);
   }, []);
 
-  return <KeyboardShortcuts isOpen={isOpen} onClose={() => setIsOpen(false)} />;
+  if (!mounted) return null;
+
+  return (
+    <KeyboardShortcuts 
+      isOpen={isOpen} 
+      onClose={() => closeDialog('keyboard-shortcuts')} 
+    />
+  );
 }

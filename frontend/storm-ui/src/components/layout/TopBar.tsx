@@ -254,7 +254,10 @@ export function TopBar() {
       </header>
 
       {/* Command Palette */}
-      <CommandPalette />
+      <CommandPalette 
+        isOpen={useUIStore(state => state.openDialogs.includes('commandPalette'))}
+        onClose={() => useUIStore.getState().closeDialog('commandPalette')}
+      />
     </>
   );
 }

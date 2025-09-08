@@ -26,7 +26,7 @@ import {
 const navigation = [
   {
     name: 'Projects',
-    href: '/',
+    href: '/projects',
     icon: FolderOpen,
     description: 'Manage your STORM projects'
   },
@@ -122,7 +122,7 @@ export function Sidebar() {
         <div className="space-y-1">
           {navigation.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+            const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
             const isDisabled = item.disabled;
             
             return (

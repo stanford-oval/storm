@@ -46,14 +46,19 @@ export const KeyboardShortcuts: React.FC<KeyboardShortcutsProps> = ({
   const [editingShortcuts, setEditingShortcuts] = useState<Record<string, string>>({});
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   
-  // Get shortcuts from store or use defaults - memoize to avoid recreating empty object
-  const customShortcuts = useUIStore(state => state.keyboard?.customShortcuts);
+  // Get shortcuts from store or use defaults - using stable selectors
+  const storeKeyboard = useUIStore(state => state.keyboard);
   const setCustomShortcuts = useUIStore(state => state.setCustomShortcuts);
+  
+  // Extract customShortcuts in a stable way
+  const customShortcuts = useMemo(() => {
+    return storeKeyboard?.customShortcuts || {};
+  }, [storeKeyboard?.customShortcuts]);
   
   // Use prop shortcuts or merge custom with defaults
   const shortcuts = useMemo(() => {
     if (propShortcuts) return propShortcuts;
-    return getMergedShortcuts(customShortcuts || {}, defaultKeyboardShortcuts);
+    return getMergedShortcuts(customShortcuts, defaultKeyboardShortcuts);
   }, [propShortcuts, customShortcuts]);
 
   // Detect platform
@@ -329,8 +334,41 @@ export const KeyboardShortcuts: React.FC<KeyboardShortcutsProps> = ({
                                       <Input
                                         value={editingShortcuts[shortcut.id] || shortcut.key}
                                         onChange={(e) => handleShortcutChange(shortcut.id, e.target.value)}
+                                        onKeyDown={(e) => {
+                                          // Capture key combination
+                                          e.stopPropagation();
+                                          
+                                          // Skip certain keys
+                                          if (['Tab', 'Enter', 'Escape'].includes(e.key)) {
+                                            return;
+                                          }
+                                          
+                                          e.preventDefault();
+                                          
+                                          // Build the shortcut string
+                                          const parts = [];
+                                          if (e.metaKey || e.ctrlKey) parts.push('cmd');
+                                          if (e.altKey) parts.push('alt');
+                                          if (e.shiftKey) parts.push('shift');
+                                          
+                                          // Add the key
+                                          let key = e.key.toLowerCase();
+                                          // Normalize special keys
+                                          if (key === ' ') key = 'space';
+                                          if (key === 'arrowup') key = 'up';
+                                          if (key === 'arrowdown') key = 'down';
+                                          if (key === 'arrowleft') key = 'left';
+                                          if (key === 'arrowright') key = 'right';
+                                          
+                                          // Don't add modifier keys as the main key
+                                          if (!['control', 'meta', 'alt', 'shift', 'cmd'].includes(key)) {
+                                            parts.push(key);
+                                            const shortcutStr = parts.join('+');
+                                            handleShortcutChange(shortcut.id, shortcutStr);
+                                          }
+                                        }}
                                         className="w-40 h-8 text-xs"
-                                        placeholder="e.g., cmd+shift+k"
+                                        placeholder="Press keys..."
                                       />
                                       {hasError && (
                                         <AlertCircle className="h-4 w-4 text-destructive" />

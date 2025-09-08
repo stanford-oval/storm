@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Command } from 'cmdk';
 import { 
@@ -8,6 +9,7 @@ import {
   Play, Square, RotateCcw, Trash2, Copy, Edit, Plus, Home,
   BarChart3, Users, Calendar, BookOpen, Code, Terminal
 } from 'lucide-react';
+import { useProjectStore, useUIStore } from '@/store';
 
 interface CommandItem {
   id: string;
@@ -28,7 +30,8 @@ interface CommandPaletteProps {
   placeholder?: string;
 }
 
-const defaultCommands: CommandItem[] = [
+// Create default commands inside the component to access hooks
+const createDefaultCommands = (router: any, openDialog: any): CommandItem[] => [
   // Navigation
   {
     id: 'nav-home',
@@ -36,8 +39,8 @@ const defaultCommands: CommandItem[] = [
     description: 'Navigate to the main dashboard',
     icon: Home,
     category: 'navigation',
-    shortcut: 'cmd+h',
-    action: () => console.log('Navigate to dashboard'),
+    shortcut: 'g then h',
+    action: () => router.push('/'),
     keywords: ['dashboard', 'home', 'main'],
   },
   {
@@ -46,7 +49,7 @@ const defaultCommands: CommandItem[] = [
     description: 'See all your projects',
     icon: Folder,
     category: 'navigation',
-    action: () => console.log('Navigate to projects'),
+    action: () => router.push('/'),
     keywords: ['projects', 'folder'],
   },
   {
@@ -55,7 +58,7 @@ const defaultCommands: CommandItem[] = [
     description: 'View analytics dashboard',
     icon: BarChart3,
     category: 'navigation',
-    action: () => console.log('Navigate to analytics'),
+    action: () => router.push('/analytics'),
     keywords: ['analytics', 'stats', 'metrics'],
   },
   
@@ -66,8 +69,8 @@ const defaultCommands: CommandItem[] = [
     description: 'Create a new STORM project',
     icon: Plus,
     category: 'creation',
-    shortcut: 'cmd+n',
-    action: () => console.log('Create new project'),
+    shortcut: 'alt+n',
+    action: () => router.push('/projects/new'),
     keywords: ['new', 'create', 'project'],
   },
   {
@@ -76,7 +79,7 @@ const defaultCommands: CommandItem[] = [
     description: 'Start writing a new article',
     icon: FileText,
     category: 'creation',
-    action: () => console.log('Create new article'),
+    action: () => router.push('/projects/new'),
     keywords: ['article', 'write', 'document'],
   },
   
@@ -87,8 +90,8 @@ const defaultCommands: CommandItem[] = [
     description: 'Execute the STORM pipeline',
     icon: Play,
     category: 'actions',
-    shortcut: 'cmd+r',
-    action: () => console.log('Run pipeline'),
+    shortcut: 'alt+r',
+    action: () => openDialog('run-pipeline'),
     keywords: ['run', 'execute', 'pipeline'],
   },
   {
@@ -97,7 +100,7 @@ const defaultCommands: CommandItem[] = [
     description: 'Stop the current pipeline execution',
     icon: Square,
     category: 'actions',
-    action: () => console.log('Stop pipeline'),
+    action: () => openDialog('stop-pipeline'),
     keywords: ['stop', 'halt', 'cancel'],
   },
   {
@@ -106,8 +109,8 @@ const defaultCommands: CommandItem[] = [
     description: 'Export your project data',
     icon: Download,
     category: 'actions',
-    shortcut: 'cmd+e',
-    action: () => console.log('Export data'),
+    shortcut: 'alt+e',
+    action: () => openDialog('export'),
     keywords: ['export', 'download', 'save'],
   },
   {
@@ -116,7 +119,7 @@ const defaultCommands: CommandItem[] = [
     description: 'Import project data',
     icon: Upload,
     category: 'actions',
-    action: () => console.log('Import data'),
+    action: () => openDialog('import'),
     keywords: ['import', 'upload', 'load'],
   },
   
@@ -127,8 +130,8 @@ const defaultCommands: CommandItem[] = [
     description: 'Configure application settings',
     icon: Settings,
     category: 'system',
-    shortcut: 'cmd+,',
-    action: () => console.log('Open settings'),
+    shortcut: 'alt+,',
+    action: () => router.push('/settings'),
     keywords: ['settings', 'preferences', 'config'],
   },
   {
@@ -137,8 +140,8 @@ const defaultCommands: CommandItem[] = [
     description: 'Show/hide terminal',
     icon: Terminal,
     category: 'system',
-    shortcut: 'cmd+`',
-    action: () => console.log('Toggle terminal'),
+    shortcut: 'alt+`',
+    action: () => openDialog('terminal'),
     keywords: ['terminal', 'console', 'cli'],
   },
 ];
@@ -160,12 +163,17 @@ const categoryLabels = {
 export const CommandPalette: React.FC<CommandPaletteProps> = ({
   isOpen,
   onClose,
-  commands = defaultCommands,
+  commands,
   className = '',
   placeholder = 'Type a command or search...',
 }) => {
+  const router = useRouter();
+  const { openDialog } = useUIStore();
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
+  
+  // Use provided commands or create default ones
+  const effectiveCommands = commands || createDefaultCommands(router, openDialog);
 
   // Register keyboard shortcuts for commands and escape key
   useEffect(() => {
@@ -179,7 +187,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       
       // Handle command shortcuts when palette is closed
       if (!isOpen) {
-        commands.forEach(command => {
+        effectiveCommands.forEach(command => {
           if (command.shortcut) {
             // Parse shortcut (e.g., "cmd+k" or "ctrl+shift+p")
             const keys = command.shortcut.toLowerCase().split('+');
@@ -205,19 +213,19 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [isOpen, onClose, commands]);
+  }, [isOpen, onClose, effectiveCommands]);
 
   // Filter and group commands
   const filteredCommands = useMemo(() => {
-    if (!query) return commands;
+    if (!query) return effectiveCommands;
     
     const lowerQuery = query.toLowerCase();
-    return commands.filter(command => 
+    return effectiveCommands.filter(command => 
       command.label.toLowerCase().includes(lowerQuery) ||
       command.description?.toLowerCase().includes(lowerQuery) ||
       command.keywords?.some(keyword => keyword.toLowerCase().includes(lowerQuery))
     );
-  }, [commands, query]);
+  }, [effectiveCommands, query]);
 
   const groupedCommands = useMemo(() => {
     return filteredCommands.reduce((groups, command) => {

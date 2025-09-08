@@ -34,7 +34,7 @@ export const defaultKeyboardShortcuts: KeyboardShortcut[] = [
   },
   {
     id: 'command-palette',
-    key: 'cmd+shift+k',
+    key: 'cmd+k',
     description: 'Open command palette',
     category: 'general',
     icon: Search,
