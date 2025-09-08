@@ -52,10 +52,10 @@ export default function KnowledgeBasePage() {
   const allTags = React.useMemo(() => {
     const tagSet = new Set<string>();
     projects?.forEach(project => {
-      if (project.config?.topic) {
+      if (project.topic) {
         // Extract potential tags from topic (simple word extraction)
-        const words = project.config.topic.toLowerCase().split(/\s+/);
-        words.forEach(word => {
+        const words = project.topic.toLowerCase().split(/\s+/);
+        words.forEach((word: string) => {
           if (word.length > 3) tagSet.add(word);
         });
       }
@@ -71,7 +71,7 @@ export default function KnowledgeBasePage() {
     if (searchQuery) {
       filtered = filtered.filter(project => 
         project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.config?.topic?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        project.topic?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         project.content?.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
@@ -84,7 +84,7 @@ export default function KnowledgeBasePage() {
     // Filter by tags
     if (selectedTags.length > 0) {
       filtered = filtered.filter(project => {
-        const projectText = `${project.title} ${project.config?.topic || ''}`.toLowerCase();
+        const projectText = `${project.title} ${project.topic || ''}`.toLowerCase();
         return selectedTags.some(tag => projectText.includes(tag));
       });
     }

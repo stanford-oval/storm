@@ -295,7 +295,7 @@ interface AnimatedCounterProps {
 
 export const AnimatedCounter: React.FC<AnimatedCounterProps> = ({
   value,
-  duration = 1,
+  duration = 1, // eslint-disable-line @typescript-eslint/no-unused-vars
   format = (val) => Math.round(val).toString(),
   className,
 }) => {

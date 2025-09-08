@@ -7,7 +7,7 @@ import { ConfigProvider } from '@/store/contexts/ConfigContext';
 import { WebSocketProvider } from '@/store/contexts/WebSocketContext';
 import { ToastProvider } from '@/components/ux/ToastSystem';
 import { TourGuide } from '@/components/ux/TourGuide';
-import { KeyboardShortcuts } from '@/components/ux/KeyboardShortcuts';
+import { KeyboardShortcutsWrapper } from '@/components/layout/KeyboardShortcutsWrapper';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { TopBar } from '@/components/layout/TopBar';
 import { DebugConsole, DebugConsoleToggle } from '@/components/debug/DebugConsole';
@@ -71,7 +71,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
 
                 {/* Global UI Components */}
                 <TourGuide />
-                <KeyboardShortcuts />
+                <KeyboardShortcutsWrapper />
                 <DebugConsole />
                 <DebugConsoleToggle />
                 </ToastProvider>

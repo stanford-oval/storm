@@ -220,17 +220,38 @@ export default function ProjectDetailPage() {
     if (!project) return;
     
     try {
-      await startPipeline(project.id, project.config || {});
+      // Use default config if project doesn't have one
+      const defaultConfig: StormConfig = {
+        llm: {
+          model: 'gpt-4o',
+          provider: 'openai',
+        },
+        retriever: {
+          type: 'bing',
+        },
+        pipeline: {
+          doResearch: true,
+          doGenerateOutline: true,
+          doGenerateArticle: true,
+          doPolishArticle: true,
+        }
+      };
+      
+      await startPipeline(project.id, project.config || defaultConfig);
       addNotification({
         type: 'success',
         title: 'Pipeline Started',
         message: `STORM pipeline started for "${project.title || 'Untitled Project'}"`,
+        read: false,
+        persistent: false,
       });
     } catch (error) {
       addNotification({
         type: 'error',
         title: 'Failed to Start Pipeline',
         message: error instanceof Error ? error.message : 'Unknown error occurred',
+        read: false,
+        persistent: false,
       });
     }
   };
@@ -244,12 +265,16 @@ export default function ProjectDetailPage() {
         type: 'info',
         title: 'Pipeline Cancelled',
         message: `Pipeline cancelled for "${project.title || 'Untitled Project'}"`,
+        read: false,
+        persistent: false,
       });
     } catch (error) {
       addNotification({
         type: 'error',
         title: 'Failed to Cancel Pipeline',
         message: error instanceof Error ? error.message : 'Unknown error occurred',
+        read: false,
+        persistent: false,
       });
     }
   };
@@ -264,12 +289,16 @@ export default function ProjectDetailPage() {
         type: 'success',
         title: 'Configuration Updated',
         message: 'Project configuration has been saved',
+        read: false,
+        persistent: false,
       });
     } catch (error) {
       addNotification({
         type: 'error',
         title: 'Failed to Update Configuration',
         message: error instanceof Error ? error.message : 'Unknown error occurred',
+        read: false,
+        persistent: false,
       });
     }
   };
@@ -284,6 +313,8 @@ export default function ProjectDetailPage() {
           type: 'success',
           title: 'Project Deleted',
           message: `"${project.title || 'Untitled Project'}" has been deleted`,
+          read: false,
+          persistent: false,
         });
         router.push('/');
       } catch (error) {
@@ -291,6 +322,8 @@ export default function ProjectDetailPage() {
           type: 'error',
           title: 'Failed to Delete Project',
           message: error instanceof Error ? error.message : 'Unknown error occurred',
+          read: false,
+          persistent: false,
         });
       }
     }
@@ -305,6 +338,8 @@ export default function ProjectDetailPage() {
         type: 'success',
         title: 'Project Duplicated',
         message: `Copy created successfully`,
+        read: false,
+        persistent: false,
       });
       router.push(`/projects/${newProject.id}`);
     } catch (error) {
@@ -312,6 +347,8 @@ export default function ProjectDetailPage() {
         type: 'error',
         title: 'Failed to Duplicate Project',
         message: error instanceof Error ? error.message : 'Unknown error occurred',
+        read: false,
+        persistent: false,
       });
     }
   };
@@ -344,12 +381,16 @@ export default function ProjectDetailPage() {
         type: 'success',
         title: 'Export Successful',
         message: `Article exported as ${format.toUpperCase()}`,
+        read: false,
+        persistent: false,
       });
     } catch (error) {
       addNotification({
         type: 'error',
         title: 'Export Failed',
         message: error instanceof Error ? error.message : 'Failed to export article',
+        read: false,
+        persistent: false,
       });
     }
   };
@@ -595,7 +636,7 @@ export default function ProjectDetailPage() {
                   <CardContent className="space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Research</span>
-                      {project.config?.do_research ? (
+                      {project.config?.pipeline?.doResearch ? (
                         <CheckCircle className="h-4 w-4 text-green-500" />
                       ) : (
                         <div className="h-4 w-4 rounded-full bg-muted" />
@@ -603,7 +644,7 @@ export default function ProjectDetailPage() {
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Generate Outline</span>
-                      {project.config?.do_generate_outline ? (
+                      {project.config?.pipeline?.doGenerateOutline ? (
                         <CheckCircle className="h-4 w-4 text-green-500" />
                       ) : (
                         <div className="h-4 w-4 rounded-full bg-muted" />
@@ -611,7 +652,7 @@ export default function ProjectDetailPage() {
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Write Article</span>
-                      {project.config?.do_generate_article ? (
+                      {project.config?.pipeline?.doGenerateArticle ? (
                         <CheckCircle className="h-4 w-4 text-green-500" />
                       ) : (
                         <div className="h-4 w-4 rounded-full bg-muted" />
@@ -832,6 +873,8 @@ export default function ProjectDetailPage() {
                         type: 'success',
                         title: 'Outline Saved',
                         message: 'Article outline has been updated',
+                        read: false,
+                        persistent: false,
                       });
                     }}
                   />

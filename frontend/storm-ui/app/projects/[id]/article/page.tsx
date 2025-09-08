@@ -15,7 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useProjectStore, useUIStore } from '@/store';
+import { useProjectStore, useNotificationStore } from '@/store';
 import { GeneratedArticle } from '@/types/storm';
 import { AnimatedPage } from '@/utils/animations/AnimatedPage';
 import { ResponsiveContainer } from '@/components/ux/ResponsiveContainer';
@@ -54,7 +54,7 @@ export default function ArticlePage() {
     updateProject 
   } = useProjectStore();
   
-  const { addNotification } = useUIStore();
+  const { addNotification } = useNotificationStore();
 
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState('article');
@@ -79,12 +79,16 @@ export default function ArticlePage() {
         type: 'success',
         title: 'Article Saved',
         message: 'Your changes have been saved successfully',
+        read: false,
+        persistent: false,
       });
     } catch (error) {
       addNotification({
         type: 'error',
         title: 'Failed to Save',
         message: error instanceof Error ? error.message : 'Unknown error occurred',
+        read: false,
+        persistent: false,
       });
     }
   };
@@ -97,6 +101,8 @@ export default function ArticlePage() {
       type: 'info',
       title: 'Export Started',
       message: `Exporting article as ${format.toUpperCase()}...`,
+      read: false,
+      persistent: false,
     });
   };
 
@@ -110,6 +116,8 @@ export default function ArticlePage() {
         type: 'success',
         title: 'Link Copied',
         message: 'Article link copied to clipboard',
+        read: false,
+        persistent: false,
       });
     });
   };

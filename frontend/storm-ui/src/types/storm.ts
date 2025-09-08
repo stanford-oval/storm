@@ -17,6 +17,11 @@ export interface StormProject {
   research?: ResearchData;
   current_stage?: string;
   pipeline_status?: string;
+  metadata?: {
+    duration?: number;
+    [key: string]: any;
+  };
+  error?: string;  // Error message if pipeline failed
 }
 
 export type ProjectStatus = 

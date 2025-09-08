@@ -49,6 +49,9 @@ interface ProjectActions {
   deselectProject: (projectId: string) => void;
   selectAllProjects: () => void;
   deselectAllProjects: () => void;
+  toggleProjectSelection: (projectId: string) => void;
+  clearSelection: () => void;
+  fetchProject: (projectId: string) => Promise<StormProject>;
   addToRecentProjects: (projectId: string) => void;
   
   // Filtering and sorting
@@ -516,6 +519,25 @@ export const useProjectStore = create<ProjectStore>()(
             set((draft) => {
               draft.selectedProjects = [];
             }, 'deselectAllProjects');
+          },
+
+          // Additional selection methods for compatibility
+          toggleProjectSelection: (projectId: string) => {
+            const store = get();
+            if (store.selectedProjects.includes(projectId)) {
+              store.deselectProject(projectId);
+            } else {
+              store.selectProject(projectId, true);
+            }
+          },
+
+          clearSelection: () => {
+            get().deselectAllProjects();
+          },
+
+          // Alias for loadProject
+          fetchProject: async (projectId: string) => {
+            return get().loadProject(projectId);
           },
 
           addToRecentProjects: (projectId) => {
