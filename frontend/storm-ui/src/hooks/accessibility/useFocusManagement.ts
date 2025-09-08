@@ -1,5 +1,4 @@
 import { useRef, useEffect, useCallback, RefObject } from 'react';
-import { useHotkeys } from 'react-hotkeys-hook';
 
 interface FocusManagementOptions {
   trapFocus?: boolean;
@@ -132,12 +131,19 @@ export const useFocusManagement = (
   }, [trapFocus, restoreFocus, autoFocus, handleTabKey, getFocusableElements, containerRef]);
 
   // Handle escape key
-  useHotkeys('escape', () => {
-    onEscape?.();
-  }, {
-    enabled: !!onEscape,
-    enableOnFormTags: true,
-  });
+  useEffect(() => {
+    if (!onEscape) return;
+    
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onEscape();
+      }
+    };
+    
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [onEscape]);
 
   // Focus management utilities
   const focusFirst = useCallback(() => {

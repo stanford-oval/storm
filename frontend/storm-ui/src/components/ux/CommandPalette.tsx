@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Command } from 'cmdk';
-import { useHotkeys } from 'react-hotkeys-hook';
 import { 
   Search, FileText, Folder, Settings, Zap, Download, Upload, 
   Play, Square, RotateCcw, Trash2, Copy, Edit, Plus, Home,
@@ -168,18 +167,45 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
 
-  // Register keyboard shortcuts for commands
-  commands.forEach(command => {
-    if (command.shortcut) {
-      useHotkeys(command.shortcut, command.action, { 
-        enabled: !isOpen,
-        preventDefault: true,
-      });
-    }
-  });
-
-  // Close palette on escape
-  useHotkeys('escape', onClose, { enabled: isOpen });
+  // Register keyboard shortcuts for commands and escape key
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // Handle escape key
+      if (isOpen && e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+        return;
+      }
+      
+      // Handle command shortcuts when palette is closed
+      if (!isOpen) {
+        commands.forEach(command => {
+          if (command.shortcut) {
+            // Parse shortcut (e.g., "cmd+k" or "ctrl+shift+p")
+            const keys = command.shortcut.toLowerCase().split('+');
+            const hasCmd = keys.includes('cmd') || keys.includes('meta');
+            const hasCtrl = keys.includes('ctrl');
+            const hasShift = keys.includes('shift');
+            const hasAlt = keys.includes('alt');
+            const mainKey = keys[keys.length - 1];
+            
+            if (
+              ((hasCmd && e.metaKey) || (hasCtrl && e.ctrlKey) || (!hasCmd && !hasCtrl)) &&
+              (hasShift ? e.shiftKey : !e.shiftKey) &&
+              (hasAlt ? e.altKey : !e.altKey) &&
+              e.key.toLowerCase() === mainKey
+            ) {
+              e.preventDefault();
+              command.action();
+            }
+          }
+        });
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [isOpen, onClose, commands]);
 
   // Filter and group commands
   const filteredCommands = useMemo(() => {

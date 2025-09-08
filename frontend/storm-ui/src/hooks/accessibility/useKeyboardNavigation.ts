@@ -1,5 +1,4 @@
 import { useCallback, useEffect, RefObject } from 'react';
-import { useHotkeys } from 'react-hotkeys-hook';
 
 interface KeyboardNavigationOptions {
   enabled?: boolean;
@@ -152,97 +151,88 @@ export const useKeyboardNavigation = (
   }, [enableArrowKeys, enabled, orientation, focusNext, focusPrevious]);
 
   // Keyboard event handlers
-  useHotkeys('up', () => handleArrowKeys('up'), {
-    enabled: enabled && enableArrowKeys,
-    preventDefault: true,
-    enableOnFormTags: true,
-    scopes: ['navigation'],
-  });
-
-  useHotkeys('down', () => handleArrowKeys('down'), {
-    enabled: enabled && enableArrowKeys,
-    preventDefault: true,
-    enableOnFormTags: true,
-    scopes: ['navigation'],
-  });
-
-  useHotkeys('left', () => handleArrowKeys('left'), {
-    enabled: enabled && enableArrowKeys,
-    preventDefault: true,
-    enableOnFormTags: true,
-    scopes: ['navigation'],
-  });
-
-  useHotkeys('right', () => handleArrowKeys('right'), {
-    enabled: enabled && enableArrowKeys,
-    preventDefault: true,
-    enableOnFormTags: true,
-    scopes: ['navigation'],
-  });
-
-  useHotkeys('home', focusFirst, {
-    enabled: enabled && enableHomeEnd,
-    preventDefault: true,
-    enableOnFormTags: true,
-    scopes: ['navigation'],
-  });
-
-  useHotkeys('end', focusLast, {
-    enabled: enabled && enableHomeEnd,
-    preventDefault: true,
-    enableOnFormTags: true,
-    scopes: ['navigation'],
-  });
-
-  useHotkeys('pageup', () => {
-    const items = getItems();
-    const currentIndex = getCurrentIndex();
-    const pageSize = Math.floor(items.length / 4) || 1;
-    const newIndex = Math.max(0, currentIndex - pageSize);
-    focusItem(newIndex);
-  }, {
-    enabled: enabled && enablePageUpDown,
-    preventDefault: true,
-    enableOnFormTags: true,
-    scopes: ['navigation'],
-  });
-
-  useHotkeys('pagedown', () => {
-    const items = getItems();
-    const currentIndex = getCurrentIndex();
-    const pageSize = Math.floor(items.length / 4) || 1;
-    const newIndex = Math.min(items.length - 1, currentIndex + pageSize);
-    focusItem(newIndex);
-  }, {
-    enabled: enabled && enablePageUpDown,
-    preventDefault: true,
-    enableOnFormTags: true,
-    scopes: ['navigation'],
-  });
-
-  useHotkeys('enter', () => {
-    const currentIndex = getCurrentIndex();
-    if (currentIndex >= 0) {
-      activateItem(currentIndex);
-    }
-  }, {
-    enabled: enabled && enableEnterSpace,
-    preventDefault: true,
-    enableOnFormTags: false,
-    scopes: ['navigation'],
-  });
-
-  useHotkeys('space', () => {
-    const currentIndex = getCurrentIndex();
-    if (currentIndex >= 0) {
-      activateItem(currentIndex);
-    }
-  }, {
-    enabled: enabled && enableEnterSpace,
-    preventDefault: true,
-    enableOnFormTags: false,
-    scopes: ['navigation'],
-  });
+  useEffect(() => {
+    if (!enabled) return;
+    
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      const isFormElement = ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
+      
+      // Arrow keys
+      if (enableArrowKeys) {
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          handleArrowKeys('up');
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          handleArrowKeys('down');
+        } else if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          handleArrowKeys('left');
+        } else if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          handleArrowKeys('right');
+        }
+      }
+      
+      // Home/End keys
+      if (enableHomeEnd) {
+        if (e.key === 'Home') {
+          e.preventDefault();
+          focusFirst();
+        } else if (e.key === 'End') {
+          e.preventDefault();
+          focusLast();
+        }
+      }
+      
+      // PageUp/PageDown
+      if (enablePageUpDown) {
+        if (e.key === 'PageUp') {
+          e.preventDefault();
+          const items = getItems();
+          const currentIndex = getCurrentIndex();
+          const pageSize = Math.floor(items.length / 4) || 1;
+          const newIndex = Math.max(0, currentIndex - pageSize);
+          focusItem(newIndex);
+        } else if (e.key === 'PageDown') {
+          e.preventDefault();
+          const items = getItems();
+          const currentIndex = getCurrentIndex();
+          const pageSize = Math.floor(items.length / 4) || 1;
+          const newIndex = Math.min(items.length - 1, currentIndex + pageSize);
+          focusItem(newIndex);
+        }
+      }
+      
+      // Enter/Space for activation
+      if (enableEnterSpace && !isFormElement) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          const currentIndex = getCurrentIndex();
+          if (currentIndex >= 0) {
+            e.preventDefault();
+            activateItem(currentIndex);
+          }
+        }
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [
+    enabled,
+    enableArrowKeys,
+    enableHomeEnd,
+    enablePageUpDown,
+    enableEnterSpace,
+    handleArrowKeys,
+    focusFirst,
+    focusLast,
+    focusItem,
+    activateItem,
+    getCurrentIndex,
+    getItems
+  ]);
 
   // Auto-focus management
   useEffect(() => {
