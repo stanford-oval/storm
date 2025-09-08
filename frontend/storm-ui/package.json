@@ -70,7 +70,6 @@
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-hook-form": "^7.48.0",
-    "react-hotkeys-hook": "^5.1.0",
     "react-intersection-observer": "^9.16.0",
     "react-markdown": "^10.1.0",
     "react-use": "^17.6.0",

@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useHotkeys } from 'react-hotkeys-hook';
 import { Keyboard, X, Command, Search, Play, Square, Settings, Download, Upload } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
@@ -219,11 +218,19 @@ export const KeyboardShortcuts: React.FC<KeyboardShortcutsProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
 
   // Close on escape key
-  useHotkeys('escape', () => {
-    if (isOpen && onClose) {
-      onClose();
-    }
-  }, { enabled: isOpen });
+  useEffect(() => {
+    if (!isOpen) return;
+    
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+    };
+    
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [isOpen, onClose]);
 
   // Filter shortcuts based on category and search
   const filteredShortcuts = shortcuts.filter(shortcut => {
