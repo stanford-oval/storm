@@ -46,16 +46,14 @@ export const KeyboardShortcuts: React.FC<KeyboardShortcutsProps> = ({
   const [editingShortcuts, setEditingShortcuts] = useState<Record<string, string>>({});
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   
-  // Get shortcuts from store or use defaults
-  const { customShortcuts, setCustomShortcuts } = useUIStore(state => ({
-    customShortcuts: state.keyboard.customShortcuts || {},
-    setCustomShortcuts: state.setCustomShortcuts,
-  }));
+  // Get shortcuts from store or use defaults - memoize to avoid recreating empty object
+  const customShortcuts = useUIStore(state => state.keyboard?.customShortcuts);
+  const setCustomShortcuts = useUIStore(state => state.setCustomShortcuts);
   
   // Use prop shortcuts or merge custom with defaults
   const shortcuts = useMemo(() => {
     if (propShortcuts) return propShortcuts;
-    return getMergedShortcuts(customShortcuts, defaultKeyboardShortcuts);
+    return getMergedShortcuts(customShortcuts || {}, defaultKeyboardShortcuts);
   }, [propShortcuts, customShortcuts]);
 
   // Detect platform
@@ -151,13 +149,17 @@ export const KeyboardShortcuts: React.FC<KeyboardShortcutsProps> = ({
       }
     });
 
-    setCustomShortcuts(customKeys);
+    if (setCustomShortcuts) {
+      setCustomShortcuts(customKeys);
+    }
     setIsEditing(false);
     setEditingShortcuts({});
   };
 
   const handleResetDefaults = () => {
-    setCustomShortcuts({});
+    if (setCustomShortcuts) {
+      setCustomShortcuts({});
+    }
     setEditingShortcuts({});
     setValidationErrors({});
   };
