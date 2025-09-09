@@ -119,7 +119,7 @@ export const usePipelineStore = create<PipelineStore>()(
                 llm_model: config.llm?.model ?? config.llm_model ?? 'gpt-4o',
                 temperature: config.llm?.temperature ?? config.temperature ?? 0.7,
                 max_tokens: config.llm?.maxTokens ?? config.max_tokens ?? 4000,
-                retriever_type: config.retriever?.type ?? config.retriever_type ?? 'bing',
+                retriever_type: config.retriever?.type ?? config.retriever_type ?? 'tavily',
                 max_search_results: config.retriever?.maxResults ?? config.max_search_results ?? 10,
                 search_top_k: config.retriever?.topK ?? config.search_top_k ?? 3,
                 // Pipeline flags

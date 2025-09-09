@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
@@ -32,6 +32,7 @@ export default function SettingsPage() {
   const { addNotification } = useNotificationStore();
   const [showApiKeys, setShowApiKeys] = useState<Record<string, boolean>>({});
   const [testingApi, setTestingApi] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   // Load saved settings from localStorage
   const loadSavedSettings = () => {
@@ -48,15 +49,51 @@ export default function SettingsPage() {
 
   const savedSettings = loadSavedSettings();
 
-  // Form state - use saved values or environment variables
+  // Form state - will be populated from backend
   const [apiKeys, setApiKeys] = useState({
-    openai: savedSettings?.apiKeys?.openai || process.env.NEXT_PUBLIC_OPENAI_API_KEY || '',
-    anthropic: savedSettings?.apiKeys?.anthropic || process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY || '',
-    google: savedSettings?.apiKeys?.google || process.env.NEXT_PUBLIC_GOOGLE_API_KEY || '',
-    tavily: savedSettings?.apiKeys?.tavily || process.env.NEXT_PUBLIC_TAVILY_API_KEY || '',
-    serper: savedSettings?.apiKeys?.serper || process.env.NEXT_PUBLIC_SERPER_API_KEY || '',
-    bing: savedSettings?.apiKeys?.bing || process.env.NEXT_PUBLIC_BING_API_KEY || '',
+    openai: '',
+    anthropic: '',
+    google: '',
+    tavily: '',
+    serper: '',
+    bing: '',
   });
+  
+  // Load API keys from backend on mount
+  useEffect(() => {
+    const loadApiKeys = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/settings/api-keys');
+        if (response.ok) {
+          const data = await response.json();
+          // Use previews from backend or saved values
+          setApiKeys({
+            openai: savedSettings?.apiKeys?.openai || data.openai_key_preview || '',
+            anthropic: savedSettings?.apiKeys?.anthropic || data.anthropic_key_preview || '',
+            google: savedSettings?.apiKeys?.google || data.google_api_key_preview || '',
+            tavily: savedSettings?.apiKeys?.tavily || data.tavily_key_preview || '',
+            serper: savedSettings?.apiKeys?.serper || data.serper_key_preview || '',
+            bing: savedSettings?.apiKeys?.bing || data.bing_key_preview || '',
+          });
+        }
+      } catch (error) {
+        console.error('Failed to load API keys:', error);
+        // Fall back to saved settings
+        setApiKeys({
+          openai: savedSettings?.apiKeys?.openai || '',
+          anthropic: savedSettings?.apiKeys?.anthropic || '',
+          google: savedSettings?.apiKeys?.google || '',
+          tavily: savedSettings?.apiKeys?.tavily || '',
+          serper: savedSettings?.apiKeys?.serper || '',
+          bing: savedSettings?.apiKeys?.bing || '',
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadApiKeys();
+  }, []);
 
   const [llmSettings, setLlmSettings] = useState({
     defaultModel: savedSettings?.llmSettings?.defaultModel || 'gpt-4',
@@ -348,11 +385,11 @@ export default function SettingsPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="google">Google Search</SelectItem>
                     <SelectItem value="tavily">Tavily</SelectItem>
+                    <SelectItem value="google">Google Search</SelectItem>
                     <SelectItem value="serper">Serper</SelectItem>
-                    <SelectItem value="bing">Bing</SelectItem>
-                    <SelectItem value="duckduckgo">DuckDuckGo</SelectItem>
+                    <SelectItem value="you">You.com</SelectItem>
+                    <SelectItem value="duckduckgo">DuckDuckGo (Free)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

@@ -4,6 +4,14 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { 
   BarChart, 
   Bar, 
@@ -34,31 +42,54 @@ export default function AnalyticsPage() {
   const { projects, loadProjects } = useProjectStore();
   const { pipelineHistory } = usePipelineStore();
   
+  // State for time range selection
+  const [timeRange, setTimeRange] = useState<'day' | 'week' | 'month' | 'year'>('month');
+  const [dateRange, setDateRange] = useState<number>(6); // Number of periods to show
+  
   useEffect(() => {
     loadProjects();
   }, [loadProjects]);
 
-  // Calculate real data from projects
+  // Calculate real data from projects with time range support
   const calculateUsageData = () => {
     if (!projects || projects.length === 0) {
       return [];
     }
 
-    // Group projects by month
-    const monthlyData: Record<string, { tokens: number; cost: number; projects: number }> = {};
+    // Group projects by time period
+    const periodData: Record<string, { tokens: number; cost: number; projects: number }> = {};
     
     projects.forEach(project => {
       const date = new Date(project.createdAt);
-      const monthKey = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+      let periodKey = '';
       
-      if (!monthlyData[monthKey]) {
-        monthlyData[monthKey] = { tokens: 0, cost: 0, projects: 0 };
+      // Format the key based on selected time range
+      switch (timeRange) {
+        case 'day':
+          periodKey = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+          break;
+        case 'week':
+          // Get week number and year
+          const weekStart = new Date(date);
+          weekStart.setDate(date.getDate() - date.getDay());
+          periodKey = `Week of ${weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+          break;
+        case 'month':
+          periodKey = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+          break;
+        case 'year':
+          periodKey = date.getFullYear().toString();
+          break;
+      }
+      
+      if (!periodData[periodKey]) {
+        periodData[periodKey] = { tokens: 0, cost: 0, projects: 0 };
       }
       
       // Estimate tokens based on word count (rough estimate: 1 word ≈ 1.3 tokens)
       const estimatedTokens = (project.word_count || 0) * 1.3;
-      monthlyData[monthKey].tokens += estimatedTokens;
-      monthlyData[monthKey].projects += 1;
+      periodData[periodKey].tokens += estimatedTokens;
+      periodData[periodKey].projects += 1;
       
       // Estimate cost based on model (rough estimates)
       const model = project.config?.llm?.model || 'gpt-3.5-turbo';
@@ -66,18 +97,24 @@ export default function AnalyticsPage() {
       if (model.includes('gpt-4')) costPerToken = 0.00003;
       if (model.includes('claude')) costPerToken = 0.000015;
       
-      monthlyData[monthKey].cost += estimatedTokens * costPerToken;
+      periodData[periodKey].cost += estimatedTokens * costPerToken;
     });
 
     // Convert to array and sort by date
-    return Object.entries(monthlyData)
-      .map(([month, data]) => ({
-        month,
+    const sortedData = Object.entries(periodData)
+      .map(([period, data]) => ({
+        period,
         tokens: Math.round(data.tokens),
         cost: Math.round(data.cost * 100) / 100,
         projects: data.projects
       }))
-      .slice(-6); // Last 6 months
+      .sort((a, b) => {
+        // Sort chronologically (this is simplified, might need better date parsing)
+        return new Date(a.period).getTime() - new Date(b.period).getTime();
+      });
+    
+    // Return the requested number of periods
+    return sortedData.slice(-dateRange);
   };
 
   const calculateModelUsage = () => {
@@ -213,7 +250,7 @@ export default function AnalyticsPage() {
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={usageData}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
+                    <XAxis dataKey="period" />
                     <YAxis />
                     <Tooltip />
                     <Legend />
@@ -319,15 +356,109 @@ export default function AnalyticsPage() {
         <TabsContent value="costs" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Cost Breakdown</CardTitle>
-              <CardDescription>Monthly API costs and projections</CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Cost Breakdown</CardTitle>
+                  <CardDescription>API costs over time</CardDescription>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="flex rounded-lg border p-1">
+                    <Button
+                      variant={timeRange === 'day' ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => {
+                        setTimeRange('day');
+                        setDateRange(30);
+                      }}
+                      className="px-3 py-1 h-8"
+                    >
+                      Day
+                    </Button>
+                    <Button
+                      variant={timeRange === 'week' ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => {
+                        setTimeRange('week');
+                        setDateRange(12);
+                      }}
+                      className="px-3 py-1 h-8"
+                    >
+                      Week
+                    </Button>
+                    <Button
+                      variant={timeRange === 'month' ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => {
+                        setTimeRange('month');
+                        setDateRange(6);
+                      }}
+                      className="px-3 py-1 h-8"
+                    >
+                      Month
+                    </Button>
+                    <Button
+                      variant={timeRange === 'year' ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => {
+                        setTimeRange('year');
+                        setDateRange(3);
+                      }}
+                      className="px-3 py-1 h-8"
+                    >
+                      Year
+                    </Button>
+                  </div>
+                  <Select
+                    value={dateRange.toString()}
+                    onValueChange={(value) => setDateRange(parseInt(value))}
+                  >
+                    <SelectTrigger className="w-24 h-8">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {timeRange === 'day' && (
+                        <>
+                          <SelectItem value="7">7 days</SelectItem>
+                          <SelectItem value="14">14 days</SelectItem>
+                          <SelectItem value="30">30 days</SelectItem>
+                          <SelectItem value="90">90 days</SelectItem>
+                        </>
+                      )}
+                      {timeRange === 'week' && (
+                        <>
+                          <SelectItem value="4">4 weeks</SelectItem>
+                          <SelectItem value="8">8 weeks</SelectItem>
+                          <SelectItem value="12">12 weeks</SelectItem>
+                          <SelectItem value="26">26 weeks</SelectItem>
+                        </>
+                      )}
+                      {timeRange === 'month' && (
+                        <>
+                          <SelectItem value="3">3 months</SelectItem>
+                          <SelectItem value="6">6 months</SelectItem>
+                          <SelectItem value="12">12 months</SelectItem>
+                          <SelectItem value="24">24 months</SelectItem>
+                        </>
+                      )}
+                      {timeRange === 'year' && (
+                        <>
+                          <SelectItem value="1">1 year</SelectItem>
+                          <SelectItem value="2">2 years</SelectItem>
+                          <SelectItem value="3">3 years</SelectItem>
+                          <SelectItem value="5">5 years</SelectItem>
+                        </>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               {usageData && usageData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={usageData}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
+                    <XAxis dataKey="period" />
                     <YAxis />
                     <Tooltip formatter={(value) => `$${value}`} />
                     <Legend />

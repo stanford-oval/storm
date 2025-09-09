@@ -41,7 +41,7 @@ class ProjectConfig(BaseModel):
     max_tokens: int = 4000
 
     # Retriever Configuration
-    retriever_type: str = "bing"
+    retriever_type: str = "tavily"  # Default to tavily (bing is not implemented)
     max_search_results: int = 10
     search_top_k: int = 3
 

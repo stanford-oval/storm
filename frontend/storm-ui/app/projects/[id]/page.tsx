@@ -78,6 +78,7 @@ export default function ProjectDetailPage() {
 
   const [activeTab, setActiveTab] = useState<string>('overview');
   const [isConfiguring, setIsConfiguring] = useState(false);
+  const [projectConfig, setProjectConfig] = useState<StormConfig | undefined>();
 
   // Load project on mount and ensure fresh data
   useEffect(() => {
@@ -86,9 +87,21 @@ export default function ProjectDetailPage() {
       const loadFreshProject = async () => {
         try {
           const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-          const response = await fetch(`${apiUrl}/projects/${projectId}`);
-          if (response.ok) {
-            const freshProject = await response.json();
+          
+          // Fetch both project and default config in parallel
+          const [projectResponse, configResponse] = await Promise.all([
+            fetch(`${apiUrl}/projects/${projectId}`),
+            fetch(`${apiUrl}/settings/default-config`)
+          ]);
+          
+          if (projectResponse.ok) {
+            const freshProject = await projectResponse.json();
+            
+            // Get default config if available
+            let defaultConfig = null;
+            if (configResponse.ok) {
+              defaultConfig = await configResponse.json();
+            }
             
             // Map backend config to frontend format if config exists
             if (freshProject.config) {
@@ -102,14 +115,14 @@ export default function ProjectDetailPage() {
                 freshProject.config = {
                   ...freshProject.config,
                   llm: freshProject.config.llm || {
-                    provider: freshProject.config.llm_provider || 'openai',
-                    model: freshProject.config.llm_model || 'gpt-4o',
-                    temperature: freshProject.config.temperature || 0.7,
-                    maxTokens: freshProject.config.max_tokens || 4000,
+                    provider: freshProject.config.llm_provider || defaultConfig?.llm?.model?.includes('claude') ? 'anthropic' : 'openai',
+                    model: freshProject.config.llm_model || defaultConfig?.llm?.model || 'gpt-4o',
+                    temperature: freshProject.config.temperature || defaultConfig?.llm?.temperature || 0.7,
+                    maxTokens: freshProject.config.max_tokens || defaultConfig?.llm?.max_tokens || 4000,
                   },
                   retriever: freshProject.config.retriever || {
-                    type: freshProject.config.retriever_type || 'bing',
-                    maxResults: freshProject.config.max_search_results || 10,
+                    type: freshProject.config.retriever_type || defaultConfig?.retriever?.type || 'tavily',
+                    maxResults: freshProject.config.max_search_results || defaultConfig?.retriever?.max_results || 10,
                     topK: freshProject.config.search_top_k || 3,
                   },
                   pipeline: freshProject.config.pipeline || {
@@ -127,12 +140,62 @@ export default function ProjectDetailPage() {
                   }
                 };
               }
-              // If already in frontend format, keep it as is
+              // If already in frontend format, merge with defaults
+              else {
+                freshProject.config = {
+                  llm: {
+                    ...freshProject.config.llm,
+                    model: freshProject.config.llm?.model || defaultConfig?.llm?.model || 'gpt-4o',
+                    provider: freshProject.config.llm?.provider || (defaultConfig?.llm?.model?.includes('claude') ? 'anthropic' : 'openai'),
+                  },
+                  retriever: {
+                    ...freshProject.config.retriever,
+                    type: freshProject.config.retriever?.type || defaultConfig?.retriever?.type || 'tavily',
+                  },
+                  pipeline: freshProject.config.pipeline || {
+                    doResearch: true,
+                    doGenerateOutline: true,
+                    doGenerateArticle: true,
+                    doPolishArticle: true,
+                  },
+                  output: freshProject.config.output || {
+                    format: 'markdown',
+                    includeCitations: true,
+                  }
+                };
+              }
+            } else if (defaultConfig) {
+              // If no config exists, use default config from backend
+              freshProject.config = {
+                llm: {
+                  model: defaultConfig.llm?.model || 'gpt-4o',
+                  provider: defaultConfig.llm?.model?.includes('claude') ? 'anthropic' : 'openai',
+                  temperature: defaultConfig.llm?.temperature || 0.7,
+                  maxTokens: defaultConfig.llm?.max_tokens || 4000,
+                },
+                retriever: {
+                  type: defaultConfig.retriever?.type || 'tavily',
+                  maxResults: defaultConfig.retriever?.max_results || 10,
+                },
+                pipeline: {
+                  doResearch: true,
+                  doGenerateOutline: true,
+                  doGenerateArticle: true,
+                  doPolishArticle: true,
+                },
+                output: {
+                  format: 'markdown',
+                  includeCitations: true,
+                }
+              };
             }
             
             // Update store with fresh data
             const { setCurrentProject } = useProjectStore.getState();
             setCurrentProject(freshProject);
+            
+            // Set the project config state
+            setProjectConfig(freshProject.config);
             
             // The setCurrentProject method already updates the projects array
           }
@@ -220,8 +283,8 @@ export default function ProjectDetailPage() {
     if (!project) return;
     
     try {
-      // Use default config if project doesn't have one
-      const defaultConfig: StormConfig = {
+      // Use loaded config, project config, or default config
+      const configToUse = projectConfig || project.config || {
         llm: {
           model: 'gpt-4o',
           provider: 'openai',
@@ -237,7 +300,7 @@ export default function ProjectDetailPage() {
         }
       };
       
-      await startPipeline(project.id, project.config || defaultConfig);
+      await startPipeline(project.id, configToUse);
       addNotification({
         type: 'success',
         title: 'Pipeline Started',
@@ -284,6 +347,7 @@ export default function ProjectDetailPage() {
     
     try {
       await updateProjectConfig(project.id, config);
+      setProjectConfig(config); // Update local state
       setIsConfiguring(false);
       addNotification({
         type: 'success',
@@ -919,10 +983,10 @@ export default function ProjectDetailPage() {
 
           <TabsContent value="settings">
             <ConfigurationPanel
-              config={project.config}
+              config={projectConfig || project.config}
               onChange={(config) => {
                 // Update local state immediately for responsive UI
-                // Note: This doesn't save to backend until handleConfigSave is called
+                setProjectConfig(config);
               }}
               onSave={handleConfigSave}
               onCancel={() => setIsConfiguring(false)}

@@ -354,11 +354,11 @@ export const useProjectStore = create<ProjectStore>()(
                           temperature: project.config.temperature || 0.7,
                           maxTokens: project.config.max_tokens || 4000,
                         },
-                        retriever: project.config.retriever || {
-                          type: project.config.retriever_type || 'bing',
+                        retriever: (!project.config.retriever || project.config.retriever === null) ? {
+                          type: project.config.retriever_type || 'tavily',
                           maxResults: project.config.max_search_results || 10,
                           topK: project.config.search_top_k || 3,
-                        },
+                        } : project.config.retriever,
                         pipeline: project.config.pipeline || {
                           maxConvTurns: project.config.max_conv_turn || 3,
                           maxPerspectives: project.config.max_perspective || 4,
@@ -427,11 +427,11 @@ export const useProjectStore = create<ProjectStore>()(
                       temperature: project.config.temperature || 0.7,
                       maxTokens: project.config.max_tokens || 4000,
                     },
-                    retriever: project.config.retriever || {
-                      type: project.config.retriever_type || 'bing',
+                    retriever: (!project.config.retriever || project.config.retriever === null) ? {
+                      type: project.config.retriever_type || 'tavily',
                       maxResults: project.config.max_search_results || 10,
                       topK: project.config.search_top_k || 3,
-                    },
+                    } : project.config.retriever,
                     pipeline: project.config.pipeline || {
                       maxConvTurns: project.config.max_conv_turn || 3,
                       maxPerspectives: project.config.max_perspective || 4,
@@ -709,7 +709,7 @@ export const useProjectStore = create<ProjectStore>()(
                 llm_model: config.llm?.model ?? 'gpt-4o',
                 temperature: config.llm?.temperature ?? 0.7,
                 max_tokens: config.llm?.maxTokens ?? 4000,
-                retriever_type: config.retriever?.type ?? 'bing',
+                retriever_type: config.retriever?.type ?? 'tavily',
                 max_search_results: config.retriever?.maxResults ?? 10,
                 search_top_k: config.retriever?.topK ?? 3,
                 // Pipeline flags

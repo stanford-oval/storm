@@ -41,6 +41,34 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
   className,
   allowSaveWithoutChanges = false,
 }) => {
+  const [backendConfig, setBackendConfig] = React.useState<any>(null);
+  const [backendApiKeys, setBackendApiKeys] = React.useState<any>(null);
+  
+  // Fetch default config and API keys from backend
+  React.useEffect(() => {
+    const fetchBackendData = async () => {
+      try {
+        const [configResponse, keysResponse] = await Promise.all([
+          fetch('http://localhost:8000/api/settings/default-config'),
+          fetch('http://localhost:8000/api/settings/api-keys')
+        ]);
+        
+        if (configResponse.ok) {
+          const data = await configResponse.json();
+          setBackendConfig(data);
+        }
+        
+        if (keysResponse.ok) {
+          const keysData = await keysResponse.json();
+          setBackendApiKeys(keysData);
+        }
+      } catch (error) {
+        console.error('Failed to fetch backend data:', error);
+      }
+    };
+    fetchBackendData();
+  }, []);
+  
   // Initialize config with environment variables if API keys are not set
   const initializeConfig = React.useCallback((baseConfig: StormConfig): StormConfig => {
     // Create a deep mutable copy to avoid "object is not extensible" errors
@@ -61,19 +89,19 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
     // Start with a deep mutable copy of the base config
     const baseCopy = baseConfig ? createMutableCopy(baseConfig) : {};
     
-    // Ensure config has proper structure with defaults
+    // Ensure config has proper structure with defaults (use backend config if available)
     const newConfig: StormConfig = {
       llm: {
-        model: baseCopy.llm?.model || 'gpt-3.5-turbo',
-        provider: baseCopy.llm?.provider || 'openai',
+        model: baseCopy.llm?.model || backendConfig?.llm?.model || 'gpt-3.5-turbo',
+        provider: baseCopy.llm?.provider || (backendConfig?.llm?.model?.includes('claude') ? 'anthropic' : 'openai'),
         temperature: baseCopy.llm?.temperature ?? 0.7,
-        maxTokens: baseCopy.llm?.maxTokens || 4000,
+        maxTokens: baseCopy.llm?.maxTokens || backendConfig?.llm?.max_tokens || 4000,
         apiKey: baseCopy.llm?.apiKey,
         baseUrl: baseCopy.llm?.baseUrl
       },
       retriever: {
-        type: baseCopy.retriever?.type || 'tavily',
-        maxResults: baseCopy.retriever?.maxResults || 10,
+        type: baseCopy.retriever?.type || backendConfig?.retriever?.type || 'tavily',
+        maxResults: baseCopy.retriever?.maxResults || backendConfig?.retriever?.max_results || 10,
         apiKey: baseCopy.retriever?.apiKey
       },
       pipeline: {
@@ -86,33 +114,43 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
       }
     };
     
-    // Auto-fill LLM API key from environment if not set
-    if (!newConfig.llm.apiKey) {
-      const llmConfig = getLLMConfig(newConfig.llm.provider);
-      
-      if (llmConfig?.apiKey) {
-        newConfig.llm.apiKey = llmConfig.apiKey;
-      }
-      if (llmConfig?.baseUrl) {
-        newConfig.llm.baseUrl = llmConfig.baseUrl;
+    // Auto-fill API keys from backend if available
+    if (!newConfig.llm.apiKey && backendApiKeys) {
+      // Use masked keys from backend as placeholder
+      if (newConfig.llm.provider === 'openai' && backendApiKeys.openai_key_preview) {
+        // Don't set the actual key, but indicate it's configured
+        newConfig.llm.apiKey = ''; // Will be filled from backend
+      } else if (newConfig.llm.provider === 'anthropic' && backendApiKeys.anthropic_key_preview) {
+        newConfig.llm.apiKey = ''; // Will be filled from backend
       }
     }
     
-    // Auto-fill retriever API key from environment if not set
-    if (!newConfig.retriever.apiKey && newConfig.retriever.type !== 'duckduckgo') {
-      const retrieverConfig = getRetrieverConfig(newConfig.retriever.type);
-      
-      if (retrieverConfig?.apiKey) {
-        newConfig.retriever.apiKey = retrieverConfig.apiKey;
+    // Auto-fill retriever API key from backend if available
+    if (!newConfig.retriever.apiKey && backendApiKeys && newConfig.retriever.type !== 'duckduckgo') {
+      if (newConfig.retriever.type === 'google' && backendApiKeys.google_search_configured) {
+        newConfig.retriever.apiKey = ''; // Will be filled from backend
+      } else if (newConfig.retriever.type === 'serper' && backendApiKeys.serper_configured) {
+        newConfig.retriever.apiKey = ''; // Will be filled from backend
+      } else if (newConfig.retriever.type === 'tavily' && backendApiKeys.tavily_configured) {
+        newConfig.retriever.apiKey = ''; // Will be filled from backend
+      } else if (newConfig.retriever.type === 'you' && backendApiKeys.you_configured) {
+        newConfig.retriever.apiKey = ''; // Will be filled from backend
       }
     }
     
     return newConfig;
-  }, []);
+  }, [backendConfig, backendApiKeys]);
   
   const [localConfig, setLocalConfig] = React.useState<StormConfig>(() => initializeConfig(config));
   const [showApiKeys, setShowApiKeys] = React.useState(false);
   const [hasChanges, setHasChanges] = React.useState(false);
+  
+  // Re-initialize config when backend data is loaded
+  React.useEffect(() => {
+    if (backendConfig || backendApiKeys) {
+      setLocalConfig(initializeConfig(config));
+    }
+  }, [backendConfig, backendApiKeys, config, initializeConfig]);
 
   // Log configuration details after mount to avoid setState during render
   React.useEffect(() => {
@@ -344,9 +382,16 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
                 <Input
                   id="api-key"
                   type={showApiKeys ? "text" : "password"}
-                  value={localConfig.llm.apiKey || ''}
+                  value={localConfig.llm.apiKey || 
+                    (backendApiKeys && localConfig.llm.provider === 'openai' && backendApiKeys.openai_key_preview) ||
+                    (backendApiKeys && localConfig.llm.provider === 'anthropic' && backendApiKeys.anthropic_key_preview) ||
+                    ''}
                   onChange={(e) => handleConfigChange('llm.apiKey', e.target.value)}
-                  placeholder="Enter API key"
+                  placeholder={
+                    (backendApiKeys && localConfig.llm.provider === 'openai' && backendApiKeys.openai_configured) ? "Using environment key" :
+                    (backendApiKeys && localConfig.llm.provider === 'anthropic' && backendApiKeys.anthropic_configured) ? "Using environment key" :
+                    "Enter API key"
+                  }
                 />
               </div>
 
@@ -436,9 +481,20 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
                 <Input
                   id="retriever-api-key"
                   type={showApiKeys ? "text" : "password"}
-                  value={localConfig.retriever.apiKey || ''}
+                  value={localConfig.retriever.apiKey || 
+                    (backendApiKeys && localConfig.retriever.type === 'google' && backendApiKeys.google_api_key_preview) ||
+                    (backendApiKeys && localConfig.retriever.type === 'serper' && backendApiKeys.serper_key_preview) ||
+                    (backendApiKeys && localConfig.retriever.type === 'tavily' && backendApiKeys.tavily_key_preview) ||
+                    (backendApiKeys && localConfig.retriever.type === 'you' && backendApiKeys.you_key_preview) ||
+                    ''}
                   onChange={(e) => handleConfigChange('retriever.apiKey', e.target.value)}
-                  placeholder="Enter retriever API key"
+                  placeholder={
+                    (backendApiKeys && localConfig.retriever.type === 'google' && backendApiKeys.google_search_configured) ? "Using environment key" :
+                    (backendApiKeys && localConfig.retriever.type === 'serper' && backendApiKeys.serper_configured) ? "Using environment key" :
+                    (backendApiKeys && localConfig.retriever.type === 'tavily' && backendApiKeys.tavily_configured) ? "Using environment key" :
+                    (backendApiKeys && localConfig.retriever.type === 'you' && backendApiKeys.you_configured) ? "Using environment key" :
+                    "Enter retriever API key"
+                  }
                 />
               </div>
             )}
