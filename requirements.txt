@@ -1,6 +1,6 @@
 dspy_ai==2.4.9
 wikipedia==1.4.0
-sentence-transformers==2.2.2
+sentence-transformers==2.6.0
 toml==0.10.2
 langchain-text-splitters==0.2.0
 trafilatura==1.6.2
