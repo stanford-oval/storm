@@ -57,9 +57,6 @@ const customJestConfig = {
     '^.+\\.module\\.(css|sass|scss)$',
   ],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  testEnvironments: {
-    'performance': 'node',
-  },
   reporters: [
     'default',
     ['jest-junit', {

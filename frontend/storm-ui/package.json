@@ -110,6 +110,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "jest-websocket-mock": "^2.5.0",
     "prettier": "^3.0.0",
+    "prettier-plugin-tailwindcss": "^0.6.14",
     "storybook": "^7.6.0"
   },
   "msw": {
