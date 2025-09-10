@@ -36,8 +36,8 @@ import { useProjectStore, usePipelineStore } from '@/store';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function AnalyticsPage() {
-  const { projects, loadProjects, loading } = useProjectStore();
-  const { pipelineHistory } = usePipelineStore();
+  const { projects, loadProjects, loading: _loading } = useProjectStore();
+  const { pipelineHistory: _pipelineHistory } = usePipelineStore();
   const [dataLoading, setDataLoading] = useState(true);
   
   // State for time range selection

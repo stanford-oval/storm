@@ -69,14 +69,14 @@ export default function ProjectDetailPage() {
     startPipeline,
     cancelPipeline, 
     runningPipelines,
-    getPipelineExecution,
+    getPipelineExecution: _getPipelineExecution,
     updatePipelineProgress
   } = usePipelineStore();
   
   const { addNotification } = useNotificationStore();
 
   const [activeTab, setActiveTab] = useState<string>('overview');
-  const [isConfiguring, setIsConfiguring] = useState(false);
+  const [_isConfiguring, _setIsConfiguring] = useState(false);
   const [projectConfig, setProjectConfig] = useState<StormConfig | undefined>();
 
   // Load project on mount and ensure fresh data

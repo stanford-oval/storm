@@ -6,7 +6,7 @@ import { ProjectCard } from '@/components/storm/ProjectCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+// import { Badge } from '@/components/ui/badge'; // Removed unused import
 import { 
   Select,
   SelectContent,
@@ -63,12 +63,12 @@ export default function ProjectsPage() {
     deleteProject, 
     duplicateProject,
     selectedProjects,
-    toggleProjectSelection,
+    toggleProjectSelection: _toggleProjectSelection,
     clearSelection 
   } = useProjectStore();
   
-  const { theme } = useUIStore();
-  const { runningPipelines } = usePipelineStore();
+  const { theme: _theme } = useUIStore();
+  const { runningPipelines: _runningPipelines } = usePipelineStore();
 
   // Local state for filtering and search
   const [searchQuery, setSearchQuery] = useState('');

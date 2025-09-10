@@ -46,7 +46,7 @@ interface ActivityItem {
 export default function ActivityPage() {
   const router = useRouter();
   const { projects, loadProjects } = useProjectStore();
-  const { pipelineHistory, runningPipelines } = usePipelineStore();
+  const { pipelineHistory, runningPipelines: _runningPipelines } = usePipelineStore();
   const [filterType, setFilterType] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [dateRange, setDateRange] = useState<string>('all');

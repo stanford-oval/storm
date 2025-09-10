@@ -4,7 +4,7 @@ import { logger } from '@/utils/logger';
 // API Configuration endpoint for frontend-backend connection
 // This provides configuration info and health checks for the STORM API
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const backendUrl = process.env.STORM_API_URL || 'http://localhost:8000';
     

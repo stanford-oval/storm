@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
+// import { Badge } from '@/components/ui/badge'; // Removed unused import
 import { 
   Database,
   Eye,
@@ -25,7 +25,7 @@ export default function SettingsPage() {
   const { addNotification } = useNotificationStore();
   const [showApiKeys, setShowApiKeys] = useState<Record<string, boolean>>({});
   const [testingApi, setTestingApi] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [_loading, _setLoading] = useState(true);
 
   // Load saved settings from localStorage
   const loadSavedSettings = () => {

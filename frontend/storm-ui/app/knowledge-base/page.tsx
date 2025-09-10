@@ -30,7 +30,7 @@ import {
   CheckCircle
 } from 'lucide-react';
 import { useProjectStore } from '@/store';
-import { cn } from '@/lib/utils';
+// import { cn } from '@/lib/utils'; // Removed unused import
 
 type ViewMode = 'grid' | 'list';
 type SortBy = 'date' | 'title' | 'words' | 'status';
