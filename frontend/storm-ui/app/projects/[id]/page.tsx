@@ -347,7 +347,7 @@ export default function ProjectDetailPage() {
     try {
       await updateProjectConfig(project.id, config);
       setProjectConfig(config); // Update local state
-      setIsConfiguring(false);
+      _setIsConfiguring(false);
       addNotification({
         type: 'success',
         title: 'Configuration Updated',
@@ -553,7 +553,7 @@ export default function ProjectDetailPage() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setIsConfiguring(true)}>
+                <DropdownMenuItem onClick={() => _setIsConfiguring(true)}>
                   <Settings className="h-4 w-4 mr-2" />
                   Configure
                 </DropdownMenuItem>
@@ -1002,7 +1002,7 @@ export default function ProjectDetailPage() {
                 setProjectConfig(config);
               }}
               onSave={handleConfigSave}
-              onCancel={() => setIsConfiguring(false)}
+              onCancel={() => _setIsConfiguring(false)}
               isLoading={loading}
             />
           </TabsContent>

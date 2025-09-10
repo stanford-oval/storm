@@ -81,7 +81,7 @@ export default function SettingsPage() {
           bing: savedSettings?.apiKeys?.bing || ''
         });
       } finally {
-        setLoading(false);
+        _setLoading(false);
       }
     };
     
