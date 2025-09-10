@@ -69,7 +69,9 @@ class SetupChecker:
 
         return all_good
 
-    def _check_package(self, package: str, description: str, required: bool = True) -> bool:
+    def _check_package(
+        self, package: str, description: str, required: bool = True
+    ) -> bool:
         """Check if a package is available."""
         try:
             importlib.import_module(package)
@@ -249,7 +251,9 @@ class SetupChecker:
                 results.append(False)
 
         all_passed = all(results)
-        critical_passed = results[0] and results[1] and results[2] and results[5]  # Critical checks
+        critical_passed = (
+            results[0] and results[1] and results[2] and results[5]
+        )  # Critical checks
 
         print("\n" + "=" * 40)
         print(f"Setup Status: {'✅ Ready' if critical_passed else '❌ Issues Found'}")

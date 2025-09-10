@@ -118,7 +118,9 @@ class PipelineResultResponse(BaseModel):
 
 
 @router.post("/{project_id}/run", response_model=PipelineResultResponse)
-async def run_pipeline(project_id: str, request: RunPipelineRequest, background_tasks: BackgroundTasks):
+async def run_pipeline(
+    project_id: str, request: RunPipelineRequest, background_tasks: BackgroundTasks
+):
     """Start pipeline execution for a project."""
     try:
         # Check if project exists
@@ -129,13 +131,17 @@ async def run_pipeline(project_id: str, request: RunPipelineRequest, background_
         # Check if pipeline is already running
         status = storm_runner.get_pipeline_status(project_id)
         if status["is_running"]:
-            raise HTTPException(status_code=400, detail="Pipeline is already running for this project")
+            raise HTTPException(
+                status_code=400, detail="Pipeline is already running for this project"
+            )
 
         # Get project config and merge with request config
         project_config = file_service._load_project_config(project_id)
         if request.config:
             # Merge request config with saved config (request config takes precedence)
-            merged_config = project_config.model_copy() if project_config else ProjectConfig()
+            merged_config = (
+                project_config.model_copy() if project_config else ProjectConfig()
+            )
             for field, value in request.config.model_dump(exclude_unset=True).items():
                 setattr(merged_config, field, value)
             final_config = merged_config
@@ -155,7 +161,9 @@ async def run_pipeline(project_id: str, request: RunPipelineRequest, background_
         # Start pipeline in background
         if request.mock_mode:
             # For testing/demo purposes
-            background_tasks.add_task(storm_runner.run_mock_pipeline, project_id, progress_callback)
+            background_tasks.add_task(
+                storm_runner.run_mock_pipeline, project_id, progress_callback
+            )
 
             return PipelineResultResponse(
                 status="started",
@@ -165,7 +173,9 @@ async def run_pipeline(project_id: str, request: RunPipelineRequest, background_
             )
         else:
             # Real pipeline execution
-            background_tasks.add_task(storm_runner.run_pipeline, project_id, final_config, progress_callback)
+            background_tasks.add_task(
+                storm_runner.run_pipeline, project_id, final_config, progress_callback
+            )
 
             return PipelineResultResponse(
                 status="started",
@@ -187,7 +197,9 @@ async def cancel_pipeline(project_id: str):
         success = storm_runner.cancel_pipeline(project_id)
 
         if not success:
-            raise HTTPException(status_code=400, detail="No running pipeline found for this project")
+            raise HTTPException(
+                status_code=400, detail="No running pipeline found for this project"
+            )
 
         return {"message": "Pipeline cancelled successfully"}
 
@@ -292,7 +304,9 @@ async def websocket_endpoint(websocket: WebSocket, project_id: str):
     try:
         # Send current status immediately
         status = storm_runner.get_pipeline_status(project_id)
-        await websocket.send_text(json.dumps({"type": "status", "data": status}, default=str))
+        await websocket.send_text(
+            json.dumps({"type": "status", "data": status}, default=str)
+        )
 
         # Keep connection alive and handle messages
         while True:
@@ -306,7 +320,9 @@ async def websocket_endpoint(websocket: WebSocket, project_id: str):
                     await websocket.send_text(json.dumps({"type": "pong"}))
                 elif message.get("type") == "get_status":
                     status = storm_runner.get_pipeline_status(project_id)
-                    await websocket.send_text(json.dumps({"type": "status", "data": status}, default=str))
+                    await websocket.send_text(
+                        json.dumps({"type": "status", "data": status}, default=str)
+                    )
 
             except WebSocketDisconnect:
                 break
@@ -329,7 +345,9 @@ async def global_websocket_endpoint(websocket: WebSocket):
     try:
         # Send list of running pipelines
         running = storm_runner.list_running_pipelines()
-        await websocket.send_text(json.dumps({"type": "running_pipelines", "data": running}))
+        await websocket.send_text(
+            json.dumps({"type": "running_pipelines", "data": running})
+        )
 
         # Keep connection alive
         while True:
@@ -341,7 +359,9 @@ async def global_websocket_endpoint(websocket: WebSocket):
                     await websocket.send_text(json.dumps({"type": "pong"}))
                 elif message.get("type") == "get_running":
                     running = storm_runner.list_running_pipelines()
-                    await websocket.send_text(json.dumps({"type": "running_pipelines", "data": running}))
+                    await websocket.send_text(
+                        json.dumps({"type": "running_pipelines", "data": running})
+                    )
 
             except WebSocketDisconnect:
                 break
@@ -402,8 +422,12 @@ async def get_available_retrievers():
         },
     }
 
-    available_retrievers = [name for name, info in retrievers.items() if info["available"]]
-    default_retriever = available_retrievers[0] if available_retrievers else "duckduckgo"
+    available_retrievers = [
+        name for name, info in retrievers.items() if info["available"]
+    ]
+    default_retriever = (
+        available_retrievers[0] if available_retrievers else "duckduckgo"
+    )
 
     return {
         "retrievers": retrievers,
