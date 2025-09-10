@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
-import { MindMapNode, MindMapLink, MindMapState, MindMapConfig, MindMapViewport } from '../types/mindmap';
+import { MindMapNode, MindMapLink, MindMapState, MindMapConfig, MindMapViewport, MindMapCluster } from '../types/mindmap';
 
 const defaultConfig: MindMapConfig = {
   forceStrength: -300,
@@ -55,14 +55,14 @@ export const useMindMap = (initialNodes: MindMapNode[] = [], initialLinks: MindM
     lastUpdate: new Date().toISOString(),
   });
 
-  const simulationRef = useRef<d3.Simulation<MindMapNode, MindMapLink>>();
+  const simulationRef = useRef<d3.Simulation<MindMapNode & d3.SimulationNodeDatum, MindMapLink>>();
   const svgRef = useRef<SVGSVGElement>(null);
 
   // Initialize D3 simulation
   const initializeSimulation = useCallback(() => {
     if (!simulationRef.current) {
-      simulationRef.current = d3.forceSimulation<MindMapNode>(state.nodes)
-        .force('link', d3.forceLink<MindMapNode, MindMapLink>(state.links)
+      simulationRef.current = d3.forceSimulation<MindMapNode & d3.SimulationNodeDatum>(state.nodes as (MindMapNode & d3.SimulationNodeDatum)[])
+        .force('link', d3.forceLink<MindMapNode & d3.SimulationNodeDatum, MindMapLink>(state.links)
           .id(d => d.id)
           .distance(state.config.linkDistance))
         .force('charge', d3.forceManyBody().strength(state.config.forceStrength))
@@ -73,8 +73,8 @@ export const useMindMap = (initialNodes: MindMapNode[] = [], initialLinks: MindM
 
     // Update simulation on state change
     simulationRef.current
-      .nodes(state.nodes)
-      .force('link', d3.forceLink<MindMapNode, MindMapLink>(state.links)
+      .nodes(state.nodes as (MindMapNode & d3.SimulationNodeDatum)[])
+      .force('link', d3.forceLink<MindMapNode & d3.SimulationNodeDatum, MindMapLink>(state.links)
         .id(d => d.id)
         .distance(state.config.linkDistance));
 
@@ -89,7 +89,7 @@ export const useMindMap = (initialNodes: MindMapNode[] = [], initialLinks: MindM
     }
 
     // Simple k-means clustering based on position and type
-    const clusters = [];
+    const clusters: MindMapCluster[] = [];
     const k = Math.min(5, Math.floor(nodes.length / state.config.clustering.minClusterSize));
     
     // Group nodes by type first

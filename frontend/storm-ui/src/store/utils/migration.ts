@@ -337,7 +337,7 @@ export const migrationUtils = {
 
   // Change data structure
   restructure: <T, R>(restructurer: (state: T) => R): MigrationFunction<R> =>
-    restructurer,
+    (state: any) => restructurer(state as T),
 
   // Conditional migration
   conditional: <T>(

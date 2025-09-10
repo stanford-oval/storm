@@ -26,9 +26,9 @@ export const AnimatedPage: React.FC<AnimatedPageProps> = ({
     ? {
         ...variants,
         animate: {
-          ...variants.animate,
+          ...(typeof variants.animate === 'object' ? variants.animate : {}),
           transition: {
-            ...variants.animate?.transition,
+            ...(typeof variants.animate === 'object' && 'transition' in variants.animate ? (variants.animate as any).transition : {}),
             staggerChildren: staggerDelay,
             delayChildren: 0.2,
           },

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { logger } from '@/utils/logger';
 
 // API Configuration endpoint for frontend-backend connection
 // This provides configuration info and health checks for the STORM API
@@ -52,7 +53,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Config API error:', error);
+    logger.error('Config API error:', error);
     
     return NextResponse.json(
       {
@@ -229,7 +230,7 @@ export async function POST(request: NextRequest) {
         );
     }
   } catch (error) {
-    console.error('Config API POST error:', error);
+    logger.error('Config API POST error:', error);
     
     return NextResponse.json(
       {
@@ -295,7 +296,7 @@ export async function PUT(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Config API PUT error:', error);
+    logger.error('Config API PUT error:', error);
     
     return NextResponse.json(
       {

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
+import { within } from '@storybook/test';
 import { PipelineProgress } from './PipelineProgress';
 import { PipelineProgress as PipelineProgressType } from '@/types/storm';
 
@@ -402,7 +403,7 @@ export const ManyErrors: Story = {
         stage: 'research' as const,
         message: `Error ${i + 1}: Service unavailable for source ${i + 1}`,
         timestamp: new Date(`2024-01-16T10:0${i}:00Z`),
-        severity: (i % 3 === 0 ? 'critical' : i % 2 === 0 ? 'error' : 'warning') as const,
+        severity: (i % 3 === 0 ? 'critical' : i % 2 === 0 ? 'error' : 'warning') as 'critical' | 'error' | 'warning',
       })),
     },
     showDetails: true,

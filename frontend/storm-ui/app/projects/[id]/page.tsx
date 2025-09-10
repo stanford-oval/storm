@@ -1,10 +1,13 @@
 'use client';
 
+import { logger } from '@/utils/logger';
+// Removed unused ErrorBoundary import
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { PipelineProgress } from '@/components/storm/PipelineProgress';
 import { ConfigurationPanel } from '@/components/storm/ConfigurationPanel';
-import { ResearchView } from '@/components/storm/ResearchView';
+// Removed unused ResearchView import
 import { OutlineEditor } from '@/components/storm/OutlineEditor';
 import { ConversationView } from '@/components/storm/ConversationView';
 import { Button } from '@/components/ui/button';
@@ -22,7 +25,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useProjectStore, usePipelineStore, useNotificationStore } from '@/store';
-import { StormProject, StormConfig } from '@/types/storm';
+import { StormConfig } from '@/types/storm';
 import { AnimatedPage } from '@/utils/animations/AnimatedPage';
 import { ResponsiveContainer } from '@/components/ux/ResponsiveContainer';
 import { 
@@ -34,17 +37,13 @@ import {
   FileText,
   Search,
   Brain,
-  Wand2,
   Download,
   Share2,
   Copy,
   Trash2,
-  Edit3,
   Eye,
   AlertCircle,
-  CheckCircle,
-  Clock,
-  Activity
+  CheckCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getProjectStatusIcon, getProjectStatusColor, getProjectStatusLabel } from '@/utils/status';
@@ -129,9 +128,9 @@ export default function ProjectDetailPage() {
                     maxConvTurns: freshProject.config.max_conv_turn || 3,
                     maxPerspectives: freshProject.config.max_perspective || 4,
                     maxSearchQueriesPerTurn: freshProject.config.max_search_queries_per_turn || 3,
-                    doResearch: freshProject.config.do_research !== false,
-                    doGenerateOutline: freshProject.config.do_generate_outline !== false,
-                    doGenerateArticle: freshProject.config.do_generate_article !== false,
+                    doResearch: freshProject.config.pipeline?.doResearch !== false,
+                    doGenerateOutline: freshProject.config.pipeline?.doGenerateOutline !== false,
+                    doGenerateArticle: freshProject.config.pipeline?.doGenerateArticle !== false,
                     doPolishArticle: freshProject.config.do_polish_article !== false,
                   },
                   output: freshProject.config.output || {
@@ -200,7 +199,7 @@ export default function ProjectDetailPage() {
             // The setCurrentProject method already updates the projects array
           }
         } catch (error) {
-          console.error('Error loading fresh project data:', error);
+          logger.error('Error loading fresh project data:', error);
           // Fall back to regular load
           loadProject(projectId);
         }
@@ -208,7 +207,7 @@ export default function ProjectDetailPage() {
       
       loadFreshProject();
     }
-  }, [projectId]);
+  }, [projectId, loadProject]);
 
   const project = currentProject || projects?.find(p => p.id === projectId);
   const runningPipeline = Object.values(runningPipelines).find(p => p.projectId === projectId);
@@ -255,7 +254,7 @@ export default function ProjectDetailPage() {
                 setCurrentProject(updatedProject);
               }
             } catch (err) {
-              console.error('Error refreshing project data:', err);
+              logger.error('Error refreshing project data:', err);
             }
             
             // Update pipeline status to completed which will move it to history
@@ -265,7 +264,7 @@ export default function ProjectDetailPage() {
           }
         }
       } catch (error) {
-        console.error('Error checking pipeline status:', error);
+        logger.error('Error checking pipeline status:', error);
       }
     };
     
@@ -724,7 +723,7 @@ export default function ProjectDetailPage() {
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Polish Article</span>
-                      {project.config?.do_polish_article ? (
+                      {project.config?.pipeline?.doPolishArticle ? (
                         <CheckCircle className="h-4 w-4 text-green-500" />
                       ) : (
                         <div className="h-4 w-4 rounded-full bg-muted" />
@@ -742,19 +741,19 @@ export default function ProjectDetailPage() {
                     <div className="flex justify-between">
                       <span className="text-xs text-muted-foreground">Language Model</span>
                       <Badge variant="secondary" className="text-xs">
-                        {project.config?.llm_model || project.config?.llm?.model || 'Not configured'}
+                        {project.config?.llm?.model || 'Not configured'}
                       </Badge>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-xs text-muted-foreground">Provider</span>
                       <Badge variant="outline" className="text-xs">
-                        {project.config?.llm_provider || project.config?.llm?.provider || 'Not configured'}
+                        {project.config?.llm?.provider || 'Not configured'}
                       </Badge>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-xs text-muted-foreground">Retriever</span>
                       <Badge variant="outline" className="text-xs">
-                        {project.config?.retriever_type || project.config?.retriever?.type || 'Not configured'}
+                        {project.config?.retriever?.type || 'Not configured'}
                       </Badge>
                     </div>
                   </CardContent>
@@ -783,7 +782,7 @@ export default function ProjectDetailPage() {
                         <>
                           <div className="flex justify-between">
                             <span className="text-xs text-muted-foreground">Word Count</span>
-                            <span className="text-xs">{project?.metadata?.word_count || 0}</span>
+                            <span className="text-xs">{(project?.metadata as any)?.word_count || 0}</span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-xs text-muted-foreground">Sections</span>
@@ -810,7 +809,7 @@ export default function ProjectDetailPage() {
                   {project.content && (
                     <div className="flex items-center space-x-2">
                       <Badge variant="outline">
-                        {project?.metadata?.word_count || 0} words
+                        {(project?.metadata as any)?.word_count || 0} words
                       </Badge>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -842,16 +841,16 @@ export default function ProjectDetailPage() {
                 {project.content ? (
                   <div className="space-y-6">
                     <div className="max-w-none prose prose-gray dark:prose-invert">
-                      <Markdown content={project.contentWithLinks || project.content} />
+                      <Markdown content={project.content} />
                     </div>
                     {/* References section */}
-                    {project.references && Object.keys(project.references).length > 0 && (
+                    {(project as any).references && Object.keys((project as any).references).length > 0 && (
                       <div className="border-t pt-6">
                         <h3 className="text-lg font-semibold mb-4">References</h3>
                         <div className="space-y-3">
                           {(() => {
-                            const urlToIndex = project.references.url_to_unified_index || {};
-                            const urlToInfo = project.references.url_to_info || {};
+                            const urlToIndex = (project as any).references.url_to_unified_index || {};
+                            const urlToInfo = (project as any).references.url_to_info || {};
                             
                             // Create sorted list of references
                             const references = Object.entries(urlToIndex)
@@ -909,7 +908,7 @@ export default function ProjectDetailPage() {
           </TabsContent>
 
           <TabsContent value="research">
-            <ConversationView projectId={params.id} />
+            <ConversationView projectId={projectId} />
           </TabsContent>
 
           <TabsContent value="outline">
@@ -983,7 +982,21 @@ export default function ProjectDetailPage() {
 
           <TabsContent value="settings">
             <ConfigurationPanel
-              config={projectConfig || project.config}
+              config={projectConfig || project.config || {
+                llm: {
+                  model: 'gpt-4o',
+                  provider: 'openai'
+                },
+                retriever: {
+                  type: 'tavily'
+                },
+                pipeline: {
+                  doResearch: true,
+                  doGenerateOutline: true,
+                  doGenerateArticle: true,
+                  doPolishArticle: true
+                }
+              }}
               onChange={(config) => {
                 // Update local state immediately for responsive UI
                 setProjectConfig(config);

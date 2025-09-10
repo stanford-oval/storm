@@ -82,7 +82,7 @@ export const useAuthStore = create<AuthStore>()(
             set((draft) => {
               draft.loading = true;
               draft.error = null;
-            }, 'login:start');
+            });
 
             try {
               // Simulate API call - replace with actual authentication
@@ -110,13 +110,13 @@ export const useAuthStore = create<AuthStore>()(
                 draft.isAuthenticated = true;
                 draft.loading = false;
                 draft.lastUpdated = new Date();
-              }, 'login:success');
+              });
             } catch (error) {
               set((draft) => {
                 draft.error = error instanceof Error ? error.message : 'Login failed';
                 draft.loading = false;
                 draft.isAuthenticated = false;
-              }, 'login:error');
+              });
               throw error;
             }
           },
@@ -130,7 +130,7 @@ export const useAuthStore = create<AuthStore>()(
               draft.isAuthenticated = false;
               draft.error = null;
               draft.lastUpdated = new Date();
-            }, 'logout');
+            });
 
             // Clear any stored tokens
             localStorage.removeItem('authToken');
@@ -141,7 +141,7 @@ export const useAuthStore = create<AuthStore>()(
             set((draft) => {
               draft.loading = true;
               draft.error = null;
-            }, 'register:start');
+            });
 
             try {
               const response = await fetch('/api/auth/register', {
@@ -166,7 +166,7 @@ export const useAuthStore = create<AuthStore>()(
               set((draft) => {
                 draft.error = error instanceof Error ? error.message : 'Registration failed';
                 draft.loading = false;
-              }, 'register:error');
+              });
               throw error;
             }
           },
@@ -196,7 +196,7 @@ export const useAuthStore = create<AuthStore>()(
                 draft.refreshToken = newRefreshToken;
                 draft.sessionExpiry = new Date(Date.now() + expiresIn * 1000);
                 draft.lastUpdated = new Date();
-              }, 'refreshAuth:success');
+              });
             } catch (error) {
               // If refresh fails, log out the user
               get().logout();
@@ -211,7 +211,7 @@ export const useAuthStore = create<AuthStore>()(
                 Object.assign(draft.user, updates);
                 draft.lastUpdated = new Date();
               }
-            }, 'updateUser');
+            });
           },
 
           updatePreferences: (preferences) => {
@@ -220,7 +220,7 @@ export const useAuthStore = create<AuthStore>()(
                 Object.assign(draft.user.preferences, preferences);
                 draft.lastUpdated = new Date();
               }
-            }, 'updatePreferences');
+            });
           },
 
           updateNotificationPreferences: (notifications) => {
@@ -229,7 +229,7 @@ export const useAuthStore = create<AuthStore>()(
                 Object.assign(draft.user.preferences.notifications, notifications);
                 draft.lastUpdated = new Date();
               }
-            }, 'updateNotificationPreferences');
+            });
           },
 
           // Session management
@@ -253,32 +253,32 @@ export const useAuthStore = create<AuthStore>()(
               draft.refreshToken = null;
               draft.sessionExpiry = null;
               draft.isAuthenticated = false;
-            }, 'clearSession');
+            });
           },
 
           // State management
           setLoading: (loading) => {
             set((draft) => {
               draft.loading = loading;
-            }, 'setLoading');
+            });
           },
 
           setError: (error) => {
             set((draft) => {
               draft.error = error;
-            }, 'setError');
+            });
           },
 
           clearError: () => {
             set((draft) => {
               draft.error = null;
-            }, 'clearError');
+            });
           },
 
           reset: () => {
             set((draft) => {
               Object.assign(draft, initialState);
-            }, 'reset');
+            });
           },
 
           // Token management
@@ -288,7 +288,7 @@ export const useAuthStore = create<AuthStore>()(
               draft.refreshToken = refreshToken;
               draft.sessionExpiry = new Date(Date.now() + expiresIn * 1000);
               draft.lastUpdated = new Date();
-            }, 'setTokens');
+            });
           },
 
           clearTokens: () => {
@@ -296,7 +296,7 @@ export const useAuthStore = create<AuthStore>()(
               draft.token = null;
               draft.refreshToken = null;
               draft.sessionExpiry = null;
-            }, 'clearTokens');
+            });
           },
 
           isTokenExpired: () => {

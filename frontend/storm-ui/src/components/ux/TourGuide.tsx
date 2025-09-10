@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ChevronRight, ChevronLeft, X, CheckCircle, Circle, 
@@ -97,11 +97,6 @@ export const TourGuide: React.FC<TourGuideProps> = ({
   const [isVisible, setIsVisible] = useState(false);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
-  
-  // Early return if not open
-  if (!isOpen) {
-    return null;
-  }
 
   // Calculate tooltip position based on target element
   const updateTooltipPosition = (target: string, placement: string = 'bottom') => {
@@ -165,7 +160,51 @@ export const TourGuide: React.FC<TourGuideProps> = ({
     }
   }, [isOpen, autoStart]);
 
-  // Keyboard navigation
+  const handleComplete = useCallback(() => {
+    setIsVisible(false);
+    onComplete?.();
+    onClose();
+  }, [onComplete, onClose]);
+
+  const handleNext = useCallback(() => {
+    const step = steps[currentStep];
+    setCompletedSteps(prev => new Set([...Array.from(prev), step.id]));
+
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      handleComplete();
+    }
+  }, [currentStep, steps, handleComplete]);
+
+  const handlePrevious = useCallback(() => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  }, [currentStep]);
+
+  const handleClose = useCallback(() => {
+    setIsVisible(false);
+    onClose();
+  }, [onClose]);
+
+  const handleStart = useCallback(() => {
+    setIsVisible(true);
+    setCurrentStep(0);
+  }, []);
+
+  const handleSkip = useCallback(() => {
+    const step = steps[currentStep];
+    if (step.skippable !== false) {
+      handleNext();
+    }
+  }, [currentStep, steps, handleNext]);
+
+  const handleStepClick = (stepIndex: number) => {
+    setCurrentStep(stepIndex);
+  };
+
+  // Keyboard navigation - moved after handler definitions
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!isOpen) return;
@@ -188,51 +227,7 @@ export const TourGuide: React.FC<TourGuideProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, currentStep]);
-
-  const handleStart = () => {
-    setIsVisible(true);
-    setCurrentStep(0);
-  };
-
-  const handleNext = () => {
-    const step = steps[currentStep];
-    setCompletedSteps(prev => new Set([...prev, step.id]));
-
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      handleComplete();
-    }
-  };
-
-  const handlePrevious = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  const handleSkip = () => {
-    const step = steps[currentStep];
-    if (step.skippable !== false) {
-      handleNext();
-    }
-  };
-
-  const handleComplete = () => {
-    setIsVisible(false);
-    onComplete?.();
-    onClose();
-  };
-
-  const handleClose = () => {
-    setIsVisible(false);
-    onClose();
-  };
-
-  const handleStepClick = (stepIndex: number) => {
-    setCurrentStep(stepIndex);
-  };
+  }, [isOpen, currentStep, handleNext, handlePrevious, handleClose]);
 
   const currentStepData = steps[currentStep];
   const progress = ((currentStep + 1) / steps.length) * 100;
@@ -261,6 +256,11 @@ export const TourGuide: React.FC<TourGuideProps> = ({
       />
     );
   };
+
+  // Early return after all hooks
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <AnimatePresence>

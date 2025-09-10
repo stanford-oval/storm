@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 // Pipeline execution store slice
 import { create } from 'zustand';
 import { PipelineState, PipelineExecution, PipelineLog, ResourceUsage } from '../types';
@@ -28,7 +29,7 @@ interface PipelineActions {
   pausePipeline: (pipelineId: string) => Promise<void>;
   resumePipeline: (pipelineId: string) => Promise<void>;
   cancelPipeline: (pipelineId: string) => Promise<void>;
-  retryPipeline: (pipelineId: string) => Promise<void>;
+  retryPipeline: (pipelineId: string) => Promise<string>;
   
   // Pipeline monitoring
   updatePipelineProgress: (pipelineId: string, progress: Partial<PipelineProgress>) => void;
@@ -105,7 +106,7 @@ export const usePipelineStore = create<PipelineStore>()(
             set((draft) => {
               draft.loading = true;
               draft.error = null;
-            }, 'startPipeline:start');
+            });
 
             try {
               // Map frontend config to backend format
@@ -174,7 +175,7 @@ export const usePipelineStore = create<PipelineStore>()(
                 draft.canCancel = true;
                 draft.loading = false;
                 draft.lastUpdated = new Date();
-              }, 'startPipeline:success');
+              });
 
               // Subscribe to pipeline updates
               get().subscribeToUpdates(pipelineId);
@@ -184,7 +185,7 @@ export const usePipelineStore = create<PipelineStore>()(
               set((draft) => {
                 draft.error = error instanceof Error ? error.message : 'Failed to start pipeline';
                 draft.loading = false;
-              }, 'startPipeline:error');
+              });
               throw error;
             }
           },
@@ -192,7 +193,7 @@ export const usePipelineStore = create<PipelineStore>()(
           pausePipeline: async (pipelineId) => {
             // Guard against undefined pipelineId
             if (!pipelineId) {
-              console.warn('pausePipeline called with undefined pipelineId');
+              logger.warn('pausePipeline called with undefined pipelineId');
               return;
             }
             
@@ -211,11 +212,11 @@ export const usePipelineStore = create<PipelineStore>()(
                   pipeline.status = 'completed'; // Using completed as paused state
                   draft.canCancel = false;
                 }
-              }, 'pausePipeline');
+              });
             } catch (error) {
               set((draft) => {
                 draft.error = error instanceof Error ? error.message : 'Failed to pause pipeline';
-              }, 'pausePipeline:error');
+              });
               throw error;
             }
           },
@@ -223,7 +224,7 @@ export const usePipelineStore = create<PipelineStore>()(
           resumePipeline: async (pipelineId) => {
             // Guard against undefined pipelineId
             if (!pipelineId) {
-              console.warn('resumePipeline called with undefined pipelineId');
+              logger.warn('resumePipeline called with undefined pipelineId');
               return;
             }
             
@@ -242,11 +243,11 @@ export const usePipelineStore = create<PipelineStore>()(
                   pipeline.status = 'running';
                   draft.canCancel = true;
                 }
-              }, 'resumePipeline');
+              });
             } catch (error) {
               set((draft) => {
                 draft.error = error instanceof Error ? error.message : 'Failed to resume pipeline';
-              }, 'resumePipeline:error');
+              });
               throw error;
             }
           },
@@ -254,7 +255,7 @@ export const usePipelineStore = create<PipelineStore>()(
           cancelPipeline: async (pipelineId) => {
             // Guard against undefined pipelineId
             if (!pipelineId) {
-              console.warn('cancelPipeline called with undefined pipelineId');
+              logger.warn('cancelPipeline called with undefined pipelineId');
               return;
             }
             
@@ -279,18 +280,18 @@ export const usePipelineStore = create<PipelineStore>()(
                   delete draft.runningPipelines[pipelineId];
                   
                   // Update global state if no more running pipelines
-                  if (draft.runningPipelines.size === 0) {
+                  if (Object.keys(draft.runningPipelines).length === 0) {
                     draft.activeStage = null;
                     draft.globalProgress = 0;
                   }
                 }
-              }, 'cancelPipeline');
+              });
 
               get().unsubscribeFromUpdates(pipelineId);
             } catch (error) {
               set((draft) => {
                 draft.error = error instanceof Error ? error.message : 'Failed to cancel pipeline';
-              }, 'cancelPipeline:error');
+              });
               throw error;
             }
           },
@@ -325,7 +326,7 @@ export const usePipelineStore = create<PipelineStore>()(
                 
                 draft.lastUpdated = new Date();
               }
-            }, 'updatePipelineProgress');
+            });
 
             get().updateGlobalProgress();
           },
@@ -347,7 +348,7 @@ export const usePipelineStore = create<PipelineStore>()(
                 
                 draft.lastUpdated = new Date();
               }
-            }, 'addPipelineLog');
+            });
           },
 
           updateResourceUsage: (pipelineId, usage) => {
@@ -361,7 +362,7 @@ export const usePipelineStore = create<PipelineStore>()(
                 
                 draft.lastUpdated = new Date();
               }
-            }, 'updateResourceUsage');
+            });
           },
 
           setPipelineStatus: (pipelineId, status) => {
@@ -378,7 +379,7 @@ export const usePipelineStore = create<PipelineStore>()(
                   delete draft.runningPipelines[pipelineId];
                   
                   // Update global state
-                  if (draft.runningPipelines.size === 0) {
+                  if (Object.keys(draft.runningPipelines).length === 0) {
                     draft.activeStage = null;
                     draft.globalProgress = 0;
                     draft.canCancel = false;
@@ -388,7 +389,7 @@ export const usePipelineStore = create<PipelineStore>()(
                 
                 draft.lastUpdated = new Date();
               }
-            }, 'setPipelineStatus');
+            });
 
             if (status !== 'running') {
               get().unsubscribeFromUpdates(pipelineId);
@@ -407,13 +408,13 @@ export const usePipelineStore = create<PipelineStore>()(
             set((draft) => {
               delete draft.runningPipelines[pipelineId];
               draft.pipelineHistory = draft.pipelineHistory.filter(p => p.id !== pipelineId);
-            }, 'removePipelineExecution');
+            });
           },
 
           clearPipelineHistory: () => {
             set((draft) => {
               draft.pipelineHistory = [];
-            }, 'clearPipelineHistory');
+            });
           },
 
           archivePipeline: (pipelineId) => {
@@ -423,14 +424,14 @@ export const usePipelineStore = create<PipelineStore>()(
                 draft.pipelineHistory.unshift(pipeline);
                 delete draft.runningPipelines[pipelineId];
               }
-            }, 'archivePipeline');
+            });
           },
 
           // Global pipeline state
           setActiveStage: (stage) => {
             set((draft) => {
               draft.activeStage = stage;
-            }, 'setActiveStage');
+            });
           },
 
           updateGlobalProgress: () => {
@@ -459,19 +460,19 @@ export const usePipelineStore = create<PipelineStore>()(
                 const maxEndTime = Math.max(...estimates.map(d => d.getTime()));
                 draft.estimatedTimeRemaining = maxEndTime - Date.now();
               }
-            }, 'updateGlobalProgress');
+            });
           },
 
           setCanCancel: (canCancel) => {
             set((draft) => {
               draft.canCancel = canCancel;
-            }, 'setCanCancel');
+            });
           },
 
           setAutoSave: (autoSave) => {
             set((draft) => {
               draft.autoSave = autoSave;
-            }, 'setAutoSave');
+            });
           },
 
           // Estimation and analytics
@@ -594,26 +595,26 @@ export const usePipelineStore = create<PipelineStore>()(
           setLoading: (loading) => {
             set((draft) => {
               draft.loading = loading;
-            }, 'setLoading');
+            });
           },
 
           setError: (error) => {
             set((draft) => {
               draft.error = error;
-            }, 'setError');
+            });
           },
 
           clearError: () => {
             set((draft) => {
               draft.error = null;
-            }, 'clearError');
+            });
           },
 
           reset: () => {
             set((draft) => {
               Object.assign(draft, initialState);
               draft.runningPipelines = {};
-            }, 'reset');
+            });
           },
 
           // WebSocket integration
@@ -647,17 +648,17 @@ export const usePipelineStore = create<PipelineStore>()(
 
           subscribeToUpdates: (pipelineId) => {
             if (!pipelineId) {
-              console.warn('Cannot subscribe to updates: pipelineId is undefined');
+              logger.warn('Cannot subscribe to updates: pipelineId is undefined');
               return;
             }
             // WebSocket subscription logic would be implemented here
             // This is a placeholder for the actual implementation
-            // console.log(`Subscribing to updates for pipeline ${pipelineId}`);
+            // logger.log(`Subscribing to updates for pipeline ${pipelineId}`);
           },
 
           unsubscribeFromUpdates: (pipelineId) => {
             // WebSocket unsubscription logic would be implemented here
-            // console.log(`Unsubscribing from updates for pipeline ${pipelineId}`);
+            // logger.log(`Unsubscribing from updates for pipeline ${pipelineId}`);
           },
         }))
       ),
@@ -685,7 +686,7 @@ export const pipelineSelectors = {
   error: (state: PipelineStore) => state.error,
   estimatedTimeRemaining: (state: PipelineStore) => state.estimatedTimeRemaining,
   autoSave: (state: PipelineStore) => state.autoSave,
-  hasRunningPipelines: (state: PipelineStore) => state.runningPipelines.size > 0,
+  hasRunningPipelines: (state: PipelineStore) => Object.keys(state.runningPipelines).length > 0,
   getPipeline: (pipelineId: string) => (state: PipelineStore) => 
     state.getPipelineExecution(pipelineId),
   getProjectPipelines: (projectId: string) => (state: PipelineStore) => 

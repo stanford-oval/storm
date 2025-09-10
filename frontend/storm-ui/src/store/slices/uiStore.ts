@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 // UI state store slice
 import { create } from 'zustand';
 import { UIState, LayoutConfig, CustomPanel, KeyboardShortcuts, AccessibilitySettings } from '../types';
@@ -140,7 +141,7 @@ export const useUIStore = create<UIStore>()(
             set((draft) => {
               draft.theme = theme;
               draft.lastUpdated = new Date();
-            }, 'setTheme');
+            });
 
             // Apply theme to document
             const effectiveTheme = get().getEffectiveTheme();
@@ -186,33 +187,33 @@ export const useUIStore = create<UIStore>()(
           toggleSidebar: () => {
             set((draft) => {
               draft.sidebarCollapsed = !draft.sidebarCollapsed;
-            }, 'toggleSidebar');
+            });
           },
 
           setSidebarCollapsed: (collapsed) => {
             set((draft) => {
               draft.sidebarCollapsed = collapsed;
-            }, 'setSidebarCollapsed');
+            });
           },
 
           // Panel management
           setActivePanel: (panelId) => {
             set((draft) => {
               draft.activePanel = panelId;
-            }, 'setActivePanel');
+            });
           },
 
           togglePanel: (panelId) => {
             set((draft) => {
               draft.activePanel = draft.activePanel === panelId ? null : panelId;
-            }, 'togglePanel');
+            });
           },
 
           resizePanel: (panelId, size) => {
             set((draft) => {
               draft.layout.panelSizes[panelId] = size;
               draft.lastUpdated = new Date();
-            }, 'resizePanel');
+            });
           },
 
           // Dialog management
@@ -221,19 +222,19 @@ export const useUIStore = create<UIStore>()(
               if (!draft.openDialogs.includes(dialogId)) {
                 draft.openDialogs.push(dialogId);
               }
-            }, 'openDialog');
+            });
           },
 
           closeDialog: (dialogId) => {
             set((draft) => {
               draft.openDialogs = draft.openDialogs.filter(id => id !== dialogId);
-            }, 'closeDialog');
+            });
           },
 
           closeAllDialogs: () => {
             set((draft) => {
               draft.openDialogs = [];
-            }, 'closeAllDialogs');
+            });
           },
 
           isDialogOpen: (dialogId) => {
@@ -245,7 +246,7 @@ export const useUIStore = create<UIStore>()(
             set((draft) => {
               draft.layout.density = density;
               draft.lastUpdated = new Date();
-            }, 'setLayoutDensity');
+            });
 
             // Apply density classes to document
             document.documentElement.classList.remove('density-comfortable', 'density-compact', 'density-cozy');
@@ -256,7 +257,7 @@ export const useUIStore = create<UIStore>()(
             set((draft) => {
               Object.assign(draft.layout.panelSizes, sizes);
               draft.lastUpdated = new Date();
-            }, 'updatePanelSizes');
+            });
           },
 
           addCustomPanel: (panel) => {
@@ -269,7 +270,7 @@ export const useUIStore = create<UIStore>()(
               };
               draft.layout.customPanels.push(newPanel);
               draft.lastUpdated = new Date();
-            }, 'addCustomPanel');
+            });
 
             return id;
           },
@@ -281,7 +282,7 @@ export const useUIStore = create<UIStore>()(
                 Object.assign(panel, updates);
                 draft.lastUpdated = new Date();
               }
-            }, 'updateCustomPanel');
+            });
           },
 
           removeCustomPanel: (panelId) => {
@@ -294,7 +295,7 @@ export const useUIStore = create<UIStore>()(
               }
               
               draft.lastUpdated = new Date();
-            }, 'removeCustomPanel');
+            });
           },
 
           resetLayout: () => {
@@ -311,49 +312,49 @@ export const useUIStore = create<UIStore>()(
               draft.activePanel = null;
               draft.sidebarCollapsed = false;
               draft.lastUpdated = new Date();
-            }, 'resetLayout');
+            });
           },
 
           // Keyboard shortcuts
           setKeyboardEnabled: (enabled) => {
             set((draft) => {
               draft.keyboard.enabled = enabled;
-            }, 'setKeyboardEnabled');
+            });
           },
 
           updateShortcut: (key, action) => {
             set((draft) => {
               draft.keyboard.shortcuts[key] = action;
               draft.lastUpdated = new Date();
-            }, 'updateShortcut');
+            });
           },
 
           removeShortcut: (key) => {
             set((draft) => {
               delete draft.keyboard.shortcuts[key];
               draft.lastUpdated = new Date();
-            }, 'removeShortcut');
+            });
           },
 
           addCustomShortcut: (key, action) => {
             set((draft) => {
               draft.keyboard.customShortcuts[key] = action;
               draft.lastUpdated = new Date();
-            }, 'addCustomShortcut');
+            });
           },
 
           removeCustomShortcut: (key) => {
             set((draft) => {
               delete draft.keyboard.customShortcuts[key];
               draft.lastUpdated = new Date();
-            }, 'removeCustomShortcut');
+            });
           },
 
           setCustomShortcuts: (shortcuts) => {
             set((draft) => {
               draft.keyboard.customShortcuts = shortcuts;
               draft.lastUpdated = new Date();
-            }, 'setCustomShortcuts');
+            });
           },
 
           resetShortcuts: () => {
@@ -361,7 +362,7 @@ export const useUIStore = create<UIStore>()(
               draft.keyboard.shortcuts = { ...initialState.keyboard.shortcuts };
               draft.keyboard.customShortcuts = {};
               draft.lastUpdated = new Date();
-            }, 'resetShortcuts');
+            });
           },
 
           executeShortcut: (key) => {
@@ -411,7 +412,7 @@ export const useUIStore = create<UIStore>()(
             set((draft) => {
               Object.assign(draft.accessibility, settings);
               draft.lastUpdated = new Date();
-            }, 'updateAccessibilitySettings');
+            });
 
             // Apply accessibility settings to document
             const { accessibility } = get();
@@ -514,7 +515,7 @@ export const useUIStore = create<UIStore>()(
               set((draft) => {
                 draft.layout = { ...layout };
                 draft.lastUpdated = new Date();
-              }, 'loadLayoutPreset');
+              });
             }
           },
 
@@ -530,25 +531,25 @@ export const useUIStore = create<UIStore>()(
           setLoading: (loading) => {
             set((draft) => {
               draft.loading = loading;
-            }, 'setLoading');
+            });
           },
 
           setError: (error) => {
             set((draft) => {
               draft.error = error;
-            }, 'setError');
+            });
           },
 
           clearError: () => {
             set((draft) => {
               draft.error = null;
-            }, 'clearError');
+            });
           },
 
           reset: () => {
             set((draft) => {
               Object.assign(draft, initialState);
-            }, 'reset');
+            });
           },
         }))
       ),
@@ -580,7 +581,7 @@ if (typeof window !== 'undefined') {
       });
     }
   } catch (error) {
-    console.warn('Failed to load layout presets:', error);
+    logger.warn('Failed to load layout presets:', error);
   }
 
   // Apply initial theme and accessibility settings

@@ -1,3 +1,9 @@
+// Import hooks for internal use in composite functions
+import { useProject } from './useProjects';
+import { usePipeline } from './usePipeline';
+import { useResearch } from './useResearch';
+import { usePipelineWebSocket } from './useWebSocket';
+
 // API hooks exports
 export {
   useProjects,
@@ -83,7 +89,13 @@ export function useProjectWithResearch(projectId: string) {
 }
 
 // Hook for managing multiple projects
+// Note: This hook is commented out as it violates React Hook rules
+// (hooks cannot be called inside loops/callbacks)
+// TODO: Refactor to use a different pattern if needed
+/*
 export function useMultipleProjects(projectIds: string[]) {
+  // This pattern violates React Hook rules - hooks must be called unconditionally
+  // Consider using a single hook with multiple IDs or a different state management approach
   const projects = projectIds.map(id => useProject({ projectId: id }));
   
   const loading = projects.some(p => p.loading);
@@ -98,6 +110,7 @@ export function useMultipleProjects(projectIds: string[]) {
     refetchAll: () => Promise.all(projects.map(p => p.refetch())),
   };
 }
+*/
 
 // Hook for real-time project updates
 export function useRealTimeProject(projectId: string) {

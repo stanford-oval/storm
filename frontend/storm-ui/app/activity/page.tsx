@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+// Removed unused Tabs imports - will add back when needed
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   Activity,
@@ -13,18 +13,16 @@ import {
   Clock, 
   CheckCircle, 
   AlertCircle, 
-  RefreshCw,
   ArrowRight,
   Sparkles,
   FileSearch,
   Edit,
   Zap,
   Calendar,
-  Filter,
   Download
 } from 'lucide-react';
 import { useProjectStore, usePipelineStore } from '@/store';
-import { cn, formatDuration } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import {
   Select,
   SelectContent,

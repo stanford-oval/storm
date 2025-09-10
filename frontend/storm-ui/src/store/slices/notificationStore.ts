@@ -86,6 +86,9 @@ interface NotificationActions {
   stopAutoCleanup: () => void;
   cleanupOldNotifications: (maxAge?: number) => void;
   
+  // Sound management (internal)
+  playNotificationSound: (type: StormNotification['type']) => void;
+  
   // State management
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
@@ -176,7 +179,7 @@ export const useNotificationStore = create<NotificationStore>()(
               }
               
               draft.lastUpdated = new Date();
-            }, 'addNotification');
+            });
 
             // Auto-hide non-persistent notifications
             if (!newNotification.persistent && get().settings.autoHideTimeout > 0) {
@@ -209,7 +212,7 @@ export const useNotificationStore = create<NotificationStore>()(
                 Object.assign(notification, updates);
                 draft.lastUpdated = new Date();
               }
-            }, 'updateNotification');
+            });
           },
 
           removeNotification: (notificationId) => {
@@ -231,7 +234,7 @@ export const useNotificationStore = create<NotificationStore>()(
                 
                 draft.lastUpdated = new Date();
               }
-            }, 'removeNotification');
+            });
           },
 
           clearNotifications: () => {
@@ -247,7 +250,7 @@ export const useNotificationStore = create<NotificationStore>()(
               draft.notifications = [];
               draft.unreadCount = 0;
               draft.lastUpdated = new Date();
-            }, 'clearNotifications');
+            });
           },
 
           clearAllNotifications: () => {
@@ -256,7 +259,7 @@ export const useNotificationStore = create<NotificationStore>()(
               draft.history = [];
               draft.unreadCount = 0;
               draft.lastUpdated = new Date();
-            }, 'clearAllNotifications');
+            });
           },
 
           // Quick notification methods
@@ -266,6 +269,8 @@ export const useNotificationStore = create<NotificationStore>()(
               title,
               message,
               actions,
+              read: false,
+              persistent: false,
             });
           },
 
@@ -275,6 +280,7 @@ export const useNotificationStore = create<NotificationStore>()(
               title,
               message,
               actions,
+              read: false,
               persistent: true, // Errors are persistent by default
             });
           },
@@ -285,6 +291,8 @@ export const useNotificationStore = create<NotificationStore>()(
               title,
               message,
               actions,
+              read: false,
+              persistent: false,
             });
           },
 
@@ -294,6 +302,8 @@ export const useNotificationStore = create<NotificationStore>()(
               title,
               message,
               actions,
+              read: false,
+              persistent: false,
             });
           },
 
@@ -306,7 +316,7 @@ export const useNotificationStore = create<NotificationStore>()(
                 draft.unreadCount = Math.max(0, draft.unreadCount - 1);
                 draft.lastUpdated = new Date();
               }
-            }, 'markAsRead');
+            });
           },
 
           markAllAsRead: () => {
@@ -316,7 +326,7 @@ export const useNotificationStore = create<NotificationStore>()(
               });
               draft.unreadCount = 0;
               draft.lastUpdated = new Date();
-            }, 'markAllAsRead');
+            });
           },
 
           toggleRead: (notificationId) => {
@@ -329,7 +339,7 @@ export const useNotificationStore = create<NotificationStore>()(
                     n.read = false;
                     draft.unreadCount += 1;
                   }
-                }, 'toggleRead:unread');
+                });
               } else {
                 get().markAsRead(notificationId);
               }
@@ -340,6 +350,7 @@ export const useNotificationStore = create<NotificationStore>()(
           addPersistentNotification: (notification) => {
             return get().addNotification({
               ...notification,
+              read: false,
               persistent: true,
             });
           },
@@ -394,7 +405,7 @@ export const useNotificationStore = create<NotificationStore>()(
             set((draft) => {
               draft.history = [];
               draft.lastUpdated = new Date();
-            }, 'clearHistory');
+            });
           },
 
           restoreFromHistory: (notificationId) => {
@@ -414,7 +425,7 @@ export const useNotificationStore = create<NotificationStore>()(
                 
                 draft.lastUpdated = new Date();
               }
-            }, 'restoreFromHistory');
+            });
           },
 
           // Settings management
@@ -422,7 +433,7 @@ export const useNotificationStore = create<NotificationStore>()(
             set((draft) => {
               Object.assign(draft.settings, settings);
               draft.lastUpdated = new Date();
-            }, 'updateSettings');
+            });
           },
 
           enableNotifications: () => {
@@ -555,26 +566,26 @@ export const useNotificationStore = create<NotificationStore>()(
               );
               
               draft.lastUpdated = new Date();
-            }, 'cleanupOldNotifications');
+            });
           },
 
           // State management
           setLoading: (loading) => {
             set((draft) => {
               draft.loading = loading;
-            }, 'setLoading');
+            });
           },
 
           setError: (error) => {
             set((draft) => {
               draft.error = error;
-            }, 'setError');
+            });
           },
 
           clearError: () => {
             set((draft) => {
               draft.error = null;
-            }, 'clearError');
+            });
           },
 
           reset: () => {
@@ -582,7 +593,7 @@ export const useNotificationStore = create<NotificationStore>()(
             
             set((draft) => {
               Object.assign(draft, initialState);
-            }, 'reset');
+            });
           },
 
           // Private method for playing sounds

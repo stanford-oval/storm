@@ -174,7 +174,7 @@ function getStateChanges<T>(oldState: T, newState: T, path: string = ''): Array<
     ...Object.keys(newState as any)
   ]);
 
-  for (const key of allKeys) {
+  for (const key of Array.from(allKeys)) {
     const oldValue = (oldState as any)[key];
     const newValue = (newState as any)[key];
     const currentPath = path ? `${path}.${key}` : key;

@@ -166,7 +166,7 @@ export const useSessionStore = create<SessionStore>()(
             set((draft) => {
               draft.loading = true;
               draft.error = null;
-            }, 'createSession:start');
+            });
 
             try {
               const response = await fetch('/api/sessions', {
@@ -200,7 +200,7 @@ export const useSessionStore = create<SessionStore>()(
                 draft.currentSession = newSession;
                 draft.loading = false;
                 draft.lastUpdated = new Date();
-              }, 'createSession:success');
+              });
 
               // Connect to WebSocket for real-time updates
               await get().connectWebSocket(newSession.id);
@@ -210,7 +210,7 @@ export const useSessionStore = create<SessionStore>()(
               set((draft) => {
                 draft.error = error instanceof Error ? error.message : 'Failed to create session';
                 draft.loading = false;
-              }, 'createSession:error');
+              });
               throw error;
             }
           },
@@ -239,7 +239,7 @@ export const useSessionStore = create<SessionStore>()(
                 }
                 draft.activeParticipants = updatedSession.participants.filter(p => p.isActive);
                 draft.lastUpdated = new Date();
-              }, 'joinSession:success');
+              });
 
               // Connect to WebSocket if not already connected
               if (!websocket || websocket.readyState !== WebSocket.OPEN) {
@@ -248,7 +248,7 @@ export const useSessionStore = create<SessionStore>()(
             } catch (error) {
               set((draft) => {
                 draft.error = error instanceof Error ? error.message : 'Failed to join session';
-              }, 'joinSession:error');
+              });
               throw error;
             }
           },
@@ -282,7 +282,7 @@ export const useSessionStore = create<SessionStore>()(
                   }
                 }
                 draft.lastUpdated = new Date();
-              }, 'leaveSession:success');
+              });
 
               // Disconnect WebSocket if user is leaving entirely
               if (!participantId) {
@@ -291,7 +291,7 @@ export const useSessionStore = create<SessionStore>()(
             } catch (error) {
               set((draft) => {
                 draft.error = error instanceof Error ? error.message : 'Failed to leave session';
-              }, 'leaveSession:error');
+              });
               throw error;
             }
           },
@@ -316,13 +316,13 @@ export const useSessionStore = create<SessionStore>()(
                   draft.currentSession.status = 'completed';
                 }
                 draft.lastUpdated = new Date();
-              }, 'endSession:success');
+              });
 
               get().disconnectWebSocket();
             } catch (error) {
               set((draft) => {
                 draft.error = error instanceof Error ? error.message : 'Failed to end session';
-              }, 'endSession:error');
+              });
               throw error;
             }
           },
@@ -340,7 +340,7 @@ export const useSessionStore = create<SessionStore>()(
             set((draft) => {
               draft.loading = true;
               draft.error = null;
-            }, 'loadSession:start');
+            });
 
             try {
               const response = await fetch(`/api/sessions/${sessionId}`);
@@ -370,7 +370,7 @@ export const useSessionStore = create<SessionStore>()(
                 
                 draft.loading = false;
                 draft.lastUpdated = new Date();
-              }, 'loadSession:success');
+              });
 
               // Update session in sessions list
               set((draft) => {
@@ -380,12 +380,12 @@ export const useSessionStore = create<SessionStore>()(
                 } else {
                   draft.sessions.unshift(session);
                 }
-              }, 'loadSession:updateList');
+              });
             } catch (error) {
               set((draft) => {
                 draft.error = error instanceof Error ? error.message : 'Failed to load session';
                 draft.loading = false;
-              }, 'loadSession:error');
+              });
               throw error;
             }
           },
@@ -394,7 +394,7 @@ export const useSessionStore = create<SessionStore>()(
             set((draft) => {
               draft.loading = true;
               draft.error = null;
-            }, 'loadSessions:start');
+            });
 
             try {
               const response = await fetch('/api/sessions');
@@ -409,12 +409,12 @@ export const useSessionStore = create<SessionStore>()(
                 draft.sessions = sessions;
                 draft.loading = false;
                 draft.lastUpdated = new Date();
-              }, 'loadSessions:success');
+              });
             } catch (error) {
               set((draft) => {
                 draft.error = error instanceof Error ? error.message : 'Failed to load sessions';
                 draft.loading = false;
-              }, 'loadSessions:error');
+              });
               throw error;
             }
           },
@@ -442,11 +442,11 @@ export const useSessionStore = create<SessionStore>()(
                   draft.currentSession = updatedSession;
                 }
                 draft.lastUpdated = new Date();
-              }, 'updateSession:success');
+              });
             } catch (error) {
               set((draft) => {
                 draft.error = error instanceof Error ? error.message : 'Failed to update session';
-              }, 'updateSession:error');
+              });
               throw error;
             }
           },
@@ -469,11 +469,11 @@ export const useSessionStore = create<SessionStore>()(
                   draft.mindMap = [];
                 }
                 draft.lastUpdated = new Date();
-              }, 'deleteSession:success');
+              });
             } catch (error) {
               set((draft) => {
                 draft.error = error instanceof Error ? error.message : 'Failed to delete session';
-              }, 'deleteSession:error');
+              });
               throw error;
             }
           },
@@ -542,7 +542,7 @@ export const useSessionStore = create<SessionStore>()(
                   draft.activeParticipants = draft.currentSession.participants.filter(p => p.isActive);
                 }
               }
-            }, 'setParticipantStatus');
+            });
           },
 
           assignExpertise: async (participantId, expertise) => {
@@ -567,7 +567,7 @@ export const useSessionStore = create<SessionStore>()(
                 draft.currentSession.discourse.push(newTurn);
                 draft.currentSession.updatedAt = new Date();
               }
-            }, 'addDiscourseTurn');
+            });
 
             // Send via WebSocket for real-time updates
             get().sendWebSocketMessage('discourse_turn', newTurn);
@@ -582,7 +582,7 @@ export const useSessionStore = create<SessionStore>()(
                   draft.currentSession.updatedAt = new Date();
                 }
               }
-            }, 'updateDiscourseTurn');
+            });
           },
 
           removeDiscourseTurn: (turnId) => {
@@ -593,7 +593,7 @@ export const useSessionStore = create<SessionStore>()(
                 );
                 draft.currentSession.updatedAt = new Date();
               }
-            }, 'removeDiscourseTurn');
+            });
           },
 
           addReaction: (turnId, reaction) => {
@@ -618,7 +618,7 @@ export const useSessionStore = create<SessionStore>()(
                   draft.currentSession.updatedAt = new Date();
                 }
               }
-            }, 'addReaction');
+            });
           },
 
           removeReaction: (turnId, reactionType, participantId) => {
@@ -632,7 +632,7 @@ export const useSessionStore = create<SessionStore>()(
                   draft.currentSession.updatedAt = new Date();
                 }
               }
-            }, 'removeReaction');
+            });
           },
 
           // Mind map management
@@ -643,7 +643,7 @@ export const useSessionStore = create<SessionStore>()(
                 id: `node_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
               };
               draft.mindMap.push(newNode);
-            }, 'addMindMapNode');
+            });
           },
 
           updateMindMapNode: (nodeId, updates) => {
@@ -652,7 +652,7 @@ export const useSessionStore = create<SessionStore>()(
               if (node) {
                 Object.assign(node, updates);
               }
-            }, 'updateMindMapNode');
+            });
           },
 
           removeMindMapNode: (nodeId) => {
@@ -664,7 +664,7 @@ export const useSessionStore = create<SessionStore>()(
               draft.mindMap.forEach(node => {
                 node.connections = node.connections.filter(id => id !== nodeId);
               });
-            }, 'removeMindMapNode');
+            });
           },
 
           connectMindMapNodes: (nodeId1, nodeId2) => {
@@ -678,7 +678,7 @@ export const useSessionStore = create<SessionStore>()(
               if (node2 && !node2.connections.includes(nodeId1)) {
                 node2.connections.push(nodeId1);
               }
-            }, 'connectMindMapNodes');
+            });
           },
 
           disconnectMindMapNodes: (nodeId1, nodeId2) => {
@@ -692,7 +692,7 @@ export const useSessionStore = create<SessionStore>()(
               if (node2) {
                 node2.connections = node2.connections.filter(id => id !== nodeId1);
               }
-            }, 'disconnectMindMapNodes');
+            });
           },
 
           repositionMindMapNode: (nodeId, position) => {
@@ -701,7 +701,7 @@ export const useSessionStore = create<SessionStore>()(
               if (node) {
                 node.position = position;
               }
-            }, 'repositionMindMapNode');
+            });
           },
 
           // Knowledge base management
@@ -716,7 +716,7 @@ export const useSessionStore = create<SessionStore>()(
                 draft.currentSession.knowledgeBase.push(newItem);
                 draft.currentSession.updatedAt = new Date();
               }
-            }, 'addKnowledgeItem');
+            });
           },
 
           updateKnowledgeItem: (itemId, updates) => {
@@ -728,7 +728,7 @@ export const useSessionStore = create<SessionStore>()(
                   draft.currentSession.updatedAt = new Date();
                 }
               }
-            }, 'updateKnowledgeItem');
+            });
           },
 
           removeKnowledgeItem: (itemId) => {
@@ -739,7 +739,7 @@ export const useSessionStore = create<SessionStore>()(
                 );
                 draft.currentSession.updatedAt = new Date();
               }
-            }, 'removeKnowledgeItem');
+            });
           },
 
           validateKnowledgeItem: (itemId, validatorId) => {
@@ -751,7 +751,7 @@ export const useSessionStore = create<SessionStore>()(
                   draft.currentSession.updatedAt = new Date();
                 }
               }
-            }, 'validateKnowledgeItem');
+            });
           },
 
           searchKnowledgeBase: (query) => {
@@ -771,7 +771,7 @@ export const useSessionStore = create<SessionStore>()(
           updateTurnPolicy: (policy) => {
             set((draft) => {
               Object.assign(draft.turnPolicy, policy);
-            }, 'updateTurnPolicy');
+            });
           },
 
           updateModerator: (updates) => {
@@ -780,7 +780,7 @@ export const useSessionStore = create<SessionStore>()(
                 Object.assign(draft.currentSession.moderator, updates);
                 draft.currentSession.updatedAt = new Date();
               }
-            }, 'updateModerator');
+            });
           },
 
           requestTurn: (participantId) => {
@@ -807,7 +807,7 @@ export const useSessionStore = create<SessionStore>()(
           updateSessionSettings: (settings) => {
             set((draft) => {
               Object.assign(draft.sessionSettings, settings);
-            }, 'updateSessionSettings');
+            });
           },
 
           enableAutoSave: (interval = 30) => {
@@ -859,7 +859,7 @@ export const useSessionStore = create<SessionStore>()(
                       reconnectAttempts: 0,
                       maxReconnectAttempts: 5,
                     };
-                  }, 'websocket:connected');
+                  });
                   resolve();
                 };
 
@@ -877,7 +877,7 @@ export const useSessionStore = create<SessionStore>()(
                     if (draft.realtimeConnection) {
                       draft.realtimeConnection.status = 'disconnected';
                     }
-                  }, 'websocket:disconnected');
+                  });
 
                   // Attempt to reconnect
                   const connection = get().realtimeConnection;
@@ -888,7 +888,7 @@ export const useSessionStore = create<SessionStore>()(
                           draft.realtimeConnection.status = 'reconnecting';
                           draft.realtimeConnection.reconnectAttempts += 1;
                         }
-                      }, 'websocket:reconnecting');
+                      });
                       
                       get().connectWebSocket(sessionId);
                     }, 1000 * Math.pow(2, connection.reconnectAttempts));
@@ -914,7 +914,7 @@ export const useSessionStore = create<SessionStore>()(
             
             set((draft) => {
               draft.realtimeConnection = null;
-            }, 'websocket:disconnect');
+            });
           },
 
           handleWebSocketMessage: (message) => {
@@ -927,7 +927,7 @@ export const useSessionStore = create<SessionStore>()(
                     draft.currentSession.discourse.push(payload);
                     draft.currentSession.updatedAt = new Date();
                   }
-                }, 'websocket:discourse_turn');
+                });
                 break;
 
               case 'participant_joined':
@@ -937,7 +937,7 @@ export const useSessionStore = create<SessionStore>()(
                     draft.activeParticipants = draft.currentSession.participants.filter(p => p.isActive);
                     draft.currentSession.updatedAt = new Date();
                   }
-                }, 'websocket:participant_joined');
+                });
                 break;
 
               case 'participant_left':
@@ -949,7 +949,7 @@ export const useSessionStore = create<SessionStore>()(
                     draft.activeParticipants = draft.currentSession.participants.filter(p => p.isActive);
                     draft.currentSession.updatedAt = new Date();
                   }
-                }, 'websocket:participant_left');
+                });
                 break;
 
               case 'knowledge_item_added':
@@ -958,7 +958,7 @@ export const useSessionStore = create<SessionStore>()(
                     draft.currentSession.knowledgeBase.push(payload);
                     draft.currentSession.updatedAt = new Date();
                   }
-                }, 'websocket:knowledge_item_added');
+                });
                 break;
 
               case 'session_ended':
@@ -967,7 +967,7 @@ export const useSessionStore = create<SessionStore>()(
                     draft.currentSession.status = 'completed';
                     draft.currentSession.updatedAt = new Date();
                   }
-                }, 'websocket:session_ended');
+                });
                 break;
 
               default:
@@ -1244,19 +1244,19 @@ export const useSessionStore = create<SessionStore>()(
           setLoading: (loading) => {
             set((draft) => {
               draft.loading = loading;
-            }, 'setLoading');
+            });
           },
 
           setError: (error) => {
             set((draft) => {
               draft.error = error;
-            }, 'setError');
+            });
           },
 
           clearError: () => {
             set((draft) => {
               draft.error = null;
-            }, 'clearError');
+            });
           },
 
           reset: () => {
@@ -1265,7 +1265,7 @@ export const useSessionStore = create<SessionStore>()(
             
             set((draft) => {
               Object.assign(draft, initialState);
-            }, 'reset');
+            });
           },
         }))
       ),

@@ -32,7 +32,9 @@ export const createParametrizedSelector = <T, P, R>(
     // Cleanup old cache entries (keep only last 50)
     if (cache.size > 50) {
       const firstKey = cache.keys().next().value;
-      cache.delete(firstKey);
+      if (firstKey !== undefined) {
+        cache.delete(firstKey);
+      }
     }
     
     return result;
@@ -42,7 +44,7 @@ export const createParametrizedSelector = <T, P, R>(
 // Array selector with item stability
 export const createArraySelector = <T, I>(
   selector: (state: T) => I[],
-  keyFn: (item: I) => string | number = (item, index) => index
+  keyFn: (item: I, index: number) => string | number = (item, index) => index
 ) => {
   let lastResult: I[] = [];
   let lastState: T;

@@ -13,8 +13,14 @@ import { TopBar } from '@/components/layout/TopBar';
 import { DebugConsole, DebugConsoleToggle } from '@/components/debug/DebugConsole';
 import { cn } from '@/lib/utils';
 import { Suspense } from 'react';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ 
+  subsets: ['latin'],
+  display: 'swap', // Use font-display: swap for better performance
+  preload: false, // Disable automatic preloading to avoid the warning
+  fallback: ['system-ui', 'arial'] // Add fallback fonts
+});
 
 export const metadata: Metadata = {
   title: 'STORM - Knowledge Curation System',
@@ -40,11 +46,12 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={cn(inter.className, 'min-h-screen bg-background font-sans antialiased')}>
-        <StoreProvider>
-          <ThemeProvider>
-            <ConfigProvider>
-              <WebSocketProvider>
-                <ToastProvider>
+        <ErrorBoundary>
+          <StoreProvider>
+            <ThemeProvider>
+              <ConfigProvider>
+                <WebSocketProvider>
+                  <ToastProvider>
                 <div className="flex h-screen overflow-hidden">
                   <Suspense fallback={<div className="w-64 bg-muted/30" />}>
                     <Sidebar />
@@ -74,11 +81,12 @@ export default function RootLayout({ children }: RootLayoutProps) {
                 <KeyboardShortcutsWrapper />
                 <DebugConsole />
                 <DebugConsoleToggle />
-                </ToastProvider>
-              </WebSocketProvider>
-            </ConfigProvider>
-          </ThemeProvider>
-        </StoreProvider>
+                  </ToastProvider>
+                </WebSocketProvider>
+              </ConfigProvider>
+            </ThemeProvider>
+          </StoreProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

@@ -1,4 +1,6 @@
-'use client';
+'use client'
+
+import { logger } from '@/utils/logger';
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,16 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { 
-  Key, 
-  Globe, 
-  Brain, 
-  Palette, 
-  Bell, 
-  Shield, 
   Database,
-  Zap,
-  CheckCircle,
-  AlertCircle,
   Eye,
   EyeOff,
   Save,
@@ -56,7 +49,7 @@ export default function SettingsPage() {
     google: '',
     tavily: '',
     serper: '',
-    bing: '',
+    bing: ''
   });
   
   // Load API keys from backend on mount
@@ -73,11 +66,11 @@ export default function SettingsPage() {
             google: savedSettings?.apiKeys?.google || data.google_api_key_preview || '',
             tavily: savedSettings?.apiKeys?.tavily || data.tavily_key_preview || '',
             serper: savedSettings?.apiKeys?.serper || data.serper_key_preview || '',
-            bing: savedSettings?.apiKeys?.bing || data.bing_key_preview || '',
+            bing: savedSettings?.apiKeys?.bing || data.bing_key_preview || ''
           });
         }
       } catch (error) {
-        console.error('Failed to load API keys:', error);
+        logger.error('Failed to load API keys:', error);
         // Fall back to saved settings
         setApiKeys({
           openai: savedSettings?.apiKeys?.openai || '',
@@ -85,7 +78,7 @@ export default function SettingsPage() {
           google: savedSettings?.apiKeys?.google || '',
           tavily: savedSettings?.apiKeys?.tavily || '',
           serper: savedSettings?.apiKeys?.serper || '',
-          bing: savedSettings?.apiKeys?.bing || '',
+          bing: savedSettings?.apiKeys?.bing || ''
         });
       } finally {
         setLoading(false);
@@ -99,14 +92,14 @@ export default function SettingsPage() {
     defaultModel: savedSettings?.llmSettings?.defaultModel || 'gpt-4',
     temperature: savedSettings?.llmSettings?.temperature ?? 0.7,
     maxTokens: savedSettings?.llmSettings?.maxTokens || 4000,
-    topP: savedSettings?.llmSettings?.topP ?? 1.0,
+    topP: savedSettings?.llmSettings?.topP ?? 1.0
   });
 
   const [searchSettings, setSearchSettings] = useState({
     defaultProvider: savedSettings?.searchSettings?.defaultProvider || 'tavily',
     maxResults: savedSettings?.searchSettings?.maxResults || 10,
     includeImages: savedSettings?.searchSettings?.includeImages ?? false,
-    safeSearch: savedSettings?.searchSettings?.safeSearch ?? true,
+    safeSearch: savedSettings?.searchSettings?.safeSearch ?? true
   });
 
   const [uiSettings, setUiSettings] = useState({
@@ -114,7 +107,7 @@ export default function SettingsPage() {
     compactMode: savedSettings?.uiSettings?.compactMode ?? false,
     showDebugConsole: savedSettings?.uiSettings?.showDebugConsole ?? false,
     autoSave: savedSettings?.uiSettings?.autoSave ?? true,
-    notifications: savedSettings?.uiSettings?.notifications ?? true,
+    notifications: savedSettings?.uiSettings?.notifications ?? true
   });
 
   const toggleApiKeyVisibility = (key: string) => {
@@ -138,12 +131,16 @@ export default function SettingsPage() {
         type: 'success',
         title: 'API Key Valid',
         message: `${provider} API key tested successfully`,
+        read: false,
+        persistent: false
       });
     } catch (error) {
       addNotification({
         type: 'error',
         title: 'API Key Invalid',
         message: `Failed to validate ${provider} API key`,
+        read: false,
+        persistent: false
       });
     } finally {
       setTestingApi(null);
@@ -157,7 +154,7 @@ export default function SettingsPage() {
       llmSettings,
       searchSettings,
       uiSettings,
-      savedAt: new Date().toISOString(),
+      savedAt: new Date().toISOString()
     };
     
     localStorage.setItem('storm_settings', JSON.stringify(settings));
@@ -171,6 +168,8 @@ export default function SettingsPage() {
       type: 'success',
       title: 'Settings Saved',
       message: 'Your settings have been updated successfully',
+      read: false,
+      persistent: false
     });
   };
 

@@ -402,7 +402,7 @@ export const withTheme = <P extends object>(
 ) => {
   return React.forwardRef<any, P>((props, ref) => {
     const theme = useTheme();
-    return <Component {...props} theme={theme} ref={ref} />;
+    return <Component {...(props as P)} theme={theme} ref={ref} />;
   });
 };
 

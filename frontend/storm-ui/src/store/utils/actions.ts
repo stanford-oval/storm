@@ -399,7 +399,7 @@ export const arrayActions = {
     }
   },
 
-  updateBy: <T>(
+  updateBy: <T extends object>(
     array: T[],
     predicate: (item: T) => boolean,
     updater: (item: T) => Partial<T>

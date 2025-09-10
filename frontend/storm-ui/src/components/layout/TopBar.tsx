@@ -36,7 +36,6 @@ export function TopBar() {
   const { 
     theme, 
     setTheme, 
-    commandPaletteOpen, 
     openCommandPalette,
     getEffectiveTheme 
   } = useUIStore();

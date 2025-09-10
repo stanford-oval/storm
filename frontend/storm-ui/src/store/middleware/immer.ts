@@ -14,8 +14,9 @@ export interface ImmerStateCreator<T> {
 // Immer middleware implementation
 export const immer = <T>(config: ImmerStateCreator<T>): StateCreator<T> => {
   return (set, get, api) => {
-    const immerSet = (fn: (draft: Draft<T>) => void) => {
-      set(produce(fn));
+    const immerSet = (fn: (draft: Draft<T>) => void, actionName?: string) => {
+      // Ignore actionName for now - it's used for debugging
+      set(produce(fn) as any);
     };
 
     return config(immerSet, get, api);
@@ -75,7 +76,7 @@ export const immerHelpers = {
     if (draft[index]) {
       const result = updater(draft[index]);
       if (result) {
-        Object.assign(draft[index], result);
+        Object.assign(draft[index] as any, result);
       }
     }
   },
@@ -89,7 +90,7 @@ export const immerHelpers = {
     if (index !== -1) {
       const result = updater(draft[index]);
       if (result) {
-        Object.assign(draft[index], result);
+        Object.assign(draft[index] as any, result);
       }
     }
   },

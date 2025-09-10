@@ -6,19 +6,10 @@ import { useConfig } from './ConfigContext';
 import { useAuthStore } from '../slices/authStore';
 import { useNotificationStore } from '../slices/notificationStore';
 import { getConnectionStatusColor, getConnectionStatusText } from '@/utils/status';
+import type { WebSocketMessage } from '../types';
 
 // WebSocket connection states
 export type WebSocketState = 'connecting' | 'connected' | 'disconnected' | 'reconnecting' | 'error';
-
-// WebSocket message types
-export interface WebSocketMessage {
-  type: string;
-  payload: any;
-  id?: string;
-  timestamp: number;
-  from?: string;
-  to?: string;
-}
 
 // WebSocket event handlers
 export interface WebSocketEventHandlers {
@@ -392,7 +383,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       type,
       payload,
       id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      timestamp: Date.now(),
+      timestamp: new Date(),
     };
 
     // Queue message if not connected
@@ -644,7 +635,7 @@ export const withWebSocket = <P extends object>(
 ) => {
   return React.forwardRef<any, P>((props, ref) => {
     const websocket = useWebSocket();
-    return <Component {...props} websocket={websocket} ref={ref} />;
+    return <Component {...(props as P)} websocket={websocket} ref={ref} />;
   });
 };
 

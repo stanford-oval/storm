@@ -3,6 +3,11 @@ export { worker, enableMocking, disableMocking, updateHandler, resetHandlers } f
 export { server, setupMockServer, mockServer } from './server';
 export { handlers } from './handlers';
 
+// Import utilities for internal use
+import { resetHandlers as resetHandlersInternal, updateHandler as updateHandlerInternal } from './browser';
+import { http, HttpResponse, delay } from 'msw';
+import { handlers as handlersInternal } from './handlers';
+
 // Mock data utilities
 export const mockData = {
   // Generate mock project data
@@ -116,12 +121,12 @@ export const mockScenarios = {
   // Happy path scenario - all APIs work normally
   happyPath: () => {
     // Default handlers already provide happy path
-    resetHandlers();
+    resetHandlersInternal();
   },
 
   // Error scenario - simulate API failures
   errorScenario: () => {
-    updateHandler(
+    updateHandlerInternal(
       http.get('/api/*', () => {
         return HttpResponse.json(
           { success: false, error: 'Simulated API error' },
@@ -133,7 +138,7 @@ export const mockScenarios = {
 
   // Slow response scenario - simulate network delays
   slowResponse: (delay = 3000) => {
-    updateHandler(
+    updateHandlerInternal(
       http.get('/api/*', async () => {
         await new Promise(resolve => setTimeout(resolve, delay));
         return HttpResponse.json({ success: true, data: null });
@@ -143,7 +148,7 @@ export const mockScenarios = {
 
   // Empty data scenario - APIs return empty results
   emptyData: () => {
-    updateHandler(
+    updateHandlerInternal(
       http.get('/api/projects', () => {
         return HttpResponse.json({
           success: true,
@@ -167,7 +172,7 @@ export const mockScenarios = {
       mockData.generateProject((i + 1).toString())
     );
 
-    updateHandler(
+    updateHandlerInternal(
       http.get('/api/projects', ({ request }) => {
         const url = new URL(request.url);
         const page = parseInt(url.searchParams.get('page') || '1');
@@ -212,7 +217,7 @@ export const devUtils = {
 
   // Get mock statistics
   getStats: () => ({
-    handlersCount: handlers.length,
+    handlersCount: handlersInternal.length,
     isEnabled: mockEnv.isEnabled(),
     timestamp: new Date(),
   }),

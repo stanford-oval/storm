@@ -131,7 +131,7 @@ export const persist = <T>(
 
     // Merge persisted state with initial state
     if (persistedState) {
-      Object.assign(store, persistedState);
+      Object.assign(store as any, persistedState);
     }
 
     // Add rehydration methods to store
@@ -170,7 +170,7 @@ export const createMigrations = (migrations: Record<number, (state: any) => any>
 };
 
 // Utility to create selective persistence
-export const createPartialize = <T>(keys: (keyof T)[]) => {
+export const createPartialize = <T extends object>(keys: (keyof T)[]) => {
   return (state: T) => {
     const result: Partial<T> = {};
     for (const key of keys) {
@@ -216,8 +216,8 @@ export const createEncryptedStorage = (encryptionKey: string): Storage => {
   const baseStorage = createJSONStorage();
 
   return {
-    getItem: (name: string) => {
-      const encrypted = baseStorage.getItem(name);
+    getItem: async (name: string) => {
+      const encrypted = await baseStorage.getItem(name);
       if (!encrypted) return null;
       
       const decrypted = decrypt(encrypted, encryptionKey);

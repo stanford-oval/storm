@@ -1,16 +1,17 @@
 import React from 'react';
 import { render, RenderOptions } from '@testing-library/react';
 import { renderHook, RenderHookOptions } from '@testing-library/react-hooks';
-import { ThemeProvider } from 'next-themes';
-import { axe, toHaveNoViolations } from 'jest-axe';
+// import { ThemeProvider } from 'next-themes'; // TODO: Install next-themes
+import { ThemeProvider } from '@/store/contexts/ThemeContext';
+// import { axe, toHaveNoViolations } from 'jest-axe'; // TODO: Install jest-axe
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { StoreProvider } from '@/store/contexts/StoreProvider';
 import { WebSocketContext } from '@/store/contexts/WebSocketContext';
 import { ConfigContext } from '@/store/contexts/ConfigContext';
-import WS from 'jest-websocket-mock';
+// import WS from 'jest-websocket-mock'; // TODO: Install jest-websocket-mock
 
 // Extend jest matchers
-expect.extend(toHaveNoViolations);
+// expect.extend(toHaveNoViolations); // TODO: Uncomment when jest-axe is installed
 
 // Mock WebSocket server
 const mockWebSocketServer = new WS('ws://localhost:8080');
@@ -56,7 +57,7 @@ const AllTheProviders: React.FC<{
   };
 
   return (
-    <ThemeProvider attribute="class" defaultTheme={theme} enableSystem={false}>
+    <ThemeProvider defaultTheme={theme as 'light' | 'dark' | 'system'}>
       <ConfigContext.Provider value={mockConfig}>
         <QueryClientProvider client={queryClient}>
           <WebSocketContext.Provider value={mockWebSocket}>

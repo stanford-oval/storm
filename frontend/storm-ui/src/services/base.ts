@@ -75,7 +75,7 @@ export class BaseApiService {
 
         // Add authentication token if available
         const token = this.getAuthToken();
-        if (token && !config.skipAuth) {
+        if (token && !(config as any).skipAuth) {
           config.headers.Authorization = `Bearer ${token}`;
         }
 
@@ -86,7 +86,7 @@ export class BaseApiService {
         }
 
         // Rate limiting
-        if (!config.skipRateLimit && this.config.rateLimitPerSecond) {
+        if (!(config as any).skipRateLimit && this.config.rateLimitPerSecond) {
           await this.enforceRateLimit();
         }
 
@@ -207,9 +207,9 @@ export class BaseApiService {
     const data = response?.data as any;
 
     let message = 'An unexpected error occurred';
-    let status = response?.status;
+    const status = response?.status;
     let code = error.code;
-    let details = data;
+    const details = data;
 
     if (data && typeof data === 'object') {
       message = data.error || data.message || message;
@@ -241,7 +241,7 @@ export class BaseApiService {
   // Public methods for making requests with enhanced error handling
   protected async get<T>(url: string, options?: RequestOptions): Promise<ApiResponse<T>> {
     return this.executeWithErrorHandling(
-      () => this.client.get<T>(url, options).then(r => r.data),
+      () => this.client.get<ApiResponse<T>>(url, options).then(r => r.data),
       'GET',
       url
     );
@@ -249,7 +249,7 @@ export class BaseApiService {
 
   protected async post<T>(url: string, data?: any, options?: RequestOptions): Promise<ApiResponse<T>> {
     return this.executeWithErrorHandling(
-      () => this.client.post<T>(url, data, options).then(r => r.data),
+      () => this.client.post<ApiResponse<T>>(url, data, options).then(r => r.data),
       'POST',
       url,
       { data }
@@ -258,7 +258,7 @@ export class BaseApiService {
 
   protected async put<T>(url: string, data?: any, options?: RequestOptions): Promise<ApiResponse<T>> {
     return this.executeWithErrorHandling(
-      () => this.client.put<T>(url, data, options).then(r => r.data),
+      () => this.client.put<ApiResponse<T>>(url, data, options).then(r => r.data),
       'PUT',
       url,
       { data }
@@ -267,7 +267,7 @@ export class BaseApiService {
 
   protected async patch<T>(url: string, data?: any, options?: RequestOptions): Promise<ApiResponse<T>> {
     return this.executeWithErrorHandling(
-      () => this.client.patch<T>(url, data, options).then(r => r.data),
+      () => this.client.patch<ApiResponse<T>>(url, data, options).then(r => r.data),
       'PATCH',
       url,
       { data }
@@ -276,7 +276,7 @@ export class BaseApiService {
 
   protected async delete<T>(url: string, options?: RequestOptions): Promise<ApiResponse<T>> {
     return this.executeWithErrorHandling(
-      () => this.client.delete<T>(url, options).then(r => r.data),
+      () => this.client.delete<ApiResponse<T>>(url, options).then(r => r.data),
       'DELETE',
       url
     );
@@ -381,7 +381,7 @@ export class BaseApiService {
       }
     };
 
-    const response = await this.client.post<T>(url, formData, config);
+    const response = await this.client.post<ApiResponse<T>>(url, formData, config);
     return response.data;
   }
 

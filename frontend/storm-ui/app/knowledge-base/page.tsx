@@ -1,5 +1,7 @@
 'use client';
 
+import { logger } from '@/utils/logger';
+
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,14 +14,12 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from '@/components/ui/select';
 import { 
   Search, 
   FileText, 
-  Calendar, 
   Tag, 
-  Filter,
   Download,
   Eye,
   BookOpen,
@@ -122,7 +122,7 @@ export default function KnowledgeBasePage() {
 
   const exportProject = (projectId: string, format: 'md' | 'html' | 'pdf') => {
     // TODO: Implement export functionality
-    console.log(`Exporting project ${projectId} as ${format}`);
+    logger.log(`Exporting project ${projectId} as ${format}`);
   };
 
   const ProjectCard = ({ project }: { project: any }) => (

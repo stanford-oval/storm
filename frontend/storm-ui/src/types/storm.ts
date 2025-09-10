@@ -19,7 +19,7 @@ export interface StormProject {
   pipeline_status?: string;
   metadata?: {
     duration?: number;
-    [key: string]: any;
+    [key: string]: unknown;
   };
   error?: string;  // Error message if pipeline failed
 }
@@ -34,7 +34,7 @@ export type ProjectStatus =
   | 'failed';
 
 export interface StormConfig {
-  llm: {
+  llm?: {
     model: string;
     provider: 'openai' | 'anthropic' | 'azure' | 'gemini' | 'ollama' | 'groq';
     apiKey?: string;
@@ -42,19 +42,33 @@ export interface StormConfig {
     temperature?: number;
     maxTokens?: number;
   };
-  retriever: {
+  retriever?: {
     type: 'google' | 'bing' | 'you' | 'duckduckgo' | 'tavily' | 'serper' | 'brave' | 'vector';
     apiKey?: string;
     maxResults?: number;
+    topK?: number;
   };
-  pipeline: {
+  pipeline?: {
     doResearch: boolean;
     doGenerateOutline: boolean;
     doGenerateArticle: boolean;
     doPolishArticle: boolean;
     maxConvTurns?: number;
     maxPerspectives?: number;
+    maxSearchQueriesPerTurn?: number;
   };
+  // Legacy backend properties (for backward compatibility)
+  llm_provider?: string;
+  llm_model?: string;
+  retriever_type?: string;
+  max_perspective?: number;
+  max_conv_turn?: number;
+  max_search_queries_per_turn?: number;
+  temperature?: number;
+  max_tokens?: number;
+  max_search_results?: number;
+  search_top_k?: number;
+  [key: string]: any; // Allow other unknown properties from backend
 }
 
 export interface PipelineProgress {

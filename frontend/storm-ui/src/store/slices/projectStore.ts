@@ -6,6 +6,7 @@ import { persist, createPartialize } from '../middleware/persist';
 import { devtools } from '../middleware/devtools';
 import { immer } from '../middleware/immer';
 import { subscriptions } from '../middleware/subscriptions';
+import { logger } from '@/utils/logger';
 
 // Initial state
 const initialState: ProjectState = {
@@ -74,7 +75,7 @@ interface ProjectActions {
   // Configuration management
   updateProjectConfig: (projectId: string, config: Partial<StormConfig>) => Promise<void>;
   cloneProjectConfig: (sourceProjectId: string, targetProjectId: string) => Promise<void>;
-  exportProjectConfig: (projectId: string) => StormConfig;
+  exportProjectConfig: (projectId: string) => StormConfig | undefined;
   importProjectConfig: (projectId: string, config: StormConfig) => Promise<void>;
   
   // State management
@@ -98,11 +99,11 @@ export const useProjectStore = create<ProjectStore>()(
 
           // Project CRUD operations
           createProject: async (projectData) => {
-            console.log('createProject called with:', projectData);
+            logger.log('createProject called with:', projectData);
             set((draft) => {
               draft.loading = true;
               draft.error = null;
-            }, 'createProject:start');
+            });
 
             try {
               const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
@@ -112,8 +113,8 @@ export const useProjectStore = create<ProjectStore>()(
                 topic: projectData.topic,
                 config: projectData.config,
               };
-              console.log('Sending request to:', `${apiUrl}/projects/`);
-              console.log('Request data:', requestData);
+              logger.log('Sending request to:', `${apiUrl}/projects/`);
+              logger.log('Request data:', requestData);
               
               const response = await fetch(`${apiUrl}/projects/`, {
                 method: 'POST',
@@ -121,32 +122,32 @@ export const useProjectStore = create<ProjectStore>()(
                 body: JSON.stringify(requestData),
               });
 
-              console.log('Response status:', response.status);
-              console.log('Response ok:', response.ok);
+              logger.log('Response status:', response.status);
+              logger.log('Response ok:', response.ok);
 
               if (!response.ok) {
                 const errorText = await response.text();
-                console.error('Error response:', errorText);
+                logger.error('Error response:', errorText);
                 throw new Error(`Failed to create project: ${errorText}`);
               }
 
               const responseData = await response.json();
-              console.log('API Response:', responseData);
+              logger.log('API Response:', responseData);
               
               // Validate response
               if (!responseData || typeof responseData !== 'object') {
-                console.error('Invalid response data:', responseData);
+                logger.error('Invalid response data:', responseData);
                 throw new Error('Invalid response from server');
               }
               
               if (!responseData.id) {
-                console.error('Response missing ID:', responseData);
+                logger.error('Response missing ID:', responseData);
                 throw new Error('Server response missing project ID');
               }
               
               const newProject: StormProject = responseData;
-              console.log('New project object:', newProject);
-              console.log('Project ID:', newProject?.id);
+              logger.log('New project object:', newProject);
+              logger.log('Project ID:', newProject?.id);
 
               set((draft) => {
                 // Ensure projects array exists
@@ -161,22 +162,22 @@ export const useProjectStore = create<ProjectStore>()(
                 draft.pagination.total += 1;
                 draft.loading = false;
                 draft.lastUpdated = new Date();
-              }, 'createProject:success');
+              });
 
               // Ensure we have the ID before adding to recent
               if (newProject.id) {
                 get().addToRecentProjects(newProject.id);
               }
               
-              console.log('About to return project:', newProject);
-              console.log('Return value is:', newProject);
+              logger.log('About to return project:', newProject);
+              logger.log('Return value is:', newProject);
               return newProject;
             } catch (error) {
-              console.error('Error in createProject:', error);
+              logger.error('Error in createProject:', error);
               set((draft) => {
                 draft.error = error instanceof Error ? error.message : 'Failed to create project';
                 draft.loading = false;
-              }, 'createProject:error');
+              });
               throw error;
             }
           },
@@ -185,7 +186,7 @@ export const useProjectStore = create<ProjectStore>()(
             set((draft) => {
               draft.loading = true;
               draft.error = null;
-            }, 'updateProject:start');
+            });
 
             try {
               const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
@@ -211,12 +212,12 @@ export const useProjectStore = create<ProjectStore>()(
                 }
                 draft.loading = false;
                 draft.lastUpdated = new Date();
-              }, 'updateProject:success');
+              });
             } catch (error) {
               set((draft) => {
                 draft.error = error instanceof Error ? error.message : 'Failed to update project';
                 draft.loading = false;
-              }, 'updateProject:error');
+              });
               throw error;
             }
           },
@@ -225,7 +226,7 @@ export const useProjectStore = create<ProjectStore>()(
             set((draft) => {
               draft.loading = true;
               draft.error = null;
-            }, 'deleteProject:start');
+            });
 
             try {
               const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
@@ -247,12 +248,12 @@ export const useProjectStore = create<ProjectStore>()(
                 draft.pagination.total -= 1;
                 draft.loading = false;
                 draft.lastUpdated = new Date();
-              }, 'deleteProject:success');
+              });
             } catch (error) {
               set((draft) => {
                 draft.error = error instanceof Error ? error.message : 'Failed to delete project';
                 draft.loading = false;
-              }, 'deleteProject:error');
+              });
               throw error;
             }
           },
@@ -280,14 +281,14 @@ export const useProjectStore = create<ProjectStore>()(
               set((draft) => {
                 draft.projects.unshift(duplicatedProject);
                 draft.lastUpdated = new Date();
-              }, 'duplicateProject:success');
+              });
 
               return duplicatedProject;
             } catch (error) {
-              console.error('Error duplicating project:', error);
+              logger.error('Error duplicating project:', error);
               set((draft) => {
                 draft.error = error instanceof Error ? error.message : 'Failed to duplicate project';
-              }, 'duplicateProject:error');
+              });
               throw error;
             }
           },
@@ -305,7 +306,7 @@ export const useProjectStore = create<ProjectStore>()(
             set((draft) => {
               draft.loading = true;
               draft.error = null;
-            }, 'loadProjects:start');
+            });
 
             try {
               const queryParams = new URLSearchParams({
@@ -389,12 +390,12 @@ export const useProjectStore = create<ProjectStore>()(
                 };
                 draft.loading = false;
                 draft.lastUpdated = new Date();
-              }, 'loadProjects:success');
+              });
             } catch (error) {
               set((draft) => {
                 draft.error = error instanceof Error ? error.message : 'Failed to load projects';
                 draft.loading = false;
-              }, 'loadProjects:error');
+              });
               throw error;
             }
           },
@@ -422,13 +423,13 @@ export const useProjectStore = create<ProjectStore>()(
                   project.config = {
                     ...project.config,
                     llm: project.config.llm || {
-                      provider: project.config.llm_provider || 'openai',
+                      provider: (project.config.llm_provider || 'openai') as 'openai' | 'anthropic' | 'azure' | 'gemini' | 'ollama' | 'groq',
                       model: project.config.llm_model || 'gpt-4o',
                       temperature: project.config.temperature || 0.7,
                       maxTokens: project.config.max_tokens || 4000,
                     },
                     retriever: (!project.config.retriever || project.config.retriever === null) ? {
-                      type: project.config.retriever_type || 'tavily',
+                      type: (project.config.retriever_type || 'tavily') as 'google' | 'bing' | 'you' | 'duckduckgo' | 'tavily' | 'serper' | 'brave' | 'vector',
                       maxResults: project.config.max_search_results || 10,
                       topK: project.config.search_top_k || 3,
                     } : project.config.retriever,
@@ -459,14 +460,14 @@ export const useProjectStore = create<ProjectStore>()(
                 }
                 draft.currentProject = project;
                 draft.lastUpdated = new Date();
-              }, 'loadProject:success');
+              });
 
               get().addToRecentProjects(projectId);
               return project;
             } catch (error) {
               set((draft) => {
                 draft.error = error instanceof Error ? error.message : 'Failed to load project';
-              }, 'loadProject:error');
+              });
               throw error;
             }
           },
@@ -488,7 +489,7 @@ export const useProjectStore = create<ProjectStore>()(
                 }
                 get().addToRecentProjects(project.id);
               }
-            }, 'setCurrentProject');
+            });
           },
 
           selectProject: (projectId, multiSelect = false) => {
@@ -500,25 +501,25 @@ export const useProjectStore = create<ProjectStore>()(
               } else {
                 draft.selectedProjects = [projectId];
               }
-            }, 'selectProject');
+            });
           },
 
           deselectProject: (projectId) => {
             set((draft) => {
               draft.selectedProjects = draft.selectedProjects.filter(id => id !== projectId);
-            }, 'deselectProject');
+            });
           },
 
           selectAllProjects: () => {
             set((draft) => {
               draft.selectedProjects = draft.projects.map(p => p.id);
-            }, 'selectAllProjects');
+            });
           },
 
           deselectAllProjects: () => {
             set((draft) => {
               draft.selectedProjects = [];
-            }, 'deselectAllProjects');
+            });
           },
 
           // Additional selection methods for compatibility
@@ -546,7 +547,7 @@ export const useProjectStore = create<ProjectStore>()(
                 projectId,
                 ...draft.recentProjects.filter(id => id !== projectId)
               ].slice(0, 10); // Keep only last 10
-            }, 'addToRecentProjects');
+            });
           },
 
           // Filtering and sorting
@@ -554,7 +555,7 @@ export const useProjectStore = create<ProjectStore>()(
             set((draft) => {
               Object.assign(draft.filters, filters);
               draft.pagination.page = 1; // Reset to first page
-            }, 'setFilters');
+            });
             
             get().loadProjects(get().filters);
           },
@@ -563,7 +564,7 @@ export const useProjectStore = create<ProjectStore>()(
             set((draft) => {
               draft.filters = { searchQuery: '' };
               draft.pagination.page = 1;
-            }, 'clearFilters');
+            });
             
             get().loadProjects();
           },
@@ -573,7 +574,7 @@ export const useProjectStore = create<ProjectStore>()(
               draft.sortBy = field;
               draft.sortOrder = order;
               draft.pagination.page = 1;
-            }, 'setSortBy');
+            });
             
             get().loadProjects(get().filters);
           },
@@ -584,7 +585,7 @@ export const useProjectStore = create<ProjectStore>()(
               if (limit) {
                 draft.pagination.limit = limit;
               }
-            }, 'setPagination');
+            });
             
             get().loadProjects(get().filters, page, limit);
           },
@@ -594,7 +595,7 @@ export const useProjectStore = create<ProjectStore>()(
             set((draft) => {
               draft.loading = true;
               draft.error = null;
-            }, 'bulkUpdateStatus:start');
+            });
 
             try {
               const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
@@ -617,12 +618,12 @@ export const useProjectStore = create<ProjectStore>()(
                 draft.selectedProjects = [];
                 draft.loading = false;
                 draft.lastUpdated = new Date();
-              }, 'bulkUpdateStatus:success');
+              });
             } catch (error) {
               set((draft) => {
                 draft.error = error instanceof Error ? error.message : 'Failed to update projects';
                 draft.loading = false;
-              }, 'bulkUpdateStatus:error');
+              });
               throw error;
             }
           },
@@ -631,7 +632,7 @@ export const useProjectStore = create<ProjectStore>()(
             set((draft) => {
               draft.loading = true;
               draft.error = null;
-            }, 'bulkDelete:start');
+            });
 
             try {
               const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
@@ -655,12 +656,12 @@ export const useProjectStore = create<ProjectStore>()(
                 draft.pagination.total -= projectIds.length;
                 draft.loading = false;
                 draft.lastUpdated = new Date();
-              }, 'bulkDelete:success');
+              });
             } catch (error) {
               set((draft) => {
                 draft.error = error instanceof Error ? error.message : 'Failed to delete projects';
                 draft.loading = false;
-              }, 'bulkDelete:error');
+              });
               throw error;
             }
           },
@@ -722,7 +723,7 @@ export const useProjectStore = create<ProjectStore>()(
                 include_citations: config.output?.includeCitations ?? true,
               };
               
-              console.log('Saving configuration to backend:', {
+              logger.log('Saving configuration to backend:', {
                 max_conv_turn: backendConfig.max_conv_turn,
                 max_perspective: backendConfig.max_perspective,
                 llm_provider: backendConfig.llm_provider,
@@ -748,7 +749,7 @@ export const useProjectStore = create<ProjectStore>()(
                 if (draft.currentProject?.id === projectId) {
                   draft.currentProject.config = config;
                 }
-              }, 'updateProjectConfig:success');
+              });
               
               // Reload the project to ensure we have the latest data
               await get().loadProject(projectId);
@@ -782,25 +783,25 @@ export const useProjectStore = create<ProjectStore>()(
           setLoading: (loading) => {
             set((draft) => {
               draft.loading = loading;
-            }, 'setLoading');
+            });
           },
 
           setError: (error) => {
             set((draft) => {
               draft.error = error;
-            }, 'setError');
+            });
           },
 
           clearError: () => {
             set((draft) => {
               draft.error = null;
-            }, 'clearError');
+            });
           },
 
           reset: () => {
             set((draft) => {
               Object.assign(draft, initialState);
-            }, 'reset');
+            });
           },
         }))
       ),

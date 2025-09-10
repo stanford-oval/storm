@@ -1,5 +1,7 @@
 'use client';
 
+import { logger } from '@/utils/logger';
+
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ConfigurationPanel } from '@/components/storm/ConfigurationPanel';
@@ -17,8 +19,6 @@ import { ResponsiveContainer } from '@/components/ux/ResponsiveContainer';
 import { useProjectStore as getProjectStore } from '@/store/slices/projectStore';
 import { 
   ArrowLeft, 
-  Save, 
-  Zap, 
   Settings, 
   FileText,
   Brain,
@@ -35,11 +35,11 @@ const DEFAULT_CONFIG: StormConfig = {
     model: 'gpt-4o',  // Updated to match .env.local default
     provider: 'openai',
     temperature: 0.7,  // Updated to match .env.local default
-    maxTokens: 4000,
+    maxTokens: 4000
   },
   retriever: {
     type: 'tavily',  // Changed to tavily since we have the API key configured
-    maxResults: 10,
+    maxResults: 10
   },
   pipeline: {
     doResearch: true,
@@ -47,8 +47,8 @@ const DEFAULT_CONFIG: StormConfig = {
     doGenerateArticle: true,
     doPolishArticle: true,
     maxConvTurns: 5,
-    maxPerspectives: 4,
-  },
+    maxPerspectives: 4
+  }
 };
 
 // Form validation
@@ -76,11 +76,11 @@ const validateForm = (data: CreateProjectFormData) => {
   }
 
   // Validate LLM config
-  if (!data.config.llm.model) {
+  if (!data.config.llm?.model) {
     errors.llmModel = 'LLM model is required';
   }
 
-  if (!data.config.retriever.type) {
+  if (!data.config.retriever?.type) {
     errors.retrieverType = 'Retriever type is required';
   }
 
@@ -97,7 +97,7 @@ export default function NewProjectPage() {
     title: '',
     topic: '',
     description: '',
-    config: DEFAULT_CONFIG,
+    config: DEFAULT_CONFIG
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -108,7 +108,7 @@ export default function NewProjectPage() {
     setFormData(prev => ({ ...prev, [field]: value }));
     // Clear error when user starts typing
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
+      setErrors(prev => ({ ...prev, [field]: '' }));
     }
   };
 
@@ -119,14 +119,14 @@ export default function NewProjectPage() {
   // Handle form submission
   const handleSubmit = async () => {
     // Ensure we're validating the current form data
-    // console.log('Submitting with formData:', formData);
+    // logger.log('Submitting with formData:', formData);
     
     const formErrors = validateForm(formData);
     setErrors(formErrors);
 
     if (Object.keys(formErrors).length > 0) {
-      // console.error('Validation errors:', formErrors);
-      // console.error('Form data:', formData);
+      // logger.error('Validation errors:', formErrors);
+      // logger.error('Form data:', formData);
       
       // If we're on the advanced step and have basic field errors, go back to basic
       if (currentStep === 'advanced' && (formErrors.title || formErrors.topic)) {
@@ -135,6 +135,8 @@ export default function NewProjectPage() {
           type: 'error',
           title: 'Missing Information',
           message: 'Please complete the basic information first',
+          read: false,
+          persistent: false
         });
         return;
       }
@@ -143,28 +145,30 @@ export default function NewProjectPage() {
         type: 'error',
         title: 'Validation Error',
         message: 'Please fix the form errors before continuing: ' + Object.values(formErrors).join(', '),
+        read: false,
+        persistent: false
       });
       return;
     }
 
     try {
-      // console.log('Calling createProject with:', formData);
+      // logger.log('Calling createProject with:', formData);
       const result = await createProject(formData);
-      // console.log('Raw result from createProject:', result);
-      // console.log('Result type:', typeof result);
-      // console.log('Result is null?', result === null);
-      // console.log('Result is undefined?', result === undefined);
+      // logger.log('Raw result from createProject:', result);
+      // logger.log('Result type:', typeof result);
+      // logger.log('Result is null?', result === null);
+      // logger.log('Result is undefined?', result === undefined);
       
       // Try to get the project from the store after creation
       const store = getProjectStore.getState();
-      // console.log('Store state after creation:', store);
+      // logger.log('Store state after creation:', store);
       const project = result || store.currentProject;
-      // console.log('Project after fallback:', project);
+      // logger.log('Project after fallback:', project);
       
       if (!project || !project.id) {
-        console.error('Invalid project returned:', project);
-        console.error('Store currentProject:', store.currentProject);
-        console.error('Store projects:', store.projects);
+        logger.error('Invalid project returned:', project);
+        logger.error('Store currentProject:', store.currentProject);
+        logger.error('Store projects:', store.projects);
         throw new Error('Project creation returned invalid data');
       }
       
@@ -172,14 +176,18 @@ export default function NewProjectPage() {
         type: 'success',
         title: 'Project Created',
         message: `"${formData.title}" has been created successfully`,
+        read: false,
+        persistent: false
       });
       router.push(`/projects/${project.id}`);
     } catch (error) {
-      console.error('Failed to create project:', error);
+      logger.error('Failed to create project:', error);
       addNotification({
         type: 'error',
         title: 'Creation Failed',
         message: error instanceof Error ? error.message : 'Failed to create project',
+        read: false,
+        persistent: false
       });
     }
   };
@@ -326,7 +334,7 @@ export default function NewProjectPage() {
                       </p>
                     )}
                     <p className="text-xs text-muted-foreground">
-                      {formData.description.length}/500 characters
+                      {(formData.description?.length || 0)}/500 characters
                     </p>
                   </div>
 
@@ -410,7 +418,7 @@ export default function NewProjectPage() {
                 <div className="flex items-center space-x-3">
                   <div className={cn(
                     "h-6 w-6 rounded-full flex items-center justify-center text-xs",
-                    formData.config.pipeline.doResearch ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                    formData.config.pipeline?.doResearch ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
                   )}>
                     <Search className="h-3 w-3" />
                   </div>
@@ -418,7 +426,7 @@ export default function NewProjectPage() {
                     <p className="text-sm font-medium">Research</p>
                     <p className="text-xs text-muted-foreground">Multi-perspective information gathering</p>
                   </div>
-                  {formData.config.pipeline.doResearch && (
+                  {formData.config.pipeline?.doResearch && (
                     <CheckCircle className="h-4 w-4 text-green-500" />
                   )}
                 </div>
@@ -426,7 +434,7 @@ export default function NewProjectPage() {
                 <div className="flex items-center space-x-3">
                   <div className={cn(
                     "h-6 w-6 rounded-full flex items-center justify-center text-xs",
-                    formData.config.pipeline.doGenerateOutline ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                    formData.config.pipeline?.doGenerateOutline ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
                   )}>
                     <Brain className="h-3 w-3" />
                   </div>
@@ -434,7 +442,7 @@ export default function NewProjectPage() {
                     <p className="text-sm font-medium">Outline Generation</p>
                     <p className="text-xs text-muted-foreground">Structure the article content</p>
                   </div>
-                  {formData.config.pipeline.doGenerateOutline && (
+                  {formData.config.pipeline?.doGenerateOutline && (
                     <CheckCircle className="h-4 w-4 text-green-500" />
                   )}
                 </div>
@@ -442,7 +450,7 @@ export default function NewProjectPage() {
                 <div className="flex items-center space-x-3">
                   <div className={cn(
                     "h-6 w-6 rounded-full flex items-center justify-center text-xs",
-                    formData.config.pipeline.doGenerateArticle ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                    formData.config.pipeline?.doGenerateArticle ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
                   )}>
                     <FileText className="h-3 w-3" />
                   </div>
@@ -450,7 +458,7 @@ export default function NewProjectPage() {
                     <p className="text-sm font-medium">Article Writing</p>
                     <p className="text-xs text-muted-foreground">Generate the full article</p>
                   </div>
-                  {formData.config.pipeline.doGenerateArticle && (
+                  {formData.config.pipeline?.doGenerateArticle && (
                     <CheckCircle className="h-4 w-4 text-green-500" />
                   )}
                 </div>
@@ -458,7 +466,7 @@ export default function NewProjectPage() {
                 <div className="flex items-center space-x-3">
                   <div className={cn(
                     "h-6 w-6 rounded-full flex items-center justify-center text-xs",
-                    formData.config.pipeline.doPolishArticle ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                    formData.config.pipeline?.doPolishArticle ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
                   )}>
                     <Wand2 className="h-3 w-3" />
                   </div>
@@ -466,7 +474,7 @@ export default function NewProjectPage() {
                     <p className="text-sm font-medium">Article Polishing</p>
                     <p className="text-xs text-muted-foreground">Final refinements and citations</p>
                   </div>
-                  {formData.config.pipeline.doPolishArticle && (
+                  {formData.config.pipeline?.doPolishArticle && (
                     <CheckCircle className="h-4 w-4 text-green-500" />
                   )}
                 </div>
@@ -482,19 +490,19 @@ export default function NewProjectPage() {
                 <div className="flex justify-between">
                   <span className="text-xs text-muted-foreground">Language Model</span>
                   <Badge variant="secondary" className="text-xs">
-                    {formData.config.llm.model}
+                    {formData.config.llm?.model || 'Not configured'}
                   </Badge>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-xs text-muted-foreground">Provider</span>
                   <Badge variant="outline" className="text-xs">
-                    {formData.config.llm.provider}
+                    {formData.config.llm?.provider || 'Not configured'}
                   </Badge>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-xs text-muted-foreground">Retriever</span>
                   <Badge variant="outline" className="text-xs">
-                    {formData.config.retriever.type}
+                    {formData.config.retriever?.type || 'Not configured'}
                   </Badge>
                 </div>
               </CardContent>

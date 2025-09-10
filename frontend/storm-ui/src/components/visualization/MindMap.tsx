@@ -177,20 +177,20 @@ export const MindMap: React.FC<MindMapProps> = ({
           if (!event.active && refs.simulation.current) {
             refs.simulation.current.alphaTarget(0.3).restart();
           }
-          d.fx = d.position?.x;
-          d.fy = d.position?.y;
+          (d as any).fx = d.position?.x;
+          (d as any).fy = d.position?.y;
         })
         .on('drag', (event, d) => {
-          d.fx = event.x;
-          d.fy = event.y;
+          (d as any).fx = event.x;
+          (d as any).fy = event.y;
           actions.updateNode(d.id, { position: { x: event.x, y: event.y } });
         })
         .on('end', (event, d) => {
           if (!event.active && refs.simulation.current) {
             refs.simulation.current.alphaTarget(0);
           }
-          d.fx = null;
-          d.fy = null;
+          (d as any).fx = null;
+          (d as any).fy = null;
         })
       );
 

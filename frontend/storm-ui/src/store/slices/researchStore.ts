@@ -129,7 +129,7 @@ export const useResearchStore = create<ResearchStore>()(
             set((draft) => {
               draft.loading = true;
               draft.error = null;
-            }, 'loadResearchData:start');
+            });
 
             try {
               const response = await fetch(`/api/research/${projectId}`);
@@ -147,12 +147,12 @@ export const useResearchStore = create<ResearchStore>()(
                 );
                 draft.loading = false;
                 draft.lastUpdated = new Date();
-              }, 'loadResearchData:success');
+              });
             } catch (error) {
               set((draft) => {
                 draft.error = error instanceof Error ? error.message : 'Failed to load research data';
                 draft.loading = false;
-              }, 'loadResearchData:error');
+              });
               throw error;
             }
           },
@@ -163,7 +163,7 @@ export const useResearchStore = create<ResearchStore>()(
                 Object.assign(draft.currentResearch, research);
                 draft.lastUpdated = new Date();
               }
-            }, 'updateResearchData');
+            });
           },
 
           clearResearchData: () => {
@@ -171,7 +171,7 @@ export const useResearchStore = create<ResearchStore>()(
               draft.currentResearch = null;
               draft.activeConversations = [];
               draft.sourcesCache.clear();
-            }, 'clearResearchData');
+            });
           },
 
           refreshResearchData: async () => {
@@ -189,7 +189,7 @@ export const useResearchStore = create<ResearchStore>()(
             set((draft) => {
               draft.loading = true;
               draft.error = null;
-            }, 'startConversation:start');
+            });
 
             try {
               const response = await fetch('/api/conversations/start', {
@@ -224,14 +224,14 @@ export const useResearchStore = create<ResearchStore>()(
                 
                 draft.loading = false;
                 draft.lastUpdated = new Date();
-              }, 'startConversation:success');
+              });
 
               return conversation.id;
             } catch (error) {
               set((draft) => {
                 draft.error = error instanceof Error ? error.message : 'Failed to start conversation';
                 draft.loading = false;
-              }, 'startConversation:error');
+              });
               throw error;
             }
           },
@@ -252,7 +252,7 @@ export const useResearchStore = create<ResearchStore>()(
                   draft.lastUpdated = new Date();
                 }
               }
-            }, 'updateConversation');
+            });
           },
 
           endConversation: async (conversationId) => {
@@ -277,11 +277,11 @@ export const useResearchStore = create<ResearchStore>()(
                 }
                 
                 draft.lastUpdated = new Date();
-              }, 'endConversation');
+              });
             } catch (error) {
               set((draft) => {
                 draft.error = error instanceof Error ? error.message : 'Failed to end conversation';
-              }, 'endConversation:error');
+              });
               throw error;
             }
           },
@@ -294,7 +294,7 @@ export const useResearchStore = create<ResearchStore>()(
                 );
               }
               draft.activeConversations = draft.activeConversations.filter(c => c.id !== conversationId);
-            }, 'removeConversation');
+            });
           },
 
           addConversationTurn: (conversationId, content, speaker) => {
@@ -318,7 +318,7 @@ export const useResearchStore = create<ResearchStore>()(
                   }
                 }
               }
-            }, 'addConversationTurn');
+            });
           },
 
           // Source management
@@ -340,7 +340,7 @@ export const useResearchStore = create<ResearchStore>()(
                 draft.currentResearch.sources.push(source);
                 draft.lastUpdated = new Date();
               }
-            }, 'addSource');
+            });
           },
 
           updateSource: (sourceId, updates) => {
@@ -352,7 +352,7 @@ export const useResearchStore = create<ResearchStore>()(
                   draft.lastUpdated = new Date();
                 }
               }
-            }, 'updateSource');
+            });
           },
 
           removeSource: (sourceId) => {
@@ -363,7 +363,7 @@ export const useResearchStore = create<ResearchStore>()(
                 );
               }
               draft.sourcesCache.delete(sourceId);
-            }, 'removeSource');
+            });
           },
 
           markSourceAsUsed: (sourceId, sectionId) => {
@@ -379,7 +379,7 @@ export const useResearchStore = create<ResearchStore>()(
                   }
                 }
               }
-            }, 'markSourceAsUsed');
+            });
           },
 
           bulkAddSources: (sources) => {
@@ -400,7 +400,7 @@ export const useResearchStore = create<ResearchStore>()(
               
               draft.currentResearch.sources.push(...newSources);
               draft.lastUpdated = new Date();
-            }, 'bulkAddSources');
+            });
           },
 
           // Search functionality
@@ -408,7 +408,7 @@ export const useResearchStore = create<ResearchStore>()(
             set((draft) => {
               draft.loading = true;
               draft.error = null;
-            }, 'performSearch:start');
+            });
 
             try {
               const response = await fetch('/api/search', {
@@ -429,7 +429,7 @@ export const useResearchStore = create<ResearchStore>()(
                   draft.currentResearch.totalQueries += 1;
                 }
                 draft.lastUpdated = new Date();
-              }, 'performSearch:success');
+              });
 
               // Add to search history
               get().addToSearchHistory({
@@ -448,7 +448,7 @@ export const useResearchStore = create<ResearchStore>()(
               set((draft) => {
                 draft.error = error instanceof Error ? error.message : 'Search failed';
                 draft.loading = false;
-              }, 'performSearch:error');
+              });
               throw error;
             }
           },
@@ -461,20 +461,20 @@ export const useResearchStore = create<ResearchStore>()(
               if (draft.searchHistory.length > 100) {
                 draft.searchHistory = draft.searchHistory.slice(0, 100);
               }
-            }, 'addToSearchHistory');
+            });
           },
 
           clearSearchHistory: () => {
             set((draft) => {
               draft.searchHistory = [];
-            }, 'clearSearchHistory');
+            });
           },
 
           // Filtering and view management
           setPerspectiveFilters: (perspectives) => {
             set((draft) => {
               draft.perspectiveFilters = perspectives;
-            }, 'setPerspectiveFilters');
+            });
           },
 
           addPerspectiveFilter: (perspective) => {
@@ -482,32 +482,32 @@ export const useResearchStore = create<ResearchStore>()(
               if (!draft.perspectiveFilters.includes(perspective)) {
                 draft.perspectiveFilters.push(perspective);
               }
-            }, 'addPerspectiveFilter');
+            });
           },
 
           removePerspectiveFilter: (perspective) => {
             set((draft) => {
               draft.perspectiveFilters = draft.perspectiveFilters.filter(p => p !== perspective);
-            }, 'removePerspectiveFilter');
+            });
           },
 
           clearPerspectiveFilters: () => {
             set((draft) => {
               draft.perspectiveFilters = [];
-            }, 'clearPerspectiveFilters');
+            });
           },
 
           setViewMode: (mode) => {
             set((draft) => {
               draft.viewMode = mode;
-            }, 'setViewMode');
+            });
           },
 
           // Source caching
           cacheSource: (sourceId, data) => {
             set((draft) => {
               draft.sourcesCache.set(sourceId, data);
-            }, 'cacheSource');
+            });
           },
 
           getCachedSource: (sourceId) => {
@@ -517,14 +517,14 @@ export const useResearchStore = create<ResearchStore>()(
           clearSourcesCache: () => {
             set((draft) => {
               draft.sourcesCache.clear();
-            }, 'clearSourcesCache');
+            });
           },
 
           // Auto-refresh management
           setAutoRefresh: (enabled) => {
             set((draft) => {
               draft.autoRefresh = enabled;
-            }, 'setAutoRefresh');
+            });
 
             if (enabled) {
               get().startAutoRefresh();
@@ -734,19 +734,19 @@ export const useResearchStore = create<ResearchStore>()(
           setLoading: (loading) => {
             set((draft) => {
               draft.loading = loading;
-            }, 'setLoading');
+            });
           },
 
           setError: (error) => {
             set((draft) => {
               draft.error = error;
-            }, 'setError');
+            });
           },
 
           clearError: () => {
             set((draft) => {
               draft.error = null;
-            }, 'clearError');
+            });
           },
 
           reset: () => {
@@ -754,7 +754,7 @@ export const useResearchStore = create<ResearchStore>()(
             set((draft) => {
               Object.assign(draft, initialState);
               draft.sourcesCache = new Map();
-            }, 'reset');
+            });
           },
         }))
       ),

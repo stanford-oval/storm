@@ -10,11 +10,9 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from '@/components/ui/select';
 import { 
-  BarChart, 
-  Bar, 
   LineChart, 
   Line, 
   PieChart, 
@@ -30,24 +28,29 @@ import {
 import { 
   TrendingUp, 
   DollarSign, 
-  Clock, 
   FileText, 
   Cpu, 
-  AlertCircle,
   Activity
 } from 'lucide-react';
 import { useProjectStore, usePipelineStore } from '@/store';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function AnalyticsPage() {
-  const { projects, loadProjects } = useProjectStore();
+  const { projects, loadProjects, loading } = useProjectStore();
   const { pipelineHistory } = usePipelineStore();
+  const [dataLoading, setDataLoading] = useState(true);
   
   // State for time range selection
   const [timeRange, setTimeRange] = useState<'day' | 'week' | 'month' | 'year'>('month');
   const [dateRange, setDateRange] = useState<number>(6); // Number of periods to show
   
   useEffect(() => {
-    loadProjects();
+    const loadData = async () => {
+      setDataLoading(true);
+      await loadProjects();
+      setDataLoading(false);
+    };
+    loadData();
   }, [loadProjects]);
 
   // Calculate real data from projects with time range support
@@ -152,7 +155,7 @@ export default function AnalyticsPage() {
     total: projects?.length || 0,
     completed: projects?.filter(p => p.status === 'completed').length || 0,
     inProgress: projects?.filter(p => ['researching', 'generating_outline', 'writing_article', 'polishing'].includes(p.status)).length || 0,
-    failed: projects?.filter(p => p.status === 'failed').length || 0,
+    failed: projects?.filter(p => p.status === 'failed').length || 0
   };
 
   const totalWords = projects?.reduce((sum, p) => sum + (p.word_count || 0), 0) || 0;
@@ -177,6 +180,32 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
+      {dataLoading ? (
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map(i => (
+              <Card key={i}>
+                <CardHeader className="pb-2">
+                  <Skeleton className="h-4 w-20" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-8 w-24 mb-2" />
+                  <Skeleton className="h-3 w-16" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-32" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-64 w-full" />
+            </CardContent>
+          </Card>
+        </div>
+      ) : (
+        <>
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
@@ -522,6 +551,8 @@ export default function AnalyticsPage() {
           </div>
         </TabsContent>
       </Tabs>
+      </>
+      )}
     </div>
   );
 }

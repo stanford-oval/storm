@@ -390,11 +390,6 @@ export const StoreDebugPanel: React.FC<{
   const [isOpen, setIsOpen] = React.useState(false);
   const [debugData, setDebugData] = React.useState<any>(null);
 
-  // Only render in development
-  if (process.env.NODE_ENV !== 'development') {
-    return null;
-  }
-
   useEffect(() => {
     if (isOpen) {
       const interval = setInterval(() => {
@@ -404,6 +399,11 @@ export const StoreDebugPanel: React.FC<{
       return () => clearInterval(interval);
     }
   }, [isOpen]);
+
+  // Only render in development
+  if (process.env.NODE_ENV !== 'development') {
+    return null;
+  }
 
   const positionStyles = {
     'top-left': { top: '10px', left: '10px' },

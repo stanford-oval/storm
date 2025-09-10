@@ -12,9 +12,10 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useProjectStore, useUIStore, usePipelineStore } from '@/store';
 import { StormProject, ProjectStatus } from '@/types/storm';
 import { AnimatedPage } from '@/utils/animations/AnimatedPage';
@@ -25,9 +26,7 @@ import {
   Plus, 
   Search, 
   Filter, 
-  MoreHorizontal,
   FileText,
-  Clock,
   CheckCircle,
   AlertCircle,
   TrendingUp,
@@ -94,7 +93,7 @@ export default function ProjectsPage() {
   const filteredAndSortedProjects = React.useMemo(() => {
     if (!projects) return [];
 
-    let filtered = projects.filter((project) => {
+    const filtered = projects.filter((project) => {
       const matchesSearch = searchQuery === '' || 
         project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         project.topic.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -154,7 +153,7 @@ export default function ProjectsPage() {
       total: projects.length,
       active: projects.filter(p => ['researching', 'generating_outline', 'writing_article', 'polishing'].includes(p.status)).length,
       completed: projects.filter(p => p.status === 'completed').length,
-      failed: projects.filter(p => p.status === 'failed').length,
+      failed: projects.filter(p => p.status === 'failed').length
     };
   }, [projects]);
 
@@ -343,7 +342,17 @@ export default function ProjectsPage() {
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="loading-skeleton h-48 rounded-lg" />
+                <Card key={i}>
+                  <CardHeader>
+                    <Skeleton className="h-6 w-3/4" />
+                    <Skeleton className="h-4 w-1/2 mt-2" />
+                  </CardHeader>
+                  <CardContent>
+                    <Skeleton className="h-4 w-full mb-2" />
+                    <Skeleton className="h-4 w-full mb-2" />
+                    <Skeleton className="h-4 w-2/3" />
+                  </CardContent>
+                </Card>
               ))}
             </div>
           ) : paginatedProjects.length === 0 && filteredAndSortedProjects.length === 0 ? (

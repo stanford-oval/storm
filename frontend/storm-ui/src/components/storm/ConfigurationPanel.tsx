@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 import * as React from "react";
 import { Settings, Save, RotateCcw, Eye, EyeOff, HelpCircle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -63,7 +64,7 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
           setBackendApiKeys(keysData);
         }
       } catch (error) {
-        console.error('Failed to fetch backend data:', error);
+        logger.error('Failed to fetch backend data:', error);
       }
     };
     fetchBackendData();
@@ -72,22 +73,23 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
   // Initialize config with environment variables if API keys are not set
   const initializeConfig = React.useCallback((baseConfig: StormConfig): StormConfig => {
     // Create a deep mutable copy to avoid "object is not extensible" errors
-    const createMutableCopy = (obj: any): any => {
+    const createMutableCopy = (obj: unknown): unknown => {
       if (obj === null || typeof obj !== 'object') return obj;
       if (obj instanceof Date) return new Date(obj);
       if (obj instanceof Array) return obj.map(item => createMutableCopy(item));
       
-      const clonedObj: any = {};
-      for (const key in obj) {
-        if (obj.hasOwnProperty(key)) {
-          clonedObj[key] = createMutableCopy(obj[key]);
+      const clonedObj: Record<string, unknown> = {};
+      const objAsRecord = obj as Record<string, unknown>;
+      for (const key in objAsRecord) {
+        if (objAsRecord.hasOwnProperty(key)) {
+          clonedObj[key] = createMutableCopy(objAsRecord[key]);
         }
       }
       return clonedObj;
     };
     
     // Start with a deep mutable copy of the base config
-    const baseCopy = baseConfig ? createMutableCopy(baseConfig) : {};
+    const baseCopy = (baseConfig ? createMutableCopy(baseConfig) : {}) as StormConfig;
     
     // Ensure config has proper structure with defaults (use backend config if available)
     const newConfig: StormConfig = {
@@ -115,26 +117,26 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
     };
     
     // Auto-fill API keys from backend if available
-    if (!newConfig.llm.apiKey && backendApiKeys) {
+    if (!newConfig.llm?.apiKey && backendApiKeys) {
       // Use masked keys from backend as placeholder
-      if (newConfig.llm.provider === 'openai' && backendApiKeys.openai_key_preview) {
+      if (newConfig.llm?.provider === 'openai' && backendApiKeys.openai_key_preview) {
         // Don't set the actual key, but indicate it's configured
-        newConfig.llm.apiKey = ''; // Will be filled from backend
-      } else if (newConfig.llm.provider === 'anthropic' && backendApiKeys.anthropic_key_preview) {
-        newConfig.llm.apiKey = ''; // Will be filled from backend
+        if (newConfig.llm) newConfig.llm.apiKey = ''; // Will be filled from backend
+      } else if (newConfig.llm?.provider === 'anthropic' && backendApiKeys.anthropic_key_preview) {
+        if (newConfig.llm) newConfig.llm.apiKey = ''; // Will be filled from backend
       }
     }
     
     // Auto-fill retriever API key from backend if available
-    if (!newConfig.retriever.apiKey && backendApiKeys && newConfig.retriever.type !== 'duckduckgo') {
-      if (newConfig.retriever.type === 'google' && backendApiKeys.google_search_configured) {
-        newConfig.retriever.apiKey = ''; // Will be filled from backend
-      } else if (newConfig.retriever.type === 'serper' && backendApiKeys.serper_configured) {
-        newConfig.retriever.apiKey = ''; // Will be filled from backend
-      } else if (newConfig.retriever.type === 'tavily' && backendApiKeys.tavily_configured) {
-        newConfig.retriever.apiKey = ''; // Will be filled from backend
-      } else if (newConfig.retriever.type === 'you' && backendApiKeys.you_configured) {
-        newConfig.retriever.apiKey = ''; // Will be filled from backend
+    if (!newConfig.retriever?.apiKey && backendApiKeys && newConfig.retriever?.type !== 'duckduckgo') {
+      if (newConfig.retriever?.type === 'google' && backendApiKeys.google_search_configured) {
+        if (newConfig.retriever) newConfig.retriever.apiKey = ''; // Will be filled from backend
+      } else if (newConfig.retriever?.type === 'serper' && backendApiKeys.serper_configured) {
+        if (newConfig.retriever) newConfig.retriever.apiKey = ''; // Will be filled from backend
+      } else if (newConfig.retriever?.type === 'tavily' && backendApiKeys.tavily_configured) {
+        if (newConfig.retriever) newConfig.retriever.apiKey = ''; // Will be filled from backend
+      } else if (newConfig.retriever?.type === 'you' && backendApiKeys.you_configured) {
+        if (newConfig.retriever) newConfig.retriever.apiKey = ''; // Will be filled from backend
       }
     }
     
@@ -154,30 +156,30 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
 
   // Log configuration details after mount to avoid setState during render
   React.useEffect(() => {
-    console.log('🔧 Initializing config:', {
-      llmProvider: localConfig.llm.provider,
-      retrieverType: localConfig.retriever.type,
-      hasLlmApiKey: !!localConfig.llm.apiKey,
-      hasRetrieverApiKey: !!localConfig.retriever.apiKey
+    logger.log('🔧 Initializing config:', {
+      llmProvider: localConfig.llm?.provider,
+      retrieverType: localConfig.retriever?.type,
+      hasLlmApiKey: !!localConfig.llm?.apiKey,
+      hasRetrieverApiKey: !!localConfig.retriever?.apiKey
     });
     
-    const llmConfig = getLLMConfig(localConfig.llm.provider);
-    console.log('📝 LLM Config from environment:', llmConfig ? {
+    const llmConfig = getLLMConfig(localConfig.llm?.provider || 'openai');
+    logger.log('📝 LLM Config from environment:', llmConfig ? {
       provider: llmConfig.provider,
       hasApiKey: !!llmConfig.apiKey,
       apiKeyPreview: llmConfig.apiKey ? `${llmConfig.apiKey.substring(0, 10)}...` : 'NOT SET'
     } : 'NOT FOUND');
     
-    const retrieverConfig = getRetrieverConfig(localConfig.retriever.type);
-    console.log('📝 Retriever Config from environment:', retrieverConfig ? {
+    const retrieverConfig = getRetrieverConfig(localConfig.retriever?.type || 'tavily');
+    logger.log('📝 Retriever Config from environment:', retrieverConfig ? {
       type: retrieverConfig.type,
       hasApiKey: !!retrieverConfig.apiKey,
       apiKeyPreview: retrieverConfig.apiKey ? `${retrieverConfig.apiKey.substring(0, 10)}...` : 'NOT SET'
     } : 'NOT FOUND');
     
-    console.log('🎯 Final config state:', {
-      hasLlmApiKey: !!localConfig.llm.apiKey,
-      hasRetrieverApiKey: !!localConfig.retriever.apiKey
+    logger.log('🎯 Final config state:', {
+      hasLlmApiKey: !!localConfig.llm?.apiKey,
+      hasRetrieverApiKey: !!localConfig.retriever?.apiKey
     });
   }, []); // Run only once on mount
 
@@ -187,7 +189,7 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
     setHasChanges(isChanged);
   }, [config, localConfig]);
 
-  const handleConfigChange = (path: string, value: any) => {
+  const handleConfigChange = (path: string, value: unknown) => {
     setLocalConfig(prev => {
       const keys = path.split('.');
       const newConfig = { ...prev };
@@ -202,19 +204,19 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
       
       // Auto-fill API key from environment when provider changes
       if (path === 'llm.provider') {
-        const llmConfig = getLLMConfig(value);
-        if (llmConfig?.apiKey) {
+        const llmConfig = getLLMConfig(value as any);
+        if (llmConfig?.apiKey && newConfig.llm) {
           newConfig.llm.apiKey = llmConfig.apiKey;
         }
-        if (llmConfig?.baseUrl) {
+        if (llmConfig?.baseUrl && newConfig.llm) {
           newConfig.llm.baseUrl = llmConfig.baseUrl;
         }
       }
       
       if (path === 'retriever.type') {
-        const retrieverConfig = getRetrieverConfig(value);
+        const retrieverConfig = getRetrieverConfig(value as any);
         if (retrieverConfig?.apiKey) {
-          newConfig.retriever.apiKey = retrieverConfig.apiKey;
+          if (newConfig.retriever) newConfig.retriever.apiKey = retrieverConfig.apiKey;
         }
       }
       
@@ -305,7 +307,7 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
               <div className="space-y-2">
                 <Label htmlFor="llm-provider">Provider</Label>
                 <Select
-                  value={localConfig.llm.provider}
+                  value={localConfig.llm?.provider}
                   onValueChange={(value) => handleConfigChange('llm.provider', value)}
                 >
                   <SelectTrigger id="llm-provider">
@@ -324,14 +326,14 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
               <div className="space-y-2">
                 <Label htmlFor="llm-model">Model</Label>
                 <Select
-                  value={localConfig.llm.model}
+                  value={localConfig.llm?.model}
                   onValueChange={(value) => handleConfigChange('llm.model', value)}
                 >
                   <SelectTrigger id="llm-model">
                     <SelectValue placeholder="Select model" />
                   </SelectTrigger>
                   <SelectContent>
-                    {popularModels[localConfig.llm.provider]?.map(model => (
+                    {(localConfig.llm?.provider && popularModels[localConfig.llm.provider])?.map(model => (
                       <SelectItem key={model} value={model}>
                         {model}
                       </SelectItem>
@@ -343,13 +345,13 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
               </div>
             </div>
 
-            {localConfig.llm.provider === 'azure' && (
+            {localConfig.llm?.provider === 'azure' && (
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="azure-base-url">Azure Base URL</Label>
                   <Input
                     id="azure-base-url"
-                    value={localConfig.llm.baseUrl || ''}
+                    value={localConfig.llm?.baseUrl || ''}
                     onChange={(e) => handleConfigChange('llm.baseUrl', e.target.value)}
                     placeholder="https://your-resource.openai.azure.com/"
                   />
@@ -357,12 +359,12 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
               </div>
             )}
 
-            {localConfig.llm.provider === 'ollama' && (
+            {localConfig.llm?.provider === 'ollama' && (
               <div className="space-y-2">
                 <Label htmlFor="ollama-base-url">Ollama Base URL</Label>
                 <Input
                   id="ollama-base-url"
-                  value={localConfig.llm.baseUrl || 'http://localhost:11434'}
+                  value={localConfig.llm?.baseUrl || 'http://localhost:11434'}
                   onChange={(e) => handleConfigChange('llm.baseUrl', e.target.value)}
                   placeholder="http://localhost:11434"
                 />
@@ -382,14 +384,14 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
                 <Input
                   id="api-key"
                   type={showApiKeys ? "text" : "password"}
-                  value={localConfig.llm.apiKey || 
-                    (backendApiKeys && localConfig.llm.provider === 'openai' && backendApiKeys.openai_key_preview) ||
-                    (backendApiKeys && localConfig.llm.provider === 'anthropic' && backendApiKeys.anthropic_key_preview) ||
+                  value={localConfig.llm?.apiKey || 
+                    (backendApiKeys && localConfig.llm?.provider === 'openai' && backendApiKeys.openai_key_preview) ||
+                    (backendApiKeys && localConfig.llm?.provider === 'anthropic' && backendApiKeys.anthropic_key_preview) ||
                     ''}
                   onChange={(e) => handleConfigChange('llm.apiKey', e.target.value)}
                   placeholder={
-                    (backendApiKeys && localConfig.llm.provider === 'openai' && backendApiKeys.openai_configured) ? "Using environment key" :
-                    (backendApiKeys && localConfig.llm.provider === 'anthropic' && backendApiKeys.anthropic_configured) ? "Using environment key" :
+                    (backendApiKeys && localConfig.llm?.provider === 'openai' && backendApiKeys.openai_configured) ? "Using environment key" :
+                    (backendApiKeys && localConfig.llm?.provider === 'anthropic' && backendApiKeys.anthropic_configured) ? "Using environment key" :
                     "Enter API key"
                   }
                 />
@@ -409,7 +411,7 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
                     min="0"
                     max="2"
                     step="0.1"
-                    value={localConfig.llm.temperature || 0.7}
+                    value={localConfig.llm?.temperature || 0.7}
                     onChange={(e) => handleConfigChange('llm.temperature', parseFloat(e.target.value))}
                   />
                 </div>
@@ -425,7 +427,7 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
                     id="max-tokens"
                     type="number"
                     min="1"
-                    value={localConfig.llm.maxTokens || ''}
+                    value={localConfig.llm?.maxTokens || ''}
                     onChange={(e) => handleConfigChange('llm.maxTokens', e.target.value ? parseInt(e.target.value) : undefined)}
                     placeholder="Auto"
                   />
@@ -439,7 +441,7 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
               <div className="space-y-2">
                 <Label htmlFor="retriever-type">Retriever Type</Label>
                 <Select
-                  value={localConfig.retriever.type}
+                  value={localConfig.retriever?.type}
                   onValueChange={(value) => handleConfigChange('retriever.type', value)}
                 >
                   <SelectTrigger id="retriever-type">
@@ -462,13 +464,13 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
                   type="number"
                   min="1"
                   max="50"
-                  value={localConfig.retriever.maxResults || 10}
+                  value={localConfig.retriever?.maxResults || 10}
                   onChange={(e) => handleConfigChange('retriever.maxResults', parseInt(e.target.value))}
                 />
               </div>
             </div>
 
-            {localConfig.retriever.type !== 'duckduckgo' && (
+            {localConfig.retriever?.type !== 'duckduckgo' && (
               <div className="space-y-2">
                 <Label htmlFor="retriever-api-key">
                   API Key
@@ -481,18 +483,18 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
                 <Input
                   id="retriever-api-key"
                   type={showApiKeys ? "text" : "password"}
-                  value={localConfig.retriever.apiKey || 
-                    (backendApiKeys && localConfig.retriever.type === 'google' && backendApiKeys.google_api_key_preview) ||
-                    (backendApiKeys && localConfig.retriever.type === 'serper' && backendApiKeys.serper_key_preview) ||
-                    (backendApiKeys && localConfig.retriever.type === 'tavily' && backendApiKeys.tavily_key_preview) ||
-                    (backendApiKeys && localConfig.retriever.type === 'you' && backendApiKeys.you_key_preview) ||
+                  value={localConfig.retriever?.apiKey || 
+                    (backendApiKeys && localConfig.retriever?.type === 'google' && backendApiKeys.google_api_key_preview) ||
+                    (backendApiKeys && localConfig.retriever?.type === 'serper' && backendApiKeys.serper_key_preview) ||
+                    (backendApiKeys && localConfig.retriever?.type === 'tavily' && backendApiKeys.tavily_key_preview) ||
+                    (backendApiKeys && localConfig.retriever?.type === 'you' && backendApiKeys.you_key_preview) ||
                     ''}
                   onChange={(e) => handleConfigChange('retriever.apiKey', e.target.value)}
                   placeholder={
-                    (backendApiKeys && localConfig.retriever.type === 'google' && backendApiKeys.google_search_configured) ? "Using environment key" :
-                    (backendApiKeys && localConfig.retriever.type === 'serper' && backendApiKeys.serper_configured) ? "Using environment key" :
-                    (backendApiKeys && localConfig.retriever.type === 'tavily' && backendApiKeys.tavily_configured) ? "Using environment key" :
-                    (backendApiKeys && localConfig.retriever.type === 'you' && backendApiKeys.you_configured) ? "Using environment key" :
+                    (backendApiKeys && localConfig.retriever?.type === 'google' && backendApiKeys.google_search_configured) ? "Using environment key" :
+                    (backendApiKeys && localConfig.retriever?.type === 'serper' && backendApiKeys.serper_configured) ? "Using environment key" :
+                    (backendApiKeys && localConfig.retriever?.type === 'tavily' && backendApiKeys.tavily_configured) ? "Using environment key" :
+                    (backendApiKeys && localConfig.retriever?.type === 'you' && backendApiKeys.you_configured) ? "Using environment key" :
                     "Enter retriever API key"
                   }
                 />
@@ -511,7 +513,7 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
                 </div>
                 <Switch
                   id="do-research"
-                  checked={localConfig.pipeline.doResearch}
+                  checked={localConfig.pipeline?.doResearch}
                   onCheckedChange={(checked) => handleConfigChange('pipeline.doResearch', checked)}
                 />
               </div>
@@ -527,7 +529,7 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
                 </div>
                 <Switch
                   id="do-outline"
-                  checked={localConfig.pipeline.doGenerateOutline}
+                  checked={localConfig.pipeline?.doGenerateOutline}
                   onCheckedChange={(checked) => handleConfigChange('pipeline.doGenerateOutline', checked)}
                 />
               </div>
@@ -543,7 +545,7 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
                 </div>
                 <Switch
                   id="do-article"
-                  checked={localConfig.pipeline.doGenerateArticle}
+                  checked={localConfig.pipeline?.doGenerateArticle}
                   onCheckedChange={(checked) => handleConfigChange('pipeline.doGenerateArticle', checked)}
                 />
               </div>
@@ -559,7 +561,7 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
                 </div>
                 <Switch
                   id="do-polish"
-                  checked={localConfig.pipeline.doPolishArticle}
+                  checked={localConfig.pipeline?.doPolishArticle}
                   onCheckedChange={(checked) => handleConfigChange('pipeline.doPolishArticle', checked)}
                 />
               </div>
@@ -579,7 +581,7 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
                     type="number"
                     min="1"
                     max="20"
-                    value={localConfig.pipeline.maxConvTurns || 5}
+                    value={localConfig.pipeline?.maxConvTurns || 5}
                     onChange={(e) => handleConfigChange('pipeline.maxConvTurns', parseInt(e.target.value))}
                   />
                 </div>
@@ -596,7 +598,7 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
                     type="number"
                     min="1"
                     max="10"
-                    value={localConfig.pipeline.maxPerspectives || 4}
+                    value={localConfig.pipeline?.maxPerspectives || 4}
                     onChange={(e) => handleConfigChange('pipeline.maxPerspectives', parseInt(e.target.value))}
                   />
                 </div>

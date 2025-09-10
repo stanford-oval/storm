@@ -157,7 +157,7 @@ export const ConversationView: React.FC<ConversationViewProps> = ({
         <CardContent className="flex items-center justify-center py-12">
           <div className="text-center space-y-2">
             <p className="text-sm text-destructive">{error}</p>
-            <Button onClick={fetchConversations} variant="outline" size="sm">
+            <Button onClick={() => fetchConversations()} variant="outline" size="sm">
               Retry
             </Button>
           </div>

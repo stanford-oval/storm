@@ -20,6 +20,16 @@ export { SessionService, sessionService } from './session';
 export { ExportService, exportService } from './export';
 export { AnalyticsService, analyticsService } from './analytics';
 
+// Import service instances for re-export
+import { projectService } from './project';
+import { pipelineService } from './pipeline';
+import { configService } from './config';
+import { researchService } from './research';
+import { sessionService } from './session';
+import { exportService } from './export';
+import { analyticsService } from './analytics';
+import { getApiService } from './base';
+
 // Service type exports
 export type {
   // Project types
@@ -30,9 +40,11 @@ export type {
   ProjectShareLink,
   ProjectShareInfo,
   ProjectCollaborator,
-  ProjectImportValidation,
-  
-  // Pipeline types
+  ProjectImportValidation
+} from './project';
+
+// Export pipeline types from pipeline service
+export type {
   PipelineTemplate,
   CreatePipelineTemplateRequest,
   PipelineValidationResult,
@@ -45,9 +57,11 @@ export type {
   StageArtifact,
   ExecutionTimeEstimate,
   SchedulePipelineRequest,
-  ScheduledExecution,
-  
-  // Config types
+  ScheduledExecution
+} from './pipeline';
+
+// Export config types from config service
+export type {
   LLMTestResult,
   RetrieverTestResult,
   LLMModel,
@@ -65,9 +79,11 @@ export type {
   OptimizedConfig,
   ConfigSchema,
   ConfigRequirements,
-  EnvironmentConfig,
-  
-  // Research types
+  EnvironmentConfig
+} from './config';
+
+// Export research types from research service
+export type {
   ResearchPerspective,
   ResearchQuestion,
   QueryResult,
@@ -79,9 +95,11 @@ export type {
   CitationInfo,
   SourceValidationResult,
   ReportGenerationJob,
-  ResearchBookmark,
-  
-  // Session types
+  ResearchBookmark
+} from './research';
+
+// Export session types from session service
+export type {
   SessionJoinResult,
   MindMapConnection,
   SessionAnalytics,
@@ -90,9 +108,11 @@ export type {
   SessionInsights,
   SessionInvitationResult,
   SessionInvitation,
-  SessionRecording,
-  
-  // Export types
+  SessionRecording
+} from './session';
+
+// Export export types from export service
+export type {
   ExportJobListResponse,
   ExportTemplate,
   CreateExportTemplateRequest,
@@ -109,9 +129,11 @@ export type {
   WebhookTestResult,
   ConversionResult,
   ArchiveResult,
-  ExportQuota,
-  
-  // Analytics types
+  ExportQuota
+} from './export';
+
+// Export analytics types from analytics service
+export type {
   BatchTrackingResult,
   ProjectAnalytics,
   UserAnalytics,
@@ -134,8 +156,8 @@ export type {
   AlertHistoryResponse,
   AnalyticsInsight,
   AnalyticsSettings,
-  ComputationJob,
-} from './project';
+  ComputationJob
+} from './analytics';
 
 // Re-export commonly used service instances
 export const services = {

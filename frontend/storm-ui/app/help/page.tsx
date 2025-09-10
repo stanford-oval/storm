@@ -11,7 +11,7 @@ import {
   Accordion,
   AccordionContent,
   AccordionItem,
-  AccordionTrigger,
+  AccordionTrigger
 } from '@/components/ui/accordion';
 import { 
   Search,
@@ -23,11 +23,9 @@ import {
   Mail,
   FileText,
   Zap,
-  HelpCircle,
   Code,
   Terminal,
   Lightbulb,
-  AlertCircle,
   CheckCircle
 } from 'lucide-react';
 

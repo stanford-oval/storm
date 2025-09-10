@@ -1,6 +1,7 @@
+import { logger } from '@/utils/logger';
 import { useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { useUIStore, useProjectStore, usePipelineStore } from '@/store';
+import { useUIStore, useProjectStore, usePipelineStore, useNotificationStore } from '@/store';
 import { getMergedShortcuts, parseShortcut, defaultKeyboardShortcuts } from '@/config/keyboardShortcuts';
 
 // Track sequence shortcuts (like "g then h")
@@ -13,11 +14,11 @@ export function useKeyboardShortcuts() {
     keyboard, 
     setTheme, 
     toggleSidebar, 
-    openDialog,
-    addNotification 
+    openDialog
   } = useUIStore();
+  const { addNotification } = useNotificationStore();
   const { createProject, loadProjects } = useProjectStore();
-  const { startPipeline, stopPipeline } = usePipelineStore();
+  const { startPipeline, cancelPipeline } = usePipelineStore();
   
   // Get merged shortcuts with custom overrides
   const shortcuts = getMergedShortcuts(keyboard?.customShortcuts || {}, defaultKeyboardShortcuts);
@@ -34,7 +35,7 @@ export function useKeyboardShortcuts() {
 
   // Execute shortcut action
   const executeAction = useCallback((shortcutId: string) => {
-    console.log('Executing shortcut action:', shortcutId);
+    logger.log('Executing shortcut action:', shortcutId);
     
     switch (shortcutId) {
       // General
@@ -74,60 +75,60 @@ export function useKeyboardShortcuts() {
       case 'save':
         // Trigger save in current context
         addNotification({
-          id: Date.now().toString(),
           type: 'info',
           title: 'Save',
           message: 'Project saved',
-          timestamp: new Date(),
+          read: false,
+          persistent: false
         });
         break;
       case 'duplicate':
         addNotification({
-          id: Date.now().toString(),
           type: 'info',
           title: 'Duplicate',
           message: 'Feature coming soon',
-          timestamp: new Date(),
+          read: false,
+          persistent: false
         });
         break;
       case 'delete':
         if (!isInInputField()) {
           addNotification({
-            id: Date.now().toString(),
             type: 'warning',
             title: 'Delete',
             message: 'Select an item to delete',
-            timestamp: new Date(),
+            read: false,
+            persistent: false
           });
         }
         break;
       case 'rename':
         addNotification({
-          id: Date.now().toString(),
           type: 'info',
           title: 'Rename',
           message: 'Feature coming soon',
-          timestamp: new Date(),
+          read: false,
+          persistent: false
         });
         break;
         
       // Pipeline
       case 'run-pipeline':
         addNotification({
-          id: Date.now().toString(),
           type: 'info',
           title: 'Pipeline',
           message: 'Starting pipeline...',
-          timestamp: new Date(),
+          read: false,
+          persistent: false
         });
         break;
       case 'stop-pipeline':
         addNotification({
-          id: Date.now().toString(),
           type: 'info',
           title: 'Pipeline',
           message: 'Stopping pipeline...',
-          timestamp: new Date(),
+          read: false,
+          persistent: false
         });
         break;
       case 'export':
@@ -139,11 +140,11 @@ export function useKeyboardShortcuts() {
       case 'refresh-data':
         loadProjects();
         addNotification({
-          id: Date.now().toString(),
           type: 'info',
           title: 'Refresh',
           message: 'Data refreshed',
-          timestamp: new Date(),
+          read: false,
+          persistent: false
         });
         break;
         
@@ -162,11 +163,11 @@ export function useKeyboardShortcuts() {
         break;
       case 'zen-mode':
         addNotification({
-          id: Date.now().toString(),
           type: 'info',
           title: 'Zen Mode',
           message: 'Feature coming soon',
-          timestamp: new Date(),
+          read: false,
+          persistent: false
         });
         break;
       case 'notifications':
@@ -174,7 +175,7 @@ export function useKeyboardShortcuts() {
         break;
         
       default:
-        console.log('Unknown shortcut action:', shortcutId);
+        logger.log('Unknown shortcut action:', shortcutId);
     }
   }, [router, openDialog, setTheme, toggleSidebar, loadProjects, addNotification, isInInputField]);
 

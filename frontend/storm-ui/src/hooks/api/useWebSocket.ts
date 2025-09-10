@@ -327,13 +327,13 @@ export function useMultiWebSocket() {
         options.onOpen?.();
       };
 
-      ws.onclose = () => {
+      ws.onclose = (event) => {
         setConnectionStates(prev => new Map(prev.set(key, false)));
         connections.current.delete(key);
-        options.onClose?.();
+        options.onClose?.(event);
       };
 
-      ws.onerror = options.onError;
+      ws.onerror = options.onError || null;
       
       ws.onmessage = (event) => {
         try {

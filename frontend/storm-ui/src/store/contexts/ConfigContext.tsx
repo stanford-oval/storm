@@ -227,7 +227,7 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
       }
 
       setConfig(loadedConfig);
-      setVersion(loadedConfig.version || '1.0.0');
+      setVersion((loadedConfig as any).version || '1.0.0');
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load configuration';
@@ -314,9 +314,9 @@ const loadFromEnvironment = (): Partial<AppConfig> | null => {
     // API configuration from environment
     if (process.env.NEXT_PUBLIC_API_BASE_URL) {
       envConfig.api = {
-        ...envConfig.api,
+        ...(envConfig.api || {}),
         baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
-      };
+      } as AppConfig['api'];
     }
 
     // Feature flags from environment
@@ -332,7 +332,7 @@ const loadFromEnvironment = (): Partial<AppConfig> | null => {
     }
 
     if (Object.keys(features).length > 0) {
-      envConfig.features = features;
+      envConfig.features = features as AppConfig['features'];
     }
 
     return Object.keys(envConfig).length > 0 ? envConfig : null;
@@ -406,15 +406,15 @@ const validateConfig = (config: AppConfig): ValidationResult => {
   }
 
   // Validate STORM configuration
-  if (!config.storm.llm.model) {
+  if (!config.storm.llm?.model) {
     errors.push('STORM LLM model is required');
   }
 
-  if (!config.storm.llm.provider) {
+  if (!config.storm.llm?.provider) {
     errors.push('STORM LLM provider is required');
   }
 
-  if (config.storm.llm.temperature < 0 || config.storm.llm.temperature > 2) {
+  if (config.storm.llm?.temperature !== undefined && (config.storm.llm.temperature < 0 || config.storm.llm.temperature > 2)) {
     warnings.push('STORM LLM temperature should be between 0 and 2');
   }
 
@@ -470,7 +470,7 @@ export const withConfig = <P extends object>(
 ) => {
   return React.forwardRef<any, P>((props, ref) => {
     const { config } = useConfig();
-    return <Component {...props} config={config} ref={ref} />;
+    return <Component {...(props as P)} config={config} ref={ref} />;
   });
 };
 

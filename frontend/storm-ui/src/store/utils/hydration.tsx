@@ -334,9 +334,11 @@ export function withHydration<P extends object>(
     const hydrationState = useHydration();
     
     // Filter to specific stores if specified
-    const relevantStores = storeNames 
-      ? hydrationState.stores.filter(s => storeNames.includes(s.storeName))
-      : hydrationState.stores;
+    const relevantStores = 'stores' in hydrationState 
+      ? (storeNames 
+          ? hydrationState.stores.filter(s => storeNames.includes(s.storeName))
+          : hydrationState.stores)
+      : [hydrationState];
     
     const isHydrated = relevantStores.every(s => s.isHydrated);
     const isHydrating = relevantStores.some(s => s.isHydrating);
@@ -349,13 +351,20 @@ export function withHydration<P extends object>(
         <ErrorFallback
           error={errors[0]}
           retry={() => {
-            relevantStores.forEach(store => {
-              if (store.error) {
-                window.dispatchEvent(new CustomEvent('store:retry-hydration', {
-                  detail: { storeName: store.storeName }
-                }));
-              }
-            });
+            if ('stores' in hydrationState) {
+              relevantStores.forEach(store => {
+                if (store.error && 'storeName' in store) {
+                  window.dispatchEvent(new CustomEvent('store:retry-hydration', {
+                    detail: { storeName: store.storeName }
+                  }));
+                }
+              });
+            } else {
+              // Single store mode - retry without storeName
+              window.dispatchEvent(new CustomEvent('store:retry-hydration', {
+                detail: { }
+              }));
+            }
           }}
         />
       );
@@ -367,7 +376,7 @@ export function withHydration<P extends object>(
     }
     
     // Render component if hydrated
-    return <Component {...props} ref={ref} />;
+    return <Component {...(props as P)} ref={ref} />;
   });
 }
 
@@ -450,12 +459,12 @@ export const HydrationProgress: React.FC<{
   const hydrationState = useHydration();
   
   React.useEffect(() => {
-    if (hydrationState.allHydrated && onComplete) {
+    if ('allHydrated' in hydrationState && hydrationState.allHydrated && onComplete) {
       onComplete();
     }
-  }, [hydrationState.allHydrated, onComplete]);
+  }, ['allHydrated' in hydrationState ? hydrationState.allHydrated : false, onComplete]);
   
-  if (hydrationState.allHydrated) {
+  if ('allHydrated' in hydrationState && hydrationState.allHydrated) {
     return null;
   }
   
@@ -464,24 +473,24 @@ export const HydrationProgress: React.FC<{
       {showProgress && (
         <div className="progress-bar">
           <div className="progress-text">
-            Loading application... ({hydrationState.hydratedCount}/{hydrationState.totalStores})
+            Loading application... ({'hydratedCount' in hydrationState ? hydrationState.hydratedCount : 0}/{'totalStores' in hydrationState ? hydrationState.totalStores : 1})
           </div>
           <div className="progress-track">
             <div 
               className="progress-fill"
               style={{ 
-                width: `${(hydrationState.hydratedCount / hydrationState.totalStores) * 100}%` 
+                width: `${('hydratedCount' in hydrationState && 'totalStores' in hydrationState ? (hydrationState.hydratedCount / hydrationState.totalStores) : 0) * 100}%` 
               }}
             />
           </div>
         </div>
       )}
       
-      {showErrors && hydrationState.failedCount > 0 && (
+      {showErrors && 'failedCount' in hydrationState && hydrationState.failedCount > 0 && (
         <div className="hydration-errors">
           <p>Some stores failed to load:</p>
           <ul>
-            {hydrationState.stores
+            {'stores' in hydrationState && hydrationState.stores
               .filter(s => s.error)
               .map(s => (
                 <li key={s.storeName}>

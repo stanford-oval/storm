@@ -64,7 +64,7 @@ export const devtools = <T>(
         }
 
         // Determine action name
-        let action = { type: actionName || 'setState' };
+        const action = { type: actionName || 'setState' };
         
         if (typeof args === 'function') {
           // Try to extract function name

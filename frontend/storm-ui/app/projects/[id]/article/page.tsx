@@ -13,7 +13,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { useProjectStore, useNotificationStore } from '@/store';
 import { GeneratedArticle } from '@/types/storm';
@@ -24,7 +24,6 @@ import {
   FileText, 
   Download,
   Share2,
-  Copy,
   Edit3,
   Eye,
   MoreHorizontal,
@@ -32,12 +31,8 @@ import {
   Quote,
   Hash,
   Clock,
-  User,
   ExternalLink,
-  Printer,
-  Save,
-  Undo,
-  Redo
+  Printer
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -80,7 +75,7 @@ export default function ArticlePage() {
         title: 'Article Saved',
         message: 'Your changes have been saved successfully',
         read: false,
-        persistent: false,
+        persistent: false
       });
     } catch (error) {
       addNotification({
@@ -88,7 +83,7 @@ export default function ArticlePage() {
         title: 'Failed to Save',
         message: error instanceof Error ? error.message : 'Unknown error occurred',
         read: false,
-        persistent: false,
+        persistent: false
       });
     }
   };
@@ -102,7 +97,7 @@ export default function ArticlePage() {
       title: 'Export Started',
       message: `Exporting article as ${format.toUpperCase()}...`,
       read: false,
-      persistent: false,
+      persistent: false
     });
   };
 
@@ -117,7 +112,7 @@ export default function ArticlePage() {
         title: 'Link Copied',
         message: 'Article link copied to clipboard',
         read: false,
-        persistent: false,
+        persistent: false
       });
     });
   };
