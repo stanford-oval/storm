@@ -241,7 +241,13 @@ class FileProjectService:
         index["projects"].append(project_summary)
         self._save_index(index)
 
-        return self.get_project_summary(project_id)
+        # Get the full project summary and ensure it's not None
+        result = self.get_project_summary(project_id)
+        if result is None:
+            # This shouldn't happen since we just created the project
+            # but handle it to satisfy type checker
+            raise RuntimeError(f"Failed to retrieve newly created project {project_id}")
+        return result
 
     def list_projects(self) -> List[Dict[str, Any]]:
         """List all projects with summary information."""

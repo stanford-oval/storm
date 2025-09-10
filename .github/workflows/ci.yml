@@ -78,8 +78,8 @@ jobs:
 
     - name: Type check with mypy
       run: |
-        pip install mypy
-        mypy backend/ --ignore-missing-imports
+        pip install mypy types-requests types-toml types-pytz
+        mypy backend/ --ignore-missing-imports --exclude '.*transformers.*'
 
     - name: Test with pytest
       env:

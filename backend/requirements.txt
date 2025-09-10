@@ -30,6 +30,11 @@ black==23.11.0
 isort==5.12.0
 mypy==1.7.1
 
+# Type stubs for mypy
+types-requests==2.31.0.10
+types-toml==0.10.8.7
+types-pytz==2024.1.0.20240203
+
 # Additional utilities
 typing-extensions==4.8.0
 # Export functionality
