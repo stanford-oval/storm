@@ -57,9 +57,7 @@ class APITester:
                 print(f"✅ Project created: {data['title']} (ID: {data['id']})")
                 return True
             else:
-                print(
-                    f"❌ Project creation failed: {response.status_code} - {response.text}"
-                )
+                print(f"❌ Project creation failed: {response.status_code} - {response.text}")
                 return False
         except Exception as e:
             print(f"❌ Project creation error: {e}")
@@ -96,9 +94,7 @@ class APITester:
 
         print(f"\nTesting project retrieval for ID: {self.created_project_id}")
         try:
-            response = self.session.get(
-                f"{self.base_url}/api/projects/{self.created_project_id}"
-            )
+            response = self.session.get(f"{self.base_url}/api/projects/{self.created_project_id}")
 
             if response.status_code == 200:
                 data = response.json()
@@ -120,9 +116,7 @@ class APITester:
 
         print(f"\nTesting pipeline status for ID: {self.created_project_id}")
         try:
-            response = self.session.get(
-                f"{self.base_url}/api/pipeline/{self.created_project_id}/status"
-            )
+            response = self.session.get(f"{self.base_url}/api/pipeline/{self.created_project_id}/status")
 
             if response.status_code == 200:
                 data = response.json()
@@ -158,21 +152,15 @@ class APITester:
                 print("   Waiting for pipeline progress...")
                 time.sleep(3)
 
-                status_response = self.session.get(
-                    f"{self.base_url}/api/pipeline/{self.created_project_id}/status"
-                )
+                status_response = self.session.get(f"{self.base_url}/api/pipeline/{self.created_project_id}/status")
                 if status_response.status_code == 200:
                     status_data = status_response.json()
                     progress = status_data["progress"]
-                    print(
-                        f"   Pipeline progress: {progress['overall_progress']:.1f}% - {progress['current_task']}"
-                    )
+                    print(f"   Pipeline progress: {progress['overall_progress']:.1f}% - {progress['current_task']}")
 
                 return True
             else:
-                print(
-                    f"❌ Mock pipeline failed: {response.status_code} - {response.text}"
-                )
+                print(f"❌ Mock pipeline failed: {response.status_code} - {response.text}")
                 return False
         except Exception as e:
             print(f"❌ Mock pipeline error: {e}")
@@ -236,17 +224,13 @@ class APITester:
 
         print(f"\nCleaning up test project ID: {self.created_project_id}")
         try:
-            response = self.session.delete(
-                f"{self.base_url}/api/projects/{self.created_project_id}"
-            )
+            response = self.session.delete(f"{self.base_url}/api/projects/{self.created_project_id}")
 
             if response.status_code == 200:
                 print("✅ Test project deleted successfully")
                 return True
             else:
-                print(
-                    f"⚠️ Cleanup failed: {response.status_code} (project may still exist)"
-                )
+                print(f"⚠️ Cleanup failed: {response.status_code} (project may still exist)")
                 return False
         except Exception as e:
             print(f"⚠️ Cleanup error: {e}")
@@ -301,9 +285,7 @@ def main():
 
     parser = argparse.ArgumentParser(description="Test STORM UI Backend API")
     parser.add_argument("--url", default="http://localhost:8000", help="Backend URL")
-    parser.add_argument(
-        "--no-cleanup", action="store_true", help="Don't delete test project"
-    )
+    parser.add_argument("--no-cleanup", action="store_true", help="Don't delete test project")
     args = parser.parse_args()
 
     tester = APITester(args.url)

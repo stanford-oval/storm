@@ -54,9 +54,7 @@ async def get_api_keys():
         google_cse_id = os.environ.get("GOOGLE_CSE_ID")
         serper_key = os.environ.get("SERPER_API_KEY")
         # Check both possible env var names for Tavily
-        tavily_key = os.environ.get("TAVILY_API_KEY") or os.environ.get(
-            "NEXT_PUBLIC_TAVILY_API_KEY"
-        )
+        tavily_key = os.environ.get("TAVILY_API_KEY") or os.environ.get("NEXT_PUBLIC_TAVILY_API_KEY")
         you_key = os.environ.get("YDC_API_KEY")
 
         return APIKeysResponse(
@@ -77,9 +75,7 @@ async def get_api_keys():
 
     except Exception as e:
         logger.error(f"Error getting API keys: {e}")
-        raise HTTPException(
-            status_code=500, detail="Failed to get API key configuration"
-        )
+        raise HTTPException(status_code=500, detail="Failed to get API key configuration")
 
 
 @router.get("/default-config")
@@ -90,22 +86,13 @@ async def get_default_config():
         openai_available = bool(os.environ.get("OPENAI_API_KEY"))
         anthropic_available = bool(os.environ.get("ANTHROPIC_API_KEY"))
 
-        default_llm = (
-            "gpt-3.5-turbo"
-            if openai_available
-            else "claude-3-haiku-20240307" if anthropic_available else None
-        )
+        default_llm = "gpt-3.5-turbo" if openai_available else "claude-3-haiku-20240307" if anthropic_available else None
 
         # Determine which retriever to use
-        google_available = bool(
-            os.environ.get("GOOGLE_API_KEY") and os.environ.get("GOOGLE_CSE_ID")
-        )
+        google_available = bool(os.environ.get("GOOGLE_API_KEY") and os.environ.get("GOOGLE_CSE_ID"))
         serper_available = bool(os.environ.get("SERPER_API_KEY"))
         # Check both possible env var names for Tavily
-        tavily_available = bool(
-            os.environ.get("TAVILY_API_KEY")
-            or os.environ.get("NEXT_PUBLIC_TAVILY_API_KEY")
-        )
+        tavily_available = bool(os.environ.get("TAVILY_API_KEY") or os.environ.get("NEXT_PUBLIC_TAVILY_API_KEY"))
         you_available = bool(os.environ.get("YDC_API_KEY"))
 
         # Note: Bing is not implemented in the backend, so we don't check for it
@@ -114,13 +101,7 @@ async def get_default_config():
             "tavily"
             if tavily_available
             else (
-                "google"
-                if google_available
-                else (
-                    "serper"
-                    if serper_available
-                    else "you" if you_available else "duckduckgo"
-                )
+                "google" if google_available else ("serper" if serper_available else "you" if you_available else "duckduckgo")
             )  # Free fallback
         )
 
@@ -151,6 +132,4 @@ async def get_default_config():
 
     except Exception as e:
         logger.error(f"Error getting default config: {e}")
-        raise HTTPException(
-            status_code=500, detail="Failed to get default configuration"
-        )
+        raise HTTPException(status_code=500, detail="Failed to get default configuration")

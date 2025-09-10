@@ -169,16 +169,9 @@ class FileProjectService:
                 progress_data = json.load(f)
                 # Convert datetime strings back to datetime objects
                 if "start_time" in progress_data and progress_data["start_time"]:
-                    progress_data["start_time"] = datetime.fromisoformat(
-                        progress_data["start_time"]
-                    )
-                if (
-                    "estimated_completion" in progress_data
-                    and progress_data["estimated_completion"]
-                ):
-                    progress_data["estimated_completion"] = datetime.fromisoformat(
-                        progress_data["estimated_completion"]
-                    )
+                    progress_data["start_time"] = datetime.fromisoformat(progress_data["start_time"])
+                if "estimated_completion" in progress_data and progress_data["estimated_completion"]:
+                    progress_data["estimated_completion"] = datetime.fromisoformat(progress_data["estimated_completion"])
                 return ProgressData(**progress_data)
         except Exception as e:
             print(f"Error loading progress for {project_id}: {e}")
@@ -193,9 +186,7 @@ class FileProjectService:
         with open(progress_file, "w", encoding="utf-8") as f:
             json.dump(progress.model_dump(), f, indent=2, default=str)
 
-    def create_project(
-        self, title: str, topic: str, config: Optional[ProjectConfig] = None
-    ) -> Dict[str, Any]:
+    def create_project(self, title: str, topic: str, config: Optional[ProjectConfig] = None) -> Dict[str, Any]:
         """Create a new project."""
         project_id = str(uuid.uuid4())
         current_time = datetime.now()
@@ -350,9 +341,7 @@ class FileProjectService:
         # Add clickable links to content if references exist
         content_with_links = post.content
         if references:
-            content_with_links = self._add_inline_citation_links(
-                post.content, references
-            )
+            content_with_links = self._add_inline_citation_links(post.content, references)
 
         # Calculate word count
         word_count = len(post.content.split()) if post.content else 0
@@ -397,9 +386,7 @@ class FileProjectService:
         # Update content if provided
         if "content" in updates:
             post.content = updates["content"]
-            post.metadata["word_count"] = (
-                len(post.content.split()) if post.content else 0
-            )
+            post.metadata["word_count"] = len(post.content.split()) if post.content else 0
 
         # Save updated project
         self._save_project_file(project_id, post)
@@ -458,9 +445,7 @@ class FileProjectService:
             print(f"Error deleting project {project_id}: {e}")
             return False
 
-    def duplicate_project(
-        self, project_id: str, new_title: Optional[str] = None
-    ) -> Optional[Dict[str, Any]]:
+    def duplicate_project(self, project_id: str, new_title: Optional[str] = None) -> Optional[Dict[str, Any]]:
         """Duplicate an existing project."""
         original_project = self.get_project(project_id)
         if not original_project:
@@ -470,15 +455,11 @@ class FileProjectService:
         config = ProjectConfig(**original_project["config"])
 
         # Create new project
-        new_project = self.create_project(
-            title=title, topic=original_project["topic"], config=config
-        )
+        new_project = self.create_project(title=title, topic=original_project["topic"], config=config)
 
         # Copy content if it exists and is not the default
         if original_project["content"] and not original_project["content"].startswith(
-            "# "
-            + original_project["title"]
-            + "\n\n*Article content will be generated here...*"
+            "# " + original_project["title"] + "\n\n*Article content will be generated here...*"
         ):
             self.update_project(
                 new_project["id"],
@@ -536,9 +517,7 @@ class FileProjectService:
 
         return {}
 
-    def _add_inline_citation_links(
-        self, content: str, references: Dict[str, Any]
-    ) -> str:
+    def _add_inline_citation_links(self, content: str, references: Dict[str, Any]) -> str:
         """Convert citation numbers to clickable links."""
         if not references:
             return content
@@ -583,15 +562,11 @@ class FileProjectService:
 
         # Convert citations to links in content
         if project.get("content") and references:
-            project["content_with_links"] = self._add_inline_citation_links(
-                project["content"], references
-            )
+            project["content_with_links"] = self._add_inline_citation_links(project["content"], references)
 
         return project
 
-    def export_project(
-        self, project_id: str, format: str = "markdown"
-    ) -> Optional[str]:
+    def export_project(self, project_id: str, format: str = "markdown") -> Optional[str]:
         """Export project to specified format."""
         project = self.get_project_with_references(project_id)
         if not project:

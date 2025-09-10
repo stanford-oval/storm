@@ -27,9 +27,7 @@ class CreateProjectRequest(BaseModel):
 
     title: str = Field(..., min_length=1, max_length=200, description="Project title")
     topic: str = Field(..., min_length=1, max_length=500, description="Research topic")
-    config: Optional[ProjectConfig] = Field(
-        None, description="Optional pipeline configuration"
-    )
+    config: Optional[ProjectConfig] = Field(None, description="Optional pipeline configuration")
 
 
 class UpdateProjectRequest(BaseModel):
@@ -38,9 +36,7 @@ class UpdateProjectRequest(BaseModel):
     title: Optional[str] = Field(None, min_length=1, max_length=200)
     topic: Optional[str] = Field(None, min_length=1, max_length=500)
     content: Optional[str] = Field(None, description="Article content")
-    status: Optional[str] = Field(
-        None, pattern="^(draft|researching|writing|completed|error)$"
-    )
+    status: Optional[str] = Field(None, pattern="^(draft|researching|writing|completed|error)$")
     tags: Optional[List[str]] = Field(None, description="Project tags")
 
 
@@ -94,9 +90,7 @@ class PaginatedProjectResponse(BaseModel):
 class DuplicateProjectRequest(BaseModel):
     """Request model for duplicating a project."""
 
-    new_title: Optional[str] = Field(
-        None, description="Title for the duplicated project"
-    )
+    new_title: Optional[str] = Field(None, description="Title for the duplicated project")
 
 
 # API Endpoints
@@ -106,9 +100,7 @@ class DuplicateProjectRequest(BaseModel):
 async def list_projects(
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=100),
-    status: Optional[str] = Query(
-        None, regex="^(draft|researching|writing|completed|error)$"
-    ),
+    status: Optional[str] = Query(None, regex="^(draft|researching|writing|completed|error)$"),
     sortBy: Optional[str] = Query("updatedAt"),
     sortOrder: Optional[str] = Query("desc", regex="^(asc|desc)$"),
 ):
@@ -122,17 +114,11 @@ async def list_projects(
 
         # Sort projects
         if sortBy == "updatedAt":
-            all_projects.sort(
-                key=lambda x: x.get("updated_at", ""), reverse=(sortOrder == "desc")
-            )
+            all_projects.sort(key=lambda x: x.get("updated_at", ""), reverse=(sortOrder == "desc"))
         elif sortBy == "createdAt":
-            all_projects.sort(
-                key=lambda x: x.get("created_at", ""), reverse=(sortOrder == "desc")
-            )
+            all_projects.sort(key=lambda x: x.get("created_at", ""), reverse=(sortOrder == "desc"))
         elif sortBy == "title":
-            all_projects.sort(
-                key=lambda x: x.get("title", "").lower(), reverse=(sortOrder == "desc")
-            )
+            all_projects.sort(key=lambda x: x.get("title", "").lower(), reverse=(sortOrder == "desc"))
 
         # Calculate pagination
         total = len(all_projects)
@@ -142,9 +128,7 @@ async def list_projects(
         # Apply pagination
         paginated_projects = all_projects[start_idx:end_idx]
 
-        return PaginatedProjectResponse(
-            projects=paginated_projects, page=page, limit=limit, total=total
-        )
+        return PaginatedProjectResponse(projects=paginated_projects, page=page, limit=limit, total=total)
 
     except Exception as e:
         logger.error(f"Error listing projects: {e}")
@@ -155,9 +139,7 @@ async def list_projects(
 async def create_project(request: CreateProjectRequest):
     """Create a new project."""
     try:
-        project = file_service.create_project(
-            title=request.title, topic=request.topic, config=request.config
-        )
+        project = file_service.create_project(title=request.title, topic=request.topic, config=request.config)
 
         if not project:
             raise HTTPException(status_code=500, detail="Failed to create project")
@@ -263,9 +245,7 @@ async def get_project_config(project_id: str):
 
     except Exception as e:
         logger.error(f"Error getting project config {project_id}: {e}")
-        raise HTTPException(
-            status_code=500, detail="Failed to get project configuration"
-        )
+        raise HTTPException(status_code=500, detail="Failed to get project configuration")
 
 
 @router.put("/{project_id}/config")
@@ -281,9 +261,7 @@ async def update_project_config(project_id: str, config: ProjectConfig):
 
     except Exception as e:
         logger.error(f"Error updating project config {project_id}: {e}")
-        raise HTTPException(
-            status_code=500, detail="Failed to update project configuration"
-        )
+        raise HTTPException(status_code=500, detail="Failed to update project configuration")
 
 
 @router.get("/{project_id}/progress")
@@ -303,29 +281,19 @@ async def get_project_progress(project_id: str):
 
 
 @router.get("/{project_id}/export")
-async def export_project(
-    project_id: str, format: str = Query("markdown", regex="^(markdown|json|html|pdf)$")
-):
+async def export_project(project_id: str, format: str = Query("markdown", regex="^(markdown|json|html|pdf)$")):
     """Export project content."""
     try:
         content = file_service.export_project(project_id, format)
 
         if content is None:
             if format == "pdf":
-                raise HTTPException(
-                    status_code=501, detail="PDF export not yet implemented"
-                )
-            raise HTTPException(
-                status_code=404, detail="Project not found or export failed"
-            )
+                raise HTTPException(status_code=501, detail="PDF export not yet implemented")
+            raise HTTPException(status_code=404, detail="Project not found or export failed")
 
         # Get project for filename
         project_summary = file_service.get_project_summary(project_id)
-        filename = (
-            f"{project_summary['title']}.{format}"
-            if project_summary
-            else f"project.{format}"
-        )
+        filename = f"{project_summary['title']}.{format}" if project_summary else f"project.{format}"
 
         # Return appropriate content type
         media_types = {
@@ -385,18 +353,14 @@ async def get_projects_stats():
         for project in projects:
             # Count by status
             status = project.get("status", "draft")
-            stats["projects_by_status"][status] = (
-                stats["projects_by_status"].get(status, 0) + 1
-            )
+            stats["projects_by_status"][status] = stats["projects_by_status"].get(status, 0) + 1
 
             # Sum word counts
             stats["total_words"] += project.get("word_count", 0)
 
             # Count by current stage
             stage = project.get("current_stage", "idle")
-            stats["projects_by_stage"][stage] = (
-                stats["projects_by_stage"].get(stage, 0) + 1
-            )
+            stats["projects_by_stage"][stage] = stats["projects_by_stage"].get(stage, 0) + 1
 
         return stats
 
@@ -461,15 +425,11 @@ async def get_project_conversations(project_id: str, live: bool = Query(False)):
         return {
             "project_id": project_id,
             "conversations": conversations,
-            "conversation_count": (
-                len(conversations) if isinstance(conversations, list) else 0
-            ),
+            "conversation_count": (len(conversations) if isinstance(conversations, list) else 0),
         }
 
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Error getting project conversations {project_id}: {e}")
-        raise HTTPException(
-            status_code=500, detail="Failed to get project conversations"
-        )
+        raise HTTPException(status_code=500, detail="Failed to get project conversations")

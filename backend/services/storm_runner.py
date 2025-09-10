@@ -56,9 +56,7 @@ class StormRunnerService:
 
         try:
             # Create and start the pipeline task
-            task = asyncio.create_task(
-                self._run_pipeline_internal(project_id, config, progress_callback)
-            )
+            task = asyncio.create_task(self._run_pipeline_internal(project_id, config, progress_callback))
             self.running_tasks[project_id] = task
 
             # Wait for completion
@@ -129,9 +127,7 @@ class StormRunnerService:
                     GoogleSearch,
                 )
             except ImportError as e:
-                raise RuntimeError(
-                    f"STORM not available: {e}. Please install knowledge-storm package."
-                )
+                raise RuntimeError(f"STORM not available: {e}. Please install knowledge-storm package.")
 
             # Setup output directory
             project_files = self.file_service.get_project_files(project_id)
@@ -149,21 +145,11 @@ class StormRunnerService:
 
             if openai_kwargs["api_key"]:
                 # Configure different models for different stages
-                lm_configs.set_conv_simulator_lm(
-                    OpenAIModel(model=config.llm_model, **openai_kwargs)
-                )
-                lm_configs.set_question_asker_lm(
-                    OpenAIModel(model=config.llm_model, **openai_kwargs)
-                )
-                lm_configs.set_outline_gen_lm(
-                    OpenAIModel(model=config.llm_model, **openai_kwargs)
-                )
-                lm_configs.set_article_gen_lm(
-                    OpenAIModel(model=config.llm_model, **openai_kwargs)
-                )
-                lm_configs.set_article_polish_lm(
-                    OpenAIModel(model=config.llm_model, **openai_kwargs)
-                )
+                lm_configs.set_conv_simulator_lm(OpenAIModel(model=config.llm_model, **openai_kwargs))
+                lm_configs.set_question_asker_lm(OpenAIModel(model=config.llm_model, **openai_kwargs))
+                lm_configs.set_outline_gen_lm(OpenAIModel(model=config.llm_model, **openai_kwargs))
+                lm_configs.set_article_gen_lm(OpenAIModel(model=config.llm_model, **openai_kwargs))
+                lm_configs.set_article_polish_lm(OpenAIModel(model=config.llm_model, **openai_kwargs))
             else:
                 logger.warning("No OpenAI API key found. Using mock responses.")
                 # In production, you might want to handle this differently
@@ -172,9 +158,7 @@ class StormRunnerService:
             rm = None
 
             # Try different retrievers based on config
-            if config.retriever_type == "google" and (
-                config.retriever_api_key or os.getenv("GOOGLE_SEARCH_API_KEY")
-            ):
+            if config.retriever_type == "google" and (config.retriever_api_key or os.getenv("GOOGLE_SEARCH_API_KEY")):
                 api_key = config.retriever_api_key or os.getenv("GOOGLE_SEARCH_API_KEY")
                 cse_id = os.getenv("GOOGLE_CSE_ID")
                 if cse_id:
@@ -186,27 +170,15 @@ class StormRunnerService:
                     logger.info(f"Using GoogleSearch for project {project_id}")
                 else:
                     logger.warning("Google CSE ID not found, cannot use Google Search")
-            elif config.retriever_type == "serper" and (
-                config.retriever_api_key or os.getenv("SERPER_API_KEY")
-            ):
+            elif config.retriever_type == "serper" and (config.retriever_api_key or os.getenv("SERPER_API_KEY")):
                 api_key = config.retriever_api_key or os.getenv("SERPER_API_KEY")
-                rm = SerperRM(
-                    serper_search_api_key=api_key, k=config.max_search_results
-                )
-                logger.info(
-                    f"Using SerperRM (Google via Serper) for project {project_id}"
-                )
-            elif config.retriever_type == "tavily" and (
-                config.retriever_api_key or os.getenv("NEXT_PUBLIC_TAVILY_API_KEY")
-            ):
-                api_key = config.retriever_api_key or os.getenv(
-                    "NEXT_PUBLIC_TAVILY_API_KEY"
-                )
+                rm = SerperRM(serper_search_api_key=api_key, k=config.max_search_results)
+                logger.info(f"Using SerperRM (Google via Serper) for project {project_id}")
+            elif config.retriever_type == "tavily" and (config.retriever_api_key or os.getenv("NEXT_PUBLIC_TAVILY_API_KEY")):
+                api_key = config.retriever_api_key or os.getenv("NEXT_PUBLIC_TAVILY_API_KEY")
                 rm = TavilySearchRM(tavily_api_key=api_key, k=config.max_search_results)
                 logger.info(f"Using TavilySearchRM for project {project_id}")
-            elif config.retriever_type == "you" and (
-                config.retriever_api_key or os.getenv("YDC_API_KEY")
-            ):
+            elif config.retriever_type == "you" and (config.retriever_api_key or os.getenv("YDC_API_KEY")):
                 api_key = config.retriever_api_key or os.getenv("YDC_API_KEY")
                 rm = YouRM(ydc_api_key=api_key, k=config.max_search_results)
                 logger.info(f"Using YouRM for project {project_id}")
@@ -216,9 +188,7 @@ class StormRunnerService:
 
             if rm is None:
                 # Fallback to DuckDuckGo (no API key required)
-                logger.warning(
-                    f"No retriever configured for {config.retriever_type}, falling back to DuckDuckGo"
-                )
+                logger.warning(f"No retriever configured for {config.retriever_type}, falling back to DuckDuckGo")
                 rm = DuckDuckGoSearchRM(k=config.max_search_results)
 
             # Configure runner arguments
@@ -328,14 +298,10 @@ class StormRunnerService:
 
             if generated_content:
                 # Update project with generated content
-                self.file_service.update_project(
-                    project_id, {"content": generated_content, "status": "completed"}
-                )
+                self.file_service.update_project(project_id, {"content": generated_content, "status": "completed"})
                 logger.info(f"Updated project {project_id} with generated article")
             else:
-                logger.warning(
-                    f"No article found for project {project_id} in {storm_output_dir}"
-                )
+                logger.warning(f"No article found for project {project_id} in {storm_output_dir}")
 
             # Final progress update
             final_progress = ProgressData(
@@ -394,9 +360,7 @@ class StormRunnerService:
             except Exception as e:
                 logger.warning(f"Progress callback failed: {e}")
 
-        logger.info(
-            f"Project {project_id} - Stage: {progress.stage}, Progress: {progress.overall_progress:.1f}%"
-        )
+        logger.info(f"Project {project_id} - Stage: {progress.stage}, Progress: {progress.overall_progress:.1f}%")
 
     def cancel_pipeline(self, project_id: str) -> bool:
         """Cancel a running pipeline."""
@@ -496,9 +460,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
 """
 
             # Update project with mock content
-            self.file_service.update_project(
-                project_id, {"content": mock_content, "status": "completed"}
-            )
+            self.file_service.update_project(project_id, {"content": mock_content, "status": "completed"})
 
             # Final progress
             final_progress = ProgressData(

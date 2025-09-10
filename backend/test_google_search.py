@@ -65,9 +65,7 @@ def test_available_retrievers():
         if os.getenv("GOOGLE_SEARCH_API_KEY") and os.getenv("GOOGLE_CSE_ID"):
             available.append("✓ Google Search (API key and CSE ID configured)")
         else:
-            available.append(
-                "○ Google Search (needs GOOGLE_SEARCH_API_KEY and GOOGLE_CSE_ID)"
-            )
+            available.append("○ Google Search (needs GOOGLE_SEARCH_API_KEY and GOOGLE_CSE_ID)")
     except ImportError:
         available.append("✗ Google Search (not installed)")
 
