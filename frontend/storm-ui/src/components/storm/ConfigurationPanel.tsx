@@ -366,12 +366,13 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
       </CardHeader>
 
       <CardContent className="space-y-6">
-        <Tabs defaultValue="llm" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="llm">Language Model</TabsTrigger>
-            <TabsTrigger value="retriever">Retriever</TabsTrigger>
-            <TabsTrigger value="pipeline">Pipeline</TabsTrigger>
-          </TabsList>
+        <form onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
+          <Tabs defaultValue="llm" className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="llm">Language Model</TabsTrigger>
+              <TabsTrigger value="retriever">Retriever</TabsTrigger>
+              <TabsTrigger value="pipeline">Pipeline</TabsTrigger>
+            </TabsList>
 
           <TabsContent value="llm" className="mt-4 space-y-4">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -758,11 +759,11 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
               </div>
             </div>
           </TabsContent>
-        </Tabs>
+          </Tabs>
 
-        <Separator />
+          <Separator />
 
-        <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             {hasChanges && (
               <span className="text-sm text-amber-600 dark:text-amber-400">
@@ -772,6 +773,7 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
           </div>
           <div className="flex items-center space-x-2">
             <Button
+              type="button"
               variant="outline"
               onClick={handleReset}
               disabled={!hasChanges || isLoading}
@@ -779,11 +781,11 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
               <RotateCcw className="mr-2 h-4 w-4" />
               Reset
             </Button>
-            <Button variant="outline" onClick={onCancel} disabled={isLoading}>
+            <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
               Cancel
             </Button>
             <Button
-              onClick={handleSave}
+              type="submit"
               disabled={(!hasChanges && !allowSaveWithoutChanges) || isLoading}
               className="min-w-[80px]"
             >
@@ -798,6 +800,7 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
             </Button>
           </div>
         </div>
+        </form>
       </CardContent>
     </Card>
   );
