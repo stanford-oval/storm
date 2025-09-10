@@ -103,7 +103,7 @@ describe('projectStore', () => {
 
     it('adds a new project', () => {
       const { result } = renderHook(() => createTestStore()());
-      
+
       act(() => {
         result.current.setProjects([mockProjects[0]]);
       });
@@ -131,7 +131,9 @@ describe('projectStore', () => {
         result.current.updateProject('project-1', { title: updatedTitle });
       });
 
-      const updatedProject = result.current.projects.find(p => p.id === 'project-1');
+      const updatedProject = result.current.projects.find(
+        p => p.id === 'project-1'
+      );
       expect(updatedProject?.title).toBe(updatedTitle);
     });
 
@@ -147,7 +149,9 @@ describe('projectStore', () => {
       });
 
       expect(result.current.projects).toHaveLength(1);
-      expect(result.current.projects.find(p => p.id === 'project-1')).toBeUndefined();
+      expect(
+        result.current.projects.find(p => p.id === 'project-1')
+      ).toBeUndefined();
     });
 
     it('sets current project', () => {
@@ -251,7 +255,7 @@ describe('projectStore', () => {
       });
 
       const filteredProjects = result.current.getFilteredProjects();
-      
+
       expect(filteredProjects).toHaveLength(1);
       expect(filteredProjects[0].status).toBe('completed');
     });
@@ -265,7 +269,7 @@ describe('projectStore', () => {
       });
 
       const filteredProjects = result.current.getFilteredProjects();
-      
+
       expect(filteredProjects).toHaveLength(1);
       expect(filteredProjects[0].title).toContain('AI');
     });
@@ -284,7 +288,7 @@ describe('projectStore', () => {
       });
 
       const filteredProjects = result.current.getFilteredProjects();
-      
+
       expect(filteredProjects).toHaveLength(1);
       expect(filteredProjects[0].id).toBe('project-1');
     });
@@ -301,7 +305,7 @@ describe('projectStore', () => {
       });
 
       const filteredProjects = result.current.getFilteredProjects();
-      
+
       expect(filteredProjects).toHaveLength(1);
       expect(filteredProjects[0].id).toBe('project-1');
     });
@@ -344,7 +348,7 @@ describe('projectStore', () => {
       });
 
       const sortedProjects = result.current.getSortedProjects();
-      
+
       expect(sortedProjects[0].title).toBe('First Project');
       expect(sortedProjects[1].title).toBe('Second Project');
     });
@@ -358,7 +362,7 @@ describe('projectStore', () => {
       });
 
       const sortedProjects = result.current.getSortedProjects();
-      
+
       expect(sortedProjects[0].title).toBe('Second Project');
       expect(sortedProjects[1].title).toBe('First Project');
     });
@@ -372,7 +376,7 @@ describe('projectStore', () => {
       });
 
       const sortedProjects = result.current.getSortedProjects();
-      
+
       expect(sortedProjects[0].id).toBe('project-2'); // More recent
       expect(sortedProjects[1].id).toBe('project-1');
     });
@@ -386,7 +390,7 @@ describe('projectStore', () => {
       });
 
       const sortedProjects = result.current.getSortedProjects();
-      
+
       // 'completed' comes before 'draft' alphabetically
       expect(sortedProjects[0].status).toBe('completed');
       expect(sortedProjects[1].status).toBe('draft');
@@ -424,7 +428,7 @@ describe('projectStore', () => {
       });
 
       const paginatedProjects = result.current.getPaginatedProjects();
-      
+
       expect(paginatedProjects).toHaveLength(5);
       // Should be projects 6-10 (page 2, limit 5)
       expect(paginatedProjects[0].id).toBe('project-6');
@@ -440,7 +444,7 @@ describe('projectStore', () => {
       });
 
       const paginatedProjects = result.current.getPaginatedProjects();
-      
+
       expect(paginatedProjects).toHaveLength(0); // No projects on page 2
     });
   });
@@ -454,7 +458,7 @@ describe('projectStore', () => {
       });
 
       const project = result.current.getProjectById('project-1');
-      
+
       expect(project).toEqual(mockProjects[0]);
     });
 
@@ -466,7 +470,7 @@ describe('projectStore', () => {
       });
 
       const project = result.current.getProjectById('non-existent');
-      
+
       expect(project).toBeUndefined();
     });
 
@@ -479,7 +483,7 @@ describe('projectStore', () => {
 
       const completedProjects = result.current.getProjectsByStatus('completed');
       const draftProjects = result.current.getProjectsByStatus('draft');
-      
+
       expect(completedProjects).toHaveLength(1);
       expect(completedProjects[0].status).toBe('completed');
       expect(draftProjects).toHaveLength(1);
@@ -495,7 +499,7 @@ describe('projectStore', () => {
 
       const aiProjects = result.current.searchProjects('AI');
       const climateProjects = result.current.searchProjects('Climate');
-      
+
       expect(aiProjects).toHaveLength(1);
       expect(aiProjects[0].topic).toContain('Intelligence');
       expect(climateProjects).toHaveLength(1);
@@ -510,7 +514,7 @@ describe('projectStore', () => {
       });
 
       const results = result.current.searchProjects('first');
-      
+
       expect(results).toHaveLength(1);
       expect(results[0].title).toBe('First Project');
     });
@@ -529,7 +533,10 @@ describe('projectStore', () => {
         result.current.selectProject('project-2');
       });
 
-      expect(result.current.selectedProjects).toEqual(['project-1', 'project-2']);
+      expect(result.current.selectedProjects).toEqual([
+        'project-1',
+        'project-2',
+      ]);
     });
 
     it('deselects projects', () => {
@@ -559,7 +566,10 @@ describe('projectStore', () => {
         result.current.selectAllProjects();
       });
 
-      expect(result.current.selectedProjects).toEqual(['project-1', 'project-2']);
+      expect(result.current.selectedProjects).toEqual([
+        'project-1',
+        'project-2',
+      ]);
     });
 
     it('clears all selections', () => {
@@ -695,7 +705,9 @@ describe('projectStore', () => {
       const updatedTitle = 'Optimistically Updated Title';
 
       act(() => {
-        result.current.optimisticUpdateProject('project-1', { title: updatedTitle });
+        result.current.optimisticUpdateProject('project-1', {
+          title: updatedTitle,
+        });
       });
 
       const project = result.current.getProjectById('project-1');
@@ -713,16 +725,22 @@ describe('projectStore', () => {
       const updatedTitle = 'Optimistically Updated Title';
 
       act(() => {
-        result.current.optimisticUpdateProject('project-1', { title: updatedTitle });
+        result.current.optimisticUpdateProject('project-1', {
+          title: updatedTitle,
+        });
       });
 
-      expect(result.current.getProjectById('project-1')?.title).toBe(updatedTitle);
+      expect(result.current.getProjectById('project-1')?.title).toBe(
+        updatedTitle
+      );
 
       act(() => {
         result.current.revertOptimisticUpdate('project-1');
       });
 
-      expect(result.current.getProjectById('project-1')?.title).toBe(originalTitle);
+      expect(result.current.getProjectById('project-1')?.title).toBe(
+        originalTitle
+      );
     });
   });
 });

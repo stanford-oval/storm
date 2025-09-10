@@ -23,7 +23,12 @@ interface DebugState {
 }
 
 interface DebugActions {
-  addLog: (level: LogEntry['level'], message: string, data?: any, source?: string) => void;
+  addLog: (
+    level: LogEntry['level'],
+    message: string,
+    data?: any,
+    source?: string
+  ) => void;
   clearLogs: () => void;
   toggleVisibility: () => void;
   setVisibility: (visible: boolean) => void;
@@ -49,7 +54,7 @@ export const useDebugStore = create<DebugStore>()(
       ...initialState,
 
       addLog: (level, message, data, source) => {
-        set((draft) => {
+        set(draft => {
           const logEntry: LogEntry = {
             id: `${Date.now()}-${Math.random()}`,
             timestamp: new Date(),
@@ -69,25 +74,25 @@ export const useDebugStore = create<DebugStore>()(
       },
 
       clearLogs: () => {
-        set((draft) => {
+        set(draft => {
           draft.logs = [];
         });
       },
 
       toggleVisibility: () => {
-        set((draft) => {
+        set(draft => {
           draft.isVisible = !draft.isVisible;
         });
       },
 
-      setVisibility: (visible) => {
-        set((draft) => {
+      setVisibility: visible => {
+        set(draft => {
           draft.isVisible = visible;
         });
       },
 
-      setFilter: (filter) => {
-        set((draft) => {
+      setFilter: filter => {
+        set(draft => {
           Object.assign(draft.filter, filter);
         });
       },
@@ -111,22 +116,23 @@ export const useDebugStore = create<DebugStore>()(
 // Helper hook to get filtered logs
 export const useFilteredLogs = () => {
   const { logs, filter } = useDebugStore();
-  
+
   return logs.filter(log => {
     // Filter by level
     if (!filter.level.includes(log.level)) {
       return false;
     }
-    
+
     // Filter by search query
     if (filter.searchQuery) {
       const query = filter.searchQuery.toLowerCase();
-      const searchableText = `${log.message} ${JSON.stringify(log.data || '')}`.toLowerCase();
+      const searchableText =
+        `${log.message} ${JSON.stringify(log.data || '')}`.toLowerCase();
       if (!searchableText.includes(query)) {
         return false;
       }
     }
-    
+
     return true;
   });
 };
@@ -135,7 +141,7 @@ export const useFilteredLogs = () => {
 if (typeof window !== 'undefined' && !(window as any).__CONSOLE_CAPTURED__) {
   // Mark that console has been captured to prevent duplicate wrapping
   (window as any).__CONSOLE_CAPTURED__ = true;
-  
+
   const originalConsole = {
     log: console.log,
     warn: console.warn,
@@ -143,7 +149,7 @@ if (typeof window !== 'undefined' && !(window as any).__CONSOLE_CAPTURED__) {
     info: console.info,
     debug: console.debug,
   };
-  
+
   // Expose debug store to window for easy access
   (window as any).__DEBUG__ = {
     show: () => useDebugStore.getState().setVisibility(true),
@@ -156,24 +162,33 @@ if (typeof window !== 'undefined' && !(window as any).__CONSOLE_CAPTURED__) {
   const captureLog = (level: LogEntry['level'], args: any[]) => {
     // Call original console method
     originalConsole[level](...args);
-    
+
     // Capture to debug store
-    const message = args.map(arg => {
-      if (typeof arg === 'object') {
-        try {
-          return JSON.stringify(arg, null, 2);
-        } catch {
-          return String(arg);
+    const message = args
+      .map(arg => {
+        if (typeof arg === 'object') {
+          try {
+            return JSON.stringify(arg, null, 2);
+          } catch {
+            return String(arg);
+          }
         }
-      }
-      return String(arg);
-    }).join(' ');
-    
+        return String(arg);
+      })
+      .join(' ');
+
     // Extract source from stack trace if possible
     const stack = new Error().stack;
     const source = stack?.split('\n')[3]?.trim() || undefined;
-    
-    useDebugStore.getState().addLog(level, message, args.length > 1 ? args.slice(1) : undefined, source);
+
+    useDebugStore
+      .getState()
+      .addLog(
+        level,
+        message,
+        args.length > 1 ? args.slice(1) : undefined,
+        source
+      );
   };
 
   console.log = (...args: any[]) => captureLog('log', args);

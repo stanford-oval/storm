@@ -9,10 +9,10 @@ export function KeyboardShortcutsWrapper() {
   const [mounted, setMounted] = useState(false);
   const openDialogs = useUIStore(state => state.openDialogs);
   const closeDialog = useUIStore(state => state.closeDialog);
-  
+
   // Use the keyboard shortcuts hook to handle all shortcuts
   useKeyboardShortcuts();
-  
+
   // Check if keyboard shortcuts dialog is open
   const isOpen = openDialogs.includes('keyboard-shortcuts');
 
@@ -23,9 +23,9 @@ export function KeyboardShortcutsWrapper() {
   if (!mounted) return null;
 
   return (
-    <KeyboardShortcuts 
-      isOpen={isOpen} 
-      onClose={() => closeDialog('keyboard-shortcuts')} 
+    <KeyboardShortcuts
+      isOpen={isOpen}
+      onClose={() => closeDialog('keyboard-shortcuts')}
     />
   );
 }

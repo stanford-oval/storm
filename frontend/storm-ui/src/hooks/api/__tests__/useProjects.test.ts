@@ -127,7 +127,7 @@ describe('useProjects', () => {
         rest.get('/api/projects', (req, res, ctx) => {
           const page = req.url.searchParams.get('page');
           const limit = req.url.searchParams.get('limit');
-          
+
           expect(page).toBe('2');
           expect(limit).toBe('5');
 
@@ -146,9 +146,7 @@ describe('useProjects', () => {
         })
       );
 
-      const { result } = renderHook(() => 
-        useProjects({ page: 2, limit: 5 })
-      );
+      const { result } = renderHook(() => useProjects({ page: 2, limit: 5 }));
 
       await waitFor(() => {
         expect(result.current.projects).toEqual([mockProjects[1]]);
@@ -177,7 +175,7 @@ describe('useProjects', () => {
         })
       );
 
-      const { result } = renderHook(() => 
+      const { result } = renderHook(() =>
         useProjects({ filters: { status: ['completed'] } })
       );
 
@@ -207,7 +205,7 @@ describe('useProjects', () => {
         })
       );
 
-      const { result } = renderHook(() => 
+      const { result } = renderHook(() =>
         useProjects({ filters: { searchQuery: 'AI' } })
       );
 
@@ -306,7 +304,7 @@ describe('useProjects', () => {
       server.use(
         rest.put('/api/projects/:id', (req, res, ctx) => {
           expect(req.params.id).toBe('project-1');
-          
+
           return res(
             ctx.status(200),
             ctx.json({
@@ -360,7 +358,7 @@ describe('useProjects', () => {
       server.use(
         rest.delete('/api/projects/:id', (req, res, ctx) => {
           expect(req.params.id).toBe('project-1');
-          
+
           return res(
             ctx.status(200),
             ctx.json({
@@ -431,7 +429,7 @@ describe('useProjects', () => {
       server.use(
         rest.post('/api/projects/:id/duplicate', (req, res, ctx) => {
           expect(req.params.id).toBe('project-1');
-          
+
           return res(
             ctx.status(201),
             ctx.json({
@@ -479,7 +477,7 @@ describe('useProjects', () => {
       server.use(
         rest.post('/api/projects/:id/archive', (req, res, ctx) => {
           expect(req.params.id).toBe('project-1');
-          
+
           return res(
             ctx.status(200),
             ctx.json({
@@ -502,7 +500,7 @@ describe('useProjects', () => {
       server.use(
         rest.post('/api/projects/:id/unarchive', (req, res, ctx) => {
           expect(req.params.id).toBe('project-1');
-          
+
           return res(
             ctx.status(200),
             ctx.json({
@@ -648,13 +646,19 @@ describe('useProjects', () => {
       );
 
       act(() => {
-        result.current.updateProject('project-1', {
-          title: 'Updated Title',
-        }, { optimistic: true });
+        result.current.updateProject(
+          'project-1',
+          {
+            title: 'Updated Title',
+          },
+          { optimistic: true }
+        );
       });
 
       // Should immediately show optimistic update
-      const updatedProject = result.current.projects.find(p => p.id === 'project-1');
+      const updatedProject = result.current.projects.find(
+        p => p.id === 'project-1'
+      );
       expect(updatedProject?.title).toBe('Updated Title');
     });
 
@@ -698,9 +702,13 @@ describe('useProjects', () => {
       );
 
       await act(async () => {
-        await result.current.updateProject('project-1', {
-          title: 'Failed Update',
-        }, { optimistic: true });
+        await result.current.updateProject(
+          'project-1',
+          {
+            title: 'Failed Update',
+          },
+          { optimistic: true }
+        );
       });
 
       // Should revert to original title
@@ -712,7 +720,7 @@ describe('useProjects', () => {
   describe('caching', () => {
     it('caches project data', async () => {
       let requestCount = 0;
-      
+
       server.use(
         rest.get('/api/projects', (req, res, ctx) => {
           requestCount++;
@@ -739,14 +747,14 @@ describe('useProjects', () => {
 
       // Rerender should not trigger new request
       rerender();
-      
+
       expect(requestCount).toBe(1);
       expect(result.current.projects).toEqual(mockProjects);
     });
 
     it('invalidates cache on mutations', async () => {
       let getRequestCount = 0;
-      
+
       server.use(
         rest.get('/api/projects', (req, res, ctx) => {
           getRequestCount++;

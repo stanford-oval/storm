@@ -30,37 +30,37 @@ export {
   useAuthUser,
   useAuthStatus,
   useTheme as useAuthTheme,
-  
+
   // Project hooks
   useProjects,
   useCurrentProject,
   useProjectsList,
   useSelectedProjects,
-  
+
   // Pipeline hooks
   usePipeline,
   useRunningPipelines,
   useGlobalProgress,
   useCanCancelPipeline,
-  
+
   // Research hooks
   useResearch,
   useCurrentResearch,
   useActiveConversations,
   useResearchSources,
-  
+
   // Session hooks (Co-STORM)
   useSession,
   useCurrentSession,
   useActiveParticipants,
   useMindMap,
-  
+
   // UI hooks
   useUI,
   useTheme,
   useEffectiveTheme,
   useSidebarCollapsed,
-  
+
   // Notification hooks
   useNotifications,
   useUnreadCount,
@@ -179,7 +179,7 @@ if (process.env.NODE_ENV === 'development') {
     (window as any).__STORM_STORES__ = {
       registry: storeRegistry,
       actions: globalStoreActions,
-      
+
       // Quick access methods
       auth: () => useAuthStore.getState(),
       projects: () => useProjectStore.getState(),
@@ -188,7 +188,7 @@ if (process.env.NODE_ENV === 'development') {
       session: () => useSessionStore.getState(),
       ui: () => useUIStore.getState(),
       notifications: () => useNotificationStore.getState(),
-      
+
       // Debug helpers
       logAllStores: () => {
         console.group('🏪 All Store States');
@@ -197,7 +197,7 @@ if (process.env.NODE_ENV === 'development') {
         });
         console.groupEnd();
       },
-      
+
       resetAll: globalStoreActions.resetAllStores,
       clearErrors: globalStoreActions.clearAllErrors,
     };
@@ -212,7 +212,7 @@ export const useStoreInitialization = () => {
 
   React.useEffect(() => {
     // Initialize stores on app startup
-    
+
     // Apply saved theme
     const effectiveTheme = ui.getEffectiveTheme();
     document.documentElement.classList.remove('light', 'dark');
@@ -231,7 +231,6 @@ export const useStoreInitialization = () => {
         auth.logout();
       });
     }
-
   }, []);
 
   return {
@@ -277,16 +276,21 @@ export const useAllStores = (): CombinedStoreType => ({
 export const storeEvents = {
   // Emit an event that can be heard by any store
   emit: (eventName: string, data?: any) => {
-    window.dispatchEvent(new CustomEvent(`store:${eventName}`, { detail: data }));
+    window.dispatchEvent(
+      new CustomEvent(`store:${eventName}`, { detail: data })
+    );
   },
 
   // Listen for store events
   on: (eventName: string, handler: (data: any) => void) => {
     const listener = (event: CustomEvent) => handler(event.detail);
     window.addEventListener(`store:${eventName}`, listener as EventListener);
-    
+
     return () => {
-      window.removeEventListener(`store:${eventName}`, listener as EventListener);
+      window.removeEventListener(
+        `store:${eventName}`,
+        listener as EventListener
+      );
     };
   },
 

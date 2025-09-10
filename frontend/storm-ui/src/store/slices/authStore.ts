@@ -1,6 +1,11 @@
 // Authentication store slice
 import { create } from 'zustand';
-import { AuthState, User, UserPreferences, NotificationPreferences } from '../types';
+import {
+  AuthState,
+  User,
+  UserPreferences,
+  NotificationPreferences,
+} from '../types';
 import { persist, createPartialize } from '../middleware/persist';
 import { devtools } from '../middleware/devtools';
 import { immer } from '../middleware/immer';
@@ -42,23 +47,25 @@ interface AuthActions {
     password: string;
     name: string;
   }) => Promise<void>;
-  
+
   // User management
   updateUser: (updates: Partial<User>) => void;
   updatePreferences: (preferences: Partial<UserPreferences>) => void;
-  updateNotificationPreferences: (notifications: Partial<NotificationPreferences>) => void;
-  
+  updateNotificationPreferences: (
+    notifications: Partial<NotificationPreferences>
+  ) => void;
+
   // Session management
   extendSession: () => Promise<void>;
   checkSessionValidity: () => boolean;
   clearSession: () => void;
-  
+
   // State management
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   clearError: () => void;
   reset: () => void;
-  
+
   // Token management
   setTokens: (token: string, refreshToken: string, expiresIn: number) => void;
   clearTokens: () => void;
@@ -78,8 +85,8 @@ export const useAuthStore = create<AuthStore>()(
           ...initialState,
 
           // Authentication actions
-          login: async (credentials) => {
-            set((draft) => {
+          login: async credentials => {
+            set(draft => {
               draft.loading = true;
               draft.error = null;
             });
@@ -99,7 +106,7 @@ export const useAuthStore = create<AuthStore>()(
               const data = await response.json();
               const { user, token, refreshToken, expiresIn } = data;
 
-              set((draft) => {
+              set(draft => {
                 draft.user = {
                   ...user,
                   preferences: user.preferences || defaultPreferences,
@@ -112,8 +119,9 @@ export const useAuthStore = create<AuthStore>()(
                 draft.lastUpdated = new Date();
               });
             } catch (error) {
-              set((draft) => {
-                draft.error = error instanceof Error ? error.message : 'Login failed';
+              set(draft => {
+                draft.error =
+                  error instanceof Error ? error.message : 'Login failed';
                 draft.loading = false;
                 draft.isAuthenticated = false;
               });
@@ -122,7 +130,7 @@ export const useAuthStore = create<AuthStore>()(
           },
 
           logout: () => {
-            set((draft) => {
+            set(draft => {
               draft.user = null;
               draft.token = null;
               draft.refreshToken = null;
@@ -137,8 +145,8 @@ export const useAuthStore = create<AuthStore>()(
             localStorage.removeItem('refreshToken');
           },
 
-          register: async (userData) => {
-            set((draft) => {
+          register: async userData => {
+            set(draft => {
               draft.loading = true;
               draft.error = null;
             });
@@ -156,15 +164,18 @@ export const useAuthStore = create<AuthStore>()(
               }
 
               const data = await response.json();
-              
+
               // Auto-login after successful registration
               await get().login({
                 email: userData.email,
                 password: userData.password,
               });
             } catch (error) {
-              set((draft) => {
-                draft.error = error instanceof Error ? error.message : 'Registration failed';
+              set(draft => {
+                draft.error =
+                  error instanceof Error
+                    ? error.message
+                    : 'Registration failed';
                 draft.loading = false;
               });
               throw error;
@@ -191,7 +202,7 @@ export const useAuthStore = create<AuthStore>()(
               const data = await response.json();
               const { token, refreshToken: newRefreshToken, expiresIn } = data;
 
-              set((draft) => {
+              set(draft => {
                 draft.token = token;
                 draft.refreshToken = newRefreshToken;
                 draft.sessionExpiry = new Date(Date.now() + expiresIn * 1000);
@@ -205,8 +216,8 @@ export const useAuthStore = create<AuthStore>()(
           },
 
           // User management
-          updateUser: (updates) => {
-            set((draft) => {
+          updateUser: updates => {
+            set(draft => {
               if (draft.user) {
                 Object.assign(draft.user, updates);
                 draft.lastUpdated = new Date();
@@ -214,8 +225,8 @@ export const useAuthStore = create<AuthStore>()(
             });
           },
 
-          updatePreferences: (preferences) => {
-            set((draft) => {
+          updatePreferences: preferences => {
+            set(draft => {
               if (draft.user) {
                 Object.assign(draft.user.preferences, preferences);
                 draft.lastUpdated = new Date();
@@ -223,10 +234,13 @@ export const useAuthStore = create<AuthStore>()(
             });
           },
 
-          updateNotificationPreferences: (notifications) => {
-            set((draft) => {
+          updateNotificationPreferences: notifications => {
+            set(draft => {
               if (draft.user) {
-                Object.assign(draft.user.preferences.notifications, notifications);
+                Object.assign(
+                  draft.user.preferences.notifications,
+                  notifications
+                );
                 draft.lastUpdated = new Date();
               }
             });
@@ -248,7 +262,7 @@ export const useAuthStore = create<AuthStore>()(
           },
 
           clearSession: () => {
-            set((draft) => {
+            set(draft => {
               draft.token = null;
               draft.refreshToken = null;
               draft.sessionExpiry = null;
@@ -257,33 +271,33 @@ export const useAuthStore = create<AuthStore>()(
           },
 
           // State management
-          setLoading: (loading) => {
-            set((draft) => {
+          setLoading: loading => {
+            set(draft => {
               draft.loading = loading;
             });
           },
 
-          setError: (error) => {
-            set((draft) => {
+          setError: error => {
+            set(draft => {
               draft.error = error;
             });
           },
 
           clearError: () => {
-            set((draft) => {
+            set(draft => {
               draft.error = null;
             });
           },
 
           reset: () => {
-            set((draft) => {
+            set(draft => {
               Object.assign(draft, initialState);
             });
           },
 
           // Token management
           setTokens: (token, refreshToken, expiresIn) => {
-            set((draft) => {
+            set(draft => {
               draft.token = token;
               draft.refreshToken = refreshToken;
               draft.sessionExpiry = new Date(Date.now() + expiresIn * 1000);
@@ -292,7 +306,7 @@ export const useAuthStore = create<AuthStore>()(
           },
 
           clearTokens: () => {
-            set((draft) => {
+            set(draft => {
               draft.token = null;
               draft.refreshToken = null;
               draft.sessionExpiry = null;
@@ -314,7 +328,7 @@ export const useAuthStore = create<AuthStore>()(
           'token',
           'refreshToken',
           'sessionExpiry',
-          'isAuthenticated'
+          'isAuthenticated',
         ]),
       }
     ),
@@ -351,4 +365,5 @@ export const useAuthStatus = () => useAuthStore(authSelectors.isAuthenticated);
 export const useAuthLoading = () => useAuthStore(authSelectors.isLoading);
 export const useAuthError = () => useAuthStore(authSelectors.error);
 export const useUserThemePreference = () => useAuthStore(authSelectors.theme);
-export const useNotificationPreferences = () => useAuthStore(authSelectors.notifications);
+export const useNotificationPreferences = () =>
+  useAuthStore(authSelectors.notifications);

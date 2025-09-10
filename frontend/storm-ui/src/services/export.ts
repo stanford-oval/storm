@@ -1,9 +1,6 @@
 import { BaseApiService } from './base';
 import { ApiResponse } from '../types/storm';
-import {
-  ExportRequest,
-  ExportJob,
-} from '../types/api';
+import { ExportRequest, ExportJob } from '../types/api';
 
 export class ExportService extends BaseApiService {
   private readonly basePath = '/export';
@@ -11,7 +8,9 @@ export class ExportService extends BaseApiService {
   /**
    * Create an export job
    */
-  async createExportJob(request: ExportRequest): Promise<ApiResponse<ExportJob>> {
+  async createExportJob(
+    request: ExportRequest
+  ): Promise<ApiResponse<ExportJob>> {
     return this.post<ExportJob>(this.basePath, request);
   }
 
@@ -65,13 +64,19 @@ export class ExportService extends BaseApiService {
     jobId: string,
     onProgress?: (progress: number) => void
   ): Promise<Blob> {
-    return this.downloadFile(`${this.basePath}/${jobId}/download`, undefined, onProgress);
+    return this.downloadFile(
+      `${this.basePath}/${jobId}/download`,
+      undefined,
+      onProgress
+    );
   }
 
   /**
    * Get available export templates
    */
-  async getExportTemplates(format?: string): Promise<ApiResponse<ExportTemplate[]>> {
+  async getExportTemplates(
+    format?: string
+  ): Promise<ApiResponse<ExportTemplate[]>> {
     const params = new URLSearchParams();
     if (format) params.append('format', format);
 
@@ -82,7 +87,9 @@ export class ExportService extends BaseApiService {
   /**
    * Get export template
    */
-  async getExportTemplate(templateId: string): Promise<ApiResponse<ExportTemplate>> {
+  async getExportTemplate(
+    templateId: string
+  ): Promise<ApiResponse<ExportTemplate>> {
     return this.get<ExportTemplate>(`${this.basePath}/templates/${templateId}`);
   }
 
@@ -102,7 +109,10 @@ export class ExportService extends BaseApiService {
     templateId: string,
     updates: Partial<ExportTemplate>
   ): Promise<ApiResponse<ExportTemplate>> {
-    return this.put<ExportTemplate>(`${this.basePath}/templates/${templateId}`, updates);
+    return this.put<ExportTemplate>(
+      `${this.basePath}/templates/${templateId}`,
+      updates
+    );
   }
 
   /**
@@ -115,7 +125,9 @@ export class ExportService extends BaseApiService {
   /**
    * Preview export
    */
-  async previewExport(request: ExportRequest): Promise<ApiResponse<ExportPreview>> {
+  async previewExport(
+    request: ExportRequest
+  ): Promise<ApiResponse<ExportPreview>> {
     return this.post<ExportPreview>(`${this.basePath}/preview`, request);
   }
 
@@ -133,7 +145,7 @@ export class ExportService extends BaseApiService {
   ): Promise<ApiResponse<ExportResult>> {
     return this.post<ExportResult>(`${this.basePath}/article/${projectId}`, {
       format,
-      ...options
+      ...options,
     });
   }
 
@@ -144,7 +156,9 @@ export class ExportService extends BaseApiService {
     projectId: string,
     format: 'json' | 'yaml' | 'xml' | 'markdown'
   ): Promise<ApiResponse<ExportResult>> {
-    return this.post<ExportResult>(`${this.basePath}/outline/${projectId}`, { format });
+    return this.post<ExportResult>(`${this.basePath}/outline/${projectId}`, {
+      format,
+    });
   }
 
   /**
@@ -161,7 +175,7 @@ export class ExportService extends BaseApiService {
   ): Promise<ApiResponse<ExportResult>> {
     return this.post<ExportResult>(`${this.basePath}/research/${projectId}`, {
       format,
-      ...options
+      ...options,
     });
   }
 
@@ -172,13 +186,17 @@ export class ExportService extends BaseApiService {
     projectId: string,
     format: 'json' | 'yaml' | 'toml'
   ): Promise<ApiResponse<ExportResult>> {
-    return this.post<ExportResult>(`${this.basePath}/config/${projectId}`, { format });
+    return this.post<ExportResult>(`${this.basePath}/config/${projectId}`, {
+      format,
+    });
   }
 
   /**
    * Bulk export multiple projects
    */
-  async bulkExport(request: BulkExportRequest): Promise<ApiResponse<ExportJob>> {
+  async bulkExport(
+    request: BulkExportRequest
+  ): Promise<ApiResponse<ExportJob>> {
     return this.post<ExportJob>(`${this.basePath}/bulk`, request);
   }
 
@@ -196,7 +214,7 @@ export class ExportService extends BaseApiService {
   ): Promise<ApiResponse<ExportResult>> {
     return this.post<ExportResult>(`${this.basePath}/session/${sessionId}`, {
       format,
-      ...options
+      ...options,
     });
   }
 
@@ -210,24 +228,26 @@ export class ExportService extends BaseApiService {
   /**
    * Validate export request
    */
-  async validateExportRequest(request: ExportRequest): Promise<ApiResponse<ExportValidation>> {
+  async validateExportRequest(
+    request: ExportRequest
+  ): Promise<ApiResponse<ExportValidation>> {
     return this.post<ExportValidation>(`${this.basePath}/validate`, request);
   }
 
   /**
    * Get export statistics
    */
-  async getExportStatistics(
-    options?: {
-      startDate?: Date;
-      endDate?: Date;
-      format?: string;
-      projectId?: string;
-    }
-  ): Promise<ApiResponse<ExportStatistics>> {
+  async getExportStatistics(options?: {
+    startDate?: Date;
+    endDate?: Date;
+    format?: string;
+    projectId?: string;
+  }): Promise<ApiResponse<ExportStatistics>> {
     const params = new URLSearchParams();
-    if (options?.startDate) params.append('startDate', options.startDate.toISOString());
-    if (options?.endDate) params.append('endDate', options.endDate.toISOString());
+    if (options?.startDate)
+      params.append('startDate', options.startDate.toISOString());
+    if (options?.endDate)
+      params.append('endDate', options.endDate.toISOString());
     if (options?.format) params.append('format', options.format);
     if (options?.projectId) params.append('projectId', options.projectId);
 
@@ -245,7 +265,9 @@ export class ExportService extends BaseApiService {
   /**
    * Schedule automatic export
    */
-  async scheduleExport(request: ScheduleExportRequest): Promise<ApiResponse<ScheduledExport>> {
+  async scheduleExport(
+    request: ScheduleExportRequest
+  ): Promise<ApiResponse<ScheduledExport>> {
     return this.post<ScheduledExport>(`${this.basePath}/schedule`, request);
   }
 
@@ -269,7 +291,10 @@ export class ExportService extends BaseApiService {
     scheduleId: string,
     updates: Partial<ScheduleExportRequest>
   ): Promise<ApiResponse<ScheduledExport>> {
-    return this.patch<ScheduledExport>(`${this.basePath}/scheduled/${scheduleId}`, updates);
+    return this.patch<ScheduledExport>(
+      `${this.basePath}/scheduled/${scheduleId}`,
+      updates
+    );
   }
 
   /**
@@ -282,7 +307,9 @@ export class ExportService extends BaseApiService {
   /**
    * Get export webhooks
    */
-  async getExportWebhooks(projectId?: string): Promise<ApiResponse<ExportWebhook[]>> {
+  async getExportWebhooks(
+    projectId?: string
+  ): Promise<ApiResponse<ExportWebhook[]>> {
     const params = new URLSearchParams();
     if (projectId) params.append('projectId', projectId);
 
@@ -293,7 +320,9 @@ export class ExportService extends BaseApiService {
   /**
    * Create export webhook
    */
-  async createExportWebhook(webhook: CreateExportWebhookRequest): Promise<ApiResponse<ExportWebhook>> {
+  async createExportWebhook(
+    webhook: CreateExportWebhookRequest
+  ): Promise<ApiResponse<ExportWebhook>> {
     return this.post<ExportWebhook>(`${this.basePath}/webhooks`, webhook);
   }
 
@@ -304,7 +333,10 @@ export class ExportService extends BaseApiService {
     webhookId: string,
     updates: Partial<ExportWebhook>
   ): Promise<ApiResponse<ExportWebhook>> {
-    return this.patch<ExportWebhook>(`${this.basePath}/webhooks/${webhookId}`, updates);
+    return this.patch<ExportWebhook>(
+      `${this.basePath}/webhooks/${webhookId}`,
+      updates
+    );
   }
 
   /**
@@ -317,8 +349,12 @@ export class ExportService extends BaseApiService {
   /**
    * Test export webhook
    */
-  async testExportWebhook(webhookId: string): Promise<ApiResponse<WebhookTestResult>> {
-    return this.post<WebhookTestResult>(`${this.basePath}/webhooks/${webhookId}/test`);
+  async testExportWebhook(
+    webhookId: string
+  ): Promise<ApiResponse<WebhookTestResult>> {
+    return this.post<WebhookTestResult>(
+      `${this.basePath}/webhooks/${webhookId}/test`
+    );
   }
 
   /**
@@ -334,7 +370,7 @@ export class ExportService extends BaseApiService {
       content,
       fromFormat,
       toFormat,
-      options
+      options,
     });
   }
 
@@ -349,7 +385,9 @@ export class ExportService extends BaseApiService {
     params.append('olderThanDays', olderThanDays.toString());
     if (projectId) params.append('projectId', projectId);
 
-    return this.post<ArchiveResult>(`${this.basePath}/archive?${params.toString()}`);
+    return this.post<ArchiveResult>(
+      `${this.basePath}/archive?${params.toString()}`
+    );
   }
 
   /**
@@ -583,15 +621,18 @@ export interface ExportQuota {
   used: number;
   remaining: number;
   resetDate: Date;
-  byFormat: Record<string, {
-    limit: number;
-    used: number;
-    remaining: number;
-  }>;
+  byFormat: Record<
+    string,
+    {
+      limit: number;
+      used: number;
+      remaining: number;
+    }
+  >;
   warnings: string[];
 }
 
 // Create and export singleton instance
 export const exportService = new ExportService({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
 });

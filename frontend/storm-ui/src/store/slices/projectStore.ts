@@ -1,7 +1,12 @@
 // Project management store slice
 import { create } from 'zustand';
 import { ProjectState, ProjectFilters, ProjectSortField } from '../types';
-import { StormProject, StormConfig, ProjectStatus, CreateProjectFormData } from '@/types/storm';
+import {
+  StormProject,
+  StormConfig,
+  ProjectStatus,
+  CreateProjectFormData,
+} from '@/types/storm';
 import { persist, createPartialize } from '../middleware/persist';
 import { devtools } from '../middleware/devtools';
 import { immer } from '../middleware/immer';
@@ -33,17 +38,24 @@ const initialState: ProjectState = {
 interface ProjectActions {
   // Project CRUD operations
   createProject: (projectData: CreateProjectFormData) => Promise<StormProject>;
-  updateProject: (projectId: string, updates: Partial<StormProject>) => Promise<void>;
+  updateProject: (
+    projectId: string,
+    updates: Partial<StormProject>
+  ) => Promise<void>;
   deleteProject: (projectId: string) => Promise<void>;
   duplicateProject: (project: StormProject) => Promise<StormProject>;
   archiveProject: (projectId: string) => Promise<void>;
   restoreProject: (projectId: string) => Promise<void>;
-  
+
   // Project loading
-  loadProjects: (filters?: ProjectFilters, page?: number, limit?: number) => Promise<void>;
+  loadProjects: (
+    filters?: ProjectFilters,
+    page?: number,
+    limit?: number
+  ) => Promise<void>;
   loadProject: (projectId: string) => Promise<StormProject>;
   refreshProjects: () => Promise<void>;
-  
+
   // Project selection and navigation
   setCurrentProject: (project: StormProject | null) => void;
   selectProject: (projectId: string, multiSelect?: boolean) => void;
@@ -54,30 +66,42 @@ interface ProjectActions {
   clearSelection: () => void;
   fetchProject: (projectId: string) => Promise<StormProject>;
   addToRecentProjects: (projectId: string) => void;
-  
+
   // Filtering and sorting
   setFilters: (filters: Partial<ProjectFilters>) => void;
   clearFilters: () => void;
   setSortBy: (field: ProjectSortField, order?: 'asc' | 'desc') => void;
   setPagination: (page: number, limit?: number) => void;
-  
+
   // Batch operations
-  bulkUpdateStatus: (projectIds: string[], status: ProjectStatus) => Promise<void>;
+  bulkUpdateStatus: (
+    projectIds: string[],
+    status: ProjectStatus
+  ) => Promise<void>;
   bulkDelete: (projectIds: string[]) => Promise<void>;
   bulkArchive: (projectIds: string[]) => Promise<void>;
-  
+
   // Search and filtering
   searchProjects: (query: string) => void;
   filterByStatus: (statuses: ProjectStatus[]) => void;
   filterByDateRange: (start: Date, end: Date) => void;
   filterByTags: (tags: string[]) => void;
-  
+
   // Configuration management
-  updateProjectConfig: (projectId: string, config: Partial<StormConfig>) => Promise<void>;
-  cloneProjectConfig: (sourceProjectId: string, targetProjectId: string) => Promise<void>;
+  updateProjectConfig: (
+    projectId: string,
+    config: Partial<StormConfig>
+  ) => Promise<void>;
+  cloneProjectConfig: (
+    sourceProjectId: string,
+    targetProjectId: string
+  ) => Promise<void>;
   exportProjectConfig: (projectId: string) => StormConfig | undefined;
-  importProjectConfig: (projectId: string, config: StormConfig) => Promise<void>;
-  
+  importProjectConfig: (
+    projectId: string,
+    config: StormConfig
+  ) => Promise<void>;
+
   // State management
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
@@ -98,15 +122,16 @@ export const useProjectStore = create<ProjectStore>()(
           ...initialState,
 
           // Project CRUD operations
-          createProject: async (projectData) => {
+          createProject: async projectData => {
             logger.log('createProject called with:', projectData);
-            set((draft) => {
+            set(draft => {
               draft.loading = true;
               draft.error = null;
             });
 
             try {
-              const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+              const apiUrl =
+                process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
               // Only send fields the backend expects
               const requestData = {
                 title: projectData.title,
@@ -115,7 +140,7 @@ export const useProjectStore = create<ProjectStore>()(
               };
               logger.log('Sending request to:', `${apiUrl}/projects/`);
               logger.log('Request data:', requestData);
-              
+
               const response = await fetch(`${apiUrl}/projects/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -133,23 +158,23 @@ export const useProjectStore = create<ProjectStore>()(
 
               const responseData = await response.json();
               logger.log('API Response:', responseData);
-              
+
               // Validate response
               if (!responseData || typeof responseData !== 'object') {
                 logger.error('Invalid response data:', responseData);
                 throw new Error('Invalid response from server');
               }
-              
+
               if (!responseData.id) {
                 logger.error('Response missing ID:', responseData);
                 throw new Error('Server response missing project ID');
               }
-              
+
               const newProject: StormProject = responseData;
               logger.log('New project object:', newProject);
               logger.log('Project ID:', newProject?.id);
 
-              set((draft) => {
+              set(draft => {
                 // Ensure projects array exists
                 if (!draft.projects) {
                   draft.projects = [];
@@ -168,14 +193,17 @@ export const useProjectStore = create<ProjectStore>()(
               if (newProject.id) {
                 get().addToRecentProjects(newProject.id);
               }
-              
+
               logger.log('About to return project:', newProject);
               logger.log('Return value is:', newProject);
               return newProject;
             } catch (error) {
               logger.error('Error in createProject:', error);
-              set((draft) => {
-                draft.error = error instanceof Error ? error.message : 'Failed to create project';
+              set(draft => {
+                draft.error =
+                  error instanceof Error
+                    ? error.message
+                    : 'Failed to create project';
                 draft.loading = false;
               });
               throw error;
@@ -183,13 +211,14 @@ export const useProjectStore = create<ProjectStore>()(
           },
 
           updateProject: async (projectId, updates) => {
-            set((draft) => {
+            set(draft => {
               draft.loading = true;
               draft.error = null;
             });
 
             try {
-              const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+              const apiUrl =
+                process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
               const response = await fetch(`${apiUrl}/projects/${projectId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
@@ -202,7 +231,7 @@ export const useProjectStore = create<ProjectStore>()(
 
               const updatedProject: StormProject = await response.json();
 
-              set((draft) => {
+              set(draft => {
                 const index = draft.projects.findIndex(p => p.id === projectId);
                 if (index !== -1) {
                   draft.projects[index] = updatedProject;
@@ -214,22 +243,26 @@ export const useProjectStore = create<ProjectStore>()(
                 draft.lastUpdated = new Date();
               });
             } catch (error) {
-              set((draft) => {
-                draft.error = error instanceof Error ? error.message : 'Failed to update project';
+              set(draft => {
+                draft.error =
+                  error instanceof Error
+                    ? error.message
+                    : 'Failed to update project';
                 draft.loading = false;
               });
               throw error;
             }
           },
 
-          deleteProject: async (projectId) => {
-            set((draft) => {
+          deleteProject: async projectId => {
+            set(draft => {
               draft.loading = true;
               draft.error = null;
             });
 
             try {
-              const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+              const apiUrl =
+                process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
               const response = await fetch(`${apiUrl}/projects/${projectId}`, {
                 method: 'DELETE',
               });
@@ -238,10 +271,14 @@ export const useProjectStore = create<ProjectStore>()(
                 throw new Error('Failed to delete project');
               }
 
-              set((draft) => {
+              set(draft => {
                 draft.projects = draft.projects.filter(p => p.id !== projectId);
-                draft.selectedProjects = draft.selectedProjects.filter(id => id !== projectId);
-                draft.recentProjects = draft.recentProjects.filter(id => id !== projectId);
+                draft.selectedProjects = draft.selectedProjects.filter(
+                  id => id !== projectId
+                );
+                draft.recentProjects = draft.recentProjects.filter(
+                  id => id !== projectId
+                );
                 if (draft.currentProject?.id === projectId) {
                   draft.currentProject = null;
                 }
@@ -250,35 +287,44 @@ export const useProjectStore = create<ProjectStore>()(
                 draft.lastUpdated = new Date();
               });
             } catch (error) {
-              set((draft) => {
-                draft.error = error instanceof Error ? error.message : 'Failed to delete project';
+              set(draft => {
+                draft.error =
+                  error instanceof Error
+                    ? error.message
+                    : 'Failed to delete project';
                 draft.loading = false;
               });
               throw error;
             }
           },
 
-          duplicateProject: async (project) => {
+          duplicateProject: async project => {
             try {
-              const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-              
-              const response = await fetch(`${apiUrl}/projects/${project.id}/duplicate`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  new_title: `${project.title} (Copy)`,
-                }),
-              });
+              const apiUrl =
+                process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+
+              const response = await fetch(
+                `${apiUrl}/projects/${project.id}/duplicate`,
+                {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    new_title: `${project.title} (Copy)`,
+                  }),
+                }
+              );
 
               if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.detail || 'Failed to duplicate project');
+                throw new Error(
+                  errorData.detail || 'Failed to duplicate project'
+                );
               }
 
               const duplicatedProject = await response.json();
-              
+
               // Add the duplicated project to the list
-              set((draft) => {
+              set(draft => {
                 draft.projects.unshift(duplicatedProject);
                 draft.lastUpdated = new Date();
               });
@@ -286,24 +332,27 @@ export const useProjectStore = create<ProjectStore>()(
               return duplicatedProject;
             } catch (error) {
               logger.error('Error duplicating project:', error);
-              set((draft) => {
-                draft.error = error instanceof Error ? error.message : 'Failed to duplicate project';
+              set(draft => {
+                draft.error =
+                  error instanceof Error
+                    ? error.message
+                    : 'Failed to duplicate project';
               });
               throw error;
             }
           },
 
-          archiveProject: async (projectId) => {
+          archiveProject: async projectId => {
             await get().updateProject(projectId, { status: 'completed' });
           },
 
-          restoreProject: async (projectId) => {
+          restoreProject: async projectId => {
             await get().updateProject(projectId, { status: 'draft' });
           },
 
           // Project loading
           loadProjects: async (filters, page = 1, limit = 100) => {
-            set((draft) => {
+            set(draft => {
               draft.loading = true;
               draft.error = null;
             });
@@ -320,31 +369,43 @@ export const useProjectStore = create<ProjectStore>()(
                 queryParams.append('search', filters.searchQuery);
               }
               if (filters?.status) {
-                filters.status.forEach(status => queryParams.append('status', status));
+                filters.status.forEach(status =>
+                  queryParams.append('status', status)
+                );
               }
               if (filters?.dateRange) {
-                queryParams.append('startDate', filters.dateRange.start.toISOString());
-                queryParams.append('endDate', filters.dateRange.end.toISOString());
+                queryParams.append(
+                  'startDate',
+                  filters.dateRange.start.toISOString()
+                );
+                queryParams.append(
+                  'endDate',
+                  filters.dateRange.end.toISOString()
+                );
               }
 
-              const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-              const response = await fetch(`${apiUrl}/projects/?${queryParams}`);
+              const apiUrl =
+                process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+              const response = await fetch(
+                `${apiUrl}/projects/?${queryParams}`
+              );
 
               if (!response.ok) {
                 throw new Error('Failed to load projects');
               }
 
               const data = await response.json();
-              
+
               // Map backend config to frontend format for each project
               if (data.projects) {
                 data.projects = data.projects.map((project: any) => {
                   if (project.config) {
                     // Check if config is already in frontend format (has nested structure)
-                    const isBackendFormat = project.config.llm_provider !== undefined || 
-                                           project.config.max_perspective !== undefined ||
-                                           project.config.max_conv_turn !== undefined;
-                    
+                    const isBackendFormat =
+                      project.config.llm_provider !== undefined ||
+                      project.config.max_perspective !== undefined ||
+                      project.config.max_conv_turn !== undefined;
+
                     if (isBackendFormat) {
                       // Map from backend snake_case to frontend camelCase nested structure
                       project.config = {
@@ -355,24 +416,34 @@ export const useProjectStore = create<ProjectStore>()(
                           temperature: project.config.temperature || 0.7,
                           maxTokens: project.config.max_tokens || 4000,
                         },
-                        retriever: (!project.config.retriever || project.config.retriever === null) ? {
-                          type: project.config.retriever_type || 'tavily',
-                          maxResults: project.config.max_search_results || 10,
-                          topK: project.config.search_top_k || 3,
-                        } : project.config.retriever,
+                        retriever:
+                          !project.config.retriever ||
+                          project.config.retriever === null
+                            ? {
+                                type: project.config.retriever_type || 'tavily',
+                                maxResults:
+                                  project.config.max_search_results || 10,
+                                topK: project.config.search_top_k || 3,
+                              }
+                            : project.config.retriever,
                         pipeline: project.config.pipeline || {
                           maxConvTurns: project.config.max_conv_turn || 3,
                           maxPerspectives: project.config.max_perspective || 4,
-                          maxSearchQueriesPerTurn: project.config.max_search_queries_per_turn || 3,
+                          maxSearchQueriesPerTurn:
+                            project.config.max_search_queries_per_turn || 3,
                           doResearch: project.config.do_research !== false,
-                          doGenerateOutline: project.config.do_generate_outline !== false,
-                          doGenerateArticle: project.config.do_generate_article !== false,
-                          doPolishArticle: project.config.do_polish_article !== false,
+                          doGenerateOutline:
+                            project.config.do_generate_outline !== false,
+                          doGenerateArticle:
+                            project.config.do_generate_article !== false,
+                          doPolishArticle:
+                            project.config.do_polish_article !== false,
                         },
                         output: project.config.output || {
                           format: project.config.output_format || 'markdown',
-                          includeCitations: project.config.include_citations !== false,
-                        }
+                          includeCitations:
+                            project.config.include_citations !== false,
+                        },
                       };
                     }
                     // If already in frontend format, keep it as is
@@ -381,7 +452,7 @@ export const useProjectStore = create<ProjectStore>()(
                 });
               }
 
-              set((draft) => {
+              set(draft => {
                 draft.projects = data.projects;
                 draft.pagination = {
                   page: data.page,
@@ -392,17 +463,21 @@ export const useProjectStore = create<ProjectStore>()(
                 draft.lastUpdated = new Date();
               });
             } catch (error) {
-              set((draft) => {
-                draft.error = error instanceof Error ? error.message : 'Failed to load projects';
+              set(draft => {
+                draft.error =
+                  error instanceof Error
+                    ? error.message
+                    : 'Failed to load projects';
                 draft.loading = false;
               });
               throw error;
             }
           },
 
-          loadProject: async (projectId) => {
+          loadProject: async projectId => {
             try {
-              const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+              const apiUrl =
+                process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
               const response = await fetch(`${apiUrl}/projects/${projectId}`);
 
               if (!response.ok) {
@@ -410,48 +485,73 @@ export const useProjectStore = create<ProjectStore>()(
               }
 
               const project: StormProject = await response.json();
-              
+
               // Map backend config to frontend format if config exists
               if (project.config) {
                 // Check if config is already in frontend format (has nested structure)
-                const isBackendFormat = project.config.llm_provider !== undefined || 
-                                       project.config.max_perspective !== undefined ||
-                                       project.config.max_conv_turn !== undefined;
-                
+                const isBackendFormat =
+                  project.config.llm_provider !== undefined ||
+                  project.config.max_perspective !== undefined ||
+                  project.config.max_conv_turn !== undefined;
+
                 if (isBackendFormat) {
                   // Map from backend snake_case to frontend camelCase nested structure
                   project.config = {
                     ...project.config,
                     llm: project.config.llm || {
-                      provider: (project.config.llm_provider || 'openai') as 'openai' | 'anthropic' | 'azure' | 'gemini' | 'ollama' | 'groq',
+                      provider: (project.config.llm_provider || 'openai') as
+                        | 'openai'
+                        | 'anthropic'
+                        | 'azure'
+                        | 'gemini'
+                        | 'ollama'
+                        | 'groq',
                       model: project.config.llm_model || 'gpt-4o',
                       temperature: project.config.temperature || 0.7,
                       maxTokens: project.config.max_tokens || 4000,
                     },
-                    retriever: (!project.config.retriever || project.config.retriever === null) ? {
-                      type: (project.config.retriever_type || 'tavily') as 'google' | 'bing' | 'you' | 'duckduckgo' | 'tavily' | 'serper' | 'brave' | 'vector',
-                      maxResults: project.config.max_search_results || 10,
-                      topK: project.config.search_top_k || 3,
-                    } : project.config.retriever,
+                    retriever:
+                      !project.config.retriever ||
+                      project.config.retriever === null
+                        ? {
+                            type: (project.config.retriever_type ||
+                              'tavily') as
+                              | 'google'
+                              | 'bing'
+                              | 'you'
+                              | 'duckduckgo'
+                              | 'tavily'
+                              | 'serper'
+                              | 'brave'
+                              | 'vector',
+                            maxResults: project.config.max_search_results || 10,
+                            topK: project.config.search_top_k || 3,
+                          }
+                        : project.config.retriever,
                     pipeline: project.config.pipeline || {
                       maxConvTurns: project.config.max_conv_turn || 3,
                       maxPerspectives: project.config.max_perspective || 4,
-                      maxSearchQueriesPerTurn: project.config.max_search_queries_per_turn || 3,
+                      maxSearchQueriesPerTurn:
+                        project.config.max_search_queries_per_turn || 3,
                       doResearch: project.config.do_research !== false,
-                      doGenerateOutline: project.config.do_generate_outline !== false,
-                      doGenerateArticle: project.config.do_generate_article !== false,
-                      doPolishArticle: project.config.do_polish_article !== false,
+                      doGenerateOutline:
+                        project.config.do_generate_outline !== false,
+                      doGenerateArticle:
+                        project.config.do_generate_article !== false,
+                      doPolishArticle:
+                        project.config.do_polish_article !== false,
                     },
                     output: project.config.output || {
                       format: project.config.output_format || 'markdown',
-                      includeCitations: project.config.include_citations !== false,
-                    }
+                      includeCitations:
+                        project.config.include_citations !== false,
+                    },
                   };
                 }
                 // If already in frontend format, keep it as is
               }
 
-              set((draft) => {
+              set(draft => {
                 const index = draft.projects.findIndex(p => p.id === projectId);
                 if (index !== -1) {
                   draft.projects[index] = project;
@@ -465,8 +565,11 @@ export const useProjectStore = create<ProjectStore>()(
               get().addToRecentProjects(projectId);
               return project;
             } catch (error) {
-              set((draft) => {
-                draft.error = error instanceof Error ? error.message : 'Failed to load project';
+              set(draft => {
+                draft.error =
+                  error instanceof Error
+                    ? error.message
+                    : 'Failed to load project';
               });
               throw error;
             }
@@ -474,16 +577,22 @@ export const useProjectStore = create<ProjectStore>()(
 
           refreshProjects: async () => {
             const { filters, pagination } = get();
-            await get().loadProjects(filters, pagination.page, pagination.limit);
+            await get().loadProjects(
+              filters,
+              pagination.page,
+              pagination.limit
+            );
           },
 
           // Project selection and navigation
-          setCurrentProject: (project) => {
-            set((draft) => {
+          setCurrentProject: project => {
+            set(draft => {
               draft.currentProject = project;
               if (project) {
                 // Also update the project in the projects array
-                const index = draft.projects.findIndex(p => p.id === project.id);
+                const index = draft.projects.findIndex(
+                  p => p.id === project.id
+                );
                 if (index !== -1) {
                   draft.projects[index] = project;
                 }
@@ -493,7 +602,7 @@ export const useProjectStore = create<ProjectStore>()(
           },
 
           selectProject: (projectId, multiSelect = false) => {
-            set((draft) => {
+            set(draft => {
               if (multiSelect) {
                 if (!draft.selectedProjects.includes(projectId)) {
                   draft.selectedProjects.push(projectId);
@@ -504,20 +613,22 @@ export const useProjectStore = create<ProjectStore>()(
             });
           },
 
-          deselectProject: (projectId) => {
-            set((draft) => {
-              draft.selectedProjects = draft.selectedProjects.filter(id => id !== projectId);
+          deselectProject: projectId => {
+            set(draft => {
+              draft.selectedProjects = draft.selectedProjects.filter(
+                id => id !== projectId
+              );
             });
           },
 
           selectAllProjects: () => {
-            set((draft) => {
+            set(draft => {
               draft.selectedProjects = draft.projects.map(p => p.id);
             });
           },
 
           deselectAllProjects: () => {
-            set((draft) => {
+            set(draft => {
               draft.selectedProjects = [];
             });
           },
@@ -541,64 +652,65 @@ export const useProjectStore = create<ProjectStore>()(
             return get().loadProject(projectId);
           },
 
-          addToRecentProjects: (projectId) => {
-            set((draft) => {
+          addToRecentProjects: projectId => {
+            set(draft => {
               draft.recentProjects = [
                 projectId,
-                ...draft.recentProjects.filter(id => id !== projectId)
+                ...draft.recentProjects.filter(id => id !== projectId),
               ].slice(0, 10); // Keep only last 10
             });
           },
 
           // Filtering and sorting
-          setFilters: (filters) => {
-            set((draft) => {
+          setFilters: filters => {
+            set(draft => {
               Object.assign(draft.filters, filters);
               draft.pagination.page = 1; // Reset to first page
             });
-            
+
             get().loadProjects(get().filters);
           },
 
           clearFilters: () => {
-            set((draft) => {
+            set(draft => {
               draft.filters = { searchQuery: '' };
               draft.pagination.page = 1;
             });
-            
+
             get().loadProjects();
           },
 
           setSortBy: (field, order = 'desc') => {
-            set((draft) => {
+            set(draft => {
               draft.sortBy = field;
               draft.sortOrder = order;
               draft.pagination.page = 1;
             });
-            
+
             get().loadProjects(get().filters);
           },
 
           setPagination: (page, limit) => {
-            set((draft) => {
+            set(draft => {
               draft.pagination.page = page;
               if (limit) {
                 draft.pagination.limit = limit;
               }
             });
-            
+
             get().loadProjects(get().filters, page, limit);
           },
 
           // Batch operations
           bulkUpdateStatus: async (projectIds, status) => {
-            set((draft) => {
+            set(draft => {
               draft.loading = true;
               draft.error = null;
             });
 
             try {
-              const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+              const apiUrl =
+                process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
               const response = await fetch(`${apiUrl}/projects/bulk-update`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
@@ -609,7 +721,7 @@ export const useProjectStore = create<ProjectStore>()(
                 throw new Error('Failed to update projects');
               }
 
-              set((draft) => {
+              set(draft => {
                 draft.projects = draft.projects.map(project =>
                   projectIds.includes(project.id)
                     ? { ...project, status, updatedAt: new Date() }
@@ -620,22 +732,26 @@ export const useProjectStore = create<ProjectStore>()(
                 draft.lastUpdated = new Date();
               });
             } catch (error) {
-              set((draft) => {
-                draft.error = error instanceof Error ? error.message : 'Failed to update projects';
+              set(draft => {
+                draft.error =
+                  error instanceof Error
+                    ? error.message
+                    : 'Failed to update projects';
                 draft.loading = false;
               });
               throw error;
             }
           },
 
-          bulkDelete: async (projectIds) => {
-            set((draft) => {
+          bulkDelete: async projectIds => {
+            set(draft => {
               draft.loading = true;
               draft.error = null;
             });
 
             try {
-              const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+              const apiUrl =
+                process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
               const response = await fetch(`${apiUrl}/projects/bulk-delete`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
@@ -646,11 +762,18 @@ export const useProjectStore = create<ProjectStore>()(
                 throw new Error('Failed to delete projects');
               }
 
-              set((draft) => {
-                draft.projects = draft.projects.filter(p => !projectIds.includes(p.id));
+              set(draft => {
+                draft.projects = draft.projects.filter(
+                  p => !projectIds.includes(p.id)
+                );
                 draft.selectedProjects = [];
-                draft.recentProjects = draft.recentProjects.filter(id => !projectIds.includes(id));
-                if (draft.currentProject && projectIds.includes(draft.currentProject.id)) {
+                draft.recentProjects = draft.recentProjects.filter(
+                  id => !projectIds.includes(id)
+                );
+                if (
+                  draft.currentProject &&
+                  projectIds.includes(draft.currentProject.id)
+                ) {
                   draft.currentProject = null;
                 }
                 draft.pagination.total -= projectIds.length;
@@ -658,24 +781,27 @@ export const useProjectStore = create<ProjectStore>()(
                 draft.lastUpdated = new Date();
               });
             } catch (error) {
-              set((draft) => {
-                draft.error = error instanceof Error ? error.message : 'Failed to delete projects';
+              set(draft => {
+                draft.error =
+                  error instanceof Error
+                    ? error.message
+                    : 'Failed to delete projects';
                 draft.loading = false;
               });
               throw error;
             }
           },
 
-          bulkArchive: async (projectIds) => {
+          bulkArchive: async projectIds => {
             await get().bulkUpdateStatus(projectIds, 'completed');
           },
 
           // Search and filtering
-          searchProjects: (query) => {
+          searchProjects: query => {
             get().setFilters({ searchQuery: query });
           },
 
-          filterByStatus: (statuses) => {
+          filterByStatus: statuses => {
             get().setFilters({ status: statuses });
           },
 
@@ -683,7 +809,7 @@ export const useProjectStore = create<ProjectStore>()(
             get().setFilters({ dateRange: { start, end } });
           },
 
-          filterByTags: (tags) => {
+          filterByTags: tags => {
             get().setFilters({ tags });
           },
 
@@ -695,8 +821,9 @@ export const useProjectStore = create<ProjectStore>()(
             }
 
             try {
-              const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-              
+              const apiUrl =
+                process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+
               // Config from ConfigurationPanel has frontend structure
               // Map directly from the frontend config to backend format
               // Note: API keys are not stored in project config on backend
@@ -704,7 +831,8 @@ export const useProjectStore = create<ProjectStore>()(
                 // Map pipeline fields from camelCase to snake_case
                 max_conv_turn: config.pipeline?.maxConvTurns ?? 3,
                 max_perspective: config.pipeline?.maxPerspectives ?? 4,
-                max_search_queries_per_turn: config.pipeline?.maxSearchQueriesPerTurn ?? 3,
+                max_search_queries_per_turn:
+                  config.pipeline?.maxSearchQueriesPerTurn ?? 3,
                 // Map other fields
                 llm_provider: config.llm?.provider ?? 'openai',
                 llm_model: config.llm?.model ?? 'gpt-4o',
@@ -722,26 +850,29 @@ export const useProjectStore = create<ProjectStore>()(
                 output_format: config.output?.format ?? 'markdown',
                 include_citations: config.output?.includeCitations ?? true,
               };
-              
+
               logger.log('Saving configuration to backend:', {
                 max_conv_turn: backendConfig.max_conv_turn,
                 max_perspective: backendConfig.max_perspective,
                 llm_provider: backendConfig.llm_provider,
-                retriever_type: backendConfig.retriever_type
+                retriever_type: backendConfig.retriever_type,
               });
-              
-              const response = await fetch(`${apiUrl}/projects/${projectId}/config`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(backendConfig),
-              });
+
+              const response = await fetch(
+                `${apiUrl}/projects/${projectId}/config`,
+                {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(backendConfig),
+                }
+              );
 
               if (!response.ok) {
                 throw new Error('Failed to update project configuration');
               }
 
               // Update local state with the frontend config structure
-              set((draft) => {
+              set(draft => {
                 const index = draft.projects.findIndex(p => p.id === projectId);
                 if (index !== -1) {
                   draft.projects[index].config = config;
@@ -750,7 +881,7 @@ export const useProjectStore = create<ProjectStore>()(
                   draft.currentProject.config = config;
                 }
               });
-              
+
               // Reload the project to ensure we have the latest data
               await get().loadProject(projectId);
             } catch (error) {
@@ -759,15 +890,19 @@ export const useProjectStore = create<ProjectStore>()(
           },
 
           cloneProjectConfig: async (sourceProjectId, targetProjectId) => {
-            const sourceProject = get().projects.find(p => p.id === sourceProjectId);
+            const sourceProject = get().projects.find(
+              p => p.id === sourceProjectId
+            );
             if (!sourceProject) {
               throw new Error('Source project not found');
             }
 
-            await get().updateProject(targetProjectId, { config: sourceProject.config });
+            await get().updateProject(targetProjectId, {
+              config: sourceProject.config,
+            });
           },
 
-          exportProjectConfig: (projectId) => {
+          exportProjectConfig: projectId => {
             const project = get().projects.find(p => p.id === projectId);
             if (!project) {
               throw new Error('Project not found');
@@ -780,26 +915,26 @@ export const useProjectStore = create<ProjectStore>()(
           },
 
           // State management
-          setLoading: (loading) => {
-            set((draft) => {
+          setLoading: loading => {
+            set(draft => {
               draft.loading = loading;
             });
           },
 
-          setError: (error) => {
-            set((draft) => {
+          setError: error => {
+            set(draft => {
               draft.error = error;
             });
           },
 
           clearError: () => {
-            set((draft) => {
+            set(draft => {
               draft.error = null;
             });
           },
 
           reset: () => {
-            set((draft) => {
+            set(draft => {
               Object.assign(draft, initialState);
             });
           },
@@ -832,7 +967,7 @@ export const projectSelectors = {
   pagination: (state: ProjectStore) => state.pagination,
   isLoading: (state: ProjectStore) => state.loading,
   error: (state: ProjectStore) => state.error,
-  selectedProjectsData: (state: ProjectStore) => 
+  selectedProjectsData: (state: ProjectStore) =>
     state.projects.filter(p => state.selectedProjects.includes(p.id)),
   recentProjectsData: (state: ProjectStore) =>
     state.recentProjects
@@ -840,20 +975,21 @@ export const projectSelectors = {
       .filter(Boolean) as StormProject[],
   filteredProjects: (state: ProjectStore) => {
     let filtered = state.projects;
-    
+
     if (state.filters.searchQuery) {
       const query = state.filters.searchQuery.toLowerCase();
-      filtered = filtered.filter(p =>
-        p.title.toLowerCase().includes(query) ||
-        p.topic.toLowerCase().includes(query) ||
-        p.description?.toLowerCase().includes(query)
+      filtered = filtered.filter(
+        p =>
+          p.title.toLowerCase().includes(query) ||
+          p.topic.toLowerCase().includes(query) ||
+          p.description?.toLowerCase().includes(query)
       );
     }
-    
+
     if (state.filters.status && state.filters.status.length > 0) {
       filtered = filtered.filter(p => state.filters.status!.includes(p.status));
     }
-    
+
     return filtered;
   },
 };
@@ -867,10 +1003,15 @@ export const useProjects = () => {
   };
 };
 
-export const useCurrentProject = () => useProjectStore(projectSelectors.currentProject);
+export const useCurrentProject = () =>
+  useProjectStore(projectSelectors.currentProject);
 export const useProjectsList = () => useProjectStore(projectSelectors.projects);
-export const useSelectedProjects = () => useProjectStore(projectSelectors.selectedProjectsData);
-export const useRecentProjects = () => useProjectStore(projectSelectors.recentProjectsData);
-export const useProjectFilters = () => useProjectStore(projectSelectors.filters);
-export const useProjectLoading = () => useProjectStore(projectSelectors.isLoading);
+export const useSelectedProjects = () =>
+  useProjectStore(projectSelectors.selectedProjectsData);
+export const useRecentProjects = () =>
+  useProjectStore(projectSelectors.recentProjectsData);
+export const useProjectFilters = () =>
+  useProjectStore(projectSelectors.filters);
+export const useProjectLoading = () =>
+  useProjectStore(projectSelectors.isLoading);
 export const useProjectError = () => useProjectStore(projectSelectors.error);

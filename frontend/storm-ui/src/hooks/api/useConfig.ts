@@ -1,6 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { configService } from '../../services/config';
-import { StormConfig, ConfigTemplate, LLMModel, RetrieverInfo } from '../../types/api';
+import {
+  StormConfig,
+  ConfigTemplate,
+  LLMModel,
+  RetrieverInfo,
+} from '../../types/api';
 import { useToast } from '../useToast';
 
 export function useConfig() {
@@ -56,60 +61,73 @@ export function useConfig() {
     }
   }, []);
 
-  const validateConfig = useCallback(async (config: StormConfig) => {
-    setLoading(true);
-    try {
-      const response = await configService.validateConfig({ config });
-      return response.data;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Validation failed';
-      setError(errorMessage);
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, [toast]);
+  const validateConfig = useCallback(
+    async (config: StormConfig) => {
+      setLoading(true);
+      try {
+        const response = await configService.validateConfig({ config });
+        return response.data;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Validation failed';
+        setError(errorMessage);
+        toast({
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [toast]
+  );
 
-  const testLlmConfig = useCallback(async (llmConfig: StormConfig['llm']) => {
-    setLoading(true);
-    try {
-      const response = await configService.testLLMConfig(llmConfig);
-      return response.data;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'LLM test failed';
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, [toast]);
+  const testLlmConfig = useCallback(
+    async (llmConfig: StormConfig['llm']) => {
+      setLoading(true);
+      try {
+        const response = await configService.testLLMConfig(llmConfig);
+        return response.data;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'LLM test failed';
+        toast({
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [toast]
+  );
 
-  const testRetrieverConfig = useCallback(async (retrieverConfig: StormConfig['retriever']) => {
-    setLoading(true);
-    try {
-      const response = await configService.testRetrieverConfig(retrieverConfig);
-      return response.data;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Retriever test failed';
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, [toast]);
+  const testRetrieverConfig = useCallback(
+    async (retrieverConfig: StormConfig['retriever']) => {
+      setLoading(true);
+      try {
+        const response =
+          await configService.testRetrieverConfig(retrieverConfig);
+        return response.data;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Retriever test failed';
+        toast({
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [toast]
+  );
 
   useEffect(() => {
     fetchTemplates();

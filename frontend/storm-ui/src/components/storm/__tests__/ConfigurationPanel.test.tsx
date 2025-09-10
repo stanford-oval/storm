@@ -160,7 +160,9 @@ describe('ConfigurationPanel', () => {
       );
 
       const apiKeyInput = screen.getByLabelText(/api key/i);
-      const toggleButton = screen.getByRole('button', { name: /toggle api key visibility/i });
+      const toggleButton = screen.getByRole('button', {
+        name: /toggle api key visibility/i,
+      });
 
       expect(apiKeyInput).toHaveAttribute('type', 'password');
 
@@ -415,7 +417,9 @@ describe('ConfigurationPanel', () => {
         />
       );
 
-      const resetButton = screen.getByRole('button', { name: /reset to defaults/i });
+      const resetButton = screen.getByRole('button', {
+        name: /reset to defaults/i,
+      });
       await user.click(resetButton);
 
       expect(mockOnChange).toHaveBeenCalledWith({
@@ -449,15 +453,19 @@ describe('ConfigurationPanel', () => {
         />
       );
 
-      const importButton = screen.getByRole('button', { name: /import config/i });
+      const importButton = screen.getByRole('button', {
+        name: /import config/i,
+      });
       const fileInput = screen.getByLabelText(/import configuration file/i);
 
       const file = new File(
-        [JSON.stringify({ 
-          llm: { model: 'gpt-3.5-turbo', provider: 'openai' },
-          retriever: { type: 'you' },
-          pipeline: { doResearch: false }
-        })],
+        [
+          JSON.stringify({
+            llm: { model: 'gpt-3.5-turbo', provider: 'openai' },
+            retriever: { type: 'you' },
+            pipeline: { doResearch: false },
+          }),
+        ],
         'config.json',
         { type: 'application/json' }
       );
@@ -486,7 +494,9 @@ describe('ConfigurationPanel', () => {
         />
       );
 
-      const exportButton = screen.getByRole('button', { name: /export config/i });
+      const exportButton = screen.getByRole('button', {
+        name: /export config/i,
+      });
       await user.click(exportButton);
 
       expect(global.URL.createObjectURL).toHaveBeenCalled();
@@ -532,7 +542,9 @@ describe('ConfigurationPanel', () => {
       const saveButton = screen.getByRole('button', { name: /save/i });
       await user.click(saveButton);
 
-      expect(screen.getByText(/temperature must be between 0 and 1/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/temperature must be between 0 and 1/i)
+      ).toBeInTheDocument();
       expect(mockOnSave).not.toHaveBeenCalled();
     });
 
@@ -574,7 +586,9 @@ describe('ConfigurationPanel', () => {
       const saveButton = screen.getByRole('button', { name: /save/i });
       await user.click(saveButton);
 
-      expect(screen.getByText(/must be a positive number/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/must be a positive number/i)
+      ).toBeInTheDocument();
       expect(mockOnSave).not.toHaveBeenCalled();
     });
   });
@@ -717,8 +731,12 @@ describe('ConfigurationPanel', () => {
         />
       );
 
-      expect(screen.getByText(/controls randomness of responses/i)).toBeInTheDocument();
-      expect(screen.getByText(/maximum tokens in response/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/controls randomness of responses/i)
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/maximum tokens in response/i)
+      ).toBeInTheDocument();
       expect(screen.getByText(/number of search results/i)).toBeInTheDocument();
     });
   });
@@ -795,7 +813,9 @@ describe('ConfigurationPanel', () => {
 
       await user.upload(fileInput, invalidFile);
 
-      expect(screen.getByText(/invalid configuration file/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/invalid configuration file/i)
+      ).toBeInTheDocument();
       expect(mockOnChange).not.toHaveBeenCalled();
     });
 
@@ -816,7 +836,9 @@ describe('ConfigurationPanel', () => {
       const saveButton = screen.getByRole('button', { name: /save/i });
       await user.click(saveButton);
 
-      expect(screen.getByText(/failed to save configuration/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/failed to save configuration/i)
+      ).toBeInTheDocument();
     });
   });
 });

@@ -37,7 +37,7 @@ export const DebugConsole: React.FC = () => {
     setFilter,
     exportLogs,
   } = useDebugStore();
-  
+
   const filteredLogs = useFilteredLogs();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [isMinimized, setIsMinimized] = React.useState(false);
@@ -46,7 +46,9 @@ export const DebugConsole: React.FC = () => {
   // Auto-scroll to bottom when new logs arrive
   useEffect(() => {
     if (autoScroll && scrollAreaRef.current) {
-      const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      const scrollContainer = scrollAreaRef.current.querySelector(
+        '[data-radix-scroll-area-viewport]'
+      );
       if (scrollContainer) {
         scrollContainer.scrollTop = scrollContainer.scrollHeight;
       }
@@ -90,7 +92,9 @@ export const DebugConsole: React.FC = () => {
     }
   };
 
-  const getLevelBadgeVariant = (level: string): "default" | "secondary" | "destructive" | "outline" => {
+  const getLevelBadgeVariant = (
+    level: string
+  ): 'default' | 'secondary' | 'destructive' | 'outline' => {
     switch (level) {
       case 'error':
         return 'destructive';
@@ -106,22 +110,22 @@ export const DebugConsole: React.FC = () => {
   return (
     <Card
       className={cn(
-        'fixed bottom-0 right-0 z-50 flex flex-col shadow-2xl border-t-2',
+        'fixed bottom-0 right-0 z-50 flex flex-col border-t-2 shadow-2xl',
         'transition-all duration-300 ease-in-out',
         isMinimized ? 'h-12 w-96' : 'h-96 w-[600px]',
         'bg-background/95 backdrop-blur-sm'
       )}
     >
       {/* Header */}
-      <div className="flex items-center justify-between p-2 border-b bg-muted/50">
+      <div className="flex items-center justify-between border-b bg-muted/50 p-2">
         <div className="flex items-center gap-2">
           <Terminal className="h-4 w-4" />
-          <span className="font-semibold text-sm">Debug Console</span>
+          <span className="text-sm font-semibold">Debug Console</span>
           <Badge variant="secondary" className="text-xs">
             {filteredLogs.length} logs
           </Badge>
         </div>
-        
+
         <div className="flex items-center gap-1">
           {/* Filter dropdown */}
           <DropdownMenu>
@@ -133,11 +137,11 @@ export const DebugConsole: React.FC = () => {
             <DropdownMenuContent align="end">
               <DropdownMenuCheckboxItem
                 checked={filter.level.includes('log')}
-                onCheckedChange={(checked) => {
+                onCheckedChange={checked => {
                   setFilter({
                     level: checked
                       ? [...filter.level, 'log']
-                      : filter.level.filter(l => l !== 'log')
+                      : filter.level.filter(l => l !== 'log'),
                   });
                 }}
               >
@@ -145,11 +149,11 @@ export const DebugConsole: React.FC = () => {
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
                 checked={filter.level.includes('info')}
-                onCheckedChange={(checked) => {
+                onCheckedChange={checked => {
                   setFilter({
                     level: checked
                       ? [...filter.level, 'info']
-                      : filter.level.filter(l => l !== 'info')
+                      : filter.level.filter(l => l !== 'info'),
                   });
                 }}
               >
@@ -157,11 +161,11 @@ export const DebugConsole: React.FC = () => {
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
                 checked={filter.level.includes('warn')}
-                onCheckedChange={(checked) => {
+                onCheckedChange={checked => {
                   setFilter({
                     level: checked
                       ? [...filter.level, 'warn']
-                      : filter.level.filter(l => l !== 'warn')
+                      : filter.level.filter(l => l !== 'warn'),
                   });
                 }}
               >
@@ -169,11 +173,11 @@ export const DebugConsole: React.FC = () => {
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
                 checked={filter.level.includes('error')}
-                onCheckedChange={(checked) => {
+                onCheckedChange={checked => {
                   setFilter({
                     level: checked
                       ? [...filter.level, 'error']
-                      : filter.level.filter(l => l !== 'error')
+                      : filter.level.filter(l => l !== 'error'),
                   });
                 }}
               >
@@ -181,11 +185,11 @@ export const DebugConsole: React.FC = () => {
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
                 checked={filter.level.includes('debug')}
-                onCheckedChange={(checked) => {
+                onCheckedChange={checked => {
                   setFilter({
                     level: checked
                       ? [...filter.level, 'debug']
-                      : filter.level.filter(l => l !== 'debug')
+                      : filter.level.filter(l => l !== 'debug'),
                   });
                 }}
               >
@@ -210,7 +214,7 @@ export const DebugConsole: React.FC = () => {
           >
             <Download className="h-3 w-3" />
           </Button>
-          
+
           <Button
             variant="ghost"
             size="icon"
@@ -220,7 +224,7 @@ export const DebugConsole: React.FC = () => {
           >
             <Trash2 className="h-3 w-3" />
           </Button>
-          
+
           <Button
             variant="ghost"
             size="icon"
@@ -233,7 +237,7 @@ export const DebugConsole: React.FC = () => {
               <ChevronDown className="h-3 w-3" />
             )}
           </Button>
-          
+
           <Button
             variant="ghost"
             size="icon"
@@ -247,14 +251,14 @@ export const DebugConsole: React.FC = () => {
 
       {/* Search bar */}
       {!isMinimized && (
-        <div className="p-2 border-b">
+        <div className="border-b p-2">
           <div className="relative">
-            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
             <Input
               placeholder="Search logs..."
               value={filter.searchQuery}
-              onChange={(e) => setFilter({ searchQuery: e.target.value })}
-              className="pl-8 h-8 text-sm"
+              onChange={e => setFilter({ searchQuery: e.target.value })}
+              className="h-8 pl-8 text-sm"
             />
           </div>
         </div>
@@ -265,16 +269,16 @@ export const DebugConsole: React.FC = () => {
         <ScrollArea className="flex-1 p-2" ref={scrollAreaRef}>
           <div className="space-y-1">
             {filteredLogs.length === 0 ? (
-              <div className="text-center text-muted-foreground text-sm py-8">
+              <div className="py-8 text-center text-sm text-muted-foreground">
                 No logs to display
               </div>
             ) : (
-              filteredLogs.map((log) => (
+              filteredLogs.map(log => (
                 <div
                   key={log.id}
-                  className="group flex items-start gap-2 p-2 rounded hover:bg-muted/50 font-mono text-xs"
+                  className="group flex items-start gap-2 rounded p-2 font-mono text-xs hover:bg-muted/50"
                 >
-                  <span className="text-muted-foreground opacity-50 min-w-[140px]">
+                  <span className="min-w-[140px] text-muted-foreground opacity-50">
                     {log.timestamp.toLocaleTimeString('en-US', {
                       hour12: false,
                       hour: '2-digit',
@@ -283,29 +287,34 @@ export const DebugConsole: React.FC = () => {
                       fractionalSecondDigits: 3,
                     } as any)}
                   </span>
-                  
+
                   <Badge
                     variant={getLevelBadgeVariant(log.level)}
-                    className="min-w-[50px] justify-center text-[10px] h-5"
+                    className="h-5 min-w-[50px] justify-center text-[10px]"
                   >
                     {log.level.toUpperCase()}
                   </Badge>
-                  
+
                   <div className="flex-1 break-all">
-                    <span className={cn('whitespace-pre-wrap', getLevelColor(log.level))}>
+                    <span
+                      className={cn(
+                        'whitespace-pre-wrap',
+                        getLevelColor(log.level)
+                      )}
+                    >
                       {log.message}
                     </span>
                     {log.data && (
-                      <div className="mt-1 p-1 bg-muted rounded text-[10px] text-muted-foreground">
+                      <div className="mt-1 rounded bg-muted p-1 text-[10px] text-muted-foreground">
                         <pre>{JSON.stringify(log.data, null, 2)}</pre>
                       </div>
                     )}
                   </div>
-                  
+
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="h-5 w-5 opacity-0 transition-opacity group-hover:opacity-100"
                     onClick={() => handleCopyLog(log)}
                   >
                     <Copy className="h-3 w-3" />
@@ -323,7 +332,7 @@ export const DebugConsole: React.FC = () => {
 // Debug console toggle button
 export const DebugConsoleToggle: React.FC = () => {
   const { isVisible, toggleVisibility } = useDebugStore();
-  
+
   // Add keyboard shortcut (Ctrl/Cmd + Shift + D)
   React.useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -332,20 +341,20 @@ export const DebugConsoleToggle: React.FC = () => {
         toggleVisibility();
       }
     };
-    
+
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [toggleVisibility]);
-  
+
   if (isVisible) {
     return null; // Console is already visible
   }
-  
+
   return (
     <Button
       variant="outline"
       size="icon"
-      className="fixed bottom-4 right-4 z-50 shadow-lg bg-background border-2"
+      className="fixed bottom-4 right-4 z-50 border-2 bg-background shadow-lg"
       onClick={toggleVisibility}
       title="Open Debug Console (Cmd+Shift+D)"
     >

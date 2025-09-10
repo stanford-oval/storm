@@ -9,6 +9,7 @@ Advanced user experience components for enhanced interaction and accessibility.
 A searchable command palette for quick access to application features.
 
 **Features:**
+
 - Fuzzy search across commands
 - Keyboard navigation
 - Categorized commands
@@ -29,8 +30,8 @@ const customCommands = [
     category: 'creation',
     shortcut: 'cmd+n',
     action: () => createProject(),
-    keywords: ['new', 'create', 'project']
-  }
+    keywords: ['new', 'create', 'project'],
+  },
 ];
 
 function App() {
@@ -38,9 +39,7 @@ function App() {
 
   return (
     <>
-      <button onClick={() => setIsOpen(true)}>
-        Open Command Palette
-      </button>
+      <button onClick={() => setIsOpen(true)}>Open Command Palette</button>
       <CommandPalette
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
@@ -56,6 +55,7 @@ function App() {
 A comprehensive keyboard shortcuts help dialog.
 
 **Features:**
+
 - Categorized shortcuts display
 - Search and filtering
 - Responsive layout
@@ -83,6 +83,7 @@ function App() {
 Interactive onboarding and feature tours.
 
 **Features:**
+
 - Step-by-step guided tours
 - Spotlight highlighting
 - Customizable tour steps
@@ -99,15 +100,15 @@ const tourSteps = [
     id: 'welcome',
     title: 'Welcome',
     content: 'Welcome to our application!',
-    placement: 'center'
+    placement: 'center',
   },
   {
     id: 'feature1',
     title: 'Feature 1',
     content: 'This is an important feature',
     target: '[data-tour="feature1"]',
-    placement: 'bottom'
-  }
+    placement: 'bottom',
+  },
 ];
 
 function App() {
@@ -132,6 +133,7 @@ function App() {
 Comprehensive toast notification system.
 
 **Features:**
+
 - Multiple toast types (success, error, warning, info, loading)
 - Action buttons in toasts
 - Progress indicators
@@ -154,12 +156,8 @@ function App() {
 
 // Use in components
 function MyComponent() {
-  const { 
-    showSuccess, 
-    showError, 
-    showLoading, 
-    showProgress 
-  } = useToastActions();
+  const { showSuccess, showError, showLoading, showProgress } =
+    useToastActions();
 
   const handleSuccess = () => {
     showSuccess('Operation completed successfully!');
@@ -167,16 +165,16 @@ function MyComponent() {
 
   const handleLongProcess = async () => {
     const { updateProgress, complete } = showProgress(
-      'Processing...', 
+      'Processing...',
       'This may take a while'
     );
-    
+
     // Update progress
     for (let i = 0; i <= 100; i += 10) {
       updateProgress(i, `${i}% complete`);
       await new Promise(resolve => setTimeout(resolve, 500));
     }
-    
+
     complete('Process finished!');
   };
 
@@ -194,6 +192,7 @@ function MyComponent() {
 Flexible container with responsive properties.
 
 **Features:**
+
 - Responsive padding, margin, max-width
 - Responsive grid/flex layouts
 - Breakpoint-based styling
@@ -202,12 +201,12 @@ Flexible container with responsive properties.
 **Usage:**
 
 ```tsx
-import { 
-  ResponsiveContainer, 
-  FlexContainer, 
-  GridContainer, 
-  Show, 
-  Hide 
+import {
+  ResponsiveContainer,
+  FlexContainer,
+  GridContainer,
+  Show,
+  Hide,
 } from '@/components/ux/ResponsiveContainer';
 
 function MyComponent() {
@@ -216,11 +215,11 @@ function MyComponent() {
       padding={{
         xs: '1rem',
         md: '2rem',
-        lg: '3rem'
+        lg: '3rem',
       }}
       maxWidth={{
         xs: '100%',
-        lg: '1200px'
+        lg: '1200px',
       }}
       center
     >
@@ -228,11 +227,11 @@ function MyComponent() {
         columns={{
           xs: 1,
           md: 2,
-          lg: 3
+          lg: 3,
         }}
         gap={{
           xs: '1rem',
-          lg: '2rem'
+          lg: '2rem',
         }}
       >
         <div>Item 1</div>

@@ -1,8 +1,14 @@
 // Default keyboard shortcuts configuration
 // Users can override these in their settings
 
-import { 
-  Keyboard, Search, Play, Square, Settings, Download, Upload 
+import {
+  Keyboard,
+  Search,
+  Play,
+  Square,
+  Settings,
+  Download,
+  Upload,
 } from 'lucide-react';
 
 export interface KeyboardShortcut {
@@ -224,18 +230,21 @@ export const platformKeys = {
 };
 
 // Get platform-specific key display
-export function formatShortcutKey(key: string, platform: 'mac' | 'windows' = 'mac'): string {
+export function formatShortcutKey(
+  key: string,
+  platform: 'mac' | 'windows' = 'mac'
+): string {
   const keys = platformKeys[platform];
   let formatted = key;
-  
+
   // Replace key names with symbols/proper names
   Object.entries(keys).forEach(([name, symbol]) => {
     formatted = formatted.replace(new RegExp(name, 'gi'), symbol);
   });
-  
+
   // Format "then" sequences
   formatted = formatted.replace(' then ', ' → ');
-  
+
   return formatted;
 }
 
@@ -252,7 +261,7 @@ export function parseShortcut(shortcut: string): {
   sequence?: string[]; // For "g then h" style shortcuts
 } {
   const normalized = shortcut.toLowerCase();
-  
+
   // Check if it's a sequence shortcut
   if (normalized.includes(' then ')) {
     const parts = normalized.split(' then ');
@@ -262,7 +271,7 @@ export function parseShortcut(shortcut: string): {
       sequence: parts.map(p => p.trim()),
     };
   }
-  
+
   // Parse modifier keys
   const parts = normalized.split('+');
   const modifiers = {
@@ -272,28 +281,35 @@ export function parseShortcut(shortcut: string): {
     shift: parts.includes('shift'),
     meta: parts.includes('cmd') || parts.includes('meta'),
   };
-  
+
   // The last part is the main key
   const key = parts[parts.length - 1];
-  
+
   return { modifiers, key };
 }
 
 // Check if a keyboard event matches a shortcut
-export function matchesShortcut(event: KeyboardEvent, shortcut: string): boolean {
+export function matchesShortcut(
+  event: KeyboardEvent,
+  shortcut: string
+): boolean {
   const parsed = parseShortcut(shortcut);
-  
+
   // For sequence shortcuts, this needs to be handled differently
   if (parsed.sequence) {
     return false; // Sequences are handled separately
   }
-  
+
   const keyMatches = event.key.toLowerCase() === parsed.key;
-  const cmdMatches = parsed.modifiers.cmd ? (event.metaKey || event.ctrlKey) : true;
+  const cmdMatches = parsed.modifiers.cmd
+    ? event.metaKey || event.ctrlKey
+    : true;
   const ctrlMatches = parsed.modifiers.ctrl ? event.ctrlKey : !event.ctrlKey;
   const altMatches = parsed.modifiers.alt ? event.altKey : !event.altKey;
-  const shiftMatches = parsed.modifiers.shift ? event.shiftKey : !event.shiftKey;
-  
+  const shiftMatches = parsed.modifiers.shift
+    ? event.shiftKey
+    : !event.shiftKey;
+
   return keyMatches && cmdMatches && ctrlMatches && altMatches && shiftMatches;
 }
 
@@ -324,14 +340,14 @@ export function hasConflict(shortcut: string): {
     { keys: 'f11', reason: 'Fullscreen' },
     { keys: 'f12', reason: 'DevTools' },
   ];
-  
+
   const normalized = shortcut.toLowerCase();
   const conflict = conflictingShortcuts.find(c => c.keys === normalized);
-  
+
   if (conflict) {
     return { hasConflict: true, reason: conflict.reason };
   }
-  
+
   return { hasConflict: false };
 }
 

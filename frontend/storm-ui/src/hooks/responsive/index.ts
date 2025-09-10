@@ -1,6 +1,6 @@
 // Responsive Hooks
-export { 
-  useBreakpoint, 
+export {
+  useBreakpoint,
   useBreakpointValue,
   useResponsiveColumns,
   useResponsiveSpacing,
@@ -8,6 +8,6 @@ export {
   useResponsiveFontSize,
   useMediaQuery,
   useCommonMediaQueries,
-  breakpoints
+  breakpoints,
 } from './useBreakpoint';
 export type { Breakpoint } from './useBreakpoint';

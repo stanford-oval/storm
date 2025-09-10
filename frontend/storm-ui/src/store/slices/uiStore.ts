@@ -1,7 +1,13 @@
 import { logger } from '@/utils/logger';
 // UI state store slice
 import { create } from 'zustand';
-import { UIState, LayoutConfig, CustomPanel, KeyboardShortcuts, AccessibilitySettings } from '../types';
+import {
+  UIState,
+  LayoutConfig,
+  CustomPanel,
+  KeyboardShortcuts,
+  AccessibilitySettings,
+} from '../types';
 import { persist, createPartialize } from '../middleware/persist';
 import { devtools } from '../middleware/devtools';
 import { immer } from '../middleware/immer';
@@ -33,7 +39,7 @@ const initialState: UIState = {
       'cmd+s': 'saveProject',
       'cmd+z': 'undo',
       'cmd+shift+z': 'redo',
-      'escape': 'closeDialog',
+      escape: 'closeDialog',
     },
     customShortcuts: {},
   },
@@ -54,22 +60,22 @@ interface UIActions {
   setTheme: (theme: 'light' | 'dark' | 'system') => void;
   toggleTheme: () => void;
   getEffectiveTheme: () => 'light' | 'dark';
-  
+
   // Sidebar management
   toggleSidebar: () => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
-  
+
   // Panel management
   setActivePanel: (panelId: string | null) => void;
   togglePanel: (panelId: string) => void;
   resizePanel: (panelId: string, size: number) => void;
-  
+
   // Dialog management
   openDialog: (dialogId: string) => void;
   closeDialog: (dialogId: string) => void;
   closeAllDialogs: () => void;
   isDialogOpen: (dialogId: string) => boolean;
-  
+
   // Layout management
   setLayoutDensity: (density: 'comfortable' | 'compact' | 'cozy') => void;
   updatePanelSizes: (sizes: Partial<Record<string, number>>) => void;
@@ -77,7 +83,7 @@ interface UIActions {
   updateCustomPanel: (panelId: string, updates: Partial<CustomPanel>) => void;
   removeCustomPanel: (panelId: string) => void;
   resetLayout: () => void;
-  
+
   // Keyboard shortcuts
   setKeyboardEnabled: (enabled: boolean) => void;
   updateShortcut: (key: string, action: string) => void;
@@ -87,33 +93,35 @@ interface UIActions {
   setCustomShortcuts: (shortcuts: Record<string, string>) => void;
   resetShortcuts: () => void;
   executeShortcut: (key: string) => void;
-  
+
   // Accessibility
-  updateAccessibilitySettings: (settings: Partial<AccessibilitySettings>) => void;
+  updateAccessibilitySettings: (
+    settings: Partial<AccessibilitySettings>
+  ) => void;
   setReducedMotion: (enabled: boolean) => void;
   setHighContrast: (enabled: boolean) => void;
   setFontSize: (size: 'small' | 'medium' | 'large' | 'xl') => void;
   setScreenReaderMode: (enabled: boolean) => void;
-  
+
   // UI state management
   setFullscreen: (enabled: boolean) => void;
   setFocus: (elementId: string) => void;
   clearFocus: () => void;
-  
+
   // Command palette
   openCommandPalette: () => void;
   closeCommandPalette: () => void;
-  
+
   // Help and tutorials
   showShortcutsHelp: () => void;
   showTutorial: (tutorialId: string) => void;
   completeTutorial: (tutorialId: string) => void;
-  
+
   // State persistence
   saveLayoutPresets: (presetName: string, layout: LayoutConfig) => void;
   loadLayoutPreset: (presetName: string) => void;
   deleteLayoutPreset: (presetName: string) => void;
-  
+
   // State management
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
@@ -137,8 +145,8 @@ export const useUIStore = create<UIStore>()(
           ...initialState,
 
           // Theme management
-          setTheme: (theme) => {
-            set((draft) => {
+          setTheme: theme => {
+            set(draft => {
               draft.theme = theme;
               draft.lastUpdated = new Date();
             });
@@ -152,7 +160,7 @@ export const useUIStore = create<UIStore>()(
           toggleTheme: () => {
             const currentTheme = get().theme;
             let newTheme: 'light' | 'dark' | 'system';
-            
+
             switch (currentTheme) {
               case 'light':
                 newTheme = 'dark';
@@ -164,106 +172,115 @@ export const useUIStore = create<UIStore>()(
                 newTheme = 'light';
                 break;
             }
-            
+
             get().setTheme(newTheme);
           },
 
           getEffectiveTheme: () => {
             const theme = get().theme;
-            
+
             if (theme === 'system') {
               // Check if window is available (client-side)
               if (typeof window !== 'undefined') {
-                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                return window.matchMedia('(prefers-color-scheme: dark)').matches
+                  ? 'dark'
+                  : 'light';
               }
               // Default to light theme on server
               return 'light';
             }
-            
+
             return theme;
           },
 
           // Sidebar management
           toggleSidebar: () => {
-            set((draft) => {
+            set(draft => {
               draft.sidebarCollapsed = !draft.sidebarCollapsed;
             });
           },
 
-          setSidebarCollapsed: (collapsed) => {
-            set((draft) => {
+          setSidebarCollapsed: collapsed => {
+            set(draft => {
               draft.sidebarCollapsed = collapsed;
             });
           },
 
           // Panel management
-          setActivePanel: (panelId) => {
-            set((draft) => {
+          setActivePanel: panelId => {
+            set(draft => {
               draft.activePanel = panelId;
             });
           },
 
-          togglePanel: (panelId) => {
-            set((draft) => {
-              draft.activePanel = draft.activePanel === panelId ? null : panelId;
+          togglePanel: panelId => {
+            set(draft => {
+              draft.activePanel =
+                draft.activePanel === panelId ? null : panelId;
             });
           },
 
           resizePanel: (panelId, size) => {
-            set((draft) => {
+            set(draft => {
               draft.layout.panelSizes[panelId] = size;
               draft.lastUpdated = new Date();
             });
           },
 
           // Dialog management
-          openDialog: (dialogId) => {
-            set((draft) => {
+          openDialog: dialogId => {
+            set(draft => {
               if (!draft.openDialogs.includes(dialogId)) {
                 draft.openDialogs.push(dialogId);
               }
             });
           },
 
-          closeDialog: (dialogId) => {
-            set((draft) => {
-              draft.openDialogs = draft.openDialogs.filter(id => id !== dialogId);
+          closeDialog: dialogId => {
+            set(draft => {
+              draft.openDialogs = draft.openDialogs.filter(
+                id => id !== dialogId
+              );
             });
           },
 
           closeAllDialogs: () => {
-            set((draft) => {
+            set(draft => {
               draft.openDialogs = [];
             });
           },
 
-          isDialogOpen: (dialogId) => {
+          isDialogOpen: dialogId => {
             return get().openDialogs.includes(dialogId);
           },
 
           // Layout management
-          setLayoutDensity: (density) => {
-            set((draft) => {
+          setLayoutDensity: density => {
+            set(draft => {
               draft.layout.density = density;
               draft.lastUpdated = new Date();
             });
 
             // Apply density classes to document
-            document.documentElement.classList.remove('density-comfortable', 'density-compact', 'density-cozy');
+            document.documentElement.classList.remove(
+              'density-comfortable',
+              'density-compact',
+              'density-cozy'
+            );
             document.documentElement.classList.add(`density-${density}`);
           },
 
-          updatePanelSizes: (sizes) => {
-            set((draft) => {
+          updatePanelSizes: sizes => {
+            set(draft => {
               Object.assign(draft.layout.panelSizes, sizes);
               draft.lastUpdated = new Date();
             });
           },
 
-          addCustomPanel: (panel) => {
+          addCustomPanel: panel => {
             const id = `panel_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-            
-            set((draft) => {
+
+            set(draft => {
               const newPanel: CustomPanel = {
                 ...panel,
                 id,
@@ -276,8 +293,10 @@ export const useUIStore = create<UIStore>()(
           },
 
           updateCustomPanel: (panelId, updates) => {
-            set((draft) => {
-              const panel = draft.layout.customPanels.find(p => p.id === panelId);
+            set(draft => {
+              const panel = draft.layout.customPanels.find(
+                p => p.id === panelId
+              );
               if (panel) {
                 Object.assign(panel, updates);
                 draft.lastUpdated = new Date();
@@ -285,21 +304,23 @@ export const useUIStore = create<UIStore>()(
             });
           },
 
-          removeCustomPanel: (panelId) => {
-            set((draft) => {
-              draft.layout.customPanels = draft.layout.customPanels.filter(p => p.id !== panelId);
-              
+          removeCustomPanel: panelId => {
+            set(draft => {
+              draft.layout.customPanels = draft.layout.customPanels.filter(
+                p => p.id !== panelId
+              );
+
               // Close panel if it's active
               if (draft.activePanel === panelId) {
                 draft.activePanel = null;
               }
-              
+
               draft.lastUpdated = new Date();
             });
           },
 
           resetLayout: () => {
-            set((draft) => {
+            set(draft => {
               draft.layout = {
                 density: 'comfortable',
                 panelSizes: {
@@ -316,60 +337,61 @@ export const useUIStore = create<UIStore>()(
           },
 
           // Keyboard shortcuts
-          setKeyboardEnabled: (enabled) => {
-            set((draft) => {
+          setKeyboardEnabled: enabled => {
+            set(draft => {
               draft.keyboard.enabled = enabled;
             });
           },
 
           updateShortcut: (key, action) => {
-            set((draft) => {
+            set(draft => {
               draft.keyboard.shortcuts[key] = action;
               draft.lastUpdated = new Date();
             });
           },
 
-          removeShortcut: (key) => {
-            set((draft) => {
+          removeShortcut: key => {
+            set(draft => {
               delete draft.keyboard.shortcuts[key];
               draft.lastUpdated = new Date();
             });
           },
 
           addCustomShortcut: (key, action) => {
-            set((draft) => {
+            set(draft => {
               draft.keyboard.customShortcuts[key] = action;
               draft.lastUpdated = new Date();
             });
           },
 
-          removeCustomShortcut: (key) => {
-            set((draft) => {
+          removeCustomShortcut: key => {
+            set(draft => {
               delete draft.keyboard.customShortcuts[key];
               draft.lastUpdated = new Date();
             });
           },
 
-          setCustomShortcuts: (shortcuts) => {
-            set((draft) => {
+          setCustomShortcuts: shortcuts => {
+            set(draft => {
               draft.keyboard.customShortcuts = shortcuts;
               draft.lastUpdated = new Date();
             });
           },
 
           resetShortcuts: () => {
-            set((draft) => {
+            set(draft => {
               draft.keyboard.shortcuts = { ...initialState.keyboard.shortcuts };
               draft.keyboard.customShortcuts = {};
               draft.lastUpdated = new Date();
             });
           },
 
-          executeShortcut: (key) => {
+          executeShortcut: key => {
             const { keyboard } = get();
             if (!keyboard.enabled) return;
 
-            const action = keyboard.customShortcuts[key] || keyboard.shortcuts[key];
+            const action =
+              keyboard.customShortcuts[key] || keyboard.shortcuts[key];
             if (!action) return;
 
             // Execute built-in shortcuts
@@ -402,26 +424,41 @@ export const useUIStore = create<UIStore>()(
                 break;
               default:
                 // Custom actions
-                window.dispatchEvent(new CustomEvent('ui:customAction', { detail: { action } }));
+                window.dispatchEvent(
+                  new CustomEvent('ui:customAction', { detail: { action } })
+                );
                 break;
             }
           },
 
           // Accessibility
-          updateAccessibilitySettings: (settings) => {
-            set((draft) => {
+          updateAccessibilitySettings: settings => {
+            set(draft => {
               Object.assign(draft.accessibility, settings);
               draft.lastUpdated = new Date();
             });
 
             // Apply accessibility settings to document
             const { accessibility } = get();
-            
-            document.documentElement.classList.toggle('reduced-motion', accessibility.reducedMotion);
-            document.documentElement.classList.toggle('high-contrast', accessibility.highContrast);
-            document.documentElement.classList.remove('font-small', 'font-medium', 'font-large', 'font-xl');
-            document.documentElement.classList.add(`font-${accessibility.fontSize}`);
-            
+
+            document.documentElement.classList.toggle(
+              'reduced-motion',
+              accessibility.reducedMotion
+            );
+            document.documentElement.classList.toggle(
+              'high-contrast',
+              accessibility.highContrast
+            );
+            document.documentElement.classList.remove(
+              'font-small',
+              'font-medium',
+              'font-large',
+              'font-xl'
+            );
+            document.documentElement.classList.add(
+              `font-${accessibility.fontSize}`
+            );
+
             if (accessibility.screenReader) {
               document.documentElement.setAttribute('aria-live', 'polite');
             } else {
@@ -429,24 +466,24 @@ export const useUIStore = create<UIStore>()(
             }
           },
 
-          setReducedMotion: (enabled) => {
+          setReducedMotion: enabled => {
             get().updateAccessibilitySettings({ reducedMotion: enabled });
           },
 
-          setHighContrast: (enabled) => {
+          setHighContrast: enabled => {
             get().updateAccessibilitySettings({ highContrast: enabled });
           },
 
-          setFontSize: (size) => {
+          setFontSize: size => {
             get().updateAccessibilitySettings({ fontSize: size });
           },
 
-          setScreenReaderMode: (enabled) => {
+          setScreenReaderMode: enabled => {
             get().updateAccessibilitySettings({ screenReader: enabled });
           },
 
           // UI state management
-          setFullscreen: (enabled) => {
+          setFullscreen: enabled => {
             if (enabled) {
               document.documentElement.requestFullscreen?.();
             } else {
@@ -454,7 +491,7 @@ export const useUIStore = create<UIStore>()(
             }
           },
 
-          setFocus: (elementId) => {
+          setFocus: elementId => {
             const element = document.getElementById(elementId);
             if (element) {
               element.focus();
@@ -482,72 +519,75 @@ export const useUIStore = create<UIStore>()(
             get().openDialog('shortcutsHelp');
           },
 
-          showTutorial: (tutorialId) => {
+          showTutorial: tutorialId => {
             get().openDialog(`tutorial_${tutorialId}`);
           },
 
-          completeTutorial: (tutorialId) => {
+          completeTutorial: tutorialId => {
             get().closeDialog(`tutorial_${tutorialId}`);
-            
+
             // Mark tutorial as completed
             const completedTutorials = JSON.parse(
               localStorage.getItem('completedTutorials') || '[]'
             );
-            
+
             if (!completedTutorials.includes(tutorialId)) {
               completedTutorials.push(tutorialId);
-              localStorage.setItem('completedTutorials', JSON.stringify(completedTutorials));
+              localStorage.setItem(
+                'completedTutorials',
+                JSON.stringify(completedTutorials)
+              );
             }
           },
 
           // State persistence
           saveLayoutPresets: (presetName, layout) => {
             layoutPresets.set(presetName, layout);
-            
+
             // Save to localStorage
             const presets = Object.fromEntries(layoutPresets);
             localStorage.setItem('layoutPresets', JSON.stringify(presets));
           },
 
-          loadLayoutPreset: (presetName) => {
+          loadLayoutPreset: presetName => {
             const layout = layoutPresets.get(presetName);
             if (layout) {
-              set((draft) => {
+              set(draft => {
                 draft.layout = { ...layout };
                 draft.lastUpdated = new Date();
               });
             }
           },
 
-          deleteLayoutPreset: (presetName) => {
+          deleteLayoutPreset: presetName => {
             layoutPresets.delete(presetName);
-            
+
             // Update localStorage
             const presets = Object.fromEntries(layoutPresets);
             localStorage.setItem('layoutPresets', JSON.stringify(presets));
           },
 
           // State management
-          setLoading: (loading) => {
-            set((draft) => {
+          setLoading: loading => {
+            set(draft => {
               draft.loading = loading;
             });
           },
 
-          setError: (error) => {
-            set((draft) => {
+          setError: error => {
+            set(draft => {
               draft.error = error;
             });
           },
 
           clearError: () => {
-            set((draft) => {
+            set(draft => {
               draft.error = null;
             });
           },
 
           reset: () => {
-            set((draft) => {
+            set(draft => {
               Object.assign(draft, initialState);
             });
           },
@@ -589,14 +629,16 @@ if (typeof window !== 'undefined') {
   const effectiveTheme = store.getEffectiveTheme();
   document.documentElement.classList.add(effectiveTheme);
   document.documentElement.classList.add(`density-${store.layout.density}`);
-  
+
   if (store.accessibility.reducedMotion) {
     document.documentElement.classList.add('reduced-motion');
   }
   if (store.accessibility.highContrast) {
     document.documentElement.classList.add('high-contrast');
   }
-  document.documentElement.classList.add(`font-${store.accessibility.fontSize}`);
+  document.documentElement.classList.add(
+    `font-${store.accessibility.fontSize}`
+  );
 
   // Listen for system theme changes
   const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -610,16 +652,21 @@ if (typeof window !== 'undefined') {
   });
 
   // Global keyboard shortcut listener
-  document.addEventListener('keydown', (event) => {
+  document.addEventListener('keydown', event => {
     const store = useUIStore.getState();
     if (!store.keyboard.enabled) return;
-    
+
     // Skip if key is undefined or if we're in an input/textarea
     if (!event.key) return;
-    
+
     // Don't trigger shortcuts when typing in inputs
     const target = event.target as HTMLElement;
-    if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.contentEditable === 'true')) {
+    if (
+      target &&
+      (target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.contentEditable === 'true')
+    ) {
       // Allow Cmd+Enter or Ctrl+Enter to work in inputs
       if (!((event.metaKey || event.ctrlKey) && event.key === 'Enter')) {
         return;
@@ -631,11 +678,16 @@ if (typeof window !== 'undefined') {
       event.ctrlKey && 'ctrl',
       event.shiftKey && 'shift',
       event.altKey && 'alt',
-      event.key.toLowerCase()
-    ].filter(Boolean).join('+');
+      event.key.toLowerCase(),
+    ]
+      .filter(Boolean)
+      .join('+');
 
-    const allShortcuts = { ...store.keyboard.shortcuts, ...store.keyboard.customShortcuts };
-    
+    const allShortcuts = {
+      ...store.keyboard.shortcuts,
+      ...store.keyboard.customShortcuts,
+    };
+
     if (allShortcuts[key]) {
       event.preventDefault();
       store.executeShortcut(key);
@@ -655,8 +707,12 @@ export const uiSelectors = {
   accessibility: (state: UIStore) => state.accessibility,
   isLoading: (state: UIStore) => state.loading,
   error: (state: UIStore) => state.error,
-  isDialogOpen: (dialogId: string) => (state: UIStore) => state.isDialogOpen(dialogId),
-  allShortcuts: (state: UIStore) => ({ ...state.keyboard.shortcuts, ...state.keyboard.customShortcuts }),
+  isDialogOpen: (dialogId: string) => (state: UIStore) =>
+    state.isDialogOpen(dialogId),
+  allShortcuts: (state: UIStore) => ({
+    ...state.keyboard.shortcuts,
+    ...state.keyboard.customShortcuts,
+  }),
   customPanels: (state: UIStore) => state.layout.customPanels,
   panelSizes: (state: UIStore) => state.layout.panelSizes,
 };
@@ -672,7 +728,8 @@ export const useUI = () => {
 
 export const useTheme = () => useUIStore(uiSelectors.theme);
 export const useEffectiveTheme = () => useUIStore(uiSelectors.effectiveTheme);
-export const useSidebarCollapsed = () => useUIStore(uiSelectors.sidebarCollapsed);
+export const useSidebarCollapsed = () =>
+  useUIStore(uiSelectors.sidebarCollapsed);
 export const useActivePanel = () => useUIStore(uiSelectors.activePanel);
 export const useOpenDialogs = () => useUIStore(uiSelectors.openDialogs);
 export const useLayout = () => useUIStore(uiSelectors.layout);

@@ -17,36 +17,55 @@ export class PipelineService extends BaseApiService {
   /**
    * Start the STORM pipeline for a project
    */
-  async startPipeline(request: StartPipelineRequest): Promise<ApiResponse<PipelineStatusResponse>> {
+  async startPipeline(
+    request: StartPipelineRequest
+  ): Promise<ApiResponse<PipelineStatusResponse>> {
     return this.post<PipelineStatusResponse>(`${this.basePath}/start`, request);
   }
 
   /**
    * Stop a running pipeline
    */
-  async stopPipeline(request: StopPipelineRequest): Promise<ApiResponse<{ success: boolean; message: string }>> {
-    return this.post<{ success: boolean; message: string }>(`${this.basePath}/stop`, request);
+  async stopPipeline(
+    request: StopPipelineRequest
+  ): Promise<ApiResponse<{ success: boolean; message: string }>> {
+    return this.post<{ success: boolean; message: string }>(
+      `${this.basePath}/stop`,
+      request
+    );
   }
 
   /**
    * Pause a running pipeline
    */
-  async pausePipeline(projectId: string): Promise<ApiResponse<PipelineStatusResponse>> {
-    return this.post<PipelineStatusResponse>(`${this.basePath}/pause`, { projectId });
+  async pausePipeline(
+    projectId: string
+  ): Promise<ApiResponse<PipelineStatusResponse>> {
+    return this.post<PipelineStatusResponse>(`${this.basePath}/pause`, {
+      projectId,
+    });
   }
 
   /**
    * Resume a paused pipeline
    */
-  async resumePipeline(projectId: string): Promise<ApiResponse<PipelineStatusResponse>> {
-    return this.post<PipelineStatusResponse>(`${this.basePath}/resume`, { projectId });
+  async resumePipeline(
+    projectId: string
+  ): Promise<ApiResponse<PipelineStatusResponse>> {
+    return this.post<PipelineStatusResponse>(`${this.basePath}/resume`, {
+      projectId,
+    });
   }
 
   /**
    * Get pipeline status for a project
    */
-  async getPipelineStatus(projectId: string): Promise<ApiResponse<PipelineStatusResponse>> {
-    return this.get<PipelineStatusResponse>(`${this.basePath}/status/${projectId}`);
+  async getPipelineStatus(
+    projectId: string
+  ): Promise<ApiResponse<PipelineStatusResponse>> {
+    return this.get<PipelineStatusResponse>(
+      `${this.basePath}/status/${projectId}`
+    );
   }
 
   /**
@@ -63,7 +82,7 @@ export class PipelineService extends BaseApiService {
     }
   ): Promise<ApiResponse<PipelineLog[]>> {
     const params = new URLSearchParams();
-    
+
     if (options?.stage) params.append('stage', options.stage);
     if (options?.level) params.append('level', options.level);
     if (options?.limit) params.append('limit', options.limit.toString());
@@ -83,13 +102,13 @@ export class PipelineService extends BaseApiService {
     onError?: (error: Error) => void
   ): Promise<() => void> {
     const ws = createPipelineWebSocket(projectId);
-    
+
     // Set up WebSocket event handlers
     ws.setEventHandlers({
-      onError: (event) => {
+      onError: event => {
         onError?.(new Error('WebSocket connection error'));
       },
-      onClose: (event) => {
+      onClose: event => {
         if (!event.wasClean) {
           onError?.(new Error('WebSocket connection closed unexpectedly'));
         }
@@ -100,7 +119,11 @@ export class PipelineService extends BaseApiService {
     try {
       await ws.connect();
     } catch (error) {
-      onError?.(error instanceof Error ? error : new Error('Failed to connect to log stream'));
+      onError?.(
+        error instanceof Error
+          ? error
+          : new Error('Failed to connect to log stream')
+      );
       return () => {};
     }
 
@@ -129,17 +152,20 @@ export class PipelineService extends BaseApiService {
     return this.post<PipelineStatusResponse>(`${this.basePath}/retry-stage`, {
       projectId,
       stage,
-      config
+      config,
     });
   }
 
   /**
    * Skip a pipeline stage
    */
-  async skipStage(projectId: string, stage: string): Promise<ApiResponse<PipelineStatusResponse>> {
+  async skipStage(
+    projectId: string,
+    stage: string
+  ): Promise<ApiResponse<PipelineStatusResponse>> {
     return this.post<PipelineStatusResponse>(`${this.basePath}/skip-stage`, {
       projectId,
-      stage
+      stage,
     });
   }
 
@@ -166,7 +192,10 @@ export class PipelineService extends BaseApiService {
     templateId: string,
     updates: Partial<PipelineTemplate>
   ): Promise<ApiResponse<PipelineTemplate>> {
-    return this.put<PipelineTemplate>(`${this.basePath}/templates/${templateId}`, updates);
+    return this.put<PipelineTemplate>(
+      `${this.basePath}/templates/${templateId}`,
+      updates
+    );
   }
 
   /**
@@ -185,14 +214,16 @@ export class PipelineService extends BaseApiService {
   ): Promise<ApiResponse<PipelineValidationResult>> {
     return this.post<PipelineValidationResult>(`${this.basePath}/validate`, {
       config,
-      stages
+      stages,
     });
   }
 
   /**
    * Get pipeline performance metrics
    */
-  async getPipelineMetrics(projectId: string): Promise<ApiResponse<PipelineMetrics>> {
+  async getPipelineMetrics(
+    projectId: string
+  ): Promise<ApiResponse<PipelineMetrics>> {
     return this.get<PipelineMetrics>(`${this.basePath}/metrics/${projectId}`);
   }
 
@@ -218,7 +249,7 @@ export class PipelineService extends BaseApiService {
     executionIds: string[]
   ): Promise<ApiResponse<PipelineComparison>> {
     return this.post<PipelineComparison>(`${this.basePath}/compare`, {
-      executionIds
+      executionIds,
     });
   }
 
@@ -260,13 +291,13 @@ export class PipelineService extends BaseApiService {
     onError?: (error: Error) => void
   ): Promise<() => void> {
     const ws = createPipelineWebSocket(projectId);
-    
+
     // Set up WebSocket event handlers
     ws.setEventHandlers({
-      onError: (event) => {
+      onError: event => {
         onError?.(new Error('WebSocket connection error'));
       },
-      onClose: (event) => {
+      onClose: event => {
         if (!event.wasClean) {
           onError?.(new Error('WebSocket connection closed unexpectedly'));
         }
@@ -277,7 +308,11 @@ export class PipelineService extends BaseApiService {
     try {
       await ws.connect();
     } catch (error) {
-      onError?.(error instanceof Error ? error : new Error('Failed to connect to metrics stream'));
+      onError?.(
+        error instanceof Error
+          ? error
+          : new Error('Failed to connect to metrics stream')
+      );
       return () => {};
     }
 
@@ -310,11 +345,13 @@ export class PipelineService extends BaseApiService {
   ): Promise<Blob> {
     const params = new URLSearchParams();
     params.append('format', format);
-    
+
     if (options?.stage) params.append('stage', options.stage);
     if (options?.level) params.append('level', options.level);
-    if (options?.startDate) params.append('startDate', options.startDate.toISOString());
-    if (options?.endDate) params.append('endDate', options.endDate.toISOString());
+    if (options?.startDate)
+      params.append('startDate', options.startDate.toISOString());
+    if (options?.endDate)
+      params.append('endDate', options.endDate.toISOString());
 
     const url = `${this.basePath}/logs/${projectId}/export?${params.toString()}`;
     return this.downloadFile(url, `pipeline-logs-${projectId}.${format}`);
@@ -323,7 +360,9 @@ export class PipelineService extends BaseApiService {
   /**
    * Get pipeline resource usage
    */
-  async getResourceUsage(projectId: string): Promise<ApiResponse<ResourceUsage>> {
+  async getResourceUsage(
+    projectId: string
+  ): Promise<ApiResponse<ResourceUsage>> {
     return this.get<ResourceUsage>(`${this.basePath}/resources/${projectId}`);
   }
 
@@ -336,7 +375,7 @@ export class PipelineService extends BaseApiService {
   ): Promise<ApiResponse<ExecutionTimeEstimate>> {
     return this.post<ExecutionTimeEstimate>(`${this.basePath}/estimate`, {
       config,
-      stages
+      stages,
     });
   }
 
@@ -359,7 +398,9 @@ export class PipelineService extends BaseApiService {
   /**
    * Cancel a scheduled execution
    */
-  async cancelScheduledExecution(scheduledId: string): Promise<ApiResponse<void>> {
+  async cancelScheduledExecution(
+    scheduledId: string
+  ): Promise<ApiResponse<void>> {
     return this.delete<void>(`${this.basePath}/scheduled/${scheduledId}`);
   }
 
@@ -377,15 +418,17 @@ export class PipelineService extends BaseApiService {
     }
   ): Promise<() => void> {
     const ws = createPipelineWebSocket(projectId);
-    
+
     // Set up WebSocket event handlers
     ws.setEventHandlers({
-      onError: (event) => {
+      onError: event => {
         callbacks.onError?.(new Error('WebSocket connection error'));
       },
-      onClose: (event) => {
+      onClose: event => {
         if (!event.wasClean) {
-          callbacks.onError?.(new Error('WebSocket connection closed unexpectedly'));
+          callbacks.onError?.(
+            new Error('WebSocket connection closed unexpectedly')
+          );
         }
       },
     });
@@ -394,29 +437,46 @@ export class PipelineService extends BaseApiService {
     try {
       await ws.connect();
     } catch (error) {
-      callbacks.onError?.(error instanceof Error ? error : new Error('Failed to connect to pipeline updates'));
+      callbacks.onError?.(
+        error instanceof Error
+          ? error
+          : new Error('Failed to connect to pipeline updates')
+      );
       return () => {};
     }
 
     // Subscribe to different message types
     const unsubscribers: (() => void)[] = [];
-    
+
     if (callbacks.onProgress) {
-      unsubscribers.push(ws.on<PipelineProgress>('pipeline_progress', callbacks.onProgress));
+      unsubscribers.push(
+        ws.on<PipelineProgress>('pipeline_progress', callbacks.onProgress)
+      );
     }
-    
+
     if (callbacks.onStatusChange) {
-      unsubscribers.push(ws.on<PipelineStatusResponse>('pipeline_status', callbacks.onStatusChange));
+      unsubscribers.push(
+        ws.on<PipelineStatusResponse>(
+          'pipeline_status',
+          callbacks.onStatusChange
+        )
+      );
     }
-    
+
     if (callbacks.onStageStart) {
-      unsubscribers.push(ws.on<{ stage: string }>('stage_start', (data) => callbacks.onStageStart!(data.stage)));
+      unsubscribers.push(
+        ws.on<{ stage: string }>('stage_start', data =>
+          callbacks.onStageStart!(data.stage)
+        )
+      );
     }
-    
+
     if (callbacks.onStageComplete) {
-      unsubscribers.push(ws.on<{ stage: string; result: any }>('stage_complete', (data) => 
-        callbacks.onStageComplete!(data.stage, data.result)
-      ));
+      unsubscribers.push(
+        ws.on<{ stage: string; result: any }>('stage_complete', data =>
+          callbacks.onStageComplete!(data.stage, data.result)
+        )
+      );
     }
 
     // Send initial request to start receiving updates
@@ -439,21 +499,23 @@ export class PipelineService extends BaseApiService {
     options?: { stage?: string; reason?: string }
   ): Promise<void> {
     const ws = createPipelineWebSocket(projectId);
-    
+
     try {
       await ws.connect();
       ws.send('pipeline_command', {
         projectId,
         command,
         options,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
-      
+
       // Keep connection alive for a moment to ensure command is sent
       await new Promise(resolve => setTimeout(resolve, 1000));
       ws.disconnect();
     } catch (error) {
-      throw new Error(`Failed to send realtime command: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to send realtime command: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 }
@@ -655,5 +717,5 @@ export interface ScheduledExecution {
 
 // Create and export singleton instance
 export const pipelineService = new PipelineService({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
 });

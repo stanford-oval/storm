@@ -9,39 +9,45 @@ export function useExport() {
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const createExport = useCallback(async (request: ExportRequest) => {
-    setLoading(true);
-    try {
-      const response = await exportService.createExportJob(request);
-      if (response.success && response.data) {
-        setJobs(prev => [response.data!, ...prev]);
+  const createExport = useCallback(
+    async (request: ExportRequest) => {
+      setLoading(true);
+      try {
+        const response = await exportService.createExportJob(request);
+        if (response.success && response.data) {
+          setJobs(prev => [response.data!, ...prev]);
+          toast({
+            title: 'Success',
+            description: 'Export job created successfully',
+            variant: 'success',
+          });
+          return response.data;
+        }
+        return null;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Failed to create export';
+        setError(errorMessage);
         toast({
-          title: 'Success',
-          description: 'Export job created successfully',
-          variant: 'success',
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
         });
-        return response.data;
+        return null;
+      } finally {
+        setLoading(false);
       }
-      return null;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to create export';
-      setError(errorMessage);
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, [toast]);
+    },
+    [toast]
+  );
 
   const getExportJob = useCallback(async (jobId: string) => {
     try {
       const response = await exportService.getExportJob(jobId);
       if (response.success && response.data) {
-        setJobs(prev => prev.map(job => job.id === jobId ? response.data! : job));
+        setJobs(prev =>
+          prev.map(job => (job.id === jobId ? response.data! : job))
+        );
         return response.data;
       }
       return null;
@@ -51,23 +57,27 @@ export function useExport() {
     }
   }, []);
 
-  const downloadExport = useCallback(async (jobId: string) => {
-    try {
-      await exportService.downloadExport(jobId);
-      toast({
-        title: 'Success',
-        description: 'Download started',
-        variant: 'success',
-      });
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Download failed';
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-    }
-  }, [toast]);
+  const downloadExport = useCallback(
+    async (jobId: string) => {
+      try {
+        await exportService.downloadExport(jobId);
+        toast({
+          title: 'Success',
+          description: 'Download started',
+          variant: 'success',
+        });
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Download failed';
+        toast({
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+      }
+    },
+    [toast]
+  );
 
   return {
     jobs,

@@ -1,5 +1,11 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
@@ -11,7 +17,12 @@ import { ArticleEditor } from '../ArticleEditor';
 import { OutlineEditor } from '../OutlineEditor';
 import { ResearchView } from '../ResearchView';
 
-import { StormConfig, PipelineProgress as PipelineProgressType, ResearchData, ArticleOutline } from '../../../types/storm';
+import {
+  StormConfig,
+  PipelineProgress as PipelineProgressType,
+  ResearchData,
+  ArticleOutline,
+} from '../../../types/storm';
 import { TestWrapper } from '../../../test/utils';
 
 // Mock data
@@ -48,7 +59,11 @@ const mockPipelineProgress: PipelineProgressType = {
   estimatedTimeRemaining: 300,
   currentAction: 'Simulating expert conversations',
   stages: {
-    research: { status: 'running', progress: 0.3, startedAt: new Date('2023-01-01T10:00:00Z') },
+    research: {
+      status: 'running',
+      progress: 0.3,
+      startedAt: new Date('2023-01-01T10:00:00Z'),
+    },
     outline: { status: 'pending', progress: 0, startedAt: null },
     article: { status: 'pending', progress: 0, startedAt: null },
     polish: { status: 'pending', progress: 0, startedAt: null },
@@ -79,12 +94,29 @@ const mockResearchData: ResearchData = {
       title: 'Expert Discussion on AI Safety',
       perspective: 'expert',
       messages: [
-        { role: 'expert', content: 'AI safety is a critical concern...', timestamp: new Date() },
-        { role: 'moderator', content: 'Can you elaborate on alignment issues?', timestamp: new Date() },
-        { role: 'expert', content: 'Alignment refers to...', timestamp: new Date() },
+        {
+          role: 'expert',
+          content: 'AI safety is a critical concern...',
+          timestamp: new Date(),
+        },
+        {
+          role: 'moderator',
+          content: 'Can you elaborate on alignment issues?',
+          timestamp: new Date(),
+        },
+        {
+          role: 'expert',
+          content: 'Alignment refers to...',
+          timestamp: new Date(),
+        },
       ],
       sources: [
-        { id: 'source-1', title: 'AI Safety Research', url: 'https://example.com/ai-safety', snippet: 'Safety considerations...' },
+        {
+          id: 'source-1',
+          title: 'AI Safety Research',
+          url: 'https://example.com/ai-safety',
+          snippet: 'Safety considerations...',
+        },
       ],
     },
     {
@@ -92,15 +124,35 @@ const mockResearchData: ResearchData = {
       title: 'Critical Analysis of AI Development',
       perspective: 'critic',
       messages: [
-        { role: 'critic', content: 'Current AI development lacks oversight...', timestamp: new Date() },
-        { role: 'moderator', content: 'What are the main concerns?', timestamp: new Date() },
+        {
+          role: 'critic',
+          content: 'Current AI development lacks oversight...',
+          timestamp: new Date(),
+        },
+        {
+          role: 'moderator',
+          content: 'What are the main concerns?',
+          timestamp: new Date(),
+        },
       ],
       sources: [],
     },
   ],
   sources: [
-    { id: 'source-1', title: 'AI Safety Research', url: 'https://example.com/ai-safety', snippet: 'Safety considerations...', relevanceScore: 0.9 },
-    { id: 'source-2', title: 'AI Ethics Guidelines', url: 'https://example.com/ai-ethics', snippet: 'Ethical frameworks...', relevanceScore: 0.85 },
+    {
+      id: 'source-1',
+      title: 'AI Safety Research',
+      url: 'https://example.com/ai-safety',
+      snippet: 'Safety considerations...',
+      relevanceScore: 0.9,
+    },
+    {
+      id: 'source-2',
+      title: 'AI Ethics Guidelines',
+      url: 'https://example.com/ai-ethics',
+      snippet: 'Ethical frameworks...',
+      relevanceScore: 0.85,
+    },
   ],
   queries: ['AI safety', 'machine learning ethics', 'AI alignment'],
   metadata: {
@@ -118,8 +170,16 @@ const mockOutline: ArticleOutline = {
       title: 'Introduction',
       description: 'Overview of AI development and current state',
       subsections: [
-        { id: 'subsection-1-1', title: 'Definition of AI', description: 'What is artificial intelligence?' },
-        { id: 'subsection-1-2', title: 'Historical Context', description: 'Brief history of AI development' },
+        {
+          id: 'subsection-1-1',
+          title: 'Definition of AI',
+          description: 'What is artificial intelligence?',
+        },
+        {
+          id: 'subsection-1-2',
+          title: 'Historical Context',
+          description: 'Brief history of AI development',
+        },
       ],
       sources: ['source-1'],
       estimatedWordCount: 500,
@@ -129,8 +189,16 @@ const mockOutline: ArticleOutline = {
       title: 'Safety Considerations',
       description: 'Critical analysis of AI safety concerns',
       subsections: [
-        { id: 'subsection-2-1', title: 'Alignment Problem', description: 'Ensuring AI systems align with human values' },
-        { id: 'subsection-2-2', title: 'Control Mechanisms', description: 'Methods for maintaining control over AI systems' },
+        {
+          id: 'subsection-2-1',
+          title: 'Alignment Problem',
+          description: 'Ensuring AI systems align with human values',
+        },
+        {
+          id: 'subsection-2-2',
+          title: 'Control Mechanisms',
+          description: 'Methods for maintaining control over AI systems',
+        },
       ],
       sources: ['source-1', 'source-2'],
       estimatedWordCount: 750,
@@ -145,15 +213,29 @@ const mockOutline: ArticleOutline = {
 
 // Mock server
 const server = setupServer(
-  rest.post('http://localhost:8000/api/v1/projects/:id/pipeline/start', (req, res, ctx) => {
-    return res(ctx.json({ success: true, data: mockPipelineProgress }));
-  }),
-  rest.get('http://localhost:8000/api/v1/projects/:id/pipeline/status', (req, res, ctx) => {
-    return res(ctx.json({ success: true, data: mockPipelineProgress }));
-  }),
-  rest.post('http://localhost:8000/api/v1/projects/:id/pipeline/stop', (req, res, ctx) => {
-    return res(ctx.json({ success: true, data: { ...mockPipelineProgress, isRunning: false } }));
-  }),
+  rest.post(
+    'http://localhost:8000/api/v1/projects/:id/pipeline/start',
+    (req, res, ctx) => {
+      return res(ctx.json({ success: true, data: mockPipelineProgress }));
+    }
+  ),
+  rest.get(
+    'http://localhost:8000/api/v1/projects/:id/pipeline/status',
+    (req, res, ctx) => {
+      return res(ctx.json({ success: true, data: mockPipelineProgress }));
+    }
+  ),
+  rest.post(
+    'http://localhost:8000/api/v1/projects/:id/pipeline/stop',
+    (req, res, ctx) => {
+      return res(
+        ctx.json({
+          success: true,
+          data: { ...mockPipelineProgress, isRunning: false },
+        })
+      );
+    }
+  )
 );
 
 beforeAll(() => server.listen());
@@ -197,7 +279,7 @@ describe('PipelineProgress Component', () => {
 
     const researchStage = screen.getByTestId('research-stage-indicator');
     expect(researchStage).toHaveClass('active');
-    
+
     const outlineStage = screen.getByTestId('outline-stage-indicator');
     expect(outlineStage).toHaveClass('pending');
   });
@@ -229,7 +311,9 @@ describe('PipelineProgress Component', () => {
       </TestWrapper>
     );
 
-    expect(screen.getByText('Simulating expert conversations')).toBeInTheDocument();
+    expect(
+      screen.getByText('Simulating expert conversations')
+    ).toBeInTheDocument();
   });
 
   test('displays pipeline logs', async () => {
@@ -243,7 +327,9 @@ describe('PipelineProgress Component', () => {
     await userEvent.click(logsToggle);
 
     expect(screen.getByText('Starting research phase')).toBeInTheDocument();
-    expect(screen.getByText('Initializing conversation with expert perspective')).toBeInTheDocument();
+    expect(
+      screen.getByText('Initializing conversation with expert perspective')
+    ).toBeInTheDocument();
   });
 
   test('handles pause button click', async () => {
@@ -270,8 +356,10 @@ describe('PipelineProgress Component', () => {
     await userEvent.click(stopButton);
 
     // Should show confirmation dialog
-    expect(screen.getByText(/Are you sure you want to stop/)).toBeInTheDocument();
-    
+    expect(
+      screen.getByText(/Are you sure you want to stop/)
+    ).toBeInTheDocument();
+
     const confirmButton = screen.getByTestId('confirm-stop-button');
     await userEvent.click(confirmButton);
 
@@ -326,9 +414,21 @@ describe('PipelineProgress Component', () => {
         progress: 1.0,
         isRunning: false,
         stages: {
-          research: { status: 'completed', progress: 1.0, startedAt: new Date() },
-          outline: { status: 'completed', progress: 1.0, startedAt: new Date() },
-          article: { status: 'completed', progress: 1.0, startedAt: new Date() },
+          research: {
+            status: 'completed',
+            progress: 1.0,
+            startedAt: new Date(),
+          },
+          outline: {
+            status: 'completed',
+            progress: 1.0,
+            startedAt: new Date(),
+          },
+          article: {
+            status: 'completed',
+            progress: 1.0,
+            startedAt: new Date(),
+          },
           polish: { status: 'completed', progress: 1.0, startedAt: new Date() },
         },
       },
@@ -468,7 +568,9 @@ describe('ConfigurationPanel Component', () => {
       </TestWrapper>
     );
 
-    expect(screen.getByText('Temperature must be between 0 and 1')).toBeInTheDocument();
+    expect(
+      screen.getByText('Temperature must be between 0 and 1')
+    ).toBeInTheDocument();
     expect(screen.getByTestId('temperature-error')).toBeInTheDocument();
   });
 
@@ -494,7 +596,9 @@ describe('ConfigurationPanel Component', () => {
       </TestWrapper>
     );
 
-    expect(screen.getByText('High maxResults may increase processing time')).toBeInTheDocument();
+    expect(
+      screen.getByText('High maxResults may increase processing time')
+    ).toBeInTheDocument();
     expect(screen.getByTestId('max-results-warning')).toBeInTheDocument();
   });
 
@@ -530,8 +634,10 @@ describe('ConfigurationPanel Component', () => {
     await userEvent.click(importButton);
 
     const fileInput = screen.getByTestId('config-file-input');
-    const file = new File([JSON.stringify(mockConfig)], 'config.json', { type: 'application/json' });
-    
+    const file = new File([JSON.stringify(mockConfig)], 'config.json', {
+      type: 'application/json',
+    });
+
     await userEvent.upload(fileInput, file);
 
     expect(defaultProps.onConfigChange).toHaveBeenCalledWith(mockConfig);
@@ -570,8 +676,12 @@ describe('ResearchView Component', () => {
       </TestWrapper>
     );
 
-    expect(screen.getByText('Expert Discussion on AI Safety')).toBeInTheDocument();
-    expect(screen.getByText('Critical Analysis of AI Development')).toBeInTheDocument();
+    expect(
+      screen.getByText('Expert Discussion on AI Safety')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Critical Analysis of AI Development')
+    ).toBeInTheDocument();
   });
 
   test('shows conversation messages', async () => {
@@ -582,12 +692,18 @@ describe('ResearchView Component', () => {
     );
 
     const firstConversation = screen.getByTestId('conversation-0');
-    const expandButton = within(firstConversation).getByTestId('expand-conversation');
-    
+    const expandButton = within(firstConversation).getByTestId(
+      'expand-conversation'
+    );
+
     await userEvent.click(expandButton);
 
-    expect(screen.getByText('AI safety is a critical concern...')).toBeInTheDocument();
-    expect(screen.getByText('Can you elaborate on alignment issues?')).toBeInTheDocument();
+    expect(
+      screen.getByText('AI safety is a critical concern...')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Can you elaborate on alignment issues?')
+    ).toBeInTheDocument();
   });
 
   test('displays sources with relevance scores', () => {
@@ -612,7 +728,9 @@ describe('ResearchView Component', () => {
     const firstSource = screen.getByTestId('source-0');
     await userEvent.click(firstSource);
 
-    expect(defaultProps.onSourceSelect).toHaveBeenCalledWith(mockResearchData.sources[0]);
+    expect(defaultProps.onSourceSelect).toHaveBeenCalledWith(
+      mockResearchData.sources[0]
+    );
   });
 
   test('shows loading state', () => {
@@ -649,8 +767,12 @@ describe('ResearchView Component', () => {
     await userEvent.selectOptions(perspectiveFilter, 'expert');
 
     // Should only show expert conversations
-    expect(screen.getByText('Expert Discussion on AI Safety')).toBeInTheDocument();
-    expect(screen.queryByText('Critical Analysis of AI Development')).not.toBeInTheDocument();
+    expect(
+      screen.getByText('Expert Discussion on AI Safety')
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText('Critical Analysis of AI Development')
+    ).not.toBeInTheDocument();
   });
 });
 
@@ -675,7 +797,11 @@ describe('OutlineEditor Component', () => {
     );
 
     expect(screen.getByTestId('outline-editor')).toBeInTheDocument();
-    expect(screen.getByText('Artificial Intelligence: Current State and Future Implications')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Artificial Intelligence: Current State and Future Implications'
+      )
+    ).toBeInTheDocument();
     expect(screen.getByText('Introduction')).toBeInTheDocument();
     expect(screen.getByText('Safety Considerations')).toBeInTheDocument();
   });
@@ -689,7 +815,7 @@ describe('OutlineEditor Component', () => {
 
     const introSection = screen.getByTestId('outline-section-section-1');
     const expandButton = within(introSection).getByTestId('expand-section');
-    
+
     await userEvent.click(expandButton);
 
     expect(screen.getByText('Definition of AI')).toBeInTheDocument();
@@ -708,8 +834,14 @@ describe('OutlineEditor Component', () => {
 
     expect(screen.getByTestId('new-section-modal')).toBeInTheDocument();
 
-    await userEvent.type(screen.getByTestId('new-section-title'), 'Future Implications');
-    await userEvent.type(screen.getByTestId('new-section-description'), 'Discussion of future AI developments');
+    await userEvent.type(
+      screen.getByTestId('new-section-title'),
+      'Future Implications'
+    );
+    await userEvent.type(
+      screen.getByTestId('new-section-description'),
+      'Discussion of future AI developments'
+    );
 
     const confirmButton = screen.getByTestId('confirm-add-section');
     await userEvent.click(confirmButton);
@@ -781,11 +913,11 @@ describe('OutlineEditor Component', () => {
 
     const section1 = screen.getByTestId('outline-section-section-1');
     const deleteButton = within(section1).getByTestId('delete-section-button');
-    
+
     await userEvent.click(deleteButton);
 
     expect(screen.getByTestId('confirm-delete-modal')).toBeInTheDocument();
-    
+
     const confirmDelete = screen.getByTestId('confirm-delete-section');
     await userEvent.click(confirmDelete);
 
@@ -816,7 +948,9 @@ describe('OutlineEditor Component', () => {
     );
 
     expect(screen.queryByTestId('add-section-button')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('delete-section-button')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('delete-section-button')
+    ).not.toBeInTheDocument();
   });
 
   test('saves outline', async () => {
@@ -840,10 +974,19 @@ describe('ArticleEditor Component', () => {
       title: 'Test Article',
       content: '# Introduction\n\nThis is a test article.',
       sections: [
-        { id: 'intro', title: 'Introduction', content: 'This is the introduction.' },
+        {
+          id: 'intro',
+          title: 'Introduction',
+          content: 'This is the introduction.',
+        },
       ],
       citations: [
-        { id: 'ref-1', title: 'AI Safety Research', url: 'https://example.com', authors: ['John Doe'] },
+        {
+          id: 'ref-1',
+          title: 'AI Safety Research',
+          url: 'https://example.com',
+          authors: ['John Doe'],
+        },
       ],
       wordCount: 150,
       lastModified: new Date(),
@@ -977,7 +1120,7 @@ describe('ArticleEditor Component', () => {
 describe('Component Integration Tests', () => {
   test('pipeline progress communicates with other components', async () => {
     const mockOnStageClick = jest.fn();
-    
+
     render(
       <TestWrapper>
         <PipelineProgress
@@ -1014,13 +1157,13 @@ describe('Component Integration Tests', () => {
     );
 
     await userEvent.click(screen.getByTestId('language-model-tab'));
-    
+
     const temperatureInput = screen.getByTestId('temperature-input');
     await userEvent.clear(temperatureInput);
     await userEvent.type(temperatureInput, '0.8');
 
     expect(mockOnConfigChange).toHaveBeenCalled();
-    
+
     await waitFor(() => {
       expect(mockOnValidate).toHaveBeenCalled();
     });

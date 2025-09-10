@@ -1,18 +1,36 @@
-import * as React from "react";
-import { MoreHorizontal, Calendar, Clock, FileText, Trash2, Copy } from "lucide-react";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
+import * as React from 'react';
+import {
+  MoreHorizontal,
+  Calendar,
+  Clock,
+  FileText,
+  Trash2,
+  Copy,
+} from 'lucide-react';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { cn, formatRelativeTime, getProjectStatusColor, getProjectStatusLabel } from "@/lib/utils";
-import type { ProjectCardProps, StormProject } from "@/types";
+} from '@/components/ui/dropdown-menu';
+import {
+  cn,
+  formatRelativeTime,
+  getProjectStatusColor,
+  getProjectStatusLabel,
+} from '@/lib/utils';
+import type { ProjectCardProps, StormProject } from '@/types';
 
 export const ProjectCard: React.FC<ProjectCardProps> = ({
   project,
@@ -21,12 +39,19 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   onDuplicate,
   className,
 }) => {
-  const isRunning = ['researching', 'generating_outline', 'writing_article', 'polishing'].includes(project.status);
+  const isRunning = [
+    'researching',
+    'generating_outline',
+    'writing_article',
+    'polishing',
+  ].includes(project.status);
   const progress = project.progress?.overallProgress || 0;
 
   const handleCardClick = (e: React.MouseEvent) => {
     // Don't trigger card selection if clicking on dropdown or buttons
-    if ((e.target as HTMLElement).closest('[data-radix-dropdown-trigger], button')) {
+    if (
+      (e.target as HTMLElement).closest('[data-radix-dropdown-trigger], button')
+    ) {
       return;
     }
     onSelect(project);
@@ -35,26 +60,26 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   return (
     <Card
       className={cn(
-        "group relative cursor-pointer transition-all duration-200 hover:shadow-md hover:-translate-y-0.5",
-        isRunning && "ring-2 ring-primary ring-opacity-50",
+        'group relative cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md',
+        isRunning && 'ring-2 ring-primary ring-opacity-50',
         className
       )}
       onClick={handleCardClick}
     >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
-          <div className="flex-1 min-w-0">
-            <CardTitle className="text-lg font-semibold truncate mb-1">
+          <div className="min-w-0 flex-1">
+            <CardTitle className="mb-1 truncate text-lg font-semibold">
               {project.title}
             </CardTitle>
-            <p className="text-sm text-muted-foreground truncate">
+            <p className="truncate text-sm text-muted-foreground">
               {project.topic}
             </p>
           </div>
-          <div className="flex items-center space-x-2 ml-3">
+          <div className="ml-3 flex items-center space-x-2">
             <Badge
               variant="secondary"
-              className={cn("text-xs", getProjectStatusColor(project.status))}
+              className={cn('text-xs', getProjectStatusColor(project.status))}
             >
               {getProjectStatusLabel(project.status)}
             </Badge>
@@ -63,7 +88,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="h-8 w-8 opacity-0 transition-opacity group-hover:opacity-100"
                   data-radix-dropdown-trigger
                 >
                   <MoreHorizontal className="h-4 w-4" />
@@ -95,20 +120,20 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
 
       <CardContent className="pb-3">
         {project.description && (
-          <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+          <p className="mb-3 line-clamp-2 text-sm text-muted-foreground">
             {project.description}
           </p>
         )}
 
         {isRunning && (
           <div className="mb-3">
-            <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
+            <div className="mb-1 flex items-center justify-between text-xs text-muted-foreground">
               <span>Progress</span>
               <span>{Math.round(progress)}%</span>
             </div>
             <Progress value={progress} className="h-1.5" />
             {project.progress?.currentTask && (
-              <p className="text-xs text-muted-foreground mt-1 truncate">
+              <p className="mt-1 truncate text-xs text-muted-foreground">
                 {project.progress.currentTask}
               </p>
             )}
@@ -128,7 +153,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
       </CardContent>
 
       <CardFooter className="pt-0">
-        <div className="flex w-full justify-between items-center">
+        <div className="flex w-full items-center justify-between">
           <div className="flex items-center space-x-4 text-xs text-muted-foreground">
             {project.config?.llm?.model && (
               <>
@@ -139,9 +164,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
             {project.config?.retriever?.type && (
               <span>Retriever: {project.config.retriever.type}</span>
             )}
-            {!project.config && (
-              <span>No configuration</span>
-            )}
+            {!project.config && <span>No configuration</span>}
           </div>
           {project.word_count ? (
             <span className="text-xs text-muted-foreground">
@@ -153,12 +176,12 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
 
       {/* Running indicator */}
       {isRunning && (
-        <div className="absolute top-2 left-2">
-          <div className="h-2 w-2 bg-primary rounded-full animate-pulse"></div>
+        <div className="absolute left-2 top-2">
+          <div className="h-2 w-2 animate-pulse rounded-full bg-primary"></div>
         </div>
       )}
     </Card>
   );
 };
 
-ProjectCard.displayName = "ProjectCard";
+ProjectCard.displayName = 'ProjectCard';

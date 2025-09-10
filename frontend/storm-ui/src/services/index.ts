@@ -1,5 +1,11 @@
 // Base API service and utilities
-export { BaseApiService, ApiError, DEFAULT_API_CONFIG, getApiService, resetApiService } from './base';
+export {
+  BaseApiService,
+  ApiError,
+  DEFAULT_API_CONFIG,
+  getApiService,
+  resetApiService,
+} from './base';
 
 // WebSocket and real-time utilities
 export * from '../lib/websocket';
@@ -40,7 +46,7 @@ export type {
   ProjectShareLink,
   ProjectShareInfo,
   ProjectCollaborator,
-  ProjectImportValidation
+  ProjectImportValidation,
 } from './project';
 
 // Export pipeline types from pipeline service
@@ -57,7 +63,7 @@ export type {
   StageArtifact,
   ExecutionTimeEstimate,
   SchedulePipelineRequest,
-  ScheduledExecution
+  ScheduledExecution,
 } from './pipeline';
 
 // Export config types from config service
@@ -79,7 +85,7 @@ export type {
   OptimizedConfig,
   ConfigSchema,
   ConfigRequirements,
-  EnvironmentConfig
+  EnvironmentConfig,
 } from './config';
 
 // Export research types from research service
@@ -95,7 +101,7 @@ export type {
   CitationInfo,
   SourceValidationResult,
   ReportGenerationJob,
-  ResearchBookmark
+  ResearchBookmark,
 } from './research';
 
 // Export session types from session service
@@ -108,7 +114,7 @@ export type {
   SessionInsights,
   SessionInvitationResult,
   SessionInvitation,
-  SessionRecording
+  SessionRecording,
 } from './session';
 
 // Export export types from export service
@@ -129,7 +135,7 @@ export type {
   WebhookTestResult,
   ConversionResult,
   ArchiveResult,
-  ExportQuota
+  ExportQuota,
 } from './export';
 
 // Export analytics types from analytics service
@@ -156,7 +162,7 @@ export type {
   AlertHistoryResponse,
   AnalyticsInsight,
   AnalyticsSettings,
-  ComputationJob
+  ComputationJob,
 } from './analytics';
 
 // Re-export commonly used service instances
@@ -179,11 +185,11 @@ export async function initializeServices(config?: {
   if (config?.baseURL) {
     // Update base URL for all services
     const baseApiService = getApiService({ baseURL: config.baseURL });
-    
+
     if (config.apiKey) {
       baseApiService.setApiKey(config.apiKey);
     }
-    
+
     if (config.authToken) {
       baseApiService.setAuthToken(config.authToken);
     }
@@ -196,7 +202,9 @@ export async function initializeServices(config?: {
       console.log('✅ API services initialized successfully');
       return true;
     } else {
-      console.warn('⚠️ API health check failed - services may not be available');
+      console.warn(
+        '⚠️ API health check failed - services may not be available'
+      );
       return false;
     }
   } catch (error) {
@@ -215,7 +223,7 @@ export async function checkServiceHealth() {
 
   try {
     results.api = await getApiService().healthCheck();
-    
+
     // You could add individual service health checks here
     // For now, we'll just check the main API
     results.services.main = results.api;
@@ -230,7 +238,7 @@ export async function checkServiceHealth() {
 export function setupGlobalErrorHandler() {
   // Set up a global error handler for uncaught service errors
   if (typeof window !== 'undefined') {
-    window.addEventListener('unhandledrejection', (event) => {
+    window.addEventListener('unhandledrejection', event => {
       if (event.reason?.name === 'ApiError') {
         console.error('Unhandled API Error:', event.reason);
         // You could integrate with error tracking services here

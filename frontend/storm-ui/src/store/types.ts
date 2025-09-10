@@ -1,5 +1,15 @@
 // Core store types and interfaces
-import { StormProject, StormConfig, PipelineProgress, ResearchData, GeneratedArticle, ArticleOutline, ConversationData, ProjectStatus, PipelineStage } from '@/types/storm';
+import {
+  StormProject,
+  StormConfig,
+  PipelineProgress,
+  ResearchData,
+  GeneratedArticle,
+  ArticleOutline,
+  ConversationData,
+  ProjectStatus,
+  PipelineStage,
+} from '@/types/storm';
 
 // Base store slice interface
 export interface BaseSlice {
@@ -65,7 +75,12 @@ export interface ProjectFilters {
   tags?: string[];
 }
 
-export type ProjectSortField = 'title' | 'createdAt' | 'updatedAt' | 'status' | 'progress';
+export type ProjectSortField =
+  | 'title'
+  | 'createdAt'
+  | 'updatedAt'
+  | 'status'
+  | 'progress';
 
 // Pipeline execution state
 export interface PipelineState extends BaseSlice {

@@ -82,7 +82,7 @@ export const persist = <T>(
 
   return (set: any, get: any, api: any) => {
     const persistedState = loadPersistedState();
-    
+
     const store = config(
       (args: any) => {
         set(args);
@@ -122,7 +122,7 @@ export const persist = <T>(
           version,
           timestamp: Date.now(),
         };
-        
+
         storage.setItem(name, JSON.stringify(persistData));
       } catch (error) {
         console.warn(`Failed to save state for ${name}:`, error);
@@ -151,10 +151,12 @@ export const persist = <T>(
 };
 
 // Utility to create versioned state migrations
-export const createMigrations = (migrations: Record<number, (state: any) => any>) => {
+export const createMigrations = (
+  migrations: Record<number, (state: any) => any>
+) => {
   return (persistedState: any, version: number) => {
     let migratedState = persistedState;
-    
+
     // Apply all migrations from stored version to current version
     const versions = Object.keys(migrations)
       .map(Number)
@@ -186,7 +188,7 @@ export const createPartialize = <T extends object>(keys: (keyof T)[]) => {
 export const createEncryptedStorage = (encryptionKey: string): Storage => {
   const base64Encode = (str: string) => btoa(unescape(encodeURIComponent(str)));
   const base64Decode = (str: string) => decodeURIComponent(escape(atob(str)));
-  
+
   // Simple XOR encryption (not secure for production use)
   const encrypt = (text: string, key: string) => {
     let result = '';
@@ -219,7 +221,7 @@ export const createEncryptedStorage = (encryptionKey: string): Storage => {
     getItem: async (name: string) => {
       const encrypted = await baseStorage.getItem(name);
       if (!encrypted) return null;
-      
+
       const decrypted = decrypt(encrypted, encryptionKey);
       return decrypted;
     },

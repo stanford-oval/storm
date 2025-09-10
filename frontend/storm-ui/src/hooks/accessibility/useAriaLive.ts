@@ -29,7 +29,7 @@ class LiveRegionManager {
     element.style.width = '1px';
     element.style.height = '1px';
     element.style.overflow = 'hidden';
-    
+
     document.body.appendChild(element);
     return element;
   }
@@ -41,9 +41,13 @@ class LiveRegionManager {
     return this.regions.get(politeness)!;
   }
 
-  announce(message: string, politeness: AriaPoliteness = 'polite', delay: number = 0) {
+  announce(
+    message: string,
+    politeness: AriaPoliteness = 'polite',
+    delay: number = 0
+  ) {
     const region = this.getRegion(politeness);
-    
+
     if (delay > 0) {
       setTimeout(() => {
         region.textContent = message;
@@ -53,11 +57,14 @@ class LiveRegionManager {
     }
 
     // Clear the message after a short delay to allow for repeated announcements
-    setTimeout(() => {
-      if (region.textContent === message) {
-        region.textContent = '';
-      }
-    }, Math.max(1000, message.length * 50));
+    setTimeout(
+      () => {
+        if (region.textContent === message) {
+          region.textContent = '';
+        }
+      },
+      Math.max(1000, message.length * 50)
+    );
   }
 
   clear(politeness?: AriaPoliteness) {
@@ -87,7 +94,9 @@ class LiveRegionManager {
 const liveRegionManager = new LiveRegionManager();
 
 // Hook for using ARIA live regions
-export const useAriaLive = (defaultOptions: AriaLiveOptions = {}): AriaLiveRegion => {
+export const useAriaLive = (
+  defaultOptions: AriaLiveOptions = {}
+): AriaLiveRegion => {
   const {
     politeness = 'polite',
     atomic = true,
@@ -100,22 +109,22 @@ export const useAriaLive = (defaultOptions: AriaLiveOptions = {}): AriaLiveRegio
   // Get or create the live region
   useEffect(() => {
     currentRegionRef.current = liveRegionManager.getRegion(politeness);
-    
+
     if (currentRegionRef.current) {
       currentRegionRef.current.setAttribute('aria-atomic', atomic.toString());
       currentRegionRef.current.setAttribute('aria-relevant', relevant);
     }
   }, [politeness, atomic, relevant]);
 
-  const announce = useCallback((
-    message: string, 
-    options: Partial<AriaLiveOptions> = {}
-  ) => {
-    const finalPoliteness = options.politeness ?? politeness;
-    const finalDelay = options.delay ?? delay;
-    
-    liveRegionManager.announce(message, finalPoliteness, finalDelay);
-  }, [politeness, delay]);
+  const announce = useCallback(
+    (message: string, options: Partial<AriaLiveOptions> = {}) => {
+      const finalPoliteness = options.politeness ?? politeness;
+      const finalDelay = options.delay ?? delay;
+
+      liveRegionManager.announce(message, finalPoliteness, finalDelay);
+    },
+    [politeness, delay]
+  );
 
   const clear = useCallback(() => {
     liveRegionManager.clear(politeness);
@@ -141,21 +150,30 @@ export const useAssertiveAnnouncements = () => {
 export const useFormAnnouncements = () => {
   const { announce } = useAriaLive({ politeness: 'assertive', delay: 100 });
 
-  const announceError = useCallback((fieldName: string, error: string) => {
-    announce(`Error in ${fieldName}: ${error}`);
-  }, [announce]);
+  const announceError = useCallback(
+    (fieldName: string, error: string) => {
+      announce(`Error in ${fieldName}: ${error}`);
+    },
+    [announce]
+  );
 
-  const announceSuccess = useCallback((message: string) => {
-    announce(`Success: ${message}`);
-  }, [announce]);
+  const announceSuccess = useCallback(
+    (message: string) => {
+      announce(`Success: ${message}`);
+    },
+    [announce]
+  );
 
-  const announceValidation = useCallback((fieldName: string, isValid: boolean, message?: string) => {
-    if (isValid) {
-      announce(`${fieldName} is valid`);
-    } else if (message) {
-      announce(`${fieldName} error: ${message}`);
-    }
-  }, [announce]);
+  const announceValidation = useCallback(
+    (fieldName: string, isValid: boolean, message?: string) => {
+      if (isValid) {
+        announce(`${fieldName} is valid`);
+      } else if (message) {
+        announce(`${fieldName} error: ${message}`);
+      }
+    },
+    [announce]
+  );
 
   return {
     announce,
@@ -169,20 +187,29 @@ export const useFormAnnouncements = () => {
 export const useLoadingAnnouncements = () => {
   const { announce } = useAriaLive({ politeness: 'polite' });
 
-  const announceLoading = useCallback((resource: string) => {
-    announce(`Loading ${resource}...`);
-  }, [announce]);
+  const announceLoading = useCallback(
+    (resource: string) => {
+      announce(`Loading ${resource}...`);
+    },
+    [announce]
+  );
 
-  const announceLoaded = useCallback((resource: string) => {
-    announce(`${resource} loaded successfully`);
-  }, [announce]);
+  const announceLoaded = useCallback(
+    (resource: string) => {
+      announce(`${resource} loaded successfully`);
+    },
+    [announce]
+  );
 
-  const announceError = useCallback((resource: string, error?: string) => {
-    const message = error 
-      ? `Failed to load ${resource}: ${error}`
-      : `Failed to load ${resource}`;
-    announce(message);
-  }, [announce]);
+  const announceError = useCallback(
+    (resource: string, error?: string) => {
+      const message = error
+        ? `Failed to load ${resource}: ${error}`
+        : `Failed to load ${resource}`;
+      announce(message);
+    },
+    [announce]
+  );
 
   return {
     announceLoading,
@@ -195,18 +222,27 @@ export const useLoadingAnnouncements = () => {
 export const useNavigationAnnouncements = () => {
   const { announce } = useAriaLive({ politeness: 'polite', delay: 200 });
 
-  const announceNavigation = useCallback((destination: string) => {
-    announce(`Navigated to ${destination}`);
-  }, [announce]);
+  const announceNavigation = useCallback(
+    (destination: string) => {
+      announce(`Navigated to ${destination}`);
+    },
+    [announce]
+  );
 
-  const announceRouteChange = useCallback((from: string, to: string) => {
-    announce(`Navigated from ${from} to ${to}`);
-  }, [announce]);
+  const announceRouteChange = useCallback(
+    (from: string, to: string) => {
+      announce(`Navigated from ${from} to ${to}`);
+    },
+    [announce]
+  );
 
-  const announceBreadcrumb = useCallback((breadcrumbs: string[]) => {
-    const breadcrumbText = breadcrumbs.join(' > ');
-    announce(`Current location: ${breadcrumbText}`);
-  }, [announce]);
+  const announceBreadcrumb = useCallback(
+    (breadcrumbs: string[]) => {
+      const breadcrumbText = breadcrumbs.join(' > ');
+      announce(`Current location: ${breadcrumbText}`);
+    },
+    [announce]
+  );
 
   return {
     announceNavigation,

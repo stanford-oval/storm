@@ -18,26 +18,28 @@ export class ProjectService extends BaseApiService {
   /**
    * Get all projects with optional filtering and pagination
    */
-  async getProjects(request?: ProjectListRequest): Promise<ApiResponse<PaginatedResponse<StormProject>>> {
+  async getProjects(
+    request?: ProjectListRequest
+  ): Promise<ApiResponse<PaginatedResponse<StormProject>>> {
     const params = new URLSearchParams();
-    
+
     if (request?.page) params.append('page', request.page.toString());
     if (request?.limit) params.append('limit', request.limit.toString());
     if (request?.sortBy) params.append('sortBy', request.sortBy);
     if (request?.sortOrder) params.append('sortOrder', request.sortOrder);
-    
+
     // Handle filters
     if (request?.filters) {
       const { filters } = request;
-      
+
       if (filters.status && filters.status.length > 0) {
         params.append('status', filters.status.join(','));
       }
-      
+
       if (filters.searchQuery) {
         params.append('search', filters.searchQuery);
       }
-      
+
       if (filters.dateRange) {
         params.append('startDate', filters.dateRange.start.toISOString());
         params.append('endDate', filters.dateRange.end.toISOString());
@@ -58,14 +60,18 @@ export class ProjectService extends BaseApiService {
   /**
    * Create a new project
    */
-  async createProject(request: CreateProjectRequest): Promise<ApiResponse<StormProject>> {
+  async createProject(
+    request: CreateProjectRequest
+  ): Promise<ApiResponse<StormProject>> {
     return this.post<StormProject>(this.basePath, request);
   }
 
   /**
    * Update an existing project
    */
-  async updateProject(request: UpdateProjectRequest): Promise<ApiResponse<StormProject>> {
+  async updateProject(
+    request: UpdateProjectRequest
+  ): Promise<ApiResponse<StormProject>> {
     const { id, ...updateData } = request;
     return this.put<StormProject>(`${this.basePath}/${id}`, updateData);
   }
@@ -73,7 +79,10 @@ export class ProjectService extends BaseApiService {
   /**
    * Partially update a project (PATCH)
    */
-  async patchProject(projectId: string, updates: Partial<StormProject>): Promise<ApiResponse<StormProject>> {
+  async patchProject(
+    projectId: string,
+    updates: Partial<StormProject>
+  ): Promise<ApiResponse<StormProject>> {
     return this.patch<StormProject>(`${this.basePath}/${projectId}`, updates);
   }
 
@@ -87,20 +96,30 @@ export class ProjectService extends BaseApiService {
   /**
    * Bulk delete projects
    */
-  async deleteProjects(projectIds: string[]): Promise<ApiResponse<{ deleted: number; errors: string[] }>> {
-    return this.post<{ deleted: number; errors: string[] }>(`${this.basePath}/bulk-delete`, {
-      projectIds
-    });
+  async deleteProjects(
+    projectIds: string[]
+  ): Promise<ApiResponse<{ deleted: number; errors: string[] }>> {
+    return this.post<{ deleted: number; errors: string[] }>(
+      `${this.basePath}/bulk-delete`,
+      {
+        projectIds,
+      }
+    );
   }
 
   /**
    * Duplicate a project
    */
-  async duplicateProject(request: DuplicateProjectRequest): Promise<ApiResponse<StormProject>> {
-    return this.post<StormProject>(`${this.basePath}/${request.projectId}/duplicate`, {
-      new_title: request.title,
-      description: request.description
-    });
+  async duplicateProject(
+    request: DuplicateProjectRequest
+  ): Promise<ApiResponse<StormProject>> {
+    return this.post<StormProject>(
+      `${this.basePath}/${request.projectId}/duplicate`,
+      {
+        new_title: request.title,
+        description: request.description,
+      }
+    );
   }
 
   /**
@@ -113,20 +132,25 @@ export class ProjectService extends BaseApiService {
   /**
    * Search projects
    */
-  async searchProjects(query: string, filters?: ProjectFilters): Promise<ApiResponse<StormProject[]>> {
+  async searchProjects(
+    query: string,
+    filters?: ProjectFilters
+  ): Promise<ApiResponse<StormProject[]>> {
     const params = new URLSearchParams();
     params.append('q', query);
-    
+
     if (filters?.status && filters.status.length > 0) {
       params.append('status', filters.status.join(','));
     }
-    
+
     if (filters?.dateRange) {
       params.append('startDate', filters.dateRange.start.toISOString());
       params.append('endDate', filters.dateRange.end.toISOString());
     }
 
-    return this.get<StormProject[]>(`${this.basePath}/search?${params.toString()}`);
+    return this.get<StormProject[]>(
+      `${this.basePath}/search?${params.toString()}`
+    );
   }
 
   /**
@@ -140,10 +164,13 @@ export class ProjectService extends BaseApiService {
    * Create project from template
    */
   async createFromTemplate(
-    templateId: string, 
+    templateId: string,
     data: { title: string; topic: string; description?: string }
   ): Promise<ApiResponse<StormProject>> {
-    return this.post<StormProject>(`${this.basePath}/templates/${templateId}/create`, data);
+    return this.post<StormProject>(
+      `${this.basePath}/templates/${templateId}/create`,
+      data
+    );
   }
 
   /**
@@ -156,7 +183,9 @@ export class ProjectService extends BaseApiService {
   /**
    * Unarchive a project
    */
-  async unarchiveProject(projectId: string): Promise<ApiResponse<StormProject>> {
+  async unarchiveProject(
+    projectId: string
+  ): Promise<ApiResponse<StormProject>> {
     return this.post<StormProject>(`${this.basePath}/${projectId}/unarchive`);
   }
 
@@ -164,7 +193,7 @@ export class ProjectService extends BaseApiService {
    * Get project activity log
    */
   async getProjectActivity(
-    projectId: string, 
+    projectId: string,
     options?: { page?: number; limit?: number }
   ): Promise<ApiResponse<PaginatedResponse<ProjectActivity>>> {
     const params = new URLSearchParams();
@@ -178,15 +207,25 @@ export class ProjectService extends BaseApiService {
   /**
    * Add tags to a project
    */
-  async addProjectTags(projectId: string, tags: string[]): Promise<ApiResponse<StormProject>> {
-    return this.post<StormProject>(`${this.basePath}/${projectId}/tags`, { tags });
+  async addProjectTags(
+    projectId: string,
+    tags: string[]
+  ): Promise<ApiResponse<StormProject>> {
+    return this.post<StormProject>(`${this.basePath}/${projectId}/tags`, {
+      tags,
+    });
   }
 
   /**
    * Remove tags from a project
    */
-  async removeProjectTags(projectId: string, tags: string[]): Promise<ApiResponse<StormProject>> {
-    return this.delete<StormProject>(`${this.basePath}/${projectId}/tags`, { data: { tags } });
+  async removeProjectTags(
+    projectId: string,
+    tags: string[]
+  ): Promise<ApiResponse<StormProject>> {
+    return this.delete<StormProject>(`${this.basePath}/${projectId}/tags`, {
+      data: { tags },
+    });
   }
 
   /**
@@ -200,23 +239,31 @@ export class ProjectService extends BaseApiService {
    * Share a project
    */
   async shareProject(
-    projectId: string, 
+    projectId: string,
     options: ProjectShareOptions
   ): Promise<ApiResponse<ProjectShareLink>> {
-    return this.post<ProjectShareLink>(`${this.basePath}/${projectId}/share`, options);
+    return this.post<ProjectShareLink>(
+      `${this.basePath}/${projectId}/share`,
+      options
+    );
   }
 
   /**
    * Get project sharing info
    */
-  async getProjectSharing(projectId: string): Promise<ApiResponse<ProjectShareInfo>> {
+  async getProjectSharing(
+    projectId: string
+  ): Promise<ApiResponse<ProjectShareInfo>> {
     return this.get<ProjectShareInfo>(`${this.basePath}/${projectId}/share`);
   }
 
   /**
    * Revoke project sharing
    */
-  async revokeProjectSharing(projectId: string, shareId: string): Promise<ApiResponse<void>> {
+  async revokeProjectSharing(
+    projectId: string,
+    shareId: string
+  ): Promise<ApiResponse<void>> {
     return this.delete<void>(`${this.basePath}/${projectId}/share/${shareId}`);
   }
 
@@ -246,8 +293,12 @@ export class ProjectService extends BaseApiService {
   /**
    * Get project collaborators
    */
-  async getProjectCollaborators(projectId: string): Promise<ApiResponse<ProjectCollaborator[]>> {
-    return this.get<ProjectCollaborator[]>(`${this.basePath}/${projectId}/collaborators`);
+  async getProjectCollaborators(
+    projectId: string
+  ): Promise<ApiResponse<ProjectCollaborator[]>> {
+    return this.get<ProjectCollaborator[]>(
+      `${this.basePath}/${projectId}/collaborators`
+    );
   }
 
   /**
@@ -257,7 +308,10 @@ export class ProjectService extends BaseApiService {
     projectId: string,
     collaborator: { email: string; role: 'viewer' | 'editor' | 'admin' }
   ): Promise<ApiResponse<ProjectCollaborator>> {
-    return this.post<ProjectCollaborator>(`${this.basePath}/${projectId}/collaborators`, collaborator);
+    return this.post<ProjectCollaborator>(
+      `${this.basePath}/${projectId}/collaborators`,
+      collaborator
+    );
   }
 
   /**
@@ -268,9 +322,12 @@ export class ProjectService extends BaseApiService {
     collaboratorId: string,
     role: 'viewer' | 'editor' | 'admin'
   ): Promise<ApiResponse<ProjectCollaborator>> {
-    return this.patch<ProjectCollaborator>(`${this.basePath}/${projectId}/collaborators/${collaboratorId}`, {
-      role
-    });
+    return this.patch<ProjectCollaborator>(
+      `${this.basePath}/${projectId}/collaborators/${collaboratorId}`,
+      {
+        role,
+      }
+    );
   }
 
   /**
@@ -280,7 +337,9 @@ export class ProjectService extends BaseApiService {
     projectId: string,
     collaboratorId: string
   ): Promise<ApiResponse<void>> {
-    return this.delete<void>(`${this.basePath}/${projectId}/collaborators/${collaboratorId}`);
+    return this.delete<void>(
+      `${this.basePath}/${projectId}/collaborators/${collaboratorId}`
+    );
   }
 
   /**
@@ -296,15 +355,17 @@ export class ProjectService extends BaseApiService {
     }
   ): Promise<() => void> {
     const ws = createProjectWebSocket(projectId);
-    
+
     // Set up WebSocket event handlers
     ws.setEventHandlers({
-      onError: (event) => {
+      onError: event => {
         callbacks.onError?.(new Error('WebSocket connection error'));
       },
-      onClose: (event) => {
+      onClose: event => {
         if (!event.wasClean) {
-          callbacks.onError?.(new Error('WebSocket connection closed unexpectedly'));
+          callbacks.onError?.(
+            new Error('WebSocket connection closed unexpectedly')
+          );
         }
       },
     });
@@ -313,21 +374,31 @@ export class ProjectService extends BaseApiService {
     try {
       await ws.connect();
     } catch (error) {
-      callbacks.onError?.(error instanceof Error ? error : new Error('Failed to connect to project updates'));
+      callbacks.onError?.(
+        error instanceof Error
+          ? error
+          : new Error('Failed to connect to project updates')
+      );
       return () => {};
     }
 
     // Subscribe to different message types
     const unsubscribers: (() => void)[] = [];
-    
+
     if (callbacks.onProjectUpdate) {
-      unsubscribers.push(ws.on<StormProject>('project_update', callbacks.onProjectUpdate));
+      unsubscribers.push(
+        ws.on<StormProject>('project_update', callbacks.onProjectUpdate)
+      );
     }
-    
+
     if (callbacks.onStatusChange) {
-      unsubscribers.push(ws.on<{ status: string }>('status_change', (data) => callbacks.onStatusChange!(data.status)));
+      unsubscribers.push(
+        ws.on<{ status: string }>('status_change', data =>
+          callbacks.onStatusChange!(data.status)
+        )
+      );
     }
-    
+
     if (callbacks.onProgressUpdate) {
       unsubscribers.push(ws.on('progress_update', callbacks.onProgressUpdate));
     }
@@ -362,10 +433,10 @@ export class ProjectService extends BaseApiService {
   private enhanceError(error: any, operationName: string): Error {
     const message = error?.message || 'Unknown error occurred';
     const status = error?.status || error?.response?.status;
-    
+
     // Provide more specific error messages based on status codes
     let enhancedMessage = `${operationName} failed: ${message}`;
-    
+
     switch (status) {
       case 400:
         enhancedMessage = `Invalid request for ${operationName}. Please check your input.`;
@@ -395,12 +466,12 @@ export class ProjectService extends BaseApiService {
         enhancedMessage = `Server error in ${operationName}. Please try again or contact support.`;
         break;
     }
-    
+
     const enhancedError = new Error(enhancedMessage);
     (enhancedError as any).originalError = error;
     (enhancedError as any).operation = operationName;
     (enhancedError as any).status = status;
-    
+
     return enhancedError;
   }
 }
@@ -481,5 +552,5 @@ export interface ProjectImportValidation {
 
 // Create and export singleton instance
 export const projectService = new ProjectService({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
 });

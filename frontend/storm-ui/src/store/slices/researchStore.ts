@@ -28,52 +28,65 @@ interface ResearchActions {
   updateResearchData: (research: Partial<ResearchData>) => void;
   clearResearchData: () => void;
   refreshResearchData: () => Promise<void>;
-  
+
   // Conversation management
-  startConversation: (perspective: string, projectId: string) => Promise<string>;
-  updateConversation: (conversationId: string, updates: Partial<ConversationData>) => void;
+  startConversation: (
+    perspective: string,
+    projectId: string
+  ) => Promise<string>;
+  updateConversation: (
+    conversationId: string,
+    updates: Partial<ConversationData>
+  ) => void;
   endConversation: (conversationId: string) => Promise<void>;
   removeConversation: (conversationId: string) => void;
-  addConversationTurn: (conversationId: string, content: string, speaker: 'user' | 'assistant') => void;
-  
+  addConversationTurn: (
+    conversationId: string,
+    content: string,
+    speaker: 'user' | 'assistant'
+  ) => void;
+
   // Source management
   addSource: (source: SourceData) => void;
   updateSource: (sourceId: string, updates: Partial<SourceData>) => void;
   removeSource: (sourceId: string) => void;
   markSourceAsUsed: (sourceId: string, sectionId: string) => void;
   bulkAddSources: (sources: SourceData[]) => void;
-  
+
   // Search functionality
   performSearch: (query: string, perspective?: string) => Promise<SourceData[]>;
   addToSearchHistory: (query: SearchQuery) => void;
   clearSearchHistory: () => void;
-  
+
   // Filtering and view management
   setPerspectiveFilters: (perspectives: string[]) => void;
   addPerspectiveFilter: (perspective: string) => void;
   removePerspectiveFilter: (perspective: string) => void;
   clearPerspectiveFilters: () => void;
   setViewMode: (mode: 'conversations' | 'sources' | 'timeline') => void;
-  
+
   // Source caching
   cacheSource: (sourceId: string, data: any) => void;
   getCachedSource: (sourceId: string) => any | null;
   clearSourcesCache: () => void;
-  
+
   // Auto-refresh management
   setAutoRefresh: (enabled: boolean) => void;
   startAutoRefresh: (interval?: number) => void;
   stopAutoRefresh: () => void;
-  
+
   // Analytics and insights
   getConversationAnalytics: () => ConversationAnalytics;
   getSourceAnalytics: () => SourceAnalytics;
   getResearchInsights: () => ResearchInsights;
-  
+
   // Export functionality
   exportResearchData: (format: 'json' | 'csv' | 'txt') => string;
-  exportConversation: (conversationId: string, format: 'json' | 'txt') => string;
-  
+  exportConversation: (
+    conversationId: string,
+    format: 'json' | 'txt'
+  ) => string;
+
   // State management
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
@@ -125,22 +138,22 @@ export const useResearchStore = create<ResearchStore>()(
           ...initialState,
 
           // Research data management
-          loadResearchData: async (projectId) => {
-            set((draft) => {
+          loadResearchData: async projectId => {
+            set(draft => {
               draft.loading = true;
               draft.error = null;
             });
 
             try {
               const response = await fetch(`/api/research/${projectId}`);
-              
+
               if (!response.ok) {
                 throw new Error('Failed to load research data');
               }
 
               const researchData: ResearchData = await response.json();
 
-              set((draft) => {
+              set(draft => {
                 draft.currentResearch = researchData;
                 draft.activeConversations = researchData.conversations.filter(
                   c => c.status === 'active'
@@ -149,16 +162,19 @@ export const useResearchStore = create<ResearchStore>()(
                 draft.lastUpdated = new Date();
               });
             } catch (error) {
-              set((draft) => {
-                draft.error = error instanceof Error ? error.message : 'Failed to load research data';
+              set(draft => {
+                draft.error =
+                  error instanceof Error
+                    ? error.message
+                    : 'Failed to load research data';
                 draft.loading = false;
               });
               throw error;
             }
           },
 
-          updateResearchData: (research) => {
-            set((draft) => {
+          updateResearchData: research => {
+            set(draft => {
               if (draft.currentResearch) {
                 Object.assign(draft.currentResearch, research);
                 draft.lastUpdated = new Date();
@@ -167,7 +183,7 @@ export const useResearchStore = create<ResearchStore>()(
           },
 
           clearResearchData: () => {
-            set((draft) => {
+            set(draft => {
               draft.currentResearch = null;
               draft.activeConversations = [];
               draft.sourcesCache.clear();
@@ -186,7 +202,7 @@ export const useResearchStore = create<ResearchStore>()(
 
           // Conversation management
           startConversation: async (perspective, projectId) => {
-            set((draft) => {
+            set(draft => {
               draft.loading = true;
               draft.error = null;
             });
@@ -204,7 +220,7 @@ export const useResearchStore = create<ResearchStore>()(
 
               const conversation: ConversationData = await response.json();
 
-              set((draft) => {
+              set(draft => {
                 if (!draft.currentResearch) {
                   draft.currentResearch = {
                     conversations: [],
@@ -214,22 +230,25 @@ export const useResearchStore = create<ResearchStore>()(
                     lastUpdated: new Date(),
                   };
                 }
-                
+
                 draft.currentResearch.conversations.push(conversation);
                 draft.activeConversations.push(conversation);
-                
+
                 if (!draft.currentResearch.perspectives.includes(perspective)) {
                   draft.currentResearch.perspectives.push(perspective);
                 }
-                
+
                 draft.loading = false;
                 draft.lastUpdated = new Date();
               });
 
               return conversation.id;
             } catch (error) {
-              set((draft) => {
-                draft.error = error instanceof Error ? error.message : 'Failed to start conversation';
+              set(draft => {
+                draft.error =
+                  error instanceof Error
+                    ? error.message
+                    : 'Failed to start conversation';
                 draft.loading = false;
               });
               throw error;
@@ -237,70 +256,92 @@ export const useResearchStore = create<ResearchStore>()(
           },
 
           updateConversation: (conversationId, updates) => {
-            set((draft) => {
+            set(draft => {
               if (draft.currentResearch) {
-                const conversation = draft.currentResearch.conversations.find(c => c.id === conversationId);
+                const conversation = draft.currentResearch.conversations.find(
+                  c => c.id === conversationId
+                );
                 if (conversation) {
                   Object.assign(conversation, updates);
-                  
+
                   // Update active conversations list
-                  const activeIndex = draft.activeConversations.findIndex(c => c.id === conversationId);
+                  const activeIndex = draft.activeConversations.findIndex(
+                    c => c.id === conversationId
+                  );
                   if (activeIndex !== -1) {
-                    Object.assign(draft.activeConversations[activeIndex], updates);
+                    Object.assign(
+                      draft.activeConversations[activeIndex],
+                      updates
+                    );
                   }
-                  
+
                   draft.lastUpdated = new Date();
                 }
               }
             });
           },
 
-          endConversation: async (conversationId) => {
+          endConversation: async conversationId => {
             try {
-              const response = await fetch(`/api/conversations/${conversationId}/end`, {
-                method: 'POST',
-              });
+              const response = await fetch(
+                `/api/conversations/${conversationId}/end`,
+                {
+                  method: 'POST',
+                }
+              );
 
               if (!response.ok) {
                 throw new Error('Failed to end conversation');
               }
 
-              set((draft) => {
-                draft.activeConversations = draft.activeConversations.filter(c => c.id !== conversationId);
-                
+              set(draft => {
+                draft.activeConversations = draft.activeConversations.filter(
+                  c => c.id !== conversationId
+                );
+
                 if (draft.currentResearch) {
-                  const conversation = draft.currentResearch.conversations.find(c => c.id === conversationId);
+                  const conversation = draft.currentResearch.conversations.find(
+                    c => c.id === conversationId
+                  );
                   if (conversation) {
                     conversation.status = 'completed';
                     conversation.endTime = new Date();
                   }
                 }
-                
+
                 draft.lastUpdated = new Date();
               });
             } catch (error) {
-              set((draft) => {
-                draft.error = error instanceof Error ? error.message : 'Failed to end conversation';
+              set(draft => {
+                draft.error =
+                  error instanceof Error
+                    ? error.message
+                    : 'Failed to end conversation';
               });
               throw error;
             }
           },
 
-          removeConversation: (conversationId) => {
-            set((draft) => {
+          removeConversation: conversationId => {
+            set(draft => {
               if (draft.currentResearch) {
-                draft.currentResearch.conversations = draft.currentResearch.conversations.filter(
-                  c => c.id !== conversationId
-                );
+                draft.currentResearch.conversations =
+                  draft.currentResearch.conversations.filter(
+                    c => c.id !== conversationId
+                  );
               }
-              draft.activeConversations = draft.activeConversations.filter(c => c.id !== conversationId);
+              draft.activeConversations = draft.activeConversations.filter(
+                c => c.id !== conversationId
+              );
             });
           },
 
           addConversationTurn: (conversationId, content, speaker) => {
-            set((draft) => {
+            set(draft => {
               if (draft.currentResearch) {
-                const conversation = draft.currentResearch.conversations.find(c => c.id === conversationId);
+                const conversation = draft.currentResearch.conversations.find(
+                  c => c.id === conversationId
+                );
                 if (conversation) {
                   const turn = {
                     id: `turn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -308,11 +349,13 @@ export const useResearchStore = create<ResearchStore>()(
                     content,
                     timestamp: new Date(),
                   };
-                  
+
                   conversation.turns.push(turn);
-                  
+
                   // Update active conversation as well
-                  const activeConversation = draft.activeConversations.find(c => c.id === conversationId);
+                  const activeConversation = draft.activeConversations.find(
+                    c => c.id === conversationId
+                  );
                   if (activeConversation) {
                     activeConversation.turns.push(turn);
                   }
@@ -322,8 +365,8 @@ export const useResearchStore = create<ResearchStore>()(
           },
 
           // Source management
-          addSource: (source) => {
-            set((draft) => {
+          addSource: source => {
+            set(draft => {
               if (!draft.currentResearch) {
                 draft.currentResearch = {
                   conversations: [],
@@ -333,9 +376,11 @@ export const useResearchStore = create<ResearchStore>()(
                   lastUpdated: new Date(),
                 };
               }
-              
+
               // Check if source already exists
-              const existingSource = draft.currentResearch.sources.find(s => s.url === source.url);
+              const existingSource = draft.currentResearch.sources.find(
+                s => s.url === source.url
+              );
               if (!existingSource) {
                 draft.currentResearch.sources.push(source);
                 draft.lastUpdated = new Date();
@@ -344,9 +389,11 @@ export const useResearchStore = create<ResearchStore>()(
           },
 
           updateSource: (sourceId, updates) => {
-            set((draft) => {
+            set(draft => {
               if (draft.currentResearch) {
-                const source = draft.currentResearch.sources.find(s => s.id === sourceId);
+                const source = draft.currentResearch.sources.find(
+                  s => s.id === sourceId
+                );
                 if (source) {
                   Object.assign(source, updates);
                   draft.lastUpdated = new Date();
@@ -355,21 +402,22 @@ export const useResearchStore = create<ResearchStore>()(
             });
           },
 
-          removeSource: (sourceId) => {
-            set((draft) => {
+          removeSource: sourceId => {
+            set(draft => {
               if (draft.currentResearch) {
-                draft.currentResearch.sources = draft.currentResearch.sources.filter(
-                  s => s.id !== sourceId
-                );
+                draft.currentResearch.sources =
+                  draft.currentResearch.sources.filter(s => s.id !== sourceId);
               }
               draft.sourcesCache.delete(sourceId);
             });
           },
 
           markSourceAsUsed: (sourceId, sectionId) => {
-            set((draft) => {
+            set(draft => {
               if (draft.currentResearch) {
-                const source = draft.currentResearch.sources.find(s => s.id === sourceId);
+                const source = draft.currentResearch.sources.find(
+                  s => s.id === sourceId
+                );
                 if (source) {
                   if (!source.usedInSections) {
                     source.usedInSections = [];
@@ -382,8 +430,8 @@ export const useResearchStore = create<ResearchStore>()(
             });
           },
 
-          bulkAddSources: (sources) => {
-            set((draft) => {
+          bulkAddSources: sources => {
+            set(draft => {
               if (!draft.currentResearch) {
                 draft.currentResearch = {
                   conversations: [],
@@ -393,11 +441,13 @@ export const useResearchStore = create<ResearchStore>()(
                   lastUpdated: new Date(),
                 };
               }
-              
+
               // Add only new sources
-              const existingUrls = new Set(draft.currentResearch.sources.map(s => s.url));
+              const existingUrls = new Set(
+                draft.currentResearch.sources.map(s => s.url)
+              );
               const newSources = sources.filter(s => !existingUrls.has(s.url));
-              
+
               draft.currentResearch.sources.push(...newSources);
               draft.lastUpdated = new Date();
             });
@@ -405,7 +455,7 @@ export const useResearchStore = create<ResearchStore>()(
 
           // Search functionality
           performSearch: async (query, perspective) => {
-            set((draft) => {
+            set(draft => {
               draft.loading = true;
               draft.error = null;
             });
@@ -423,7 +473,7 @@ export const useResearchStore = create<ResearchStore>()(
 
               const sources: SourceData[] = await response.json();
 
-              set((draft) => {
+              set(draft => {
                 draft.loading = false;
                 if (draft.currentResearch) {
                   draft.currentResearch.totalQueries += 1;
@@ -445,18 +495,19 @@ export const useResearchStore = create<ResearchStore>()(
 
               return sources;
             } catch (error) {
-              set((draft) => {
-                draft.error = error instanceof Error ? error.message : 'Search failed';
+              set(draft => {
+                draft.error =
+                  error instanceof Error ? error.message : 'Search failed';
                 draft.loading = false;
               });
               throw error;
             }
           },
 
-          addToSearchHistory: (query) => {
-            set((draft) => {
+          addToSearchHistory: query => {
+            set(draft => {
               draft.searchHistory.unshift(query);
-              
+
               // Keep only last 100 searches
               if (draft.searchHistory.length > 100) {
                 draft.searchHistory = draft.searchHistory.slice(0, 100);
@@ -465,64 +516,66 @@ export const useResearchStore = create<ResearchStore>()(
           },
 
           clearSearchHistory: () => {
-            set((draft) => {
+            set(draft => {
               draft.searchHistory = [];
             });
           },
 
           // Filtering and view management
-          setPerspectiveFilters: (perspectives) => {
-            set((draft) => {
+          setPerspectiveFilters: perspectives => {
+            set(draft => {
               draft.perspectiveFilters = perspectives;
             });
           },
 
-          addPerspectiveFilter: (perspective) => {
-            set((draft) => {
+          addPerspectiveFilter: perspective => {
+            set(draft => {
               if (!draft.perspectiveFilters.includes(perspective)) {
                 draft.perspectiveFilters.push(perspective);
               }
             });
           },
 
-          removePerspectiveFilter: (perspective) => {
-            set((draft) => {
-              draft.perspectiveFilters = draft.perspectiveFilters.filter(p => p !== perspective);
+          removePerspectiveFilter: perspective => {
+            set(draft => {
+              draft.perspectiveFilters = draft.perspectiveFilters.filter(
+                p => p !== perspective
+              );
             });
           },
 
           clearPerspectiveFilters: () => {
-            set((draft) => {
+            set(draft => {
               draft.perspectiveFilters = [];
             });
           },
 
-          setViewMode: (mode) => {
-            set((draft) => {
+          setViewMode: mode => {
+            set(draft => {
               draft.viewMode = mode;
             });
           },
 
           // Source caching
           cacheSource: (sourceId, data) => {
-            set((draft) => {
+            set(draft => {
               draft.sourcesCache.set(sourceId, data);
             });
           },
 
-          getCachedSource: (sourceId) => {
+          getCachedSource: sourceId => {
             return get().sourcesCache.get(sourceId) || null;
           },
 
           clearSourcesCache: () => {
-            set((draft) => {
+            set(draft => {
               draft.sourcesCache.clear();
             });
           },
 
           // Auto-refresh management
-          setAutoRefresh: (enabled) => {
-            set((draft) => {
+          setAutoRefresh: enabled => {
+            set(draft => {
               draft.autoRefresh = enabled;
             });
 
@@ -535,7 +588,7 @@ export const useResearchStore = create<ResearchStore>()(
 
           startAutoRefresh: (interval = 30000) => {
             get().stopAutoRefresh(); // Clear existing timer
-            
+
             autoRefreshTimer = setInterval(() => {
               get().refreshResearchData();
             }, interval);
@@ -565,10 +618,18 @@ export const useResearchStore = create<ResearchStore>()(
 
             const conversations = currentResearch.conversations;
             const totalConversations = conversations.length;
-            const activeConversations = conversations.filter(c => c.status === 'active').length;
-            const completedConversations = conversations.filter(c => c.status === 'completed').length;
-            const totalTurns = conversations.reduce((sum, c) => sum + c.turns.length, 0);
-            const averageTurnsPerConversation = totalConversations > 0 ? totalTurns / totalConversations : 0;
+            const activeConversations = conversations.filter(
+              c => c.status === 'active'
+            ).length;
+            const completedConversations = conversations.filter(
+              c => c.status === 'completed'
+            ).length;
+            const totalTurns = conversations.reduce(
+              (sum, c) => sum + c.turns.length,
+              0
+            );
+            const averageTurnsPerConversation =
+              totalConversations > 0 ? totalTurns / totalConversations : 0;
 
             // Perspective breakdown
             const perspectiveCounts = new Map<string, number>();
@@ -621,9 +682,11 @@ export const useResearchStore = create<ResearchStore>()(
 
             // Average relevance score
             const relevanceScores = sources.map(s => s.relevanceScore || 0);
-            const averageRelevanceScore = relevanceScores.length > 0 
-              ? relevanceScores.reduce((sum, score) => sum + score, 0) / relevanceScores.length 
-              : 0;
+            const averageRelevanceScore =
+              relevanceScores.length > 0
+                ? relevanceScores.reduce((sum, score) => sum + score, 0) /
+                  relevanceScores.length
+                : 0;
 
             // Most used sources
             const mostUsedSources = sources
@@ -635,7 +698,10 @@ export const useResearchStore = create<ResearchStore>()(
               .slice(0, 10);
 
             // This would require additional tracking of which perspective found which source
-            const sourcesByPerspective: Array<{ perspective: string; count: number }> = [];
+            const sourcesByPerspective: Array<{
+              perspective: string;
+              count: number;
+            }> = [];
 
             return {
               totalSources,
@@ -663,9 +729,16 @@ export const useResearchStore = create<ResearchStore>()(
             const keyTopics: string[] = [];
             const emergingThemes: string[] = [];
             const coverageGaps: string[] = [];
-            const sourceDiversity = new Set(currentResearch.sources.map(s => new URL(s.url).hostname)).size;
-            const informationDensity = currentResearch.sources.length / Math.max(currentResearch.conversations.length, 1);
-            const conflictingInformation: Array<{ topic: string; sources: SourceData[] }> = [];
+            const sourceDiversity = new Set(
+              currentResearch.sources.map(s => new URL(s.url).hostname)
+            ).size;
+            const informationDensity =
+              currentResearch.sources.length /
+              Math.max(currentResearch.conversations.length, 1);
+            const conflictingInformation: Array<{
+              topic: string;
+              sources: SourceData[];
+            }> = [];
 
             return {
               keyTopics,
@@ -678,7 +751,7 @@ export const useResearchStore = create<ResearchStore>()(
           },
 
           // Export functionality
-          exportResearchData: (format) => {
+          exportResearchData: format => {
             const { currentResearch } = get();
             if (!currentResearch) return '';
 
@@ -687,9 +760,13 @@ export const useResearchStore = create<ResearchStore>()(
                 return JSON.stringify(currentResearch, null, 2);
               case 'csv':
                 // Simple CSV export of sources
-                const csvHeaders = 'Title,URL,Snippet,Retrieved At,Relevance Score\n';
+                const csvHeaders =
+                  'Title,URL,Snippet,Retrieved At,Relevance Score\n';
                 const csvRows = currentResearch.sources
-                  .map(s => `"${s.title}","${s.url}","${s.snippet}","${s.retrievedAt}","${s.relevanceScore || 0}"`)
+                  .map(
+                    s =>
+                      `"${s.title}","${s.url}","${s.snippet}","${s.retrievedAt}","${s.relevanceScore || 0}"`
+                  )
                   .join('\n');
                 return csvHeaders + csvRows;
               case 'txt':
@@ -697,12 +774,12 @@ export const useResearchStore = create<ResearchStore>()(
                 txtOutput += `Total Conversations: ${currentResearch.conversations.length}\n`;
                 txtOutput += `Total Sources: ${currentResearch.sources.length}\n`;
                 txtOutput += `Perspectives: ${currentResearch.perspectives.join(', ')}\n\n`;
-                
+
                 txtOutput += 'Sources:\n' + '-'.repeat(20) + '\n';
                 currentResearch.sources.forEach((source, index) => {
                   txtOutput += `${index + 1}. ${source.title}\n   ${source.url}\n   ${source.snippet}\n\n`;
                 });
-                
+
                 return txtOutput;
               default:
                 return '';
@@ -713,7 +790,9 @@ export const useResearchStore = create<ResearchStore>()(
             const { currentResearch } = get();
             if (!currentResearch) return '';
 
-            const conversation = currentResearch.conversations.find(c => c.id === conversationId);
+            const conversation = currentResearch.conversations.find(
+              c => c.id === conversationId
+            );
             if (!conversation) return '';
 
             switch (format) {
@@ -731,27 +810,27 @@ export const useResearchStore = create<ResearchStore>()(
           },
 
           // State management
-          setLoading: (loading) => {
-            set((draft) => {
+          setLoading: loading => {
+            set(draft => {
               draft.loading = loading;
             });
           },
 
-          setError: (error) => {
-            set((draft) => {
+          setError: error => {
+            set(draft => {
               draft.error = error;
             });
           },
 
           clearError: () => {
-            set((draft) => {
+            set(draft => {
               draft.error = null;
             });
           },
 
           reset: () => {
             get().stopAutoRefresh();
-            set((draft) => {
+            set(draft => {
               Object.assign(draft, initialState);
               draft.sourcesCache = new Map();
             });
@@ -784,12 +863,16 @@ export const researchSelectors = {
   isLoading: (state: ResearchStore) => state.loading,
   error: (state: ResearchStore) => state.error,
   sources: (state: ResearchStore) => state.currentResearch?.sources || [],
-  conversations: (state: ResearchStore) => state.currentResearch?.conversations || [],
-  perspectives: (state: ResearchStore) => state.currentResearch?.perspectives || [],
+  conversations: (state: ResearchStore) =>
+    state.currentResearch?.conversations || [],
+  perspectives: (state: ResearchStore) =>
+    state.currentResearch?.perspectives || [],
   filteredConversations: (state: ResearchStore) => {
     const conversations = state.currentResearch?.conversations || [];
     if (state.perspectiveFilters.length === 0) return conversations;
-    return conversations.filter(c => state.perspectiveFilters.includes(c.perspective));
+    return conversations.filter(c =>
+      state.perspectiveFilters.includes(c.perspective)
+    );
   },
   filteredSources: (state: ResearchStore) => {
     const sources = state.currentResearch?.sources || [];
@@ -808,10 +891,15 @@ export const useResearch = () => {
   };
 };
 
-export const useCurrentResearch = () => useResearchStore(researchSelectors.currentResearch);
-export const useActiveConversations = () => useResearchStore(researchSelectors.activeConversations);
-export const useResearchSources = () => useResearchStore(researchSelectors.sources);
-export const useResearchLoading = () => useResearchStore(researchSelectors.isLoading);
+export const useCurrentResearch = () =>
+  useResearchStore(researchSelectors.currentResearch);
+export const useActiveConversations = () =>
+  useResearchStore(researchSelectors.activeConversations);
+export const useResearchSources = () =>
+  useResearchStore(researchSelectors.sources);
+export const useResearchLoading = () =>
+  useResearchStore(researchSelectors.isLoading);
 export const useResearchError = () => useResearchStore(researchSelectors.error);
 export const useViewMode = () => useResearchStore(researchSelectors.viewMode);
-export const usePerspectiveFilters = () => useResearchStore(researchSelectors.perspectiveFilters);
+export const usePerspectiveFilters = () =>
+  useResearchStore(researchSelectors.perspectiveFilters);

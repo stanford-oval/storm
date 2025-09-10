@@ -7,43 +7,51 @@ export function useApiKeys() {
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const setApiKey = useCallback((apiKey: string) => {
-    try {
-      getApiService().setApiKey(apiKey);
-      toast({
-        title: 'Success',
-        description: 'API key updated successfully',
-        variant: 'success',
-      });
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to set API key';
-      setError(errorMessage);
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-    }
-  }, [toast]);
+  const setApiKey = useCallback(
+    (apiKey: string) => {
+      try {
+        getApiService().setApiKey(apiKey);
+        toast({
+          title: 'Success',
+          description: 'API key updated successfully',
+          variant: 'success',
+        });
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Failed to set API key';
+        setError(errorMessage);
+        toast({
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+      }
+    },
+    [toast]
+  );
 
-  const setAuthToken = useCallback((token: string, persistent = false) => {
-    try {
-      getApiService().setAuthToken(token, persistent);
-      toast({
-        title: 'Success',
-        description: 'Authentication token updated successfully',
-        variant: 'success',
-      });
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to set auth token';
-      setError(errorMessage);
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-    }
-  }, [toast]);
+  const setAuthToken = useCallback(
+    (token: string, persistent = false) => {
+      try {
+        getApiService().setAuthToken(token, persistent);
+        toast({
+          title: 'Success',
+          description: 'Authentication token updated successfully',
+          variant: 'success',
+        });
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Failed to set auth token';
+        setError(errorMessage);
+        toast({
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+      }
+    },
+    [toast]
+  );
 
   const clearCredentials = useCallback(() => {
     try {
@@ -55,7 +63,8 @@ export function useApiKeys() {
         variant: 'success',
       });
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to clear credentials';
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to clear credentials';
       setError(errorMessage);
       toast({
         title: 'Error',
@@ -86,7 +95,8 @@ export function useApiKeys() {
         return false;
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Connection test failed';
+      const errorMessage =
+        err instanceof Error ? err.message : 'Connection test failed';
       setError(errorMessage);
       toast({
         title: 'Error',

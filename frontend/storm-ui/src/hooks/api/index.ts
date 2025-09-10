@@ -60,7 +60,7 @@ export { useApiKeys } from './useApiKeys';
 export function useProjectWithPipeline(projectId: string) {
   const project = useProject({ projectId });
   const pipeline = usePipeline({ projectId });
-  
+
   return {
     ...project,
     pipeline: pipeline.status,
@@ -76,7 +76,7 @@ export function useProjectWithPipeline(projectId: string) {
 export function useProjectWithResearch(projectId: string) {
   const project = useProject({ projectId });
   const research = useResearch({ projectId });
-  
+
   return {
     ...project,
     research: research.research,
@@ -115,11 +115,11 @@ export function useMultipleProjects(projectIds: string[]) {
 // Hook for real-time project updates
 export function useRealTimeProject(projectId: string) {
   const project = useProject({ projectId });
-  const pipeline = usePipelineWebSocket(projectId, (update) => {
+  const pipeline = usePipelineWebSocket(projectId, update => {
     // Handle pipeline updates
     console.log('Pipeline update:', update);
   });
-  
+
   return {
     ...project,
     isConnected: pipeline.isConnected,
@@ -131,7 +131,7 @@ export function useRealTimeProject(projectId: string) {
 export function useProjectCollaboration(projectId: string) {
   const project = useProject({ projectId });
   // This would integrate with session management for collaborative features
-  
+
   return {
     ...project,
     // Add collaboration-specific methods here

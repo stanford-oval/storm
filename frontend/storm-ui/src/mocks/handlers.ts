@@ -1,16 +1,24 @@
 import { http, HttpResponse } from 'msw';
-import { StormProject, ProjectStatus, PipelineProgress, ResearchData } from '../types/storm';
-import { 
-  PaginatedResponse, 
-  PipelineStatusResponse, 
+import {
+  StormProject,
+  ProjectStatus,
+  PipelineProgress,
+  ResearchData,
+} from '../types/storm';
+import {
+  PaginatedResponse,
+  PipelineStatusResponse,
   ConfigTemplate,
   CoStormSession,
   ExportJob,
-  AnalyticsSummary 
+  AnalyticsSummary,
 } from '../types/api';
 
 // Mock data generators
-const generateMockProject = (id: string, overrides?: Partial<StormProject>): StormProject => ({
+const generateMockProject = (
+  id: string,
+  overrides?: Partial<StormProject>
+): StormProject => ({
   id,
   title: `Project ${id}`,
   topic: `Topic for project ${id}`,
@@ -41,9 +49,11 @@ const generateMockProject = (id: string, overrides?: Partial<StormProject>): Sto
 });
 
 const generateMockProjects = (count: number): StormProject[] => {
-  return Array.from({ length: count }, (_, i) => 
+  return Array.from({ length: count }, (_, i) =>
     generateMockProject((i + 1).toString(), {
-      status: ['draft', 'researching', 'completed', 'failed'][Math.floor(Math.random() * 4)] as ProjectStatus,
+      status: ['draft', 'researching', 'completed', 'failed'][
+        Math.floor(Math.random() * 4)
+      ] as ProjectStatus,
     })
   );
 };
@@ -95,9 +105,10 @@ export const handlers = [
 
     // Apply filters
     if (search) {
-      projects = projects.filter(p => 
-        p.title.toLowerCase().includes(search.toLowerCase()) ||
-        p.topic.toLowerCase().includes(search.toLowerCase())
+      projects = projects.filter(
+        p =>
+          p.title.toLowerCase().includes(search.toLowerCase()) ||
+          p.topic.toLowerCase().includes(search.toLowerCase())
       );
     }
 
@@ -142,7 +153,7 @@ export const handlers = [
   }),
 
   http.post('/api/projects', async ({ request }) => {
-    const body = await request.json() as any;
+    const body = (await request.json()) as any;
     const newProject = generateMockProject(Date.now().toString(), {
       title: body.title,
       topic: body.topic,
@@ -159,7 +170,7 @@ export const handlers = [
 
   http.put('/api/projects/:projectId', async ({ params, request }) => {
     const { projectId } = params;
-    const body = await request.json() as any;
+    const body = (await request.json()) as any;
     const updatedProject = generateMockProject(projectId as string, body);
 
     return HttpResponse.json({
@@ -176,26 +187,29 @@ export const handlers = [
     });
   }),
 
-  http.post('/api/projects/:projectId/duplicate', async ({ params, request }) => {
-    const { projectId } = params;
-    const body = await request.json() as any;
-    const duplicatedProject = generateMockProject(Date.now().toString(), {
-      title: body.title || `Copy of Project ${projectId}`,
-      description: body.description,
-    });
+  http.post(
+    '/api/projects/:projectId/duplicate',
+    async ({ params, request }) => {
+      const { projectId } = params;
+      const body = (await request.json()) as any;
+      const duplicatedProject = generateMockProject(Date.now().toString(), {
+        title: body.title || `Copy of Project ${projectId}`,
+        description: body.description,
+      });
 
-    return HttpResponse.json({
-      success: true,
-      data: duplicatedProject,
-      timestamp: new Date(),
-    });
-  }),
+      return HttpResponse.json({
+        success: true,
+        data: duplicatedProject,
+        timestamp: new Date(),
+      });
+    }
+  ),
 
   // Pipeline API
   http.get('/api/pipeline/status/:projectId', ({ params }) => {
     const { projectId } = params;
     const isRunning = Math.random() > 0.5;
-    
+
     const response: PipelineStatusResponse = {
       projectId: projectId as string,
       isRunning,
@@ -226,7 +240,7 @@ export const handlers = [
   }),
 
   http.post('/api/pipeline/start', async ({ request }) => {
-    const body = await request.json() as any;
+    const body = (await request.json()) as any;
     const response: PipelineStatusResponse = {
       projectId: body.projectId,
       isRunning: true,
@@ -248,8 +262,8 @@ export const handlers = [
   }),
 
   http.post('/api/pipeline/stop', async ({ request }) => {
-    const body = await request.json() as any;
-    
+    const body = (await request.json()) as any;
+
     return HttpResponse.json({
       success: true,
       data: { success: true, message: 'Pipeline stopped successfully' },
@@ -267,7 +281,12 @@ export const handlers = [
         config: {
           llm: { model: 'gpt-4', provider: 'openai', temperature: 0.3 },
           retriever: { type: 'bing', maxResults: 20 },
-          pipeline: { doResearch: true, doGenerateOutline: true, doGenerateArticle: true, doPolishArticle: true },
+          pipeline: {
+            doResearch: true,
+            doGenerateOutline: true,
+            doGenerateArticle: true,
+            doPolishArticle: true,
+          },
         },
         isDefault: false,
         isSystem: true,
@@ -281,7 +300,12 @@ export const handlers = [
         config: {
           llm: { model: 'gpt-3.5-turbo', provider: 'openai', temperature: 0.7 },
           retriever: { type: 'duckduckgo', maxResults: 10 },
-          pipeline: { doResearch: true, doGenerateOutline: true, doGenerateArticle: true, doPolishArticle: false },
+          pipeline: {
+            doResearch: true,
+            doGenerateOutline: true,
+            doGenerateArticle: true,
+            doPolishArticle: false,
+          },
         },
         isDefault: true,
         isSystem: true,
@@ -310,7 +334,7 @@ export const handlers = [
   }),
 
   http.post('/api/research/search', async ({ request }) => {
-    const body = await request.json() as any;
+    const body = (await request.json()) as any;
     const mockResults = [
       {
         id: '1',
@@ -400,7 +424,7 @@ export const handlers = [
 
   // Export API
   http.post('/api/export', async ({ request }) => {
-    const body = await request.json() as any;
+    const body = (await request.json()) as any;
     const exportJob: ExportJob = {
       id: Date.now().toString(),
       projectId: body.projectId,
@@ -433,7 +457,8 @@ export const handlers = [
       format: 'pdf',
       status: Math.random() > 0.5 ? 'completed' : 'processing',
       progress: Math.floor(Math.random() * 100),
-      downloadUrl: Math.random() > 0.5 ? `/api/export/${jobId}/download` : undefined,
+      downloadUrl:
+        Math.random() > 0.5 ? `/api/export/${jobId}/download` : undefined,
       createdAt: new Date(Date.now() - Math.random() * 60 * 60 * 1000),
       completedAt: Math.random() > 0.5 ? new Date() : undefined,
     };
@@ -447,7 +472,7 @@ export const handlers = [
 
   // Analytics API
   http.post('/api/analytics/events', async ({ request }) => {
-    const body = await request.json() as any;
+    const body = (await request.json()) as any;
     const event = {
       id: Date.now().toString(),
       userId: 'user-1',
@@ -465,22 +490,41 @@ export const handlers = [
   }),
 
   http.post('/api/analytics/summary', async ({ request }) => {
-    const body = await request.json() as any;
+    const body = (await request.json()) as any;
     const summary: AnalyticsSummary = {
       totalEvents: Math.floor(Math.random() * 10000),
       uniqueUsers: Math.floor(Math.random() * 1000),
       topEvents: [
-        { eventType: 'project_created', count: Math.floor(Math.random() * 100) },
-        { eventType: 'pipeline_started', count: Math.floor(Math.random() * 100) },
-        { eventType: 'article_exported', count: Math.floor(Math.random() * 100) },
+        {
+          eventType: 'project_created',
+          count: Math.floor(Math.random() * 100),
+        },
+        {
+          eventType: 'pipeline_started',
+          count: Math.floor(Math.random() * 100),
+        },
+        {
+          eventType: 'article_exported',
+          count: Math.floor(Math.random() * 100),
+        },
       ],
       timeSeriesData: Array.from({ length: 30 }, (_, i) => ({
-        date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000)
+          .toISOString()
+          .split('T')[0],
         count: Math.floor(Math.random() * 100),
       })),
       userActivity: [
-        { userId: 'user-1', eventCount: Math.floor(Math.random() * 100), lastActive: new Date() },
-        { userId: 'user-2', eventCount: Math.floor(Math.random() * 100), lastActive: new Date() },
+        {
+          userId: 'user-1',
+          eventCount: Math.floor(Math.random() * 100),
+          lastActive: new Date(),
+        },
+        {
+          userId: 'user-2',
+          eventCount: Math.floor(Math.random() * 100),
+          lastActive: new Date(),
+        },
       ],
     };
 
@@ -500,9 +544,15 @@ export const handlers = [
         timestamp: new Date(),
         version: '1.0.0',
         services: {
-          database: { status: 'up', responseTime: Math.floor(Math.random() * 100) },
+          database: {
+            status: 'up',
+            responseTime: Math.floor(Math.random() * 100),
+          },
           redis: { status: 'up', responseTime: Math.floor(Math.random() * 50) },
-          search: { status: 'up', responseTime: Math.floor(Math.random() * 200) },
+          search: {
+            status: 'up',
+            responseTime: Math.floor(Math.random() * 200),
+          },
         },
         uptime: Math.floor(Math.random() * 86400),
       },
@@ -512,21 +562,27 @@ export const handlers = [
 
   // Error simulation for testing
   http.get('/api/projects/error-test', () => {
-    return HttpResponse.json({
-      success: false,
-      error: 'This is a test error for development',
-      timestamp: new Date(),
-    }, { status: 500 });
+    return HttpResponse.json(
+      {
+        success: false,
+        error: 'This is a test error for development',
+        timestamp: new Date(),
+      },
+      { status: 500 }
+    );
   }),
 
   // Catch-all for unhandled requests
   http.all('/api/*', ({ request }) => {
     console.warn(`Unhandled ${request.method} request to ${request.url}`);
-    return HttpResponse.json({
-      success: false,
-      error: `Unhandled API endpoint: ${request.method} ${request.url}`,
-      timestamp: new Date(),
-    }, { status: 404 });
+    return HttpResponse.json(
+      {
+        success: false,
+        error: `Unhandled API endpoint: ${request.method} ${request.url}`,
+        timestamp: new Date(),
+      },
+      { status: 404 }
+    );
   }),
 ];
 

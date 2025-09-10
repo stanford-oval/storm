@@ -45,7 +45,9 @@ export class SessionService extends BaseApiService {
   /**
    * Create a new Co-STORM session
    */
-  async createSession(request: CreateSessionRequest): Promise<ApiResponse<CoStormSession>> {
+  async createSession(
+    request: CreateSessionRequest
+  ): Promise<ApiResponse<CoStormSession>> {
     return this.post<CoStormSession>(this.basePath, request);
   }
 
@@ -73,11 +75,16 @@ export class SessionService extends BaseApiService {
   /**
    * Join a session
    */
-  async joinSession(request: JoinSessionRequest): Promise<ApiResponse<SessionJoinResult>> {
-    return this.post<SessionJoinResult>(`${this.basePath}/${request.sessionId}/join`, {
-      participantName: request.participantName,
-      role: request.role
-    });
+  async joinSession(
+    request: JoinSessionRequest
+  ): Promise<ApiResponse<SessionJoinResult>> {
+    return this.post<SessionJoinResult>(
+      `${this.basePath}/${request.sessionId}/join`,
+      {
+        participantName: request.participantName,
+        role: request.role,
+      }
+    );
   }
 
   /**
@@ -90,8 +97,12 @@ export class SessionService extends BaseApiService {
   /**
    * Get session participants
    */
-  async getParticipants(sessionId: string): Promise<ApiResponse<SessionParticipant[]>> {
-    return this.get<SessionParticipant[]>(`${this.basePath}/${sessionId}/participants`);
+  async getParticipants(
+    sessionId: string
+  ): Promise<ApiResponse<SessionParticipant[]>> {
+    return this.get<SessionParticipant[]>(
+      `${this.basePath}/${sessionId}/participants`
+    );
   }
 
   /**
@@ -115,19 +126,29 @@ export class SessionService extends BaseApiService {
   /**
    * Remove a participant from session
    */
-  async removeParticipant(sessionId: string, participantId: string): Promise<ApiResponse<void>> {
-    return this.delete<void>(`${this.basePath}/${sessionId}/participants/${participantId}`);
+  async removeParticipant(
+    sessionId: string,
+    participantId: string
+  ): Promise<ApiResponse<void>> {
+    return this.delete<void>(
+      `${this.basePath}/${sessionId}/participants/${participantId}`
+    );
   }
 
   /**
    * Send a message in the discourse
    */
-  async sendMessage(request: SendMessageRequest): Promise<ApiResponse<DiscourseMessage>> {
-    return this.post<DiscourseMessage>(`${this.basePath}/${request.sessionId}/messages`, {
-      content: request.content,
-      messageType: request.messageType,
-      references: request.references
-    });
+  async sendMessage(
+    request: SendMessageRequest
+  ): Promise<ApiResponse<DiscourseMessage>> {
+    return this.post<DiscourseMessage>(
+      `${this.basePath}/${request.sessionId}/messages`,
+      {
+        content: request.content,
+        messageType: request.messageType,
+        references: request.references,
+      }
+    );
   }
 
   /**
@@ -164,16 +185,24 @@ export class SessionService extends BaseApiService {
     messageId: string,
     content: string
   ): Promise<ApiResponse<DiscourseMessage>> {
-    return this.patch<DiscourseMessage>(`${this.basePath}/${sessionId}/messages/${messageId}`, {
-      content
-    });
+    return this.patch<DiscourseMessage>(
+      `${this.basePath}/${sessionId}/messages/${messageId}`,
+      {
+        content,
+      }
+    );
   }
 
   /**
    * Delete a message
    */
-  async deleteMessage(sessionId: string, messageId: string): Promise<ApiResponse<void>> {
-    return this.delete<void>(`${this.basePath}/${sessionId}/messages/${messageId}`);
+  async deleteMessage(
+    sessionId: string,
+    messageId: string
+  ): Promise<ApiResponse<void>> {
+    return this.delete<void>(
+      `${this.basePath}/${sessionId}/messages/${messageId}`
+    );
   }
 
   /**
@@ -186,11 +215,16 @@ export class SessionService extends BaseApiService {
   /**
    * Update mind map nodes
    */
-  async updateMindMap(request: UpdateMindMapRequest): Promise<ApiResponse<MindMapNode[]>> {
-    return this.post<MindMapNode[]>(`${this.basePath}/${request.sessionId}/mindmap`, {
-      nodes: request.nodes,
-      action: request.action
-    });
+  async updateMindMap(
+    request: UpdateMindMapRequest
+  ): Promise<ApiResponse<MindMapNode[]>> {
+    return this.post<MindMapNode[]>(
+      `${this.basePath}/${request.sessionId}/mindmap`,
+      {
+        nodes: request.nodes,
+        action: request.action,
+      }
+    );
   }
 
   /**
@@ -200,7 +234,10 @@ export class SessionService extends BaseApiService {
     sessionId: string,
     node: Omit<MindMapNode, 'id' | 'createdAt' | 'createdBy'>
   ): Promise<ApiResponse<MindMapNode>> {
-    return this.post<MindMapNode>(`${this.basePath}/${sessionId}/mindmap/nodes`, node);
+    return this.post<MindMapNode>(
+      `${this.basePath}/${sessionId}/mindmap/nodes`,
+      node
+    );
   }
 
   /**
@@ -220,8 +257,13 @@ export class SessionService extends BaseApiService {
   /**
    * Delete a mind map node
    */
-  async deleteMindMapNode(sessionId: string, nodeId: string): Promise<ApiResponse<void>> {
-    return this.delete<void>(`${this.basePath}/${sessionId}/mindmap/nodes/${nodeId}`);
+  async deleteMindMapNode(
+    sessionId: string,
+    nodeId: string
+  ): Promise<ApiResponse<void>> {
+    return this.delete<void>(
+      `${this.basePath}/${sessionId}/mindmap/nodes/${nodeId}`
+    );
   }
 
   /**
@@ -233,11 +275,14 @@ export class SessionService extends BaseApiService {
     targetNodeId: string,
     connectionType?: string
   ): Promise<ApiResponse<MindMapConnection>> {
-    return this.post<MindMapConnection>(`${this.basePath}/${sessionId}/mindmap/connections`, {
-      sourceNodeId,
-      targetNodeId,
-      connectionType
-    });
+    return this.post<MindMapConnection>(
+      `${this.basePath}/${sessionId}/mindmap/connections`,
+      {
+        sourceNodeId,
+        targetNodeId,
+        connectionType,
+      }
+    );
   }
 
   /**
@@ -247,7 +292,9 @@ export class SessionService extends BaseApiService {
     sessionId: string,
     connectionId: string
   ): Promise<ApiResponse<void>> {
-    return this.delete<void>(`${this.basePath}/${sessionId}/mindmap/connections/${connectionId}`);
+    return this.delete<void>(
+      `${this.basePath}/${sessionId}/mindmap/connections/${connectionId}`
+    );
   }
 
   /**
@@ -274,22 +321,33 @@ export class SessionService extends BaseApiService {
   /**
    * Complete session
    */
-  async completeSession(sessionId: string): Promise<ApiResponse<CoStormSession>> {
+  async completeSession(
+    sessionId: string
+  ): Promise<ApiResponse<CoStormSession>> {
     return this.post<CoStormSession>(`${this.basePath}/${sessionId}/complete`);
   }
 
   /**
    * Cancel session
    */
-  async cancelSession(sessionId: string, reason?: string): Promise<ApiResponse<CoStormSession>> {
-    return this.post<CoStormSession>(`${this.basePath}/${sessionId}/cancel`, { reason });
+  async cancelSession(
+    sessionId: string,
+    reason?: string
+  ): Promise<ApiResponse<CoStormSession>> {
+    return this.post<CoStormSession>(`${this.basePath}/${sessionId}/cancel`, {
+      reason,
+    });
   }
 
   /**
    * Get session analytics
    */
-  async getSessionAnalytics(sessionId: string): Promise<ApiResponse<SessionAnalytics>> {
-    return this.get<SessionAnalytics>(`${this.basePath}/${sessionId}/analytics`);
+  async getSessionAnalytics(
+    sessionId: string
+  ): Promise<ApiResponse<SessionAnalytics>> {
+    return this.get<SessionAnalytics>(
+      `${this.basePath}/${sessionId}/analytics`
+    );
   }
 
   /**
@@ -339,7 +397,10 @@ export class SessionService extends BaseApiService {
       description?: string;
     }
   ): Promise<ApiResponse<CoStormSession>> {
-    return this.post<CoStormSession>(`${this.basePath}/templates/${templateId}/create`, data);
+    return this.post<CoStormSession>(
+      `${this.basePath}/templates/${templateId}/create`,
+      data
+    );
   }
 
   /**
@@ -354,14 +415,21 @@ export class SessionService extends BaseApiService {
       tags?: string[];
     }
   ): Promise<ApiResponse<SessionTemplate>> {
-    return this.post<SessionTemplate>(`${this.basePath}/${sessionId}/save-as-template`, template);
+    return this.post<SessionTemplate>(
+      `${this.basePath}/${sessionId}/save-as-template`,
+      template
+    );
   }
 
   /**
    * Get session moderator recommendations
    */
-  async getModeratorRecommendations(sessionId: string): Promise<ApiResponse<ModeratorRecommendation[]>> {
-    return this.get<ModeratorRecommendation[]>(`${this.basePath}/${sessionId}/moderator-recommendations`);
+  async getModeratorRecommendations(
+    sessionId: string
+  ): Promise<ApiResponse<ModeratorRecommendation[]>> {
+    return this.get<ModeratorRecommendation[]>(
+      `${this.basePath}/${sessionId}/moderator-recommendations`
+    );
   }
 
   /**
@@ -370,7 +438,11 @@ export class SessionService extends BaseApiService {
   async applyModeratorAction(
     sessionId: string,
     action: {
-      type: 'redirect_conversation' | 'add_participant' | 'suggest_topic' | 'summarize_discussion';
+      type:
+        | 'redirect_conversation'
+        | 'add_participant'
+        | 'suggest_topic'
+        | 'summarize_discussion';
       data: Record<string, any>;
     }
   ): Promise<ApiResponse<{ success: boolean; message: string }>> {
@@ -383,7 +455,9 @@ export class SessionService extends BaseApiService {
   /**
    * Get session insights
    */
-  async getSessionInsights(sessionId: string): Promise<ApiResponse<SessionInsights>> {
+  async getSessionInsights(
+    sessionId: string
+  ): Promise<ApiResponse<SessionInsights>> {
     return this.get<SessionInsights>(`${this.basePath}/${sessionId}/insights`);
   }
 
@@ -406,59 +480,89 @@ export class SessionService extends BaseApiService {
       message?: string;
     }>
   ): Promise<ApiResponse<SessionInvitationResult[]>> {
-    return this.post<SessionInvitationResult[]>(`${this.basePath}/${sessionId}/invite`, {
-      invitations
-    });
+    return this.post<SessionInvitationResult[]>(
+      `${this.basePath}/${sessionId}/invite`,
+      {
+        invitations,
+      }
+    );
   }
 
   /**
    * Get session invitations
    */
-  async getInvitations(sessionId: string): Promise<ApiResponse<SessionInvitation[]>> {
-    return this.get<SessionInvitation[]>(`${this.basePath}/${sessionId}/invitations`);
+  async getInvitations(
+    sessionId: string
+  ): Promise<ApiResponse<SessionInvitation[]>> {
+    return this.get<SessionInvitation[]>(
+      `${this.basePath}/${sessionId}/invitations`
+    );
   }
 
   /**
    * Cancel invitation
    */
-  async cancelInvitation(sessionId: string, invitationId: string): Promise<ApiResponse<void>> {
-    return this.delete<void>(`${this.basePath}/${sessionId}/invitations/${invitationId}`);
+  async cancelInvitation(
+    sessionId: string,
+    invitationId: string
+  ): Promise<ApiResponse<void>> {
+    return this.delete<void>(
+      `${this.basePath}/${sessionId}/invitations/${invitationId}`
+    );
   }
 
   /**
    * Accept invitation
    */
-  async acceptInvitation(invitationToken: string): Promise<ApiResponse<SessionJoinResult>> {
+  async acceptInvitation(
+    invitationToken: string
+  ): Promise<ApiResponse<SessionJoinResult>> {
     return this.post<SessionJoinResult>(`${this.basePath}/accept-invitation`, {
-      token: invitationToken
+      token: invitationToken,
     });
   }
 
   /**
    * Get session recordings
    */
-  async getRecordings(sessionId: string): Promise<ApiResponse<SessionRecording[]>> {
-    return this.get<SessionRecording[]>(`${this.basePath}/${sessionId}/recordings`);
+  async getRecordings(
+    sessionId: string
+  ): Promise<ApiResponse<SessionRecording[]>> {
+    return this.get<SessionRecording[]>(
+      `${this.basePath}/${sessionId}/recordings`
+    );
   }
 
   /**
    * Start session recording
    */
-  async startRecording(sessionId: string): Promise<ApiResponse<SessionRecording>> {
-    return this.post<SessionRecording>(`${this.basePath}/${sessionId}/recordings/start`);
+  async startRecording(
+    sessionId: string
+  ): Promise<ApiResponse<SessionRecording>> {
+    return this.post<SessionRecording>(
+      `${this.basePath}/${sessionId}/recordings/start`
+    );
   }
 
   /**
    * Stop session recording
    */
-  async stopRecording(sessionId: string, recordingId: string): Promise<ApiResponse<SessionRecording>> {
-    return this.post<SessionRecording>(`${this.basePath}/${sessionId}/recordings/${recordingId}/stop`);
+  async stopRecording(
+    sessionId: string,
+    recordingId: string
+  ): Promise<ApiResponse<SessionRecording>> {
+    return this.post<SessionRecording>(
+      `${this.basePath}/${sessionId}/recordings/${recordingId}/stop`
+    );
   }
 
   /**
    * Download session recording
    */
-  async downloadRecording(sessionId: string, recordingId: string): Promise<Blob> {
+  async downloadRecording(
+    sessionId: string,
+    recordingId: string
+  ): Promise<Blob> {
     const url = `${this.basePath}/${sessionId}/recordings/${recordingId}/download`;
     return this.downloadFile(url);
   }
@@ -549,7 +653,12 @@ export interface SessionTemplate {
 
 export interface ModeratorRecommendation {
   id: string;
-  type: 'redirect_conversation' | 'add_expert' | 'suggest_topic' | 'summarize_discussion' | 'resolve_conflict';
+  type:
+    | 'redirect_conversation'
+    | 'add_expert'
+    | 'suggest_topic'
+    | 'summarize_discussion'
+    | 'resolve_conflict';
   title: string;
   description: string;
   priority: 'high' | 'medium' | 'low';
@@ -643,5 +752,5 @@ export interface SessionRecording {
 
 // Create and export singleton instance
 export const sessionService = new SessionService({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
 });

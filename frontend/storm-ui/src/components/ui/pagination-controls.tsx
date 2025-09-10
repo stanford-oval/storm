@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from "react";
+import * as React from 'react';
 import {
   Pagination,
   PaginationContent,
@@ -9,14 +9,14 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination";
+} from '@/components/ui/pagination';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 
 interface PaginationControlsProps {
   currentPage: number;
@@ -37,7 +37,7 @@ export function PaginationControls({
   onPageChange,
   onItemsPerPageChange,
   showItemsPerPage = true,
-  className = "",
+  className = '',
 }: PaginationControlsProps) {
   const startItem = (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
@@ -46,13 +46,13 @@ export function PaginationControls({
     const pages = [];
     const showEllipsisStart = currentPage > 3;
     const showEllipsisEnd = currentPage < totalPages - 2;
-    
+
     // Always show first page
     pages.push(
       <PaginationItem key={1}>
         <PaginationLink
           href="#"
-          onClick={(e) => {
+          onClick={e => {
             e.preventDefault();
             onPageChange(1);
           }}
@@ -63,7 +63,7 @@ export function PaginationControls({
         </PaginationLink>
       </PaginationItem>
     );
-    
+
     // Show ellipsis if needed
     if (showEllipsisStart && currentPage > 4) {
       pages.push(
@@ -72,15 +72,19 @@ export function PaginationControls({
         </PaginationItem>
       );
     }
-    
+
     // Show pages around current page
-    for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
+    for (
+      let i = Math.max(2, currentPage - 1);
+      i <= Math.min(totalPages - 1, currentPage + 1);
+      i++
+    ) {
       if (i === 1 || i === totalPages) continue;
       pages.push(
         <PaginationItem key={i}>
           <PaginationLink
             href="#"
-            onClick={(e) => {
+            onClick={e => {
               e.preventDefault();
               onPageChange(i);
             }}
@@ -92,7 +96,7 @@ export function PaginationControls({
         </PaginationItem>
       );
     }
-    
+
     // Show ellipsis if needed
     if (showEllipsisEnd && currentPage < totalPages - 3) {
       pages.push(
@@ -101,14 +105,14 @@ export function PaginationControls({
         </PaginationItem>
       );
     }
-    
+
     // Always show last page if more than 1 page
     if (totalPages > 1) {
       pages.push(
         <PaginationItem key={totalPages}>
           <PaginationLink
             href="#"
-            onClick={(e) => {
+            onClick={e => {
               e.preventDefault();
               onPageChange(totalPages);
             }}
@@ -120,21 +124,23 @@ export function PaginationControls({
         </PaginationItem>
       );
     }
-    
+
     return pages;
   };
 
   return (
-    <div className={`flex flex-col sm:flex-row items-center gap-4 ${className}`}>
+    <div
+      className={`flex flex-col items-center gap-4 sm:flex-row ${className}`}
+    >
       {/* Items per page selector */}
       {showItemsPerPage && onItemsPerPageChange && (
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">Show</span>
           <Select
             value={itemsPerPage.toString()}
-            onValueChange={(value) => onItemsPerPageChange(parseInt(value))}
+            onValueChange={value => onItemsPerPageChange(parseInt(value))}
           >
-            <SelectTrigger className="w-20 h-9">
+            <SelectTrigger className="h-9 w-20">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -153,36 +159,46 @@ export function PaginationControls({
         <Pagination className="mx-0">
           <PaginationContent>
             <PaginationItem>
-              <PaginationPrevious 
+              <PaginationPrevious
                 href="#"
-                onClick={(e) => {
+                onClick={e => {
                   e.preventDefault();
                   onPageChange(Math.max(1, currentPage - 1));
                 }}
-                className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                className={
+                  currentPage === 1
+                    ? 'pointer-events-none opacity-50'
+                    : 'cursor-pointer'
+                }
               />
             </PaginationItem>
-            
+
             {renderPageNumbers()}
-            
+
             <PaginationItem>
-              <PaginationNext 
+              <PaginationNext
                 href="#"
-                onClick={(e) => {
+                onClick={e => {
                   e.preventDefault();
                   onPageChange(Math.min(totalPages, currentPage + 1));
                 }}
-                className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                className={
+                  currentPage === totalPages
+                    ? 'pointer-events-none opacity-50'
+                    : 'cursor-pointer'
+                }
               />
             </PaginationItem>
           </PaginationContent>
         </Pagination>
       )}
-      
+
       {/* Page info */}
       <div className="text-sm text-muted-foreground">
         {totalItems > 0 ? (
-          <>Showing {startItem} to {endItem} of {totalItems} projects</>
+          <>
+            Showing {startItem} to {endItem} of {totalItems} projects
+          </>
         ) : (
           <>No projects to show</>
         )}

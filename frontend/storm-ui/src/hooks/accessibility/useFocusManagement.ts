@@ -52,7 +52,7 @@ export const useFocusManagement = (
       if (skipLinks.some(selector => element.matches(selector))) {
         return false;
       }
-      
+
       // Check if element is visible and not disabled
       const style = window.getComputedStyle(element);
       return (
@@ -71,27 +71,30 @@ export const useFocusManagement = (
   }, [containerRef, skipLinks]);
 
   // Handle tab key for focus trapping
-  const handleTabKey = useCallback((event: KeyboardEvent) => {
-    if (!trapFocus || !containerRef.current) return;
+  const handleTabKey = useCallback(
+    (event: KeyboardEvent) => {
+      if (!trapFocus || !containerRef.current) return;
 
-    const { first, last, all } = getFocusableElements();
-    
-    if (all.length === 0) return;
+      const { first, last, all } = getFocusableElements();
 
-    if (event.shiftKey) {
-      // Shift + Tab
-      if (document.activeElement === first) {
-        event.preventDefault();
-        last?.focus();
+      if (all.length === 0) return;
+
+      if (event.shiftKey) {
+        // Shift + Tab
+        if (document.activeElement === first) {
+          event.preventDefault();
+          last?.focus();
+        }
+      } else {
+        // Tab
+        if (document.activeElement === last) {
+          event.preventDefault();
+          first?.focus();
+        }
       }
-    } else {
-      // Tab
-      if (document.activeElement === last) {
-        event.preventDefault();
-        first?.focus();
-      }
-    }
-  }, [trapFocus, containerRef, getFocusableElements]);
+    },
+    [trapFocus, containerRef, getFocusableElements]
+  );
 
   // Setup focus trap
   useEffect(() => {
@@ -122,25 +125,32 @@ export const useFocusManagement = (
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
-      
+
       // Restore focus to previously focused element
       if (restoreFocus && previouslyFocusedElement.current) {
         previouslyFocusedElement.current.focus();
       }
     };
-  }, [trapFocus, restoreFocus, autoFocus, handleTabKey, getFocusableElements, containerRef]);
+  }, [
+    trapFocus,
+    restoreFocus,
+    autoFocus,
+    handleTabKey,
+    getFocusableElements,
+    containerRef,
+  ]);
 
   // Handle escape key
   useEffect(() => {
     if (!onEscape) return;
-    
+
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault();
         onEscape();
       }
     };
-    
+
     window.addEventListener('keydown', handleEscape);
     return () => window.removeEventListener('keydown', handleEscape);
   }, [onEscape]);
@@ -166,13 +176,17 @@ export const useFocusManagement = (
   const focusPrevious = useCallback(() => {
     const { all } = getFocusableElements();
     const currentIndex = all.indexOf(document.activeElement as HTMLElement);
-    const previousIndex = currentIndex === 0 ? all.length - 1 : currentIndex - 1;
+    const previousIndex =
+      currentIndex === 0 ? all.length - 1 : currentIndex - 1;
     all[previousIndex]?.focus();
   }, [getFocusableElements]);
 
-  const contains = useCallback((element: Element): boolean => {
-    return containerRef.current?.contains(element) ?? false;
-  }, [containerRef]);
+  const contains = useCallback(
+    (element: Element): boolean => {
+      return containerRef.current?.contains(element) ?? false;
+    },
+    [containerRef]
+  );
 
   const isFocusWithin = useCallback((): boolean => {
     return contains(document.activeElement!);

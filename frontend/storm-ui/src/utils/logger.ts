@@ -12,34 +12,34 @@ export const logger = {
       console.log(...args);
     }
   },
-  
+
   error: (...args: unknown[]) => {
     if (isDevelopment) {
       // eslint-disable-next-line no-console
       console.error(...args);
     }
   },
-  
+
   warn: (...args: unknown[]) => {
     if (isDevelopment) {
       // eslint-disable-next-line no-console
       console.warn(...args);
     }
   },
-  
+
   debug: (...args: unknown[]) => {
     if (isDevelopment) {
       // eslint-disable-next-line no-console
       console.debug(...args);
     }
   },
-  
+
   info: (...args: unknown[]) => {
     if (isDevelopment) {
       // eslint-disable-next-line no-console
       console.info(...args);
     }
-  }
+  },
 };
 
 export default logger;

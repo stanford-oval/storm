@@ -1,18 +1,18 @@
 // API-specific types extending storm.ts types
-import { 
-  StormProject, 
-  StormConfig, 
-  PipelineProgress, 
-  ResearchData, 
-  GeneratedArticle, 
+import {
+  StormProject,
+  StormConfig,
+  PipelineProgress,
+  ResearchData,
+  GeneratedArticle,
   ArticleOutline,
   ProjectStatus,
   ProjectFilters,
-  ProjectListResponse
+  ProjectListResponse,
 } from './storm';
 
 // Re-export types from storm.ts that are used in API contexts
-export type { 
+export type {
   StormProject,
   StormConfig,
   PipelineProgress,
@@ -20,14 +20,11 @@ export type {
   ProjectListResponse,
   ResearchData,
   ConversationData,
-  SourceData
+  SourceData,
 } from './storm';
 
 // Re-export config service types
-export type { 
-  LLMModel,
-  RetrieverInfo 
-} from '../services/config';
+export type { LLMModel, RetrieverInfo } from '../services/config';
 
 // Authentication types
 export interface AuthRequest {
@@ -353,7 +350,11 @@ export interface PipelineUpdateMessage {
 
 export interface SessionUpdateMessage {
   sessionId: string;
-  updateType: 'participant_joined' | 'participant_left' | 'message' | 'mindmap_update';
+  updateType:
+    | 'participant_joined'
+    | 'participant_left'
+    | 'message'
+    | 'mindmap_update';
   data: Record<string, unknown>;
 }
 

@@ -44,7 +44,7 @@ export const useKeyboardNavigation = (
   // Get all navigable items
   const getItems = useCallback((): HTMLElement[] => {
     if (!containerRef.current) return [];
-    
+
     return Array.from(
       containerRef.current.querySelectorAll<HTMLElement>(itemSelector)
     ).filter(item => {
@@ -66,13 +66,16 @@ export const useKeyboardNavigation = (
   }, [getItems]);
 
   // Focus specific item
-  const focusItem = useCallback((index: number) => {
-    const items = getItems();
-    if (index >= 0 && index < items.length) {
-      items[index].focus();
-      onNavigate?.(index, items[index]);
-    }
-  }, [getItems, onNavigate]);
+  const focusItem = useCallback(
+    (index: number) => {
+      const items = getItems();
+      if (index >= 0 && index < items.length) {
+        items[index].focus();
+        onNavigate?.(index, items[index]);
+      }
+    },
+    [getItems, onNavigate]
+  );
 
   // Focus next item
   const focusNext = useCallback(() => {
@@ -112,52 +115,63 @@ export const useKeyboardNavigation = (
   }, [getItems, focusItem]);
 
   // Activate current item
-  const activateItem = useCallback((index: number) => {
-    const items = getItems();
-    if (index >= 0 && index < items.length) {
-      const item = items[index];
-      
-      // Trigger click event
-      if (item.tagName.toLowerCase() === 'button' || item.tagName.toLowerCase() === 'a') {
-        item.click();
-      } else {
-        // For other elements, dispatch a custom activate event
-        const event = new CustomEvent('activate', { bubbles: true });
-        item.dispatchEvent(event);
+  const activateItem = useCallback(
+    (index: number) => {
+      const items = getItems();
+      if (index >= 0 && index < items.length) {
+        const item = items[index];
+
+        // Trigger click event
+        if (
+          item.tagName.toLowerCase() === 'button' ||
+          item.tagName.toLowerCase() === 'a'
+        ) {
+          item.click();
+        } else {
+          // For other elements, dispatch a custom activate event
+          const event = new CustomEvent('activate', { bubbles: true });
+          item.dispatchEvent(event);
+        }
+
+        onActivate?.(index, item);
       }
-      
-      onActivate?.(index, item);
-    }
-  }, [getItems, onActivate]);
+    },
+    [getItems, onActivate]
+  );
 
   // Arrow key navigation
-  const handleArrowKeys = useCallback((direction: 'up' | 'down' | 'left' | 'right') => {
-    if (!enableArrowKeys || !enabled) return;
+  const handleArrowKeys = useCallback(
+    (direction: 'up' | 'down' | 'left' | 'right') => {
+      if (!enableArrowKeys || !enabled) return;
 
-    switch (orientation) {
-      case 'vertical':
-        if (direction === 'up') focusPrevious();
-        if (direction === 'down') focusNext();
-        break;
-      case 'horizontal':
-        if (direction === 'left') focusPrevious();
-        if (direction === 'right') focusNext();
-        break;
-      case 'both':
-        if (direction === 'up' || direction === 'left') focusPrevious();
-        if (direction === 'down' || direction === 'right') focusNext();
-        break;
-    }
-  }, [enableArrowKeys, enabled, orientation, focusNext, focusPrevious]);
+      switch (orientation) {
+        case 'vertical':
+          if (direction === 'up') focusPrevious();
+          if (direction === 'down') focusNext();
+          break;
+        case 'horizontal':
+          if (direction === 'left') focusPrevious();
+          if (direction === 'right') focusNext();
+          break;
+        case 'both':
+          if (direction === 'up' || direction === 'left') focusPrevious();
+          if (direction === 'down' || direction === 'right') focusNext();
+          break;
+      }
+    },
+    [enableArrowKeys, enabled, orientation, focusNext, focusPrevious]
+  );
 
   // Keyboard event handlers
   useEffect(() => {
     if (!enabled) return;
-    
+
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
-      const isFormElement = ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
-      
+      const isFormElement = ['INPUT', 'TEXTAREA', 'SELECT'].includes(
+        target.tagName
+      );
+
       // Arrow keys
       if (enableArrowKeys) {
         if (e.key === 'ArrowUp') {
@@ -174,7 +188,7 @@ export const useKeyboardNavigation = (
           handleArrowKeys('right');
         }
       }
-      
+
       // Home/End keys
       if (enableHomeEnd) {
         if (e.key === 'Home') {
@@ -185,7 +199,7 @@ export const useKeyboardNavigation = (
           focusLast();
         }
       }
-      
+
       // PageUp/PageDown
       if (enablePageUpDown) {
         if (e.key === 'PageUp') {
@@ -204,7 +218,7 @@ export const useKeyboardNavigation = (
           focusItem(newIndex);
         }
       }
-      
+
       // Enter/Space for activation
       if (enableEnterSpace && !isFormElement) {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -216,7 +230,7 @@ export const useKeyboardNavigation = (
         }
       }
     };
-    
+
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [
@@ -231,7 +245,7 @@ export const useKeyboardNavigation = (
     focusItem,
     activateItem,
     getCurrentIndex,
-    getItems
+    getItems,
   ]);
 
   // Auto-focus management
@@ -239,19 +253,19 @@ export const useKeyboardNavigation = (
     if (!enabled || !containerRef.current) return;
 
     const container = containerRef.current;
-    
+
     const handleFocusIn = (event: FocusEvent) => {
       const target = event.target as HTMLElement;
       const items = getItems();
       const index = items.indexOf(target);
-      
+
       if (index >= 0) {
         onNavigate?.(index, target);
       }
     };
 
     container.addEventListener('focusin', handleFocusIn);
-    
+
     return () => {
       container.removeEventListener('focusin', handleFocusIn);
     };
@@ -282,7 +296,7 @@ export const useMenuNavigation = (containerRef: RefObject<HTMLElement>) => {
   });
 };
 
-// List navigation  
+// List navigation
 export const useListNavigation = (containerRef: RefObject<HTMLElement>) => {
   return useKeyboardNavigation(containerRef, {
     itemSelector: '[role="listitem"], [role="option"]',

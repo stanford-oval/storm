@@ -232,7 +232,8 @@ describe('usePipeline', () => {
       const { result } = renderHook(() => usePipeline());
 
       await act(async () => {
-        const response = await result.current.getPipelineStatus('invalid-pipeline');
+        const response =
+          await result.current.getPipelineStatus('invalid-pipeline');
         expect(response.success).toBe(false);
         expect(response.error).toBe('Pipeline not found');
       });
@@ -283,7 +284,7 @@ describe('usePipeline', () => {
         rest.get('/api/pipeline/logs/:pipelineId', (req, res, ctx) => {
           const level = req.url.searchParams.get('level');
           expect(level).toBe('error');
-          
+
           return res(
             ctx.status(200),
             ctx.json({
@@ -360,18 +361,18 @@ describe('usePipeline', () => {
   describe('retry functionality', () => {
     it('retries failed requests', async () => {
       let attemptCount = 0;
-      
+
       server.use(
         rest.post('/api/pipeline/start', (req, res, ctx) => {
           attemptCount++;
-          
+
           if (attemptCount < 3) {
             return res(
               ctx.status(500),
               ctx.json({ success: false, error: 'Server error' })
             );
           }
-          
+
           return res(
             ctx.status(200),
             ctx.json({ success: true, data: { pipelineId: 'pipeline-123' } })
@@ -595,7 +596,9 @@ describe('usePipeline', () => {
       await act(async () => {
         const response = await result.current.startPipeline(invalidProject);
         expect(response.success).toBe(false);
-        expect(response.error).toContain('at least one pipeline step must be enabled');
+        expect(response.error).toContain(
+          'at least one pipeline step must be enabled'
+        );
       });
     });
   });

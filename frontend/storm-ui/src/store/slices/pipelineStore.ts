@@ -1,7 +1,12 @@
 import { logger } from '@/utils/logger';
 // Pipeline execution store slice
 import { create } from 'zustand';
-import { PipelineState, PipelineExecution, PipelineLog, ResourceUsage } from '../types';
+import {
+  PipelineState,
+  PipelineExecution,
+  PipelineLog,
+  ResourceUsage,
+} from '../types';
 import { PipelineStage, StormConfig, PipelineProgress } from '@/types/storm';
 import { persist, createPartialize } from '../middleware/persist';
 import { devtools } from '../middleware/devtools';
@@ -30,41 +35,50 @@ interface PipelineActions {
   resumePipeline: (pipelineId: string) => Promise<void>;
   cancelPipeline: (pipelineId: string) => Promise<void>;
   retryPipeline: (pipelineId: string) => Promise<string>;
-  
+
   // Pipeline monitoring
-  updatePipelineProgress: (pipelineId: string, progress: Partial<PipelineProgress>) => void;
+  updatePipelineProgress: (
+    pipelineId: string,
+    progress: Partial<PipelineProgress>
+  ) => void;
   addPipelineLog: (pipelineId: string, log: Omit<PipelineLog, 'id'>) => void;
-  updateResourceUsage: (pipelineId: string, usage: Partial<ResourceUsage>) => void;
-  setPipelineStatus: (pipelineId: string, status: PipelineExecution['status']) => void;
-  
+  updateResourceUsage: (
+    pipelineId: string,
+    usage: Partial<ResourceUsage>
+  ) => void;
+  setPipelineStatus: (
+    pipelineId: string,
+    status: PipelineExecution['status']
+  ) => void;
+
   // Pipeline management
   getPipelineExecution: (pipelineId: string) => PipelineExecution | null;
   removePipelineExecution: (pipelineId: string) => void;
   clearPipelineHistory: () => void;
   archivePipeline: (pipelineId: string) => void;
-  
+
   // Global pipeline state
   setActiveStage: (stage: PipelineStage | null) => void;
   updateGlobalProgress: () => void;
   setCanCancel: (canCancel: boolean) => void;
   setAutoSave: (autoSave: boolean) => void;
-  
+
   // Estimation and analytics
   estimateTimeRemaining: (pipelineId: string) => number | null;
   calculateResourceCost: (pipelineId: string) => number;
   getPipelineAnalytics: (projectId?: string) => PipelineAnalytics;
-  
+
   // Batch operations
   cancelAllPipelines: () => Promise<void>;
   pauseAllPipelines: () => Promise<void>;
   resumeAllPipelines: () => Promise<void>;
-  
+
   // State management
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   clearError: () => void;
   reset: () => void;
-  
+
   // WebSocket integration
   handlePipelineEvent: (event: PipelineEvent) => void;
   subscribeToUpdates: (pipelineId: string) => void;
@@ -103,48 +117,90 @@ export const usePipelineStore = create<PipelineStore>()(
 
           // Pipeline execution
           startPipeline: async (projectId, config) => {
-            set((draft) => {
+            set(draft => {
               draft.loading = true;
               draft.error = null;
             });
 
             try {
               // Map frontend config to backend format
-              const backendConfig = config ? {
-                // Map pipeline fields from camelCase to snake_case
-                max_conv_turn: config.pipeline?.maxConvTurns ?? config.max_conv_turn ?? 3,
-                max_perspective: config.pipeline?.maxPerspectives ?? config.max_perspective ?? 4,
-                max_search_queries_per_turn: config.pipeline?.maxSearchQueriesPerTurn ?? config.max_search_queries_per_turn ?? 3,
-                // Map other fields
-                llm_provider: config.llm?.provider ?? config.llm_provider ?? 'openai',
-                llm_model: config.llm?.model ?? config.llm_model ?? 'gpt-4o',
-                temperature: config.llm?.temperature ?? config.temperature ?? 0.7,
-                max_tokens: config.llm?.maxTokens ?? config.max_tokens ?? 4000,
-                retriever_type: config.retriever?.type ?? config.retriever_type ?? 'tavily',
-                max_search_results: config.retriever?.maxResults ?? config.max_search_results ?? 10,
-                search_top_k: config.retriever?.topK ?? config.search_top_k ?? 3,
-                // Pipeline flags
-                do_research: config.pipeline?.doResearch ?? config.do_research ?? true,
-                do_generate_outline: config.pipeline?.doGenerateOutline ?? config.do_generate_outline ?? true,
-                do_generate_article: config.pipeline?.doGenerateArticle ?? config.do_generate_article ?? true,
-                do_polish_article: config.pipeline?.doPolishArticle ?? config.do_polish_article ?? true,
-                // Output settings
-                output_format: config.output?.format ?? config.output_format ?? 'markdown',
-                include_citations: config.output?.includeCitations ?? config.include_citations ?? true,
-              } : undefined;
-              
-              const response = await fetch(`http://localhost:8000/api/pipeline/${projectId}/run`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ config: backendConfig }),
-              });
+              const backendConfig = config
+                ? {
+                    // Map pipeline fields from camelCase to snake_case
+                    max_conv_turn:
+                      config.pipeline?.maxConvTurns ??
+                      config.max_conv_turn ??
+                      3,
+                    max_perspective:
+                      config.pipeline?.maxPerspectives ??
+                      config.max_perspective ??
+                      4,
+                    max_search_queries_per_turn:
+                      config.pipeline?.maxSearchQueriesPerTurn ??
+                      config.max_search_queries_per_turn ??
+                      3,
+                    // Map other fields
+                    llm_provider:
+                      config.llm?.provider ?? config.llm_provider ?? 'openai',
+                    llm_model:
+                      config.llm?.model ?? config.llm_model ?? 'gpt-4o',
+                    temperature:
+                      config.llm?.temperature ?? config.temperature ?? 0.7,
+                    max_tokens:
+                      config.llm?.maxTokens ?? config.max_tokens ?? 4000,
+                    retriever_type:
+                      config.retriever?.type ??
+                      config.retriever_type ??
+                      'tavily',
+                    max_search_results:
+                      config.retriever?.maxResults ??
+                      config.max_search_results ??
+                      10,
+                    search_top_k:
+                      config.retriever?.topK ?? config.search_top_k ?? 3,
+                    // Pipeline flags
+                    do_research:
+                      config.pipeline?.doResearch ?? config.do_research ?? true,
+                    do_generate_outline:
+                      config.pipeline?.doGenerateOutline ??
+                      config.do_generate_outline ??
+                      true,
+                    do_generate_article:
+                      config.pipeline?.doGenerateArticle ??
+                      config.do_generate_article ??
+                      true,
+                    do_polish_article:
+                      config.pipeline?.doPolishArticle ??
+                      config.do_polish_article ??
+                      true,
+                    // Output settings
+                    output_format:
+                      config.output?.format ??
+                      config.output_format ??
+                      'markdown',
+                    include_citations:
+                      config.output?.includeCitations ??
+                      config.include_citations ??
+                      true,
+                  }
+                : undefined;
+
+              const response = await fetch(
+                `http://localhost:8000/api/pipeline/${projectId}/run`,
+                {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ config: backendConfig }),
+                }
+              );
 
               if (!response.ok) {
                 throw new Error('Failed to start pipeline');
               }
 
               const data = await response.json();
-              const pipelineId = data.pipelineId || `pipeline-${projectId}-${Date.now()}`;
+              const pipelineId =
+                data.pipelineId || `pipeline-${projectId}-${Date.now()}`;
 
               const pipelineExecution: PipelineExecution = {
                 id: pipelineId,
@@ -169,7 +225,7 @@ export const usePipelineStore = create<PipelineStore>()(
                 },
               };
 
-              set((draft) => {
+              set(draft => {
                 draft.runningPipelines[pipelineId] = pipelineExecution;
                 draft.activeStage = 'initializing';
                 draft.canCancel = true;
@@ -182,31 +238,37 @@ export const usePipelineStore = create<PipelineStore>()(
 
               return pipelineId;
             } catch (error) {
-              set((draft) => {
-                draft.error = error instanceof Error ? error.message : 'Failed to start pipeline';
+              set(draft => {
+                draft.error =
+                  error instanceof Error
+                    ? error.message
+                    : 'Failed to start pipeline';
                 draft.loading = false;
               });
               throw error;
             }
           },
 
-          pausePipeline: async (pipelineId) => {
+          pausePipeline: async pipelineId => {
             // Guard against undefined pipelineId
             if (!pipelineId) {
               logger.warn('pausePipeline called with undefined pipelineId');
               return;
             }
-            
+
             try {
-              const response = await fetch(`/api/pipeline/${pipelineId}/pause`, {
-                method: 'POST',
-              });
+              const response = await fetch(
+                `/api/pipeline/${pipelineId}/pause`,
+                {
+                  method: 'POST',
+                }
+              );
 
               if (!response.ok) {
                 throw new Error('Failed to pause pipeline');
               }
 
-              set((draft) => {
+              set(draft => {
                 const pipeline = draft.runningPipelines[pipelineId];
                 if (pipeline) {
                   pipeline.status = 'completed'; // Using completed as paused state
@@ -214,30 +276,36 @@ export const usePipelineStore = create<PipelineStore>()(
                 }
               });
             } catch (error) {
-              set((draft) => {
-                draft.error = error instanceof Error ? error.message : 'Failed to pause pipeline';
+              set(draft => {
+                draft.error =
+                  error instanceof Error
+                    ? error.message
+                    : 'Failed to pause pipeline';
               });
               throw error;
             }
           },
 
-          resumePipeline: async (pipelineId) => {
+          resumePipeline: async pipelineId => {
             // Guard against undefined pipelineId
             if (!pipelineId) {
               logger.warn('resumePipeline called with undefined pipelineId');
               return;
             }
-            
+
             try {
-              const response = await fetch(`/api/pipeline/${pipelineId}/resume`, {
-                method: 'POST',
-              });
+              const response = await fetch(
+                `/api/pipeline/${pipelineId}/resume`,
+                {
+                  method: 'POST',
+                }
+              );
 
               if (!response.ok) {
                 throw new Error('Failed to resume pipeline');
               }
 
-              set((draft) => {
+              set(draft => {
                 const pipeline = draft.runningPipelines[pipelineId];
                 if (pipeline) {
                   pipeline.status = 'running';
@@ -245,40 +313,46 @@ export const usePipelineStore = create<PipelineStore>()(
                 }
               });
             } catch (error) {
-              set((draft) => {
-                draft.error = error instanceof Error ? error.message : 'Failed to resume pipeline';
+              set(draft => {
+                draft.error =
+                  error instanceof Error
+                    ? error.message
+                    : 'Failed to resume pipeline';
               });
               throw error;
             }
           },
 
-          cancelPipeline: async (pipelineId) => {
+          cancelPipeline: async pipelineId => {
             // Guard against undefined pipelineId
             if (!pipelineId) {
               logger.warn('cancelPipeline called with undefined pipelineId');
               return;
             }
-            
+
             try {
-              const response = await fetch(`/api/pipeline/${pipelineId}/cancel`, {
-                method: 'POST',
-              });
+              const response = await fetch(
+                `/api/pipeline/${pipelineId}/cancel`,
+                {
+                  method: 'POST',
+                }
+              );
 
               if (!response.ok) {
                 throw new Error('Failed to cancel pipeline');
               }
 
-              set((draft) => {
+              set(draft => {
                 const pipeline = draft.runningPipelines[pipelineId];
                 if (pipeline) {
                   pipeline.status = 'cancelled';
                   pipeline.endTime = new Date();
                   draft.canCancel = false;
-                  
+
                   // Move to history
                   draft.pipelineHistory.unshift(pipeline);
                   delete draft.runningPipelines[pipelineId];
-                  
+
                   // Update global state if no more running pipelines
                   if (Object.keys(draft.runningPipelines).length === 0) {
                     draft.activeStage = null;
@@ -289,14 +363,17 @@ export const usePipelineStore = create<PipelineStore>()(
 
               get().unsubscribeFromUpdates(pipelineId);
             } catch (error) {
-              set((draft) => {
-                draft.error = error instanceof Error ? error.message : 'Failed to cancel pipeline';
+              set(draft => {
+                draft.error =
+                  error instanceof Error
+                    ? error.message
+                    : 'Failed to cancel pipeline';
               });
               throw error;
             }
           },
 
-          retryPipeline: async (pipelineId) => {
+          retryPipeline: async pipelineId => {
             const pipeline = get().getPipelineExecution(pipelineId);
             if (!pipeline) {
               throw new Error('Pipeline not found');
@@ -307,23 +384,27 @@ export const usePipelineStore = create<PipelineStore>()(
 
           // Pipeline monitoring
           updatePipelineProgress: (pipelineId, progress) => {
-            set((draft) => {
+            set(draft => {
               const pipeline = draft.runningPipelines[pipelineId];
               if (pipeline) {
                 Object.assign(pipeline.progress, progress);
-                
+
                 // Update estimated end time
                 if (progress.stageProgress !== undefined) {
                   const elapsed = Date.now() - pipeline.startTime.getTime();
-                  const totalProgress = progress.overallProgress || pipeline.progress.overallProgress;
-                  
+                  const totalProgress =
+                    progress.overallProgress ||
+                    pipeline.progress.overallProgress;
+
                   if (totalProgress > 0) {
                     const estimatedTotal = (elapsed / totalProgress) * 100;
                     const remaining = estimatedTotal - elapsed;
-                    pipeline.progress.estimatedEndTime = new Date(Date.now() + remaining);
+                    pipeline.progress.estimatedEndTime = new Date(
+                      Date.now() + remaining
+                    );
                   }
                 }
-                
+
                 draft.lastUpdated = new Date();
               }
             });
@@ -332,7 +413,7 @@ export const usePipelineStore = create<PipelineStore>()(
           },
 
           addPipelineLog: (pipelineId, log) => {
-            set((draft) => {
+            set(draft => {
               const pipeline = draft.runningPipelines[pipelineId];
               if (pipeline) {
                 const newLog: PipelineLog = {
@@ -340,44 +421,49 @@ export const usePipelineStore = create<PipelineStore>()(
                   id: `log_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
                 };
                 pipeline.logs.push(newLog);
-                
+
                 // Keep only last 1000 logs
                 if (pipeline.logs.length > 1000) {
                   pipeline.logs = pipeline.logs.slice(-1000);
                 }
-                
+
                 draft.lastUpdated = new Date();
               }
             });
           },
 
           updateResourceUsage: (pipelineId, usage) => {
-            set((draft) => {
+            set(draft => {
               const pipeline = draft.runningPipelines[pipelineId];
               if (pipeline) {
                 Object.assign(pipeline.resourceUsage, usage);
-                
+
                 // Update duration
-                pipeline.resourceUsage.duration = Date.now() - pipeline.startTime.getTime();
-                
+                pipeline.resourceUsage.duration =
+                  Date.now() - pipeline.startTime.getTime();
+
                 draft.lastUpdated = new Date();
               }
             });
           },
 
           setPipelineStatus: (pipelineId, status) => {
-            set((draft) => {
+            set(draft => {
               const pipeline = draft.runningPipelines[pipelineId];
               if (pipeline) {
                 pipeline.status = status;
-                
-                if (status === 'completed' || status === 'failed' || status === 'cancelled') {
+
+                if (
+                  status === 'completed' ||
+                  status === 'failed' ||
+                  status === 'cancelled'
+                ) {
                   pipeline.endTime = new Date();
-                  
+
                   // Move to history
                   draft.pipelineHistory.unshift(pipeline);
                   delete draft.runningPipelines[pipelineId];
-                  
+
                   // Update global state
                   if (Object.keys(draft.runningPipelines).length === 0) {
                     draft.activeStage = null;
@@ -386,7 +472,7 @@ export const usePipelineStore = create<PipelineStore>()(
                     draft.estimatedTimeRemaining = null;
                   }
                 }
-                
+
                 draft.lastUpdated = new Date();
               }
             });
@@ -397,28 +483,30 @@ export const usePipelineStore = create<PipelineStore>()(
           },
 
           // Pipeline management
-          getPipelineExecution: (pipelineId) => {
+          getPipelineExecution: pipelineId => {
             const running = get().runningPipelines[pipelineId];
             if (running) return running;
-            
+
             return get().pipelineHistory.find(p => p.id === pipelineId) || null;
           },
 
-          removePipelineExecution: (pipelineId) => {
-            set((draft) => {
+          removePipelineExecution: pipelineId => {
+            set(draft => {
               delete draft.runningPipelines[pipelineId];
-              draft.pipelineHistory = draft.pipelineHistory.filter(p => p.id !== pipelineId);
+              draft.pipelineHistory = draft.pipelineHistory.filter(
+                p => p.id !== pipelineId
+              );
             });
           },
 
           clearPipelineHistory: () => {
-            set((draft) => {
+            set(draft => {
               draft.pipelineHistory = [];
             });
           },
 
-          archivePipeline: (pipelineId) => {
-            set((draft) => {
+          archivePipeline: pipelineId => {
+            set(draft => {
               const pipeline = draft.runningPipelines[pipelineId];
               if (pipeline && pipeline.status !== 'running') {
                 draft.pipelineHistory.unshift(pipeline);
@@ -428,16 +516,16 @@ export const usePipelineStore = create<PipelineStore>()(
           },
 
           // Global pipeline state
-          setActiveStage: (stage) => {
-            set((draft) => {
+          setActiveStage: stage => {
+            set(draft => {
               draft.activeStage = stage;
             });
           },
 
           updateGlobalProgress: () => {
-            set((draft) => {
+            set(draft => {
               const runningPipelines = Object.values(draft.runningPipelines);
-              
+
               if (runningPipelines.length === 0) {
                 draft.globalProgress = 0;
                 draft.estimatedTimeRemaining = null;
@@ -455,7 +543,7 @@ export const usePipelineStore = create<PipelineStore>()(
               const estimates = runningPipelines
                 .map(p => p.progress.estimatedEndTime)
                 .filter(Boolean) as Date[];
-              
+
               if (estimates.length > 0) {
                 const maxEndTime = Math.max(...estimates.map(d => d.getTime()));
                 draft.estimatedTimeRemaining = maxEndTime - Date.now();
@@ -463,20 +551,20 @@ export const usePipelineStore = create<PipelineStore>()(
             });
           },
 
-          setCanCancel: (canCancel) => {
-            set((draft) => {
+          setCanCancel: canCancel => {
+            set(draft => {
               draft.canCancel = canCancel;
             });
           },
 
-          setAutoSave: (autoSave) => {
-            set((draft) => {
+          setAutoSave: autoSave => {
+            set(draft => {
               draft.autoSave = autoSave;
             });
           },
 
           // Estimation and analytics
-          estimateTimeRemaining: (pipelineId) => {
+          estimateTimeRemaining: pipelineId => {
             const pipeline = get().getPipelineExecution(pipelineId);
             if (!pipeline || pipeline.status !== 'running') return null;
 
@@ -489,14 +577,14 @@ export const usePipelineStore = create<PipelineStore>()(
             return estimatedTotal - elapsed;
           },
 
-          calculateResourceCost: (pipelineId) => {
+          calculateResourceCost: pipelineId => {
             const pipeline = get().getPipelineExecution(pipelineId);
             if (!pipeline) return 0;
 
             return pipeline.resourceUsage.estimatedCost;
           },
 
-          getPipelineAnalytics: (projectId) => {
+          getPipelineAnalytics: projectId => {
             const state = get();
             let pipelines = state.pipelineHistory;
 
@@ -505,23 +593,30 @@ export const usePipelineStore = create<PipelineStore>()(
             }
 
             const totalExecutions = pipelines.length;
-            const successful = pipelines.filter(p => p.status === 'completed').length;
-            const successRate = totalExecutions > 0 ? (successful / totalExecutions) * 100 : 0;
+            const successful = pipelines.filter(
+              p => p.status === 'completed'
+            ).length;
+            const successRate =
+              totalExecutions > 0 ? (successful / totalExecutions) * 100 : 0;
 
             const durations = pipelines
               .filter(p => p.endTime)
               .map(p => p.endTime!.getTime() - p.startTime.getTime());
-            
-            const averageDuration = durations.length > 0 
-              ? durations.reduce((sum, dur) => sum + dur, 0) / durations.length 
-              : 0;
+
+            const averageDuration =
+              durations.length > 0
+                ? durations.reduce((sum, dur) => sum + dur, 0) /
+                  durations.length
+                : 0;
 
             const totalTokensUsed = pipelines.reduce(
-              (sum, p) => sum + p.resourceUsage.tokensUsed, 0
+              (sum, p) => sum + p.resourceUsage.tokensUsed,
+              0
             );
 
             const totalCost = pipelines.reduce(
-              (sum, p) => sum + p.resourceUsage.estimatedCost, 0
+              (sum, p) => sum + p.resourceUsage.estimatedCost,
+              0
             );
 
             // Collect error statistics
@@ -539,16 +634,28 @@ export const usePipelineStore = create<PipelineStore>()(
               .slice(0, 10);
 
             // Calculate stage performance
-            const stagePerformance: Array<{ stage: PipelineStage; averageDuration: number }> = [];
-            const stages: PipelineStage[] = ['research', 'outline_generation', 'article_generation', 'polishing'];
-            
+            const stagePerformance: Array<{
+              stage: PipelineStage;
+              averageDuration: number;
+            }> = [];
+            const stages: PipelineStage[] = [
+              'research',
+              'outline_generation',
+              'article_generation',
+              'polishing',
+            ];
+
             stages.forEach(stage => {
               const stageDurations = pipelines
-                .filter(p => p.progress.stage === stage || p.status === 'completed')
+                .filter(
+                  p => p.progress.stage === stage || p.status === 'completed'
+                )
                 .map(p => p.resourceUsage.duration);
-              
+
               if (stageDurations.length > 0) {
-                const avgDuration = stageDurations.reduce((sum, dur) => sum + dur, 0) / stageDurations.length;
+                const avgDuration =
+                  stageDurations.reduce((sum, dur) => sum + dur, 0) /
+                  stageDurations.length;
                 stagePerformance.push({ stage, averageDuration: avgDuration });
               }
             });
@@ -567,7 +674,7 @@ export const usePipelineStore = create<PipelineStore>()(
           // Batch operations
           cancelAllPipelines: async () => {
             const runningPipelineIds = Object.keys(get().runningPipelines);
-            
+
             await Promise.allSettled(
               runningPipelineIds.map(id => get().cancelPipeline(id))
             );
@@ -575,7 +682,7 @@ export const usePipelineStore = create<PipelineStore>()(
 
           pauseAllPipelines: async () => {
             const runningPipelineIds = Object.keys(get().runningPipelines);
-            
+
             await Promise.allSettled(
               runningPipelineIds.map(id => get().pausePipeline(id))
             );
@@ -585,40 +692,40 @@ export const usePipelineStore = create<PipelineStore>()(
             const pausedPipelineIds = Object.entries(get().runningPipelines)
               .filter(([_, pipeline]) => pipeline.status === 'completed') // Using completed as paused
               .map(([id]) => id);
-            
+
             await Promise.allSettled(
               pausedPipelineIds.map(id => get().resumePipeline(id))
             );
           },
 
           // State management
-          setLoading: (loading) => {
-            set((draft) => {
+          setLoading: loading => {
+            set(draft => {
               draft.loading = loading;
             });
           },
 
-          setError: (error) => {
-            set((draft) => {
+          setError: error => {
+            set(draft => {
               draft.error = error;
             });
           },
 
           clearError: () => {
-            set((draft) => {
+            set(draft => {
               draft.error = null;
             });
           },
 
           reset: () => {
-            set((draft) => {
+            set(draft => {
               Object.assign(draft, initialState);
               draft.runningPipelines = {};
             });
           },
 
           // WebSocket integration
-          handlePipelineEvent: (event) => {
+          handlePipelineEvent: event => {
             const { type, pipelineId, data } = event;
 
             switch (type) {
@@ -646,9 +753,11 @@ export const usePipelineStore = create<PipelineStore>()(
             }
           },
 
-          subscribeToUpdates: (pipelineId) => {
+          subscribeToUpdates: pipelineId => {
             if (!pipelineId) {
-              logger.warn('Cannot subscribe to updates: pipelineId is undefined');
+              logger.warn(
+                'Cannot subscribe to updates: pipelineId is undefined'
+              );
               return;
             }
             // WebSocket subscription logic would be implemented here
@@ -656,7 +765,7 @@ export const usePipelineStore = create<PipelineStore>()(
             // logger.log(`Subscribing to updates for pipeline ${pipelineId}`);
           },
 
-          unsubscribeFromUpdates: (pipelineId) => {
+          unsubscribeFromUpdates: pipelineId => {
             // WebSocket unsubscription logic would be implemented here
             // logger.log(`Unsubscribing from updates for pipeline ${pipelineId}`);
           },
@@ -677,22 +786,27 @@ export const usePipelineStore = create<PipelineStore>()(
 
 // Selectors
 export const pipelineSelectors = {
-  runningPipelines: (state: PipelineStore) => Object.values(state.runningPipelines),
+  runningPipelines: (state: PipelineStore) =>
+    Object.values(state.runningPipelines),
   pipelineHistory: (state: PipelineStore) => state.pipelineHistory,
   activeStage: (state: PipelineStore) => state.activeStage,
   globalProgress: (state: PipelineStore) => state.globalProgress,
   canCancel: (state: PipelineStore) => state.canCancel,
   isLoading: (state: PipelineStore) => state.loading,
   error: (state: PipelineStore) => state.error,
-  estimatedTimeRemaining: (state: PipelineStore) => state.estimatedTimeRemaining,
+  estimatedTimeRemaining: (state: PipelineStore) =>
+    state.estimatedTimeRemaining,
   autoSave: (state: PipelineStore) => state.autoSave,
-  hasRunningPipelines: (state: PipelineStore) => Object.keys(state.runningPipelines).length > 0,
-  getPipeline: (pipelineId: string) => (state: PipelineStore) => 
+  hasRunningPipelines: (state: PipelineStore) =>
+    Object.keys(state.runningPipelines).length > 0,
+  getPipeline: (pipelineId: string) => (state: PipelineStore) =>
     state.getPipelineExecution(pipelineId),
-  getProjectPipelines: (projectId: string) => (state: PipelineStore) => 
+  getProjectPipelines: (projectId: string) => (state: PipelineStore) =>
     state.pipelineHistory.filter(p => p.projectId === projectId),
   getRunningPipelinesByProject: (projectId: string) => (state: PipelineStore) =>
-    Object.values(state.runningPipelines).filter(p => p.projectId === projectId),
+    Object.values(state.runningPipelines).filter(
+      p => p.projectId === projectId
+    ),
 };
 
 // Pipeline hooks
@@ -704,10 +818,16 @@ export const usePipeline = () => {
   };
 };
 
-export const useRunningPipelines = () => usePipelineStore(pipelineSelectors.runningPipelines);
-export const usePipelineHistory = () => usePipelineStore(pipelineSelectors.pipelineHistory);
-export const useGlobalProgress = () => usePipelineStore(pipelineSelectors.globalProgress);
-export const usePipelineLoading = () => usePipelineStore(pipelineSelectors.isLoading);
+export const useRunningPipelines = () =>
+  usePipelineStore(pipelineSelectors.runningPipelines);
+export const usePipelineHistory = () =>
+  usePipelineStore(pipelineSelectors.pipelineHistory);
+export const useGlobalProgress = () =>
+  usePipelineStore(pipelineSelectors.globalProgress);
+export const usePipelineLoading = () =>
+  usePipelineStore(pipelineSelectors.isLoading);
 export const usePipelineError = () => usePipelineStore(pipelineSelectors.error);
-export const useCanCancelPipeline = () => usePipelineStore(pipelineSelectors.canCancel);
-export const useHasRunningPipelines = () => usePipelineStore(pipelineSelectors.hasRunningPipelines);
+export const useCanCancelPipeline = () =>
+  usePipelineStore(pipelineSelectors.canCancel);
+export const useHasRunningPipelines = () =>
+  usePipelineStore(pipelineSelectors.hasRunningPipelines);

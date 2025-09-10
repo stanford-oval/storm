@@ -7,11 +7,11 @@ export interface StormProject {
   status: ProjectStatus;
   createdAt: Date;
   updatedAt: Date;
-  config?: StormConfig;  // Made optional since some projects may not have config
+  config?: StormConfig; // Made optional since some projects may not have config
   outputDir?: string;
   progress?: PipelineProgress;
-  content?: string;  // The raw article content from backend
-  word_count?: number;  // Word count from backend
+  content?: string; // The raw article content from backend
+  word_count?: number; // Word count from backend
   article?: GeneratedArticle;
   outline?: ArticleOutline;
   research?: ResearchData;
@@ -21,16 +21,16 @@ export interface StormProject {
     duration?: number;
     [key: string]: unknown;
   };
-  error?: string;  // Error message if pipeline failed
+  error?: string; // Error message if pipeline failed
 }
 
-export type ProjectStatus = 
-  | 'draft' 
-  | 'researching' 
-  | 'generating_outline' 
-  | 'writing_article' 
-  | 'polishing' 
-  | 'completed' 
+export type ProjectStatus =
+  | 'draft'
+  | 'researching'
+  | 'generating_outline'
+  | 'writing_article'
+  | 'polishing'
+  | 'completed'
   | 'failed';
 
 export interface StormConfig {
@@ -43,7 +43,15 @@ export interface StormConfig {
     maxTokens?: number;
   };
   retriever?: {
-    type: 'google' | 'bing' | 'you' | 'duckduckgo' | 'tavily' | 'serper' | 'brave' | 'vector';
+    type:
+      | 'google'
+      | 'bing'
+      | 'you'
+      | 'duckduckgo'
+      | 'tavily'
+      | 'serper'
+      | 'brave'
+      | 'vector';
     apiKey?: string;
     maxResults?: number;
     topK?: number;
@@ -81,7 +89,7 @@ export interface PipelineProgress {
   errors?: PipelineError[];
 }
 
-export type PipelineStage = 
+export type PipelineStage =
   | 'initializing'
   | 'research'
   | 'outline_generation'

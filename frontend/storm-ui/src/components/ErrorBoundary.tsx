@@ -3,7 +3,13 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { logger } from '@/utils/logger';
 
 interface Props {
@@ -26,16 +32,16 @@ export class ErrorBoundary extends Component<Props, State> {
   };
 
   public static getDerivedStateFromError(error: Error): State {
-    return { 
-      hasError: true, 
+    return {
+      hasError: true,
       error,
-      errorInfo: null 
+      errorInfo: null,
     };
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     logger.error('Error caught by ErrorBoundary:', error, errorInfo);
-    
+
     this.setState({
       error,
       errorInfo,
@@ -76,7 +82,8 @@ export class ErrorBoundary extends Component<Props, State> {
                 <CardTitle>Something went wrong</CardTitle>
               </div>
               <CardDescription>
-                An unexpected error occurred. Please try refreshing the page or contact support if the problem persists.
+                An unexpected error occurred. Please try refreshing the page or
+                contact support if the problem persists.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -94,7 +101,11 @@ export class ErrorBoundary extends Component<Props, State> {
                 </div>
               )}
               <div className="flex space-x-2">
-                <Button onClick={this.handleReset} variant="outline" className="flex-1">
+                <Button
+                  onClick={this.handleReset}
+                  variant="outline"
+                  className="flex-1"
+                >
                   Try Again
                 </Button>
                 <Button onClick={this.handleReload} className="flex-1">

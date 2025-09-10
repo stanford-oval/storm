@@ -21,7 +21,7 @@ export class SubscriptionManager {
       selector,
       callback: (state: T, prevState: T) => {
         const nextValue = selector(state);
-        
+
         if (!hasCurrentValue) {
           currentValue = nextValue;
           hasCurrentValue = true;
@@ -93,14 +93,13 @@ export class SubscriptionManager {
 
   // Get active subscription count
   getActiveSubscriptionCount(): number {
-    return Array.from(this.subscriptions.values()).filter(sub => sub.active).length;
+    return Array.from(this.subscriptions.values()).filter(sub => sub.active)
+      .length;
   }
 }
 
 // Subscription middleware
-export const subscriptions = <T>(
-  config: StateCreator<T>
-) => {
+export const subscriptions = <T>(config: StateCreator<T>) => {
   const subscriptionManager = new SubscriptionManager();
 
   return (set: any, get: any, api: any) => {
@@ -109,7 +108,7 @@ export const subscriptions = <T>(
         const prevState = get();
         set(args, replace, actionName);
         const nextState = get();
-        
+
         // Notify subscriptions
         subscriptionManager.notify(nextState, prevState);
       },
@@ -118,7 +117,8 @@ export const subscriptions = <T>(
     );
 
     // Add subscription methods to store
-    (store as any).subscribe = subscriptionManager.subscribe.bind(subscriptionManager);
+    (store as any).subscribe =
+      subscriptionManager.subscribe.bind(subscriptionManager);
     (store as any).subscriptions = subscriptionManager;
 
     return store;
@@ -137,15 +137,15 @@ export const createSelector = <T, R>(
   return (state: T): R => {
     if (!hasBeenCalled || !Object.is(state, lastState)) {
       const newResult = selector(state);
-      
+
       if (!hasBeenCalled || !equalityFn(newResult, lastResult)) {
         lastResult = newResult;
       }
-      
+
       lastState = state;
       hasBeenCalled = true;
     }
-    
+
     return lastResult;
   };
 };
@@ -169,13 +169,13 @@ export const shallowEqual = (a: any, b: any): boolean => {
     if (a.length !== b.length) {
       return false;
     }
-    
+
     for (let i = 0; i < a.length; i++) {
       if (!Object.is(a[i], b[i])) {
         return false;
       }
     }
-    
+
     return true;
   }
 
@@ -188,7 +188,7 @@ export const shallowEqual = (a: any, b: any): boolean => {
 
   for (let i = 0; i < keysA.length; i++) {
     const key = keysA[i];
-    
+
     if (
       !Object.prototype.hasOwnProperty.call(b, key) ||
       !Object.is(a[key], b[key])
@@ -222,13 +222,13 @@ export const deepEqual = (a: any, b: any): boolean => {
     if (a.length !== b.length) {
       return false;
     }
-    
+
     for (let i = 0; i < a.length; i++) {
       if (!deepEqual(a[i], b[i])) {
         return false;
       }
     }
-    
+
     return true;
   }
 
@@ -264,13 +264,13 @@ export const createComputed = <T, D extends readonly any[], R>(
 
   return (state: T): R => {
     const currentDeps = dependencies(state);
-    
+
     if (!hasBeenCalled || !equalityFn(currentDeps, lastDeps)) {
       lastResult = compute(...currentDeps);
       lastDeps = currentDeps;
       hasBeenCalled = true;
     }
-    
+
     return lastResult;
   };
 };

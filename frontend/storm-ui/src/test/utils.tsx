@@ -24,12 +24,12 @@ interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
   theme?: string;
 }
 
-const AllTheProviders: React.FC<{ 
+const AllTheProviders: React.FC<{
   children: React.ReactNode;
   options?: CustomRenderOptions;
 }> = ({ children, options = {} }) => {
-  const { 
-    initialStoreState, 
+  const {
+    initialStoreState,
     queryClient = new QueryClient({
       defaultOptions: {
         queries: { retry: false },
@@ -37,7 +37,7 @@ const AllTheProviders: React.FC<{
       },
     }),
     webSocketUrl = 'ws://localhost:8080',
-    theme = 'light'
+    theme = 'light',
   } = options;
 
   const mockWebSocket = {
@@ -72,9 +72,11 @@ const AllTheProviders: React.FC<{
 };
 
 const customRender = (ui: React.ReactElement, options?: CustomRenderOptions) =>
-  render(ui, { 
-    wrapper: ({ children }) => <AllTheProviders options={options}>{children}</AllTheProviders>, 
-    ...options 
+  render(ui, {
+    wrapper: ({ children }) => (
+      <AllTheProviders options={options}>{children}</AllTheProviders>
+    ),
+    ...options,
   });
 
 // Custom hook render function
@@ -82,11 +84,19 @@ const customRenderHook = <TProps, TResult>(
   callback: (props: TProps) => TResult,
   options?: RenderHookOptions<TProps> & CustomRenderOptions
 ) => {
-  const { initialStoreState, queryClient, webSocketUrl, theme, ...hookOptions } = options || {};
-  
+  const {
+    initialStoreState,
+    queryClient,
+    webSocketUrl,
+    theme,
+    ...hookOptions
+  } = options || {};
+
   return renderHook(callback, {
     wrapper: ({ children }) => (
-      <AllTheProviders options={{ initialStoreState, queryClient, webSocketUrl, theme }}>
+      <AllTheProviders
+        options={{ initialStoreState, queryClient, webSocketUrl, theme }}
+      >
         {children}
       </AllTheProviders>
     ),
@@ -111,7 +121,7 @@ export const measureRenderTime = (renderFn: () => void): number => {
 };
 
 // Wait for async operations
-export const waitForNextTick = (): Promise<void> => 
+export const waitForNextTick = (): Promise<void> =>
   new Promise(resolve => setTimeout(resolve, 0));
 
 export const waitForWebSocket = (): Promise<void> =>
