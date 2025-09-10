@@ -1,7 +1,7 @@
 # FastAPI and server dependencies
-fastapi==0.104.1
+fastapi==0.109.2
 uvicorn[standard]==0.24.0
-python-multipart==0.0.6
+python-multipart==0.0.7
 
 # Data processing and validation
 pydantic==2.5.0
