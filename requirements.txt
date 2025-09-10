@@ -5,8 +5,8 @@ toml==0.10.2
 langchain-text-splitters==0.2.0
 trafilatura==1.6.2
 langchain-huggingface==0.0.3
-qdrant-client==1.8.0
-langchain-qdrant==0.1.0
+qdrant-client>=1.7.0,<2.0.0
+langchain-qdrant>=0.1.0,<0.2.0
 numpy==1.26.4
 litellm==1.59.3
 diskcache==5.6.3
