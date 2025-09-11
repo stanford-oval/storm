@@ -96,7 +96,8 @@ class FileProjectService:
         """Load projects index from JSON file."""
         try:
             with open(self.index_file, "r", encoding="utf-8") as f:
-                return json.load(f)
+                data: Dict[str, Any] = json.load(f)
+                return data
         except (FileNotFoundError, json.JSONDecodeError):
             return {"projects": []}
 
@@ -536,7 +537,8 @@ class FileProjectService:
             if ref_path.exists():
                 try:
                     with open(ref_path, "r", encoding="utf-8") as f:
-                        return json.load(f)
+                        refs: Dict[str, Any] = json.load(f)
+                        return refs
                 except Exception as e:
                     print(f"Error loading references from {ref_path}: {e}")
 
@@ -605,7 +607,8 @@ class FileProjectService:
 
         if format.lower() == "markdown":
             # Return content with clickable links if available
-            return project.get("content_with_links", project["content"])
+            result: Optional[str] = project.get("content_with_links", project["content"])
+            return result
         elif format.lower() == "json":
             return json.dumps(project, indent=2, default=str)
         elif format.lower() == "html":
