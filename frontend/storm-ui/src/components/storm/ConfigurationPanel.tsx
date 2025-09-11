@@ -366,7 +366,12 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
       </CardHeader>
 
       <CardContent className="space-y-6">
-        <form onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
+        <form
+          onSubmit={e => {
+            e.preventDefault();
+            handleSave();
+          }}
+        >
           <Tabs defaultValue="llm" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="llm">Language Model</TabsTrigger>
@@ -374,432 +379,444 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
               <TabsTrigger value="pipeline">Pipeline</TabsTrigger>
             </TabsList>
 
-          <TabsContent value="llm" className="mt-4 space-y-4">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="llm-provider">Provider</Label>
-                <Select
-                  value={localConfig.llm?.provider}
-                  onValueChange={value =>
-                    handleConfigChange('llm.provider', value)
-                  }
-                >
-                  <SelectTrigger id="llm-provider">
-                    <SelectValue placeholder="Select provider" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {llmProviders.map(provider => (
-                      <SelectItem key={provider.value} value={provider.value}>
-                        {provider.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="llm-model">Model</Label>
-                <Select
-                  value={localConfig.llm?.model}
-                  onValueChange={value =>
-                    handleConfigChange('llm.model', value)
-                  }
-                >
-                  <SelectTrigger id="llm-model">
-                    <SelectValue placeholder="Select model" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {(
-                      localConfig.llm?.provider &&
-                      popularModels[localConfig.llm.provider]
-                    )?.map(model => (
-                      <SelectItem key={model} value={model}>
-                        {model}
-                      </SelectItem>
-                    )) || <SelectItem value="custom">Custom Model</SelectItem>}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            {localConfig.llm?.provider === 'azure' && (
-              <div className="space-y-4">
+            <TabsContent value="llm" className="mt-4 space-y-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="azure-base-url">Azure Base URL</Label>
+                  <Label htmlFor="llm-provider">Provider</Label>
+                  <Select
+                    value={localConfig.llm?.provider}
+                    onValueChange={value =>
+                      handleConfigChange('llm.provider', value)
+                    }
+                  >
+                    <SelectTrigger id="llm-provider">
+                      <SelectValue placeholder="Select provider" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {llmProviders.map(provider => (
+                        <SelectItem key={provider.value} value={provider.value}>
+                          {provider.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="llm-model">Model</Label>
+                  <Select
+                    value={localConfig.llm?.model}
+                    onValueChange={value =>
+                      handleConfigChange('llm.model', value)
+                    }
+                  >
+                    <SelectTrigger id="llm-model">
+                      <SelectValue placeholder="Select model" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(
+                        localConfig.llm?.provider &&
+                        popularModels[localConfig.llm.provider]
+                      )?.map(model => (
+                        <SelectItem key={model} value={model}>
+                          {model}
+                        </SelectItem>
+                      )) || (
+                        <SelectItem value="custom">Custom Model</SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {localConfig.llm?.provider === 'azure' && (
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="azure-base-url">Azure Base URL</Label>
+                    <Input
+                      id="azure-base-url"
+                      value={localConfig.llm?.baseUrl || ''}
+                      onChange={e =>
+                        handleConfigChange('llm.baseUrl', e.target.value)
+                      }
+                      placeholder="https://your-resource.openai.azure.com/"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {localConfig.llm?.provider === 'ollama' && (
+                <div className="space-y-2">
+                  <Label htmlFor="ollama-base-url">Ollama Base URL</Label>
                   <Input
-                    id="azure-base-url"
-                    value={localConfig.llm?.baseUrl || ''}
+                    id="ollama-base-url"
+                    value={localConfig.llm?.baseUrl || 'http://localhost:11434'}
                     onChange={e =>
                       handleConfigChange('llm.baseUrl', e.target.value)
                     }
-                    placeholder="https://your-resource.openai.azure.com/"
+                    placeholder="http://localhost:11434"
                   />
                 </div>
-              </div>
-            )}
+              )}
 
-            {localConfig.llm?.provider === 'ollama' && (
-              <div className="space-y-2">
-                <Label htmlFor="ollama-base-url">Ollama Base URL</Label>
-                <Input
-                  id="ollama-base-url"
-                  value={localConfig.llm?.baseUrl || 'http://localhost:11434'}
-                  onChange={e =>
-                    handleConfigChange('llm.baseUrl', e.target.value)
-                  }
-                  placeholder="http://localhost:11434"
-                />
-              </div>
-            )}
-
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="api-key">
-                  API Key
-                  {!showApiKeys && (
-                    <span className="ml-2 text-xs text-muted-foreground">
-                      (hidden)
-                    </span>
-                  )}
-                </Label>
-                <Input
-                  id="api-key"
-                  type={showApiKeys ? 'text' : 'password'}
-                  value={
-                    localConfig.llm?.apiKey ||
-                    (backendApiKeys &&
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="api-key">
+                    API Key
+                    {!showApiKeys && (
+                      <span className="ml-2 text-xs text-muted-foreground">
+                        (hidden)
+                      </span>
+                    )}
+                  </Label>
+                  <Input
+                    id="api-key"
+                    type={showApiKeys ? 'text' : 'password'}
+                    value={
+                      localConfig.llm?.apiKey ||
+                      (backendApiKeys &&
+                        localConfig.llm?.provider === 'openai' &&
+                        backendApiKeys.openai_key_preview) ||
+                      (backendApiKeys &&
+                        localConfig.llm?.provider === 'anthropic' &&
+                        backendApiKeys.anthropic_key_preview) ||
+                      ''
+                    }
+                    onChange={e =>
+                      handleConfigChange('llm.apiKey', e.target.value)
+                    }
+                    placeholder={
+                      backendApiKeys &&
                       localConfig.llm?.provider === 'openai' &&
-                      backendApiKeys.openai_key_preview) ||
-                    (backendApiKeys &&
-                      localConfig.llm?.provider === 'anthropic' &&
-                      backendApiKeys.anthropic_key_preview) ||
-                    ''
-                  }
-                  onChange={e =>
-                    handleConfigChange('llm.apiKey', e.target.value)
-                  }
-                  placeholder={
-                    backendApiKeys &&
-                    localConfig.llm?.provider === 'openai' &&
-                    backendApiKeys.openai_configured
-                      ? 'Using environment key'
-                      : backendApiKeys &&
-                          localConfig.llm?.provider === 'anthropic' &&
-                          backendApiKeys.anthropic_configured
-                        ? 'Using environment key'
-                        : 'Enter API key'
-                  }
-                />
-              </div>
-
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="temperature">
-                    Temperature
-                    <span className="ml-2 text-xs text-muted-foreground">
-                      (0.0 - 2.0)
-                    </span>
-                  </Label>
-                  <Input
-                    id="temperature"
-                    type="number"
-                    min="0"
-                    max="2"
-                    step="0.1"
-                    value={localConfig.llm?.temperature || 0.7}
-                    onChange={e =>
-                      handleConfigChange(
-                        'llm.temperature',
-                        parseFloat(e.target.value)
-                      )
-                    }
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="max-tokens">
-                    Max Tokens
-                    <span className="ml-2 text-xs text-muted-foreground">
-                      (optional)
-                    </span>
-                  </Label>
-                  <Input
-                    id="max-tokens"
-                    type="number"
-                    min="1"
-                    value={localConfig.llm?.maxTokens || ''}
-                    onChange={e =>
-                      handleConfigChange(
-                        'llm.maxTokens',
-                        e.target.value ? parseInt(e.target.value) : undefined
-                      )
-                    }
-                    placeholder="Auto"
-                  />
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="retriever" className="mt-4 space-y-4">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="retriever-type">Retriever Type</Label>
-                <Select
-                  value={localConfig.retriever?.type}
-                  onValueChange={value =>
-                    handleConfigChange('retriever.type', value)
-                  }
-                >
-                  <SelectTrigger id="retriever-type">
-                    <SelectValue placeholder="Select retriever" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {retrieverTypes.map(retriever => (
-                      <SelectItem key={retriever.value} value={retriever.value}>
-                        {retriever.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="max-results">Max Results</Label>
-                <Input
-                  id="max-results"
-                  type="number"
-                  min="1"
-                  max="50"
-                  value={localConfig.retriever?.maxResults || 10}
-                  onChange={e =>
-                    handleConfigChange(
-                      'retriever.maxResults',
-                      parseInt(e.target.value)
-                    )
-                  }
-                />
-              </div>
-            </div>
-
-            {localConfig.retriever?.type !== 'duckduckgo' && (
-              <div className="space-y-2">
-                <Label htmlFor="retriever-api-key">
-                  API Key
-                  {!showApiKeys && (
-                    <span className="ml-2 text-xs text-muted-foreground">
-                      (hidden)
-                    </span>
-                  )}
-                </Label>
-                <Input
-                  id="retriever-api-key"
-                  type={showApiKeys ? 'text' : 'password'}
-                  value={
-                    localConfig.retriever?.apiKey ||
-                    (backendApiKeys &&
-                      localConfig.retriever?.type === 'google' &&
-                      backendApiKeys.google_api_key_preview) ||
-                    (backendApiKeys &&
-                      localConfig.retriever?.type === 'serper' &&
-                      backendApiKeys.serper_key_preview) ||
-                    (backendApiKeys &&
-                      localConfig.retriever?.type === 'tavily' &&
-                      backendApiKeys.tavily_key_preview) ||
-                    (backendApiKeys &&
-                      localConfig.retriever?.type === 'you' &&
-                      backendApiKeys.you_key_preview) ||
-                    ''
-                  }
-                  onChange={e =>
-                    handleConfigChange('retriever.apiKey', e.target.value)
-                  }
-                  placeholder={
-                    backendApiKeys &&
-                    localConfig.retriever?.type === 'google' &&
-                    backendApiKeys.google_search_configured
-                      ? 'Using environment key'
-                      : backendApiKeys &&
-                          localConfig.retriever?.type === 'serper' &&
-                          backendApiKeys.serper_configured
+                      backendApiKeys.openai_configured
                         ? 'Using environment key'
                         : backendApiKeys &&
-                            localConfig.retriever?.type === 'tavily' &&
-                            backendApiKeys.tavily_configured
+                            localConfig.llm?.provider === 'anthropic' &&
+                            backendApiKeys.anthropic_configured
                           ? 'Using environment key'
-                          : backendApiKeys &&
-                              localConfig.retriever?.type === 'you' &&
-                              backendApiKeys.you_configured
-                            ? 'Using environment key'
-                            : 'Enter retriever API key'
-                  }
-                />
-              </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="pipeline" className="mt-4 space-y-4">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <Label htmlFor="do-research">Research Phase</Label>
-                  <p className="text-xs text-muted-foreground">
-                    Conduct multi-perspective research conversations
-                  </p>
+                          : 'Enter API key'
+                    }
+                  />
                 </div>
-                <Switch
-                  id="do-research"
-                  checked={localConfig.pipeline?.doResearch}
-                  onCheckedChange={checked =>
-                    handleConfigChange('pipeline.doResearch', checked)
-                  }
-                />
-              </div>
 
-              <Separator />
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="temperature">
+                      Temperature
+                      <span className="ml-2 text-xs text-muted-foreground">
+                        (0.0 - 2.0)
+                      </span>
+                    </Label>
+                    <Input
+                      id="temperature"
+                      type="number"
+                      min="0"
+                      max="2"
+                      step="0.1"
+                      value={localConfig.llm?.temperature || 0.7}
+                      onChange={e =>
+                        handleConfigChange(
+                          'llm.temperature',
+                          parseFloat(e.target.value)
+                        )
+                      }
+                    />
+                  </div>
 
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <Label htmlFor="do-outline">Generate Outline</Label>
-                  <p className="text-xs text-muted-foreground">
-                    Create structured article outline
-                  </p>
+                  <div className="space-y-2">
+                    <Label htmlFor="max-tokens">
+                      Max Tokens
+                      <span className="ml-2 text-xs text-muted-foreground">
+                        (optional)
+                      </span>
+                    </Label>
+                    <Input
+                      id="max-tokens"
+                      type="number"
+                      min="1"
+                      value={localConfig.llm?.maxTokens || ''}
+                      onChange={e =>
+                        handleConfigChange(
+                          'llm.maxTokens',
+                          e.target.value ? parseInt(e.target.value) : undefined
+                        )
+                      }
+                      placeholder="Auto"
+                    />
+                  </div>
                 </div>
-                <Switch
-                  id="do-outline"
-                  checked={localConfig.pipeline?.doGenerateOutline}
-                  onCheckedChange={checked =>
-                    handleConfigChange('pipeline.doGenerateOutline', checked)
-                  }
-                />
               </div>
+            </TabsContent>
 
-              <Separator />
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <Label htmlFor="do-article">Generate Article</Label>
-                  <p className="text-xs text-muted-foreground">
-                    Write full article sections
-                  </p>
-                </div>
-                <Switch
-                  id="do-article"
-                  checked={localConfig.pipeline?.doGenerateArticle}
-                  onCheckedChange={checked =>
-                    handleConfigChange('pipeline.doGenerateArticle', checked)
-                  }
-                />
-              </div>
-
-              <Separator />
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <Label htmlFor="do-polish">Polish Article</Label>
-                  <p className="text-xs text-muted-foreground">
-                    Add summaries and remove duplicates
-                  </p>
-                </div>
-                <Switch
-                  id="do-polish"
-                  checked={localConfig.pipeline?.doPolishArticle}
-                  onCheckedChange={checked =>
-                    handleConfigChange('pipeline.doPolishArticle', checked)
-                  }
-                />
-              </div>
-
-              <Separator />
-
+            <TabsContent value="retriever" className="mt-4 space-y-4">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="max-conv-turns">
-                    Max Conversation Turns
-                    <span className="ml-2 text-xs text-muted-foreground">
-                      (per perspective)
-                    </span>
-                  </Label>
-                  <Input
-                    id="max-conv-turns"
-                    type="number"
-                    min="1"
-                    max="20"
-                    value={localConfig.pipeline?.maxConvTurns || 5}
-                    onChange={e =>
-                      handleConfigChange(
-                        'pipeline.maxConvTurns',
-                        parseInt(e.target.value)
-                      )
+                  <Label htmlFor="retriever-type">Retriever Type</Label>
+                  <Select
+                    value={localConfig.retriever?.type}
+                    onValueChange={value =>
+                      handleConfigChange('retriever.type', value)
                     }
-                  />
+                  >
+                    <SelectTrigger id="retriever-type">
+                      <SelectValue placeholder="Select retriever" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {retrieverTypes.map(retriever => (
+                        <SelectItem
+                          key={retriever.value}
+                          value={retriever.value}
+                        >
+                          {retriever.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="max-perspectives">
-                    Max Perspectives
-                    <span className="ml-2 text-xs text-muted-foreground">
-                      (research viewpoints)
-                    </span>
-                  </Label>
+                  <Label htmlFor="max-results">Max Results</Label>
                   <Input
-                    id="max-perspectives"
+                    id="max-results"
                     type="number"
                     min="1"
-                    max="10"
-                    value={localConfig.pipeline?.maxPerspectives || 4}
+                    max="50"
+                    value={localConfig.retriever?.maxResults || 10}
                     onChange={e =>
                       handleConfigChange(
-                        'pipeline.maxPerspectives',
+                        'retriever.maxResults',
                         parseInt(e.target.value)
                       )
                     }
                   />
                 </div>
               </div>
-            </div>
-          </TabsContent>
+
+              {localConfig.retriever?.type !== 'duckduckgo' && (
+                <div className="space-y-2">
+                  <Label htmlFor="retriever-api-key">
+                    API Key
+                    {!showApiKeys && (
+                      <span className="ml-2 text-xs text-muted-foreground">
+                        (hidden)
+                      </span>
+                    )}
+                  </Label>
+                  <Input
+                    id="retriever-api-key"
+                    type={showApiKeys ? 'text' : 'password'}
+                    value={
+                      localConfig.retriever?.apiKey ||
+                      (backendApiKeys &&
+                        localConfig.retriever?.type === 'google' &&
+                        backendApiKeys.google_api_key_preview) ||
+                      (backendApiKeys &&
+                        localConfig.retriever?.type === 'serper' &&
+                        backendApiKeys.serper_key_preview) ||
+                      (backendApiKeys &&
+                        localConfig.retriever?.type === 'tavily' &&
+                        backendApiKeys.tavily_key_preview) ||
+                      (backendApiKeys &&
+                        localConfig.retriever?.type === 'you' &&
+                        backendApiKeys.you_key_preview) ||
+                      ''
+                    }
+                    onChange={e =>
+                      handleConfigChange('retriever.apiKey', e.target.value)
+                    }
+                    placeholder={
+                      backendApiKeys &&
+                      localConfig.retriever?.type === 'google' &&
+                      backendApiKeys.google_search_configured
+                        ? 'Using environment key'
+                        : backendApiKeys &&
+                            localConfig.retriever?.type === 'serper' &&
+                            backendApiKeys.serper_configured
+                          ? 'Using environment key'
+                          : backendApiKeys &&
+                              localConfig.retriever?.type === 'tavily' &&
+                              backendApiKeys.tavily_configured
+                            ? 'Using environment key'
+                            : backendApiKeys &&
+                                localConfig.retriever?.type === 'you' &&
+                                backendApiKeys.you_configured
+                              ? 'Using environment key'
+                              : 'Enter retriever API key'
+                    }
+                  />
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="pipeline" className="mt-4 space-y-4">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <Label htmlFor="do-research">Research Phase</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Conduct multi-perspective research conversations
+                    </p>
+                  </div>
+                  <Switch
+                    id="do-research"
+                    checked={localConfig.pipeline?.doResearch}
+                    onCheckedChange={checked =>
+                      handleConfigChange('pipeline.doResearch', checked)
+                    }
+                  />
+                </div>
+
+                <Separator />
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <Label htmlFor="do-outline">Generate Outline</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Create structured article outline
+                    </p>
+                  </div>
+                  <Switch
+                    id="do-outline"
+                    checked={localConfig.pipeline?.doGenerateOutline}
+                    onCheckedChange={checked =>
+                      handleConfigChange('pipeline.doGenerateOutline', checked)
+                    }
+                  />
+                </div>
+
+                <Separator />
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <Label htmlFor="do-article">Generate Article</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Write full article sections
+                    </p>
+                  </div>
+                  <Switch
+                    id="do-article"
+                    checked={localConfig.pipeline?.doGenerateArticle}
+                    onCheckedChange={checked =>
+                      handleConfigChange('pipeline.doGenerateArticle', checked)
+                    }
+                  />
+                </div>
+
+                <Separator />
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <Label htmlFor="do-polish">Polish Article</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Add summaries and remove duplicates
+                    </p>
+                  </div>
+                  <Switch
+                    id="do-polish"
+                    checked={localConfig.pipeline?.doPolishArticle}
+                    onCheckedChange={checked =>
+                      handleConfigChange('pipeline.doPolishArticle', checked)
+                    }
+                  />
+                </div>
+
+                <Separator />
+
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="max-conv-turns">
+                      Max Conversation Turns
+                      <span className="ml-2 text-xs text-muted-foreground">
+                        (per perspective)
+                      </span>
+                    </Label>
+                    <Input
+                      id="max-conv-turns"
+                      type="number"
+                      min="1"
+                      max="20"
+                      value={localConfig.pipeline?.maxConvTurns || 5}
+                      onChange={e =>
+                        handleConfigChange(
+                          'pipeline.maxConvTurns',
+                          parseInt(e.target.value)
+                        )
+                      }
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="max-perspectives">
+                      Max Perspectives
+                      <span className="ml-2 text-xs text-muted-foreground">
+                        (research viewpoints)
+                      </span>
+                    </Label>
+                    <Input
+                      id="max-perspectives"
+                      type="number"
+                      min="1"
+                      max="10"
+                      value={localConfig.pipeline?.maxPerspectives || 4}
+                      onChange={e =>
+                        handleConfigChange(
+                          'pipeline.maxPerspectives',
+                          parseInt(e.target.value)
+                        )
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
           </Tabs>
 
           <Separator />
 
           <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            {hasChanges && (
-              <span className="text-sm text-amber-600 dark:text-amber-400">
-                Unsaved changes
-              </span>
-            )}
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleReset}
-              disabled={!hasChanges || isLoading}
-            >
-              <RotateCcw className="mr-2 h-4 w-4" />
-              Reset
-            </Button>
-            <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={(!hasChanges && !allowSaveWithoutChanges) || isLoading}
-              className="min-w-[80px]"
-            >
-              {isLoading ? (
-                <div className="h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent" />
-              ) : (
-                <>
-                  <Save className="mr-2 h-4 w-4" />
-                  Save
-                </>
+            <div className="flex items-center space-x-2">
+              {hasChanges && (
+                <span className="text-sm text-amber-600 dark:text-amber-400">
+                  Unsaved changes
+                </span>
               )}
-            </Button>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleReset}
+                disabled={!hasChanges || isLoading}
+              >
+                <RotateCcw className="mr-2 h-4 w-4" />
+                Reset
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onCancel}
+                disabled={isLoading}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={
+                  (!hasChanges && !allowSaveWithoutChanges) || isLoading
+                }
+                className="min-w-[80px]"
+              >
+                {isLoading ? (
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent" />
+                ) : (
+                  <>
+                    <Save className="mr-2 h-4 w-4" />
+                    Save
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
-        </div>
         </form>
       </CardContent>
     </Card>

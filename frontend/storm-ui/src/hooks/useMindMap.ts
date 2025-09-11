@@ -65,8 +65,10 @@ export const useMindMap = (
     lastUpdate: new Date().toISOString(),
   });
 
-  const simulationRef =
-    useRef<d3.Simulation<MindMapNode & d3.SimulationNodeDatum, MindMapLink> | null>(null);
+  const simulationRef = useRef<d3.Simulation<
+    MindMapNode & d3.SimulationNodeDatum,
+    MindMapLink
+  > | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
   // Initialize D3 simulation

@@ -51,7 +51,10 @@ export const MindMap: React.FC<MindMapProps> = ({
     initialLinks
   );
   const containerRef = useRef<HTMLDivElement>(null);
-  const zoomBehaviorRef = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
+  const zoomBehaviorRef = useRef<d3.ZoomBehavior<
+    SVGSVGElement,
+    unknown
+  > | null>(null);
 
   // Update viewport dimensions
   useEffect(() => {
