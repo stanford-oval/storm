@@ -2,6 +2,11 @@ import '@testing-library/jest-dom';
 import 'jest-axe/extend-expect';
 import WS from 'jest-websocket-mock';
 
+// Add TextEncoder/TextDecoder polyfills for Node environment
+import { TextEncoder, TextDecoder } from 'util';
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;
+
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {
   constructor() {}
