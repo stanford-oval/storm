@@ -59,11 +59,11 @@ const AllTheProviders: React.FC<{
     <ThemeProvider defaultTheme={theme as 'light' | 'dark' | 'system'}>
       <ConfigContext.Provider value={mockConfig}>
         {/* <QueryClientProvider client={queryClient}> */}
-          <WebSocketContext.Provider value={mockWebSocket}>
-            <StoreProvider initialState={initialStoreState}>
-              {children}
-            </StoreProvider>
-          </WebSocketContext.Provider>
+        <WebSocketContext.Provider value={mockWebSocket}>
+          <StoreProvider initialState={initialStoreState}>
+            {children}
+          </StoreProvider>
+        </WebSocketContext.Provider>
         {/* </QueryClientProvider> */}
       </ConfigContext.Provider>
     </ThemeProvider>
