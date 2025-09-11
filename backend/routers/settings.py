@@ -93,7 +93,9 @@ async def get_default_config():
         default_llm = (
             "gpt-3.5-turbo"
             if openai_available
-            else "claude-3-haiku-20240307" if anthropic_available else None
+            else "claude-3-haiku-20240307"
+            if anthropic_available
+            else None
         )
 
         # Determine which retriever to use
@@ -119,7 +121,9 @@ async def get_default_config():
                 else (
                     "serper"
                     if serper_available
-                    else "you" if you_available else "duckduckgo"
+                    else "you"
+                    if you_available
+                    else "duckduckgo"
                 )
             )  # Free fallback
         )
