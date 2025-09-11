@@ -2,7 +2,7 @@
 security:
   # Ignore specific vulnerabilities that are false positives or already handled
   ignore-vulnerabilities:
-    - 66706  # langchain-text-splitters - already updated to 0.2.0
+    66706: # langchain-text-splitters - already updated to 0.2.0
   
   # Continue scanning even if vulnerabilities are found
   continue-on-vulnerability-error: false
