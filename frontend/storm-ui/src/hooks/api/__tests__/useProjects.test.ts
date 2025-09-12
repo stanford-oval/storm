@@ -166,7 +166,6 @@ describe('useProjects', () => {
       await waitFor(() => {
         expect(result.current.projects).toEqual([mockProjects[0]]);
       });
-  });
 
   describe('creating projects', () => {
     it('creates project successfully', async () => {
@@ -226,7 +225,6 @@ describe('useProjects', () => {
         expect(response.success).toBe(false);
         expect(response.error).toContain('Title is required');
       });
-  });
 
   describe('updating projects', () => {
     it('updates project successfully', async () => {
@@ -269,7 +267,6 @@ describe('useProjects', () => {
         expect(response.success).toBe(false);
         expect(response.error).toBe('Project not found');
       });
-  });
 
   describe('deleting projects', () => {
     it('deletes project successfully', async () => {
@@ -312,7 +309,6 @@ describe('useProjects', () => {
         expect(response.success).toBe(false);
         expect(response.error).toContain('confirmation required');
       });
-  });
 
   describe('duplicating projects', () => {
     it('duplicates project successfully', async () => {
@@ -352,7 +348,6 @@ describe('useProjects', () => {
         expect(response.success).toBe(false);
         expect(response.error).toBe('Original project not found');
       });
-  });
 
   describe('archiving projects', () => {
     it('archives project successfully', async () => {
@@ -382,7 +377,6 @@ describe('useProjects', () => {
         const response = await result.current.unarchiveProject('project-1');
         expect(response.success).toBe(true);
       });
-  });
 
   describe('refresh functionality', () => {
     it('refreshes projects list', async () => {
@@ -589,4 +583,4 @@ describe('useProjects', () => {
       await waitFor(() => {
         expect(getRequestCount).toBe(2);
       });
-  });
+});

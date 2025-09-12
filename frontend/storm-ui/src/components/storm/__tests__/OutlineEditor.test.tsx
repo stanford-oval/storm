@@ -435,7 +435,6 @@ describe('OutlineEditor', () => {
             expect.objectContaining({ isExpanded: false }),
           ]),
         });
-  });
 
   describe('Drag and Drop', () => {
     it('reorders sections via drag and drop', async () => {
@@ -526,7 +525,6 @@ describe('OutlineEditor', () => {
       await waitFor(() => {
         expect(screen.getByText(/saved/i)).toBeInTheDocument();
       });
-  });
 
   describe('Keyboard Navigation', () => {
     it('supports arrow key navigation', async () => {

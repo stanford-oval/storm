@@ -762,4 +762,6 @@ describe('ResearchView', () => {
         mockResearchData.conversations[0]
       );
     });
-});
+
+}}}}}}}}}}}}
+))))))))))))

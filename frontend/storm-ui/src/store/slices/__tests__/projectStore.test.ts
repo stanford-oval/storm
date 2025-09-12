@@ -87,7 +87,6 @@ describe('projectStore', () => {
         limit: 10,
         total: 0,
       });
-  });
 
   describe('project management', () => {
     it('sets projects', () => {
@@ -315,7 +314,6 @@ describe('projectStore', () => {
       });
 
       expect(result.current.filters).toEqual({});
-  });
 
   describe('sorting', () => {
     it('sets sort criteria', () => {

@@ -128,7 +128,6 @@ describe('API Services', () => {
           expect(value.length).toBeLessThan(50); // Should not be a full key
         }
       });
-  });
 
   describe('PipelineService', () => {
     it('should run pipeline for a project', async () => {

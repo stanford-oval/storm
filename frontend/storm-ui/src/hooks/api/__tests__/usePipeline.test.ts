@@ -110,7 +110,6 @@ describe('usePipeline', () => {
         expect(response.success).toBe(false);
         expect(response.error).toContain('API key is required');
       });
-  });
 
   describe('stopPipeline', () => {
     it('stops pipeline successfully', async () => {
@@ -140,7 +139,6 @@ describe('usePipeline', () => {
         expect(response.success).toBe(false);
         expect(response.error).toBe('Pipeline not found');
       });
-  });
 
   describe('getPipelineStatus', () => {
     it('fetches pipeline status successfully', async () => {
@@ -179,7 +177,6 @@ describe('usePipeline', () => {
         expect(response.success).toBe(false);
         expect(response.error).toBe('Pipeline not found');
       });
-  });
 
   describe('getPipelineLogs', () => {
     it('fetches pipeline logs successfully', async () => {
@@ -235,7 +232,6 @@ describe('usePipeline', () => {
         expect(response.success).toBe(true);
         expect(response.data[0].level).toBe('error');
       });
-  });
 
   describe('pausePipeline', () => {
     it('pauses pipeline successfully', async () => {
@@ -261,7 +257,6 @@ describe('usePipeline', () => {
         const response = await result.current.resumePipeline('pipeline-123');
         expect(response.success).toBe(true);
       });
-  });
 
   describe('retry functionality', () => {
     it('retries failed requests', async () => {
@@ -303,7 +298,6 @@ describe('usePipeline', () => {
         expect(response.success).toBe(false);
         expect(response.error).toBe('Server error');
       });
-  });
 
   describe('concurrent operations', () => {
     it('prevents multiple simultaneous starts', async () => {
@@ -341,7 +335,6 @@ describe('usePipeline', () => {
         const response = await result.current.startPipeline(mockProject);
         expect(response.success).toBe(true);
       });
-  });
 
   describe('cleanup', () => {
     it('cancels pending requests on unmount', async () => {
@@ -452,4 +445,4 @@ describe('usePipeline', () => {
           'at least one pipeline step must be enabled'
         );
       });
-  });
+});

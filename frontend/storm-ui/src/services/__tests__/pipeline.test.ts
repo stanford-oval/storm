@@ -246,7 +246,6 @@ describe('pipelineService', () => {
       await pipelineService.getPipelineLogs('pipeline-123', {
         stage: 'research',
       });
-  });
 
   describe('pausePipeline', () => {
     it('pauses pipeline successfully', async () => {
@@ -347,7 +346,6 @@ describe('pipelineService', () => {
           return HttpResponse.json({success: true,
               data: mockPipelines.filter(p => p.projectId === 'project-1'),});
       await pipelineService.listPipelines({ projectId: 'project-1' });
-  });
 
   describe('deletePipeline', () => {
     it('deletes pipeline successfully', async () => {

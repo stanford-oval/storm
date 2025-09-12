@@ -127,3 +127,6 @@ describe('ProjectCard', () => {
 
     expect(defaultProps.onSelect).not.toHaveBeenCalled();
   });
+
+}
+)))

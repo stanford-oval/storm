@@ -431,7 +431,6 @@ describe('useWebSocket', () => {
 
       // Should retry and succeed
       await expect(server).toReceiveMessage(JSON.stringify({ type: 'test' });
-  });
 
   describe('heartbeat/ping-pong', () => {
     it('sends periodic ping messages', async () => {
@@ -650,4 +649,4 @@ describe('useWebSocket', () => {
 
       // In a real implementation, you'd verify compression was applied
       await expect(server).toReceiveMessage(expect.any(String, { status: 200 });
-  });
+});

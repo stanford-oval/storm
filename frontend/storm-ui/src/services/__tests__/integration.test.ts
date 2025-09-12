@@ -695,7 +695,6 @@ describe('Rate Limiting and Caching Tests', () => {
       expect(response.success).toBe(true);
       expect(response.data).toEqual(mockProject);
     });
-});
 
 describe('Real-time Updates Integration Tests', () => {
   test('should handle WebSocket connection for project updates', async () => {
@@ -743,3 +742,6 @@ describe('Real-time Updates Integration Tests', () => {
     );
     expect(mockWebSocket.disconnect).toHaveBeenCalled();
   });
+
+}}}}}}}}}}}}}}}}}}}
+)))))))))))))))))))

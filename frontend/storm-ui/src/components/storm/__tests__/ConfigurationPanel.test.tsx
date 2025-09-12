@@ -205,7 +205,6 @@ describe('ConfigurationPanel', () => {
         ...mockConfig,
         llm: { ...mockConfig.llm, maxTokens: 8000 },
       });
-  });
 
   describe('Retriever Configuration', () => {
     it('updates retriever type', async () => {
@@ -358,7 +357,6 @@ describe('ConfigurationPanel', () => {
         ...mockConfig,
         pipeline: { ...mockConfig.pipeline, maxPerspectives: 5 },
       });
-  });
 
   describe('Actions', () => {
     it('saves configuration', async () => {
@@ -625,7 +623,6 @@ describe('ConfigurationPanel', () => {
             maxPerspectives: 5,
           }),
         });
-  });
 
   describe('Advanced Settings', () => {
     it('toggles advanced settings panel', async () => {
@@ -666,7 +663,6 @@ describe('ConfigurationPanel', () => {
         ...mockConfig,
         llm: { ...mockConfig.llm, baseUrl: 'https://custom-api.example.com' },
       });
-  });
 
   describe('Accessibility', () => {
     it('meets accessibility standards', async () => {

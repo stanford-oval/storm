@@ -172,7 +172,6 @@ describe('ArticleEditor', () => {
           ...mockArticle,
           title: 'Updated Article Title',
         });
-    });
 
     it('handles save button click', async () => {
       render(
@@ -258,7 +257,6 @@ describe('ArticleEditor', () => {
         expect.objectContaining({
           editable: false,
         });
-  });
 
   describe('Keyboard Shortcuts', () => {
     it('saves article with Ctrl+S', async () => {
