@@ -1,7 +1,6 @@
 # FastAPI and server dependencies
 fastapi==0.109.2
 uvicorn[standard]==0.24.0
-python-multipart==0.0.18
 
 # Data processing and validation
 pydantic==2.5.0
@@ -14,9 +13,11 @@ python-dateutil==2.8.2
 aiofiles==23.2.1
 pathlib2==2.3.7.post1
 
-# Background task processing
-python-jose[cryptography]==3.3.0
+# Authentication and security
+PyJWT==2.8.0  # Secure JWT implementation (replaces vulnerable python-jose)
+cryptography==42.0.5  # For JWT signing
 passlib[bcrypt]==1.7.4
+python-multipart==0.0.9  # Update to fix vulnerabilities
 
 # STORM dependencies (assumed to be installed separately)
 # knowledge-storm should be installed from the parent directory

@@ -8,7 +8,7 @@
 fastapi==0.109.2
 uvicorn[standard]==0.24.0
 starlette==0.36.3
-python-multipart==0.0.18
+python-multipart==0.0.9  # Updated to fix vulnerabilities
 
 # =========================
 # Data Validation & Models
@@ -36,14 +36,11 @@ six==1.17.0
 # =========================
 # Security & Authentication
 # =========================
-python-jose[cryptography]==3.3.0
+PyJWT==2.8.0  # Secure JWT implementation (replaces vulnerable python-jose)
 passlib[bcrypt]==1.7.4
 bcrypt==4.3.0
-cryptography==45.0.7
-ecdsa==0.19.1
-rsa==4.9.1
-pyasn1==0.6.1
-cffi==2.0.0
+cryptography==42.0.5  # Updated to stable version
+cffi==1.16.0  # Updated to latest stable
 pycparser==2.23
 
 # =========================

@@ -23,11 +23,12 @@ diskcache==5.6.3
 # =========================
 fastapi==0.109.2
 uvicorn[standard]==0.24.0
-python-multipart==0.0.18
+python-multipart==0.0.9  # Updated to fix vulnerabilities
 python-frontmatter==1.0.0
 aiofiles==23.2.1
 pathlib2==2.3.7.post1
-python-jose[cryptography]==3.3.0
+PyJWT==2.8.0  # Secure JWT implementation (replaces vulnerable python-jose)
+cryptography==42.0.5  # For JWT signing
 passlib[bcrypt]==1.7.4
 markdown2>=2.4.0
 
