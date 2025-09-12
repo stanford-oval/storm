@@ -14,7 +14,7 @@ aiofiles==23.2.1
 pathlib2==2.3.7.post1
 
 # Authentication and security
-PyJWT==2.8.0  # Secure JWT implementation (replaces vulnerable python-jose)
+PyJWT==2.10.1  # Secure JWT implementation (Updated to fix CVE-2024-53861)
 cryptography==44.0.1  # For JWT signing (Updated to fix OpenSSL vulnerabilities)
 passlib[bcrypt]==1.7.4
 python-multipart==0.0.18  # Updated to fix DoS vulnerability (CVE-2024-53981)
