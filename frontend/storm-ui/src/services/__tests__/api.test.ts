@@ -31,7 +31,7 @@ describe('API Services', () => {
       });
 
       const result = await ProjectService.listProjects();
-      
+
       expect(global.fetch).toHaveBeenCalledWith(
         expect.stringContaining('/api/projects'),
         expect.objectContaining({
