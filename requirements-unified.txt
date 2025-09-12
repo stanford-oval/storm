@@ -15,7 +15,7 @@ langchain-huggingface==0.0.3
 qdrant-client>=1.7.0,<2.0.0
 langchain-qdrant>=0.1.0,<0.2.0
 numpy==1.26.4
-litellm==1.61.15
+litellm>=1.61.15  # Updated to fix vulnerability 75075 (CWE-200: Exposure of Sensitive Information)
 diskcache==5.6.3
 
 # =========================

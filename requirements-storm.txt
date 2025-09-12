@@ -6,7 +6,7 @@
 # Core AI/ML Dependencies
 # =========================
 dspy_ai==2.4.9
-litellm==1.61.15
+litellm>=1.61.15  # Updated to fix vulnerability 75075 (CWE-200: Exposure of Sensitive Information)
 sentence-transformers==2.6.0
 langchain-text-splitters==0.2.0
 langchain-huggingface==0.0.3
