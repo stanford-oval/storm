@@ -55,7 +55,7 @@
     "@types/react-dom": "^18.3.7",
     "@types/ws": "^8.18.1",
     "autoprefixer": "^10.4.21",
-    "axios": "^1.11.0",
+    "axios": "^1.12.0",
     "class-variance-authority": "^0.7.1",
     "client-only": "^0.0.1",
     "clsx": "^2.1.1",
