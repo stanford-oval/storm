@@ -27,7 +27,7 @@ python-multipart==0.0.9  # Update to fix vulnerabilities
 pytest==7.4.3
 pytest-asyncio==0.21.1
 httpx==0.25.2
-black==23.11.0
+black==24.3.0  # Updated to fix ReDoS vulnerability (CVE-2024-21503)
 isort==5.12.0
 mypy==1.7.1
 
@@ -39,4 +39,4 @@ types-pytz==2024.1.0.20240203
 # Additional utilities
 typing-extensions==4.8.0
 # Export functionality
-markdown2>=2.4.0  # For HTML export
+markdown2>=2.5.4  # For HTML export (Updated to fix XSS and ReDoS vulnerabilities)
