@@ -607,7 +607,9 @@ class FileProjectService:
 
         if format.lower() == "markdown":
             # Return content with clickable links if available
-            result: Optional[str] = project.get("content_with_links", project["content"])
+            result: Optional[str] = project.get(
+                "content_with_links", project["content"]
+            )
             return result
         elif format.lower() == "json":
             return json.dumps(project, indent=2, default=str)
