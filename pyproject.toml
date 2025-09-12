@@ -86,12 +86,18 @@ classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "Topic :: Software Development :: Build Tools",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
 requires-python = ">=3.11"
+
+[tool.setuptools.packages.find]
+include = ["knowledge_storm", "knowledge_storm.*"]
+exclude = ["tests*", "frontend*", "backend*", "deploy*", "assets*"]
+
+[tool.setuptools.package-data]
+knowledge_storm = ["*.json", "*.txt"]
 
 [project.urls]
 "Homepage" = "https://github.com/stanford-oval/storm"
