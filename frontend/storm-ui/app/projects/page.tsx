@@ -7,12 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 // import { Badge } from '@/components/ui/badge'; // Removed unused import
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -22,20 +22,24 @@ import { AnimatedPage } from '@/utils/animations/AnimatedPage';
 import { ResponsiveContainer } from '@/components/ux/ResponsiveContainer';
 import { RecentActivity } from '@/components/storm/RecentActivity';
 import { PaginationControls } from '@/components/ui/pagination-controls';
-import { 
-  Plus, 
-  Search, 
-  Filter, 
+import {
+  Plus,
+  Search,
+  Filter,
   FileText,
   CheckCircle,
   AlertCircle,
   TrendingUp,
-  Activity
+  Activity,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 // Filter and sort options
-const STATUS_FILTERS: { value: ProjectStatus | 'all'; label: string; color: string }[] = [
+const STATUS_FILTERS: {
+  value: ProjectStatus | 'all';
+  label: string;
+  color: string;
+}[] = [
   { value: 'all', label: 'All Projects', color: 'bg-slate-100' },
   { value: 'draft', label: 'Draft', color: 'bg-gray-100' },
   { value: 'researching', label: 'Researching', color: 'bg-blue-100' },
@@ -55,29 +59,31 @@ const SORT_OPTIONS = [
 
 export default function ProjectsPage() {
   const router = useRouter();
-  const { 
-    projects, 
-    loading, 
-    error, 
-    loadProjects, 
-    deleteProject, 
+  const {
+    projects,
+    loading,
+    error,
+    loadProjects,
+    deleteProject,
     duplicateProject,
     selectedProjects,
     toggleProjectSelection: _toggleProjectSelection,
-    clearSelection 
+    clearSelection,
   } = useProjectStore();
-  
+
   const { theme: _theme } = useUIStore();
   const { runningPipelines: _runningPipelines } = usePipelineStore();
 
   // Local state for filtering and search
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<ProjectStatus | 'all'>('all');
+  const [statusFilter, setStatusFilter] = useState<ProjectStatus | 'all'>(
+    'all'
+  );
   const [sortBy, setSortBy] = useState<string>('updatedAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20); // Show 20 projects per page
-  
+
   // Handle items per page change
   const handleItemsPerPageChange = (newItemsPerPage: number) => {
     setItemsPerPage(newItemsPerPage);
@@ -93,13 +99,18 @@ export default function ProjectsPage() {
   const filteredAndSortedProjects = React.useMemo(() => {
     if (!projects) return [];
 
-    const filtered = projects.filter((project) => {
-      const matchesSearch = searchQuery === '' || 
+    const filtered = projects.filter(project => {
+      const matchesSearch =
+        searchQuery === '' ||
         project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         project.topic.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (project.description?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false);
-      
-      const matchesStatus = statusFilter === 'all' || project.status === statusFilter;
+        (project.description
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase()) ??
+          false);
+
+      const matchesStatus =
+        statusFilter === 'all' || project.status === statusFilter;
 
       return matchesSearch && matchesStatus;
     });
@@ -107,7 +118,7 @@ export default function ProjectsPage() {
     // Sort projects
     filtered.sort((a, b) => {
       let comparison = 0;
-      
+
       switch (sortBy) {
         case 'title':
           comparison = a.title.localeCompare(b.title);
@@ -116,11 +127,13 @@ export default function ProjectsPage() {
           comparison = a.status.localeCompare(b.status);
           break;
         case 'createdAt':
-          comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+          comparison =
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
           break;
         case 'updatedAt':
         default:
-          comparison = new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
+          comparison =
+            new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
           break;
       }
 
@@ -139,7 +152,7 @@ export default function ProjectsPage() {
 
   // Calculate pagination info
   const totalPages = Math.ceil(filteredAndSortedProjects.length / itemsPerPage);
-  
+
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
@@ -148,12 +161,19 @@ export default function ProjectsPage() {
   // Calculate statistics
   const stats = React.useMemo(() => {
     if (!projects) return { total: 0, active: 0, completed: 0, failed: 0 };
-    
+
     return {
       total: projects.length,
-      active: projects.filter(p => ['researching', 'generating_outline', 'writing_article', 'polishing'].includes(p.status)).length,
+      active: projects.filter(p =>
+        [
+          'researching',
+          'generating_outline',
+          'writing_article',
+          'polishing',
+        ].includes(p.status)
+      ).length,
       completed: projects.filter(p => p.status === 'completed').length,
-      failed: projects.filter(p => p.status === 'failed').length
+      failed: projects.filter(p => p.status === 'failed').length,
     };
   }, [projects]);
 
@@ -163,7 +183,11 @@ export default function ProjectsPage() {
   };
 
   const handleDeleteProject = async (projectId: string) => {
-    if (confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
+    if (
+      confirm(
+        'Are you sure you want to delete this project? This action cannot be undone.'
+      )
+    ) {
       await deleteProject(projectId);
     }
   };
@@ -180,19 +204,17 @@ export default function ProjectsPage() {
     return (
       <AnimatedPage>
         <ResponsiveContainer>
-          <div className="flex items-center justify-center h-96">
+          <div className="flex h-96 items-center justify-center">
             <Card className="w-full max-w-md">
               <CardHeader>
                 <CardTitle className="flex items-center text-destructive">
-                  <AlertCircle className="h-5 w-5 mr-2" />
+                  <AlertCircle className="mr-2 h-5 w-5" />
                   Error Loading Projects
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground mb-4">{error}</p>
-                <Button onClick={() => loadProjects()}>
-                  Try Again
-                </Button>
+                <p className="mb-4 text-muted-foreground">{error}</p>
+                <Button onClick={() => loadProjects()}>Try Again</Button>
               </CardContent>
             </Card>
           </div>
@@ -203,7 +225,7 @@ export default function ProjectsPage() {
 
   return (
     <AnimatedPage>
-      <ResponsiveContainer className="py-6 space-y-6">
+      <ResponsiveContainer className="space-y-6 py-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -213,69 +235,77 @@ export default function ProjectsPage() {
             </p>
           </div>
           <Button onClick={handleCreateProject} className="btn-primary">
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="mr-2 h-4 w-4" />
             New Project
           </Button>
         </div>
 
         {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Projects</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Total Projects
+              </CardTitle>
               <FileText className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.total}</div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Active</CardTitle>
               <Activity className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{stats.active}</div>
+              <div className="text-2xl font-bold text-blue-600">
+                {stats.active}
+              </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Completed</CardTitle>
               <CheckCircle className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{stats.completed}</div>
+              <div className="text-2xl font-bold text-green-600">
+                {stats.completed}
+              </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Failed</CardTitle>
               <AlertCircle className="h-4 w-4 text-red-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-red-600">{stats.failed}</div>
+              <div className="text-2xl font-bold text-red-600">
+                {stats.failed}
+              </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Filters, Search and Pagination - All in one row */}
-        <div className="flex flex-col xl:flex-row gap-4 items-start xl:items-center justify-between">
+        <div className="flex flex-col items-start justify-between gap-4 xl:flex-row xl:items-center">
           {/* Left side: Search */}
-          <div className="flex flex-1 items-center space-x-2 min-w-0">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <div className="flex min-w-0 flex-1 items-center space-x-2">
+            <div className="relative max-w-sm flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
               <Input
                 placeholder="Search projects..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={e => setSearchQuery(e.target.value)}
                 className="pl-9"
               />
             </div>
           </div>
-          
+
           {/* Middle: Pagination Controls */}
           {filteredAndSortedProjects.length > 0 && (
             <div className="flex items-center">
@@ -293,16 +323,26 @@ export default function ProjectsPage() {
 
           {/* Right side: Filters and Sort */}
           <div className="flex items-center space-x-2">
-            <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as ProjectStatus | 'all')}>
+            <Select
+              value={statusFilter}
+              onValueChange={value =>
+                setStatusFilter(value as ProjectStatus | 'all')
+              }
+            >
               <SelectTrigger className="w-[180px]">
-                <Filter className="h-4 w-4 mr-2" />
+                <Filter className="mr-2 h-4 w-4" />
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
               <SelectContent>
-                {STATUS_FILTERS.map((option) => (
+                {STATUS_FILTERS.map(option => (
                   <SelectItem key={option.value} value={option.value}>
                     <div className="flex items-center">
-                      <div className={cn("h-2 w-2 rounded-full mr-2", option.color)} />
+                      <div
+                        className={cn(
+                          'mr-2 h-2 w-2 rounded-full',
+                          option.color
+                        )}
+                      />
                       {option.label}
                     </div>
                   </SelectItem>
@@ -315,7 +355,7 @@ export default function ProjectsPage() {
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent>
-                {SORT_OPTIONS.map((option) => (
+                {SORT_OPTIONS.map(option => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
                   </SelectItem>
@@ -328,7 +368,9 @@ export default function ProjectsPage() {
               size="sm"
               onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
             >
-              <TrendingUp className={cn("h-4 w-4", sortOrder === 'asc' && "rotate-180")} />
+              <TrendingUp
+                className={cn('h-4 w-4', sortOrder === 'asc' && 'rotate-180')}
+              />
             </Button>
           </div>
         </div>
@@ -336,76 +378,78 @@ export default function ProjectsPage() {
         <Separator />
 
         {/* Main Content with Recent Activity */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           {/* Projects Grid */}
-          <div className="lg:col-span-2 space-y-4">
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <Card key={i}>
-                  <CardHeader>
-                    <Skeleton className="h-6 w-3/4" />
-                    <Skeleton className="h-4 w-1/2 mt-2" />
-                  </CardHeader>
-                  <CardContent>
-                    <Skeleton className="h-4 w-full mb-2" />
-                    <Skeleton className="h-4 w-full mb-2" />
-                    <Skeleton className="h-4 w-2/3" />
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : paginatedProjects.length === 0 && filteredAndSortedProjects.length === 0 ? (
-            <Card>
-              <CardContent className="flex flex-col items-center justify-center py-12">
-                <FileText className="h-12 w-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No projects found</h3>
-                <p className="text-muted-foreground text-center mb-4">
-                  {searchQuery || statusFilter !== 'all' 
-                    ? 'Try adjusting your search or filters'
-                    : 'Get started by creating your first STORM project'
-                  }
-                </p>
-                {!searchQuery && statusFilter === 'all' && (
-                  <Button onClick={handleCreateProject}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Create Project
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {paginatedProjects.map((project) => (
-                <ProjectCard
-                  key={project.id}
-                  project={project}
-                  onSelect={handleSelectProject}
-                  onDelete={handleDeleteProject}
-                  onDuplicate={handleDuplicateProject}
-                  className="animate-fade-in"
-                />
-              ))}
+          <div className="space-y-4 lg:col-span-2">
+            {loading ? (
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <Card key={i}>
+                    <CardHeader>
+                      <Skeleton className="h-6 w-3/4" />
+                      <Skeleton className="mt-2 h-4 w-1/2" />
+                    </CardHeader>
+                    <CardContent>
+                      <Skeleton className="mb-2 h-4 w-full" />
+                      <Skeleton className="mb-2 h-4 w-full" />
+                      <Skeleton className="h-4 w-2/3" />
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
-              
-              {/* Bottom Pagination Controls */}
-              {filteredAndSortedProjects.length > 0 && (
-                <div className="mt-6">
-                  <PaginationControls
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    totalItems={filteredAndSortedProjects.length}
-                    itemsPerPage={itemsPerPage}
-                    onPageChange={setCurrentPage}
-                    onItemsPerPageChange={handleItemsPerPageChange}
-                    showItemsPerPage={false}
-                    className="justify-center"
-                  />
+            ) : paginatedProjects.length === 0 &&
+              filteredAndSortedProjects.length === 0 ? (
+              <Card>
+                <CardContent className="flex flex-col items-center justify-center py-12">
+                  <FileText className="mb-4 h-12 w-12 text-muted-foreground" />
+                  <h3 className="mb-2 text-lg font-semibold">
+                    No projects found
+                  </h3>
+                  <p className="mb-4 text-center text-muted-foreground">
+                    {searchQuery || statusFilter !== 'all'
+                      ? 'Try adjusting your search or filters'
+                      : 'Get started by creating your first STORM project'}
+                  </p>
+                  {!searchQuery && statusFilter === 'all' && (
+                    <Button onClick={handleCreateProject}>
+                      <Plus className="mr-2 h-4 w-4" />
+                      Create Project
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  {paginatedProjects.map(project => (
+                    <ProjectCard
+                      key={project.id}
+                      project={project}
+                      onSelect={handleSelectProject}
+                      onDelete={handleDeleteProject}
+                      onDuplicate={handleDuplicateProject}
+                      className="animate-fade-in"
+                    />
+                  ))}
                 </div>
-              )}
-            </>
-          )}
+
+                {/* Bottom Pagination Controls */}
+                {filteredAndSortedProjects.length > 0 && (
+                  <div className="mt-6">
+                    <PaginationControls
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      totalItems={filteredAndSortedProjects.length}
+                      itemsPerPage={itemsPerPage}
+                      onPageChange={setCurrentPage}
+                      onItemsPerPageChange={handleItemsPerPageChange}
+                      showItemsPerPage={false}
+                      className="justify-center"
+                    />
+                  </div>
+                )}
+              </>
+            )}
           </div>
 
           {/* Recent Activity Sidebar */}
@@ -416,7 +460,7 @@ export default function ProjectsPage() {
 
         {/* Bulk Actions */}
         {selectedProjects.length > 0 && (
-          <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50">
+          <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 transform">
             <Card className="px-4 py-2 shadow-lg">
               <div className="flex items-center space-x-4">
                 <span className="text-sm font-medium">
@@ -425,11 +469,15 @@ export default function ProjectsPage() {
                 <Button size="sm" variant="outline" onClick={clearSelection}>
                   Clear
                 </Button>
-                <Button 
-                  size="sm" 
+                <Button
+                  size="sm"
                   variant="destructive"
                   onClick={() => {
-                    if (confirm(`Delete ${selectedProjects.length} selected projects?`)) {
+                    if (
+                      confirm(
+                        `Delete ${selectedProjects.length} selected projects?`
+                      )
+                    ) {
                       selectedProjects.forEach(id => deleteProject(id));
                       clearSelection();
                     }

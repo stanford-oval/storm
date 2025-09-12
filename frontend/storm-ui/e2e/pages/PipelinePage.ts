@@ -40,7 +40,7 @@ export class PipelinePage {
 
   async startPipeline() {
     await this.startPipelineButton.click();
-    
+
     // Wait for pipeline to start
     await expect(this.pipelineProgress).toBeVisible();
     await expect(this.currentStage).toContainText('initializing');
@@ -48,17 +48,17 @@ export class PipelinePage {
 
   async stopPipeline() {
     await this.stopPipelineButton.click();
-    
+
     // Confirm stop
     await this.page.getByTestId('confirm-stop-button').click();
-    
+
     // Wait for pipeline to stop
     await expect(this.page.getByText('Pipeline stopped')).toBeVisible();
   }
 
   async pausePipeline() {
     await this.pausePipelineButton.click();
-    
+
     // Wait for pipeline to pause
     await expect(this.page.getByText('Pipeline paused')).toBeVisible();
     await expect(this.resumePipelineButton).toBeVisible();
@@ -66,7 +66,7 @@ export class PipelinePage {
 
   async resumePipeline() {
     await this.resumePipelineButton.click();
-    
+
     // Wait for pipeline to resume
     await expect(this.page.getByText('Pipeline resumed')).toBeVisible();
     await expect(this.pausePipelineButton).toBeVisible();
@@ -88,11 +88,11 @@ export class PipelinePage {
   }
 
   async getCurrentStage(): Promise<string> {
-    return await this.currentStage.textContent() || '';
+    return (await this.currentStage.textContent()) || '';
   }
 
   async getCurrentTask(): Promise<string> {
-    return await this.currentTask.textContent() || '';
+    return (await this.currentTask.textContent()) || '';
   }
 
   async hasErrors(): Promise<boolean> {
@@ -102,12 +102,12 @@ export class PipelinePage {
   async getErrors(): Promise<string[]> {
     const errorElements = await this.errorMessages.all();
     const errors = [];
-    
+
     for (const element of errorElements) {
       const text = await element.textContent();
       if (text) errors.push(text);
     }
-    
+
     return errors;
   }
 
@@ -133,7 +133,7 @@ export class PipelinePage {
     const downloadPromise = this.page.waitForEvent('download');
     await this.downloadLogsButton.click();
     const download = await downloadPromise;
-    
+
     return download;
   }
 
@@ -148,20 +148,20 @@ export class PipelinePage {
   async monitorPipelineProgress() {
     const stages = [
       'initializing',
-      'research', 
+      'research',
       'outline_generation',
       'article_generation',
       'polishing',
-      'completed'
+      'completed',
     ];
 
     for (const stage of stages) {
       await this.waitForStage(stage);
-      
+
       // Verify progress is increasing
       const progress = await this.getProgressPercentage();
       expect(progress).toBeGreaterThan(0);
-      
+
       console.log(`Pipeline stage: ${stage}, Progress: ${progress}%`);
     }
 

@@ -18,6 +18,7 @@ The STORM UI now includes a complete suite of interactive visualization and UX c
 ### 1. Visualization Components (`src/components/visualization/`)
 
 #### MindMap
+
 - **Location**: `src/components/visualization/MindMap.tsx`
 - **Purpose**: Interactive D3.js-based mind map for Co-STORM knowledge spaces
 - **Key Features**:
@@ -30,6 +31,7 @@ The STORM UI now includes a complete suite of interactive visualization and UX c
   - Export/import capabilities
 
 **Usage Example**:
+
 ```tsx
 import { MindMap } from '@/components/visualization/MindMap';
 
@@ -41,12 +43,13 @@ import { MindMap } from '@/components/visualization/MindMap';
   onNodeClick={handleNodeClick}
   showControls={true}
   showMinimap={true}
-/>
+/>;
 ```
 
 ### 2. Analytics Components (`src/components/analytics/`)
 
 #### AnalyticsDashboard
+
 - **Location**: `src/components/analytics/AnalyticsDashboard.tsx`
 - **Purpose**: Comprehensive analytics and metrics visualization
 - **Key Features**:
@@ -59,6 +62,7 @@ import { MindMap } from '@/components/visualization/MindMap';
   - Real-time updates
 
 **Chart Types Included**:
+
 - Bar charts for stage duration comparison
 - Line charts for token consumption trends
 - Pie charts for model usage distribution
@@ -68,6 +72,7 @@ import { MindMap } from '@/components/visualization/MindMap';
 ### 3. UX Components (`src/components/ux/`)
 
 #### CommandPalette
+
 - **Location**: `src/components/ux/CommandPalette.tsx`
 - **Purpose**: Quick access to application features
 - **Key Features**:
@@ -78,6 +83,7 @@ import { MindMap } from '@/components/visualization/MindMap';
   - Extensible command system
 
 #### KeyboardShortcuts
+
 - **Location**: `src/components/ux/KeyboardShortcuts.tsx`
 - **Purpose**: Help dialog showing all keyboard shortcuts
 - **Key Features**:
@@ -87,6 +93,7 @@ import { MindMap } from '@/components/visualization/MindMap';
   - Dynamic shortcut registration
 
 #### TourGuide
+
 - **Location**: `src/components/ux/TourGuide.tsx`
 - **Purpose**: Interactive onboarding and feature tours
 - **Key Features**:
@@ -97,6 +104,7 @@ import { MindMap } from '@/components/visualization/MindMap';
   - Keyboard navigation support
 
 #### ToastSystem
+
 - **Location**: `src/components/ux/ToastSystem.tsx`
 - **Purpose**: Comprehensive notification system
 - **Key Features**:
@@ -107,6 +115,7 @@ import { MindMap } from '@/components/visualization/MindMap';
   - Stacked notifications with animations
 
 #### ResponsiveContainer
+
 - **Location**: `src/components/ux/ResponsiveContainer.tsx`
 - **Purpose**: Flexible responsive layout system
 - **Key Features**:
@@ -119,6 +128,7 @@ import { MindMap } from '@/components/visualization/MindMap';
 ### 4. Animation Utilities (`src/utils/animations/`)
 
 #### Core Animation Components
+
 - **AnimatedPage**: Page transition wrapper with variants
 - **AnimatedCard**: Interactive cards with hover effects
 - **AnimatedButton**: Enhanced buttons with micro-interactions
@@ -130,6 +140,7 @@ import { MindMap } from '@/components/visualization/MindMap';
 - **Skeleton**: Loading skeleton with pulse animation
 
 #### Animation Variants
+
 - Page transitions (fadeIn, slideUp, scale, blur, etc.)
 - Modal transitions (backdrop, modal, drawer)
 - List animations with staggered children
@@ -141,18 +152,21 @@ import { MindMap } from '@/components/visualization/MindMap';
 ### Accessibility Hooks (`src/hooks/accessibility/`)
 
 #### useFocusManagement
+
 - Focus trapping for modals and dialogs
 - Focus restoration on close
 - Auto-focus on open
 - Skip link support
 
 #### useAriaLive
+
 - Screen reader announcements
 - Multiple politeness levels
 - Specialized hooks for forms, loading, navigation
 - Global live region management
 
 #### useKeyboardNavigation
+
 - Arrow key navigation for lists, menus, tabs
 - Home/End navigation
 - Page up/down support
@@ -162,17 +176,20 @@ import { MindMap } from '@/components/visualization/MindMap';
 ### Responsive Hooks (`src/hooks/responsive/`)
 
 #### useBreakpoint
+
 - Current breakpoint detection
 - Up/down breakpoint queries
 - Device type detection (mobile, tablet, desktop)
 - Media query matching
 
 #### useBreakpointValue
+
 - Responsive value selection
 - Mobile-first approach
 - Fallback value support
 
 ### Mind Map Hook (`src/hooks/useMindMap.ts`)
+
 - D3.js simulation management
 - Node and link state management
 - Clustering algorithms
@@ -182,14 +199,18 @@ import { MindMap } from '@/components/visualization/MindMap';
 ## 🎨 Styling & Themes
 
 ### Tailwind Integration
+
 All components are built with Tailwind CSS classes and support:
+
 - Dark/light mode
 - Custom color schemes
 - Responsive breakpoints
 - Animation utilities
 
 ### Chart Themes
+
 Analytics components support customizable themes:
+
 ```tsx
 const customTheme = {
   primary: '#3b82f6',
@@ -199,14 +220,16 @@ const customTheme = {
   error: '#ef4444',
   background: '#ffffff',
   text: '#1f2937',
-  grid: '#e5e7eb'
+  grid: '#e5e7eb',
 };
 ```
 
 ## 🚀 Getting Started
 
 ### 1. Install Dependencies
+
 The following packages are already installed:
+
 - `d3` & `@types/d3`: For mind map visualization
 - `recharts`: For analytics charts
 - `framer-motion`: For animations
@@ -216,6 +239,7 @@ The following packages are already installed:
 - `react-use`: For utility hooks
 
 ### 2. Import Components
+
 ```tsx
 // Visualization
 import { MindMap } from '@/components/visualization/MindMap';
@@ -224,26 +248,22 @@ import { MindMap } from '@/components/visualization/MindMap';
 import { AnalyticsDashboard } from '@/components/analytics/AnalyticsDashboard';
 
 // UX Components
-import { 
-  CommandPalette, 
-  KeyboardShortcuts, 
-  TourGuide, 
-  ToastProvider, 
-  useToastActions 
+import {
+  CommandPalette,
+  KeyboardShortcuts,
+  TourGuide,
+  ToastProvider,
+  useToastActions,
 } from '@/components/ux';
 
 // Animation utilities
-import { 
-  AnimatedPage, 
-  AnimatedCard, 
-  LoadingSpinner 
-} from '@/utils/animations';
+import { AnimatedPage, AnimatedCard, LoadingSpinner } from '@/utils/animations';
 
 // Responsive components
-import { 
-  ResponsiveContainer, 
-  FlexContainer, 
-  GridContainer 
+import {
+  ResponsiveContainer,
+  FlexContainer,
+  GridContainer,
 } from '@/components/ux/ResponsiveContainer';
 
 // Hooks
@@ -252,20 +272,19 @@ import { useFocusManagement } from '@/hooks/accessibility';
 ```
 
 ### 3. Wrap Your App
+
 Some components require providers:
+
 ```tsx
 import { ToastProvider } from '@/components/ux/ToastSystem';
 
 function App() {
-  return (
-    <ToastProvider>
-      {/* Your app content */}
-    </ToastProvider>
-  );
+  return <ToastProvider>{/* Your app content */}</ToastProvider>;
 }
 ```
 
 ### 4. Use Components
+
 ```tsx
 function Dashboard() {
   const [showCommandPalette, setShowCommandPalette] = useState(false);
@@ -288,7 +307,7 @@ function Dashboard() {
         <MindMap
           initialNodes={nodes}
           initialLinks={links}
-          onNodeClick={(node) => showSuccess(`Selected: ${node.label}`)}
+          onNodeClick={node => showSuccess(`Selected: ${node.label}`)}
         />
 
         {/* Command Palette */}
@@ -305,6 +324,7 @@ function Dashboard() {
 ## 📱 Responsive Breakpoints
 
 The system uses Tailwind CSS breakpoints:
+
 - `xs`: < 640px
 - `sm`: ≥ 640px
 - `md`: ≥ 768px
@@ -315,6 +335,7 @@ The system uses Tailwind CSS breakpoints:
 ## ♿ Accessibility Features
 
 All components include:
+
 - ARIA labels and descriptions
 - Keyboard navigation
 - Screen reader announcements
@@ -326,6 +347,7 @@ All components include:
 ## 🔧 Configuration
 
 ### Mind Map Configuration
+
 ```tsx
 const mindMapConfig = {
   forceStrength: -300,
@@ -337,17 +359,18 @@ const mindMapConfig = {
     subtopic: '#06b6d4',
     research: '#10b981',
     expert: '#f59e0b',
-    concept: '#8b5cf6'
+    concept: '#8b5cf6',
   },
   clustering: {
     enabled: true,
     algorithm: 'kmeans',
-    minClusterSize: 3
-  }
+    minClusterSize: 3,
+  },
 };
 ```
 
 ### Dashboard Configuration
+
 ```tsx
 const dashboardConfig = {
   timeRange: '24h',
@@ -359,8 +382,8 @@ const dashboardConfig = {
     researchStats: true,
     performance: true,
     userActivity: true,
-    costAnalysis: true
-  }
+    costAnalysis: true,
+  },
 };
 ```
 

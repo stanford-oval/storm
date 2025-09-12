@@ -18,12 +18,14 @@ Get up and running with STORM UI development in minutes. This guide provides a s
 ## Prerequisites
 
 ### System Requirements
+
 - **Node.js**: 18.0+ (LTS recommended)
 - **npm**: 9.0+ or **yarn**: 1.22+
 - **Git**: Latest version
 - **VS Code** (recommended) or your preferred editor
 
 ### Development Tools
+
 ```bash
 # Install Node.js via nvm (recommended)
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
@@ -36,6 +38,7 @@ npm --version   # Should show 9.x.x
 ```
 
 ### Optional but Recommended
+
 - **Docker Desktop**: For local backend services
 - **Postman** or **Insomnia**: For API testing
 - **React Developer Tools**: Browser extension
@@ -43,12 +46,14 @@ npm --version   # Should show 9.x.x
 ## Quick Setup
 
 ### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/stanford-oval/storm.git
 cd storm/frontend/storm-ui
 ```
 
 ### 2. Install Dependencies
+
 ```bash
 # Using npm
 npm install
@@ -58,6 +63,7 @@ yarn install
 ```
 
 ### 3. Environment Setup
+
 ```bash
 # Copy environment template
 cp .env.example .env.local
@@ -67,6 +73,7 @@ nano .env.local
 ```
 
 **Required Environment Variables:**
+
 ```env
 # API Configuration
 NEXT_PUBLIC_API_URL=http://localhost:8000
@@ -82,6 +89,7 @@ NEXT_TELEMETRY_DISABLED=1
 ```
 
 ### 4. Start Development Server
+
 ```bash
 npm run dev
 # or
@@ -95,6 +103,7 @@ yarn dev
 ### VS Code Setup
 
 **Recommended Extensions:**
+
 ```json
 {
   "recommendations": [
@@ -110,6 +119,7 @@ yarn dev
 ```
 
 **VS Code Settings (`.vscode/settings.json`):**
+
 ```json
 {
   "editor.formatOnSave": true,
@@ -184,6 +194,7 @@ storm/frontend/storm-ui/
 ## Key Technologies
 
 ### Core Stack
+
 - **Framework**: [Next.js 14](https://nextjs.org/) with App Router
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
@@ -193,12 +204,14 @@ storm/frontend/storm-ui/
 - **Data Visualization**: [D3.js](https://d3js.org/) + [Recharts](https://recharts.org/)
 
 ### Development Tools
+
 - **Testing**: [Jest](https://jestjs.io/) + [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/) + [Playwright](https://playwright.dev/)
 - **Linting**: [ESLint](https://eslint.org/) + [Prettier](https://prettier.io/)
 - **API Mocking**: [MSW](https://mswjs.io/)
 - **Storybook**: [Component development](https://storybook.js.org/)
 
 ### Animation & UX
+
 - **Animations**: [Framer Motion](https://www.framer.com/motion/)
 - **Icons**: [Lucide React](https://lucide.dev/)
 - **Rich Text**: [TipTap](https://tiptap.dev/)
@@ -219,6 +232,7 @@ touch src/components/MyComponent/MyComponent.test.tsx
 ```
 
 **Component Template:**
+
 ```typescript
 // src/components/MyComponent/index.tsx
 import React from 'react';
@@ -260,7 +274,7 @@ export class MyService extends BaseApiService {
 }
 
 export const myService = new MyService({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
 });
 ```
 
@@ -286,7 +300,7 @@ export const useMyStore = create<MyState>()(
         items: [],
         isLoading: false,
         error: null,
-        
+
         fetchItems: async () => {
           set({ isLoading: true });
           try {
@@ -296,16 +310,16 @@ export const useMyStore = create<MyState>()(
             set({ error: error.message, isLoading: false });
           }
         },
-        
-        addItem: (item) => {
-          set((state) => ({
-            items: [...state.items, item]
+
+        addItem: item => {
+          set(state => ({
+            items: [...state.items, item],
           }));
         },
       }),
       {
         name: 'my-store',
-        partialize: (state) => ({ items: state.items }),
+        partialize: state => ({ items: state.items }),
       }
     ),
     {
@@ -371,6 +385,7 @@ npm run test:storybook
 ### Writing Tests
 
 **Component Test Example:**
+
 ```typescript
 // src/components/MyComponent/MyComponent.test.tsx
 import { render, screen } from '@testing-library/react';
@@ -386,9 +401,9 @@ describe('MyComponent', () => {
   it('handles user interaction', async () => {
     const user = userEvent.setup();
     const handleClick = jest.fn();
-    
+
     render(<MyComponent onClick={handleClick}>Click me</MyComponent>);
-    
+
     await user.click(screen.getByRole('button'));
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
@@ -396,6 +411,7 @@ describe('MyComponent', () => {
 ```
 
 **Service Test Example:**
+
 ```typescript
 // src/services/__tests__/myService.test.ts
 import { myService } from '../myService';
@@ -405,7 +421,7 @@ import { rest } from 'msw';
 describe('MyService', () => {
   it('fetches items successfully', async () => {
     const mockItems = [{ id: '1', name: 'Test Item' }];
-    
+
     server.use(
       rest.get('/api/v1/my-resource', (req, res, ctx) => {
         return res(ctx.json({ success: true, data: mockItems }));
@@ -456,6 +472,7 @@ chore: update dependencies
 ### Code Style Guidelines
 
 **TypeScript:**
+
 ```typescript
 // Use explicit types
 interface User {
@@ -466,28 +483,29 @@ interface User {
 
 // Use const assertions
 const STATUSES = ['draft', 'published'] as const;
-type Status = typeof STATUSES[number];
+type Status = (typeof STATUSES)[number];
 
 // Use optional chaining
 const userName = user?.profile?.name ?? 'Anonymous';
 ```
 
 **React Components:**
+
 ```typescript
 // Use function declarations
 export function MyComponent({ prop1, prop2 }: Props) {
   // Hooks first
   const [state, setState] = useState('');
   const { data } = useQuery();
-  
+
   // Event handlers
   const handleClick = useCallback(() => {
     // Handler logic
   }, []);
-  
+
   // Early returns
   if (!data) return <Loading />;
-  
+
   // Render
   return (
     <div className="container">
@@ -498,6 +516,7 @@ export function MyComponent({ prop1, prop2 }: Props) {
 ```
 
 **CSS/Tailwind:**
+
 ```typescript
 // Use cn() utility for conditional classes
 const buttonClasses = cn(
@@ -523,12 +542,14 @@ const buttonClasses = cn(
 ### Adding a New UI Component
 
 1. **Create component structure:**
+
 ```bash
 mkdir src/components/ui/NewComponent
 cd src/components/ui/NewComponent
 ```
 
 2. **Component files:**
+
 ```typescript
 // index.tsx - Main component
 // NewComponent.stories.tsx - Storybook stories
@@ -536,6 +557,7 @@ cd src/components/ui/NewComponent
 ```
 
 3. **Update exports:**
+
 ```typescript
 // src/components/ui/index.ts
 export { NewComponent } from './NewComponent';
@@ -544,6 +566,7 @@ export { NewComponent } from './NewComponent';
 ### Adding API Integration
 
 1. **Define types:**
+
 ```typescript
 // src/types/api.ts
 export interface NewResource {
@@ -554,6 +577,7 @@ export interface NewResource {
 ```
 
 2. **Create service:**
+
 ```typescript
 // src/services/newResource.ts
 export class NewResourceService extends BaseApiService {
@@ -562,12 +586,14 @@ export class NewResourceService extends BaseApiService {
 ```
 
 3. **Add to service index:**
+
 ```typescript
 // src/services/index.ts
 export { newResourceService } from './newResource';
 ```
 
 4. **Create store (if needed):**
+
 ```typescript
 // src/stores/newResourceStore.ts
 export const useNewResourceStore = create<NewResourceState>()(...);
@@ -576,6 +602,7 @@ export const useNewResourceStore = create<NewResourceState>()(...);
 ### Adding New Page
 
 1. **Create page file:**
+
 ```typescript
 // app/new-page/page.tsx
 export default function NewPage() {
@@ -584,15 +611,17 @@ export default function NewPage() {
 ```
 
 2. **Add navigation (if needed):**
+
 ```typescript
 // src/components/Navigation.tsx
 const navItems = [
   // ... existing items
-  { href: '/new-page', label: 'New Page' }
+  { href: '/new-page', label: 'New Page' },
 ];
 ```
 
 3. **Add to sitemap/metadata:**
+
 ```typescript
 // app/sitemap.ts or app/layout.tsx
 // Update as needed
@@ -601,6 +630,7 @@ const navItems = [
 ### Debugging Common Issues
 
 **TypeScript Errors:**
+
 ```bash
 # Check types
 npm run type-check
@@ -610,6 +640,7 @@ Cmd+Shift+P -> "TypeScript: Restart TS Server"
 ```
 
 **Build Errors:**
+
 ```bash
 # Clear Next.js cache
 rm -rf .next
@@ -620,6 +651,7 @@ npm ls
 ```
 
 **Style Issues:**
+
 ```bash
 # Rebuild Tailwind
 npm run dev
@@ -633,6 +665,7 @@ npx tailwindcss --help
 ### Common Issues
 
 **1. Port Already in Use:**
+
 ```bash
 # Find process using port 3000
 lsof -ti:3000
@@ -645,6 +678,7 @@ npm run dev -- -p 3001
 ```
 
 **2. Module Not Found:**
+
 ```bash
 # Clear node_modules and reinstall
 rm -rf node_modules package-lock.json
@@ -655,6 +689,7 @@ npm install
 ```
 
 **3. Environment Variables Not Working:**
+
 ```bash
 # Ensure .env.local exists and has correct format
 # Restart dev server after changes
@@ -662,6 +697,7 @@ npm install
 ```
 
 **4. API Connection Issues:**
+
 ```bash
 # Check backend is running
 curl http://localhost:8000/health
@@ -671,6 +707,7 @@ curl http://localhost:8000/health
 ```
 
 **5. TypeScript Compilation Errors:**
+
 ```bash
 # Update TypeScript
 npm install typescript@latest
@@ -685,6 +722,7 @@ rm -rf .next/types
 ### Performance Issues
 
 **1. Slow Development Server:**
+
 ```bash
 # Check for large files in public/
 # Exclude unnecessary files in .gitignore
@@ -692,6 +730,7 @@ rm -rf .next/types
 ```
 
 **2. Large Bundle Size:**
+
 ```bash
 # Analyze bundle
 npm run analyze
@@ -706,17 +745,20 @@ const Component = dynamic(() => import('./Component'));
 ### Getting Help
 
 **Development Resources:**
+
 - [Next.js Documentation](https://nextjs.org/docs)
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/)
 - [Tailwind CSS Docs](https://tailwindcss.com/docs)
 - [shadcn/ui Components](https://ui.shadcn.com/)
 
 **Community:**
+
 - GitHub Issues: Report bugs and request features
 - Discussions: Ask questions and share ideas
 - Discord/Slack: Real-time chat with other developers
 
 **Internal:**
+
 - Code reviews: Get feedback from team members
 - Architecture decisions: Discuss major changes
 - Documentation: Keep docs updated with changes
@@ -737,6 +779,6 @@ Happy coding! 🚀
 
 ---
 
-*This quickstart guide is regularly updated. If you find any issues or have suggestions for improvement, please open an issue or submit a PR.*
+_This quickstart guide is regularly updated. If you find any issues or have suggestions for improvement, please open an issue or submit a PR._
 
-*Last updated: September 2025*
+_Last updated: September 2025_

@@ -3,12 +3,12 @@ name: Test Suite
 on:
   push:
     branches: [main, develop]
-    paths: 
+    paths:
       - 'frontend/storm-ui/**'
       - '.github/workflows/test.yml'
   pull_request:
     branches: [main, develop]
-    paths: 
+    paths:
       - 'frontend/storm-ui/**'
       - '.github/workflows/test.yml'
 
@@ -252,7 +252,7 @@ jobs:
         run: |
           npx http-server storybook-static --port 6006 --silent &
           sleep 5
-        
+
       - name: Run accessibility tests
         run: |
           npx @storybook/test-runner \
@@ -308,7 +308,18 @@ jobs:
   test-summary:
     name: Test Summary
     runs-on: ubuntu-latest
-    needs: [lint-and-typecheck, unit-tests, integration-tests, e2e-tests, performance-tests, visual-regression, security-scan, accessibility-tests, build-test]
+    needs:
+      [
+        lint-and-typecheck,
+        unit-tests,
+        integration-tests,
+        e2e-tests,
+        performance-tests,
+        visual-regression,
+        security-scan,
+        accessibility-tests,
+        build-test,
+      ]
     if: always()
     steps:
       - name: Test Summary

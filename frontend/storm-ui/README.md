@@ -7,6 +7,7 @@ This project aims to create a comprehensive web-based UI for STORM that replaces
 ## 🎯 Implementation Roadmap
 
 ### Phase 1: MVP Implementation (2-3 weeks)
+
 - [ ] Backend API setup (FastAPI with file-based storage)
 - [ ] Next.js application structure
 - [ ] Core STORM pipeline integration
@@ -14,6 +15,7 @@ This project aims to create a comprehensive web-based UI for STORM that replaces
 - [ ] Article generation and display
 
 ### Phase 2: Advanced Features (3-4 weeks)
+
 - [ ] Co-STORM collaborative features
 - [ ] Interactive mind map
 - [ ] Analytics dashboard
@@ -23,6 +25,7 @@ This project aims to create a comprehensive web-based UI for STORM that replaces
 ## 🏗️ Current Project Structure
 
 ### What's Already Built ✅
+
 ```
 src/
 ├── components/          # React components (READY)
@@ -39,6 +42,7 @@ src/
 ```
 
 ### What Needs to Be Built 🚧
+
 ```
 app/                    # Next.js app directory (TO BUILD)
 ├── layout.tsx         # Root layout
@@ -69,6 +73,7 @@ storm-projects/        # File-based storage (TO CREATE)
 ### Step 1: Backend Setup (File-Based, No Database)
 
 #### 1.1 Create Backend Structure
+
 ```bash
 cd ../../  # Go to storm root
 mkdir backend
@@ -79,6 +84,7 @@ pip install fastapi uvicorn python-frontmatter pydantic
 ```
 
 #### 1.2 Create `backend/main.py`
+
 ```python
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -105,6 +111,7 @@ def health_check():
 ```
 
 #### 1.3 Create File Service (`backend/services/file_service.py`)
+
 ```python
 import os
 import json
@@ -119,21 +126,22 @@ class FileProjectService:
         self.projects_dir = self.base_path / "projects"
         self.index_file = self.base_path / "projects.json"
         self._ensure_directories()
-    
+
     def create_project(self, title: str, topic: str) -> dict:
         # Implementation as shown in previous examples
         pass
-    
+
     def list_projects(self) -> List[dict]:
         # Read from index file
         pass
-    
+
     def update_article(self, project_id: str, content: str):
         # Update markdown file
         pass
 ```
 
 #### 1.4 Run Backend
+
 ```bash
 cd backend
 uvicorn main:app --reload --port 8000
@@ -142,6 +150,7 @@ uvicorn main:app --reload --port 8000
 ### Step 2: Next.js Application Setup
 
 #### 2.1 Create App Directory Structure
+
 ```bash
 cd frontend/storm-ui
 mkdir -p app/{projects,api}
@@ -153,59 +162,60 @@ touch app/globals.css
 ```
 
 #### 2.2 Create `app/layout.tsx`
-```tsx
-import { Inter } from 'next/font/google'
-import './globals.css'
 
-const inter = Inter({ subsets: ['latin'] })
+```tsx
+import { Inter } from 'next/font/google';
+import './globals.css';
+
+const inter = Inter({ subsets: ['latin'] });
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        {children}
-      </body>
+      <body className={inter.className}>{children}</body>
     </html>
-  )
+  );
 }
 ```
 
 #### 2.3 Create `app/page.tsx` (Projects Dashboard)
+
 ```tsx
-'use client'
-import { useEffect, useState } from 'react'
-import { ProjectCard } from '@/components/storm'
-import { Button } from '@/components/ui'
+'use client';
+import { useEffect, useState } from 'react';
+import { ProjectCard } from '@/components/storm';
+import { Button } from '@/components/ui';
 
 export default function ProjectsPage() {
-  const [projects, setProjects] = useState([])
-  
+  const [projects, setProjects] = useState([]);
+
   useEffect(() => {
     fetch('http://localhost:8000/api/projects')
       .then(res => res.json())
-      .then(setProjects)
-  }, [])
-  
+      .then(setProjects);
+  }, []);
+
   return (
     <div className="container mx-auto p-6">
       <h1>STORM Projects</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {projects.map(project => (
           <ProjectCard key={project.id} project={project} />
         ))}
       </div>
     </div>
-  )
+  );
 }
 ```
 
 ### Step 3: STORM Integration
 
 #### 3.1 Create STORM Runner Service (`backend/services/storm_runner.py`)
+
 ```python
 from knowledge_storm import STORMWikiRunner, STORMWikiLMConfigs
 import asyncio
@@ -214,23 +224,23 @@ import json
 class StormRunnerService:
     def __init__(self, file_service):
         self.file_service = file_service
-        
+
     async def run_pipeline(self, project_id: str, config: dict):
         # Initialize STORM runner
         lm_configs = STORMWikiLMConfigs()
-        
+
         # Configure based on user settings
         engine_args = {
             'output_dir': f'./storm-projects/projects/{project_id}',
             'max_conv_turn': config.get('max_conv_turn', 3),
             'max_perspective': config.get('max_perspective', 4),
         }
-        
+
         runner = STORMWikiRunner(engine_args, lm_configs)
-        
+
         # Update progress periodically
         await self._update_progress(project_id, 'research', 0)
-        
+
         # Run pipeline stages
         runner.run(
             topic=config['topic'],
@@ -239,7 +249,7 @@ class StormRunnerService:
             do_generate_article=True,
             do_polish_article=True
         )
-        
+
         # Save results
         await self._save_results(project_id, runner)
 ```
@@ -273,7 +283,7 @@ npm test
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - Python 3.11+ (for backend)
 - React 18+
 - Next.js 14+
@@ -283,6 +293,7 @@ npm test
 ### Core STORM Components
 
 #### ProjectCard
+
 Display STORM projects with status, progress, and actions.
 
 ```tsx
@@ -298,13 +309,14 @@ const project = {
 
 <ProjectCard
   project={project}
-  onSelect={(project) => console.log('Selected:', project)}
-  onDelete={(id) => console.log('Delete:', id)}
-  onDuplicate={(project) => console.log('Duplicate:', project)}
-/>
+  onSelect={project => console.log('Selected:', project)}
+  onDelete={id => console.log('Delete:', id)}
+  onDuplicate={project => console.log('Duplicate:', project)}
+/>;
 ```
 
 #### PipelineProgress
+
 Track and display STORM pipeline execution progress.
 
 ```tsx
@@ -322,10 +334,11 @@ const progress = {
   progress={progress}
   showDetails={true}
   onCancel={() => console.log('Cancelled')}
-/>
+/>;
 ```
 
 #### ConfigurationPanel
+
 Configure LLM models, retrievers, and pipeline settings.
 
 ```tsx
@@ -351,13 +364,14 @@ const config = {
 
 <ConfigurationPanel
   config={config}
-  onChange={(newConfig) => setConfig(newConfig)}
+  onChange={newConfig => setConfig(newConfig)}
   onSave={() => console.log('Saved')}
   onCancel={() => console.log('Cancelled')}
-/>
+/>;
 ```
 
 #### ArticleEditor
+
 Rich text editor for STORM-generated articles with citation support.
 
 ```tsx
@@ -381,6 +395,7 @@ const article = {
 ```
 
 #### OutlineEditor
+
 Drag-and-drop hierarchical outline editor.
 
 ```tsx
@@ -403,13 +418,14 @@ const outline = {
 
 <OutlineEditor
   outline={outline}
-  onChange={(updatedOutline) => setOutline(updatedOutline)}
+  onChange={updatedOutline => setOutline(updatedOutline)}
   onSave={() => console.log('Outline saved')}
   readOnly={false}
-/>
+/>;
 ```
 
 #### ResearchView
+
 Display research conversations and sources with filtering.
 
 ```tsx
@@ -501,7 +517,7 @@ describe('ProjectCard', () => {
   it('renders project information', () => {
     const project = createMockStormProject();
     render(<ProjectCard project={project} onSelect={jest.fn()} />);
-    
+
     expect(screen.getByText(project.title)).toBeInTheDocument();
   });
 });
@@ -519,12 +535,12 @@ Full TypeScript support with:
 ### Key Types
 
 ```typescript
-import type { 
-  StormProject, 
-  PipelineProgress, 
+import type {
+  StormProject,
+  PipelineProgress,
   StormConfig,
   ArticleOutline,
-  ResearchData 
+  ResearchData,
 } from '@/types';
 ```
 
@@ -583,6 +599,7 @@ Located in `src/lib/utils.ts`:
 ## 🎯 MVP Features (When Complete)
 
 ### Core Functionality
+
 - ✅ **Project Management**: Create, view, delete projects with file-based storage
 - ✅ **Pipeline Configuration**: Configure LLM models and retrievers through UI
 - ✅ **Pipeline Execution**: Run STORM pipeline with real-time progress tracking
@@ -590,6 +607,7 @@ Located in `src/lib/utils.ts`:
 - ✅ **Research Visibility**: View conversations and sources from research phase
 
 ### File-Based Storage Structure
+
 ```
 storm-projects/
 ├── projects.json              # Project index
@@ -604,6 +622,7 @@ storm-projects/
 ```
 
 ### Why File-Based?
+
 - **No database required**: Simpler deployment and maintenance
 - **Version control friendly**: All content in markdown/JSON
 - **Portable**: Easy backup and migration
@@ -612,19 +631,20 @@ storm-projects/
 
 ## 📊 Implementation Status
 
-| Component | Status | Notes |
-|-----------|--------|-------|
-| UI Components | ✅ Complete | All components ready |
-| State Management | ✅ Complete | Zustand store configured |
-| Service Layer | ✅ Complete | API clients ready |
-| Backend API | ❌ Not Started | FastAPI server needed |
-| Next.js Pages | ❌ Not Started | App directory needed |
-| STORM Integration | ❌ Not Started | Runner service needed |
-| File Storage | ❌ Not Started | File service needed |
+| Component         | Status         | Notes                    |
+| ----------------- | -------------- | ------------------------ |
+| UI Components     | ✅ Complete    | All components ready     |
+| State Management  | ✅ Complete    | Zustand store configured |
+| Service Layer     | ✅ Complete    | API clients ready        |
+| Backend API       | ❌ Not Started | FastAPI server needed    |
+| Next.js Pages     | ❌ Not Started | App directory needed     |
+| STORM Integration | ❌ Not Started | Runner service needed    |
+| File Storage      | ❌ Not Started | File service needed      |
 
 ## 🔧 Development Workflow
 
 1. **Backend Development**
+
    ```bash
    cd backend
    pip install -r requirements.txt
@@ -632,6 +652,7 @@ storm-projects/
    ```
 
 2. **Frontend Development**
+
    ```bash
    cd frontend/storm-ui
    npm install
@@ -639,10 +660,11 @@ storm-projects/
    ```
 
 3. **Testing**
+
    ```bash
    # Frontend tests
    npm test
-   
+
    # Backend tests
    pytest
    ```

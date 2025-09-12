@@ -10,21 +10,25 @@ import { TourGuide } from '@/components/ux/TourGuide';
 import { KeyboardShortcutsWrapper } from '@/components/layout/KeyboardShortcutsWrapper';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { TopBar } from '@/components/layout/TopBar';
-import { DebugConsole, DebugConsoleToggle } from '@/components/debug/DebugConsole';
+import {
+  DebugConsole,
+  DebugConsoleToggle,
+} from '@/components/debug/DebugConsole';
 import { cn } from '@/lib/utils';
 import { Suspense } from 'react';
 import ErrorBoundary from '@/components/ErrorBoundary';
 
-const inter = Inter({ 
+const inter = Inter({
   subsets: ['latin'],
   display: 'swap', // Use font-display: swap for better performance
   preload: false, // Disable automatic preloading to avoid the warning
-  fallback: ['system-ui', 'arial'] // Add fallback fonts
+  fallback: ['system-ui', 'arial'], // Add fallback fonts
 });
 
 export const metadata: Metadata = {
   title: 'STORM - Knowledge Curation System',
-  description: 'LLM-powered knowledge curation system that generates Wikipedia-like articles',
+  description:
+    'LLM-powered knowledge curation system that generates Wikipedia-like articles',
   keywords: ['AI', 'LLM', 'Knowledge', 'Research', 'Article Generation'],
   authors: [{ name: 'Stanford OVAL' }],
 };
@@ -45,42 +49,51 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={cn(inter.className, 'min-h-screen bg-background font-sans antialiased')}>
+      <body
+        className={cn(
+          inter.className,
+          'min-h-screen bg-background font-sans antialiased'
+        )}
+      >
         <ErrorBoundary>
           <StoreProvider>
             <ThemeProvider>
               <ConfigProvider>
                 <WebSocketProvider>
                   <ToastProvider>
-                <div className="flex h-screen overflow-hidden">
-                  <Suspense fallback={<div className="w-64 bg-muted/30" />}>
-                    <Sidebar />
-                  </Suspense>
-                  
-                  <div className="flex flex-1 flex-col overflow-hidden">
-                    <Suspense fallback={<div className="h-16 bg-background border-b" />}>
-                      <TopBar />
-                    </Suspense>
-                    
-                    <main className="flex-1 overflow-auto bg-background">
-                      <Suspense 
-                        fallback={
-                          <div className="flex items-center justify-center h-full">
-                            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-                          </div>
-                        }
-                      >
-                        {children}
+                    <div className="flex h-screen overflow-hidden">
+                      <Suspense fallback={<div className="w-64 bg-muted/30" />}>
+                        <Sidebar />
                       </Suspense>
-                    </main>
-                  </div>
-                </div>
 
-                {/* Global UI Components */}
-                <TourGuide />
-                <KeyboardShortcutsWrapper />
-                <DebugConsole />
-                <DebugConsoleToggle />
+                      <div className="flex flex-1 flex-col overflow-hidden">
+                        <Suspense
+                          fallback={
+                            <div className="h-16 border-b bg-background" />
+                          }
+                        >
+                          <TopBar />
+                        </Suspense>
+
+                        <main className="flex-1 overflow-auto bg-background">
+                          <Suspense
+                            fallback={
+                              <div className="flex h-full items-center justify-center">
+                                <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-primary"></div>
+                              </div>
+                            }
+                          >
+                            {children}
+                          </Suspense>
+                        </main>
+                      </div>
+                    </div>
+
+                    {/* Global UI Components */}
+                    <TourGuide />
+                    <KeyboardShortcutsWrapper />
+                    <DebugConsole />
+                    <DebugConsoleToggle />
                   </ToastProvider>
                 </WebSocketProvider>
               </ConfigProvider>

@@ -5,6 +5,7 @@ This document describes the completed integration between the Next.js frontend a
 ## Overview
 
 The frontend now connects to the actual backend API with the following features:
+
 - ✅ REST API integration with proper error handling
 - ✅ WebSocket connections for real-time updates
 - ✅ Comprehensive error handling and retry logic
@@ -90,22 +91,22 @@ import { usePipelineWebSocket } from '@/services';
 
 function PipelineMonitor({ projectId }: { projectId: string }) {
   const { subscribeToProgress, subscribeToLogs, isConnected } = usePipelineWebSocket(projectId);
-  
+
   useEffect(() => {
     const unsubscribeProgress = subscribeToProgress((progress) => {
       console.log('Pipeline progress:', progress);
     });
-    
+
     const unsubscribeLogs = subscribeToLogs((log) => {
       console.log('New log:', log);
     });
-    
+
     return () => {
       unsubscribeProgress();
       unsubscribeLogs();
     };
   }, [subscribeToProgress, subscribeToLogs]);
-  
+
   return (
     <div>
       Status: {isConnected ? 'Connected' : 'Disconnected'}
@@ -121,18 +122,18 @@ import { projectService } from '@/services';
 
 // Subscribe to project updates
 const cleanup = await projectService.subscribeToProjectUpdates(projectId, {
-  onProjectUpdate: (project) => {
+  onProjectUpdate: project => {
     console.log('Project updated:', project);
   },
-  onStatusChange: (status) => {
+  onStatusChange: status => {
     console.log('Status changed:', status);
   },
-  onProgressUpdate: (progress) => {
+  onProgressUpdate: progress => {
     console.log('Progress:', progress);
   },
-  onError: (error) => {
+  onError: error => {
     console.error('WebSocket error:', error);
-  }
+  },
 });
 
 // Clean up when done
@@ -153,7 +154,7 @@ try {
     // Error is already enhanced with user-friendly messages
     console.log('User message:', error.userMessage);
     console.log('Retryable:', error.retryable);
-    
+
     // Handle specific error types
     if (error.status === 401) {
       // Redirect to login
@@ -177,7 +178,7 @@ const result = await ApiErrorHandler.handleWithRetry(
     retryDelay: 1000,
     onRetry: (attempt, error) => {
       console.log(`Retry attempt ${attempt}: ${error.message}`);
-    }
+    },
   }
 );
 ```
@@ -199,7 +200,11 @@ function DebugPage() {
 ### Programmatic Testing
 
 ```typescript
-import { integrationTester, testIntegration, testProjectIntegration } from '@/services';
+import {
+  integrationTester,
+  testIntegration,
+  testProjectIntegration,
+} from '@/services';
 
 // Test all services
 const results = await testIntegration();
@@ -229,19 +234,19 @@ const newProject = await projectService.createProject({
     llm: {
       model: 'gpt-4',
       provider: 'openai',
-      temperature: 0.7
+      temperature: 0.7,
     },
     retriever: {
       type: 'bing',
-      maxResults: 10
+      maxResults: 10,
     },
     pipeline: {
       doResearch: true,
       doGenerateOutline: true,
       doGenerateArticle: true,
-      doPolishArticle: true
-    }
-  }
+      doPolishArticle: true,
+    },
+  },
 });
 
 console.log('Created project:', newProject.data);
@@ -256,23 +261,23 @@ import { pipelineService } from '@/services';
 const pipelineResult = await pipelineService.startPipeline({
   projectId: 'project-id',
   config: projectConfig,
-  stages: ['research', 'outline_generation', 'article_generation', 'polishing']
+  stages: ['research', 'outline_generation', 'article_generation', 'polishing'],
 });
 
 // Subscribe to real-time updates
 const cleanup = await pipelineService.subscribeToUpdates('project-id', {
-  onProgress: (progress) => {
+  onProgress: progress => {
     console.log(`Progress: ${progress.overallProgress}%`);
   },
-  onStageStart: (stage) => {
+  onStageStart: stage => {
     console.log(`Starting stage: ${stage}`);
   },
   onStageComplete: (stage, result) => {
     console.log(`Completed stage: ${stage}`, result);
   },
-  onError: (error) => {
+  onError: error => {
     console.error('Pipeline error:', error);
-  }
+  },
 });
 ```
 
@@ -289,7 +294,7 @@ console.log('Available models:', models.data);
 const testResult = await configService.testLLMConfig({
   model: 'gpt-4',
   provider: 'openai',
-  apiKey: 'your-api-key'
+  apiKey: 'your-api-key',
 });
 
 if (testResult.data.success) {
@@ -362,6 +367,7 @@ The backend should provide these endpoints:
 ### WebSocket Message Types
 
 #### Pipeline Messages
+
 - `pipeline_progress` - Progress updates
 - `pipeline_log` - Log messages
 - `pipeline_metrics` - Performance metrics
@@ -369,6 +375,7 @@ The backend should provide these endpoints:
 - `stage_complete` - Stage completed
 
 #### Project Messages
+
 - `project_update` - Project data updated
 - `status_change` - Project status changed
 - `progress_update` - Overall progress updated
@@ -399,12 +406,14 @@ The frontend handles these HTTP status codes:
 ### Retry Logic
 
 Automatic retry for:
+
 - Network errors
 - Server errors (5xx)
 - Rate limiting (429)
 - Timeout errors
 
 No retry for:
+
 - Client errors (4xx except 429)
 - Authentication errors
 - Validation errors

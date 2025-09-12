@@ -1,6 +1,6 @@
 const plugin = require('tailwindcss/plugin');
 
-module.exports = plugin(function({ addUtilities, addComponents, theme }) {
+module.exports = plugin(function ({ addUtilities, addComponents, theme }) {
   addUtilities({
     '.animate-in': {
       animationName: 'enter',

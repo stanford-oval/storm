@@ -111,15 +111,16 @@ global.performance.measure = jest.fn();
 // Add custom matchers
 expect.extend({
   toHaveBeenCalledWithWebSocketMessage: (received, expectedMessage) => {
-    const pass = received.mock.calls.some(call => 
-      call[0] === JSON.stringify(expectedMessage)
+    const pass = received.mock.calls.some(
+      call => call[0] === JSON.stringify(expectedMessage)
     );
-    
+
     return {
       pass,
-      message: () => pass 
-        ? `Expected WebSocket not to have been called with ${JSON.stringify(expectedMessage)}`
-        : `Expected WebSocket to have been called with ${JSON.stringify(expectedMessage)}`
+      message: () =>
+        pass
+          ? `Expected WebSocket not to have been called with ${JSON.stringify(expectedMessage)}`
+          : `Expected WebSocket to have been called with ${JSON.stringify(expectedMessage)}`,
     };
   },
 });
@@ -132,8 +133,8 @@ console.error = (...args) => {
   if (
     typeof args[0] === 'string' &&
     (args[0].includes('Warning: ReactDOM.render is no longer supported') ||
-     args[0].includes('Warning: React.createFactory') ||
-     args[0].includes('act(...)'))
+      args[0].includes('Warning: React.createFactory') ||
+      args[0].includes('act(...)'))
   ) {
     return;
   }
@@ -144,8 +145,8 @@ console.warn = (...args) => {
   if (
     typeof args[0] === 'string' &&
     (args[0].includes('componentWillReceiveProps') ||
-     args[0].includes('componentWillMount') ||
-     args[0].includes('componentWillUpdate'))
+      args[0].includes('componentWillMount') ||
+      args[0].includes('componentWillUpdate'))
   ) {
     return;
   }
