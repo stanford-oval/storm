@@ -8,7 +8,7 @@
 fastapi==0.109.2
 uvicorn[standard]==0.24.0
 starlette==0.36.3
-python-multipart==0.0.9  # Updated to fix vulnerabilities
+python-multipart==0.0.18  # Updated to fix DoS vulnerability (CVE-2024-53981)
 
 # =========================
 # Data Validation & Models
@@ -39,7 +39,7 @@ six==1.17.0
 PyJWT==2.8.0  # Secure JWT implementation (replaces vulnerable python-jose)
 passlib[bcrypt]==1.7.4
 bcrypt==4.3.0
-cryptography==42.0.5  # Updated to stable version
+cryptography==44.0.1  # Updated to fix OpenSSL vulnerabilities (GHSA-h4gh-qq45-vh27, CVE-2024-12797)
 cffi==1.16.0  # Updated to latest stable
 pycparser==2.23
 

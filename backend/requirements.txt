@@ -15,9 +15,9 @@ pathlib2==2.3.7.post1
 
 # Authentication and security
 PyJWT==2.8.0  # Secure JWT implementation (replaces vulnerable python-jose)
-cryptography==42.0.5  # For JWT signing
+cryptography==44.0.1  # For JWT signing (Updated to fix OpenSSL vulnerabilities)
 passlib[bcrypt]==1.7.4
-python-multipart==0.0.9  # Update to fix vulnerabilities
+python-multipart==0.0.18  # Updated to fix DoS vulnerability (CVE-2024-53981)
 
 # STORM dependencies (assumed to be installed separately)
 # knowledge-storm should be installed from the parent directory
