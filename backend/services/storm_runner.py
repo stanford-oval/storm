@@ -172,10 +172,8 @@ class StormRunnerService:
             rm = None
 
             # Try different retrievers based on config
-            if config.retriever_type == "google" and (
-                config.retriever_api_key or os.getenv("GOOGLE_SEARCH_API_KEY")
-            ):
-                api_key = config.retriever_api_key or os.getenv("GOOGLE_SEARCH_API_KEY")
+            if config.retriever_type == "google" and os.getenv("GOOGLE_SEARCH_API_KEY"):
+                api_key = os.getenv("GOOGLE_SEARCH_API_KEY")
                 cse_id = os.getenv("GOOGLE_CSE_ID")
                 if cse_id:
                     rm = GoogleSearch(
@@ -186,28 +184,20 @@ class StormRunnerService:
                     logger.info(f"Using GoogleSearch for project {project_id}")
                 else:
                     logger.warning("Google CSE ID not found, cannot use Google Search")
-            elif config.retriever_type == "serper" and (
-                config.retriever_api_key or os.getenv("SERPER_API_KEY")
-            ):
-                api_key = config.retriever_api_key or os.getenv("SERPER_API_KEY")
+            elif config.retriever_type == "serper" and os.getenv("SERPER_API_KEY"):
+                api_key = os.getenv("SERPER_API_KEY")
                 rm = SerperRM(
                     serper_search_api_key=api_key, k=config.max_search_results
                 )
                 logger.info(
                     f"Using SerperRM (Google via Serper) for project {project_id}"
                 )
-            elif config.retriever_type == "tavily" and (
-                config.retriever_api_key or os.getenv("NEXT_PUBLIC_TAVILY_API_KEY")
-            ):
-                api_key = config.retriever_api_key or os.getenv(
-                    "NEXT_PUBLIC_TAVILY_API_KEY"
-                )
+            elif config.retriever_type == "tavily" and os.getenv("TAVILY_API_KEY"):
+                api_key = os.getenv("TAVILY_API_KEY")
                 rm = TavilySearchRM(tavily_api_key=api_key, k=config.max_search_results)
                 logger.info(f"Using TavilySearchRM for project {project_id}")
-            elif config.retriever_type == "you" and (
-                config.retriever_api_key or os.getenv("YDC_API_KEY")
-            ):
-                api_key = config.retriever_api_key or os.getenv("YDC_API_KEY")
+            elif config.retriever_type == "you" and os.getenv("YDC_API_KEY"):
+                api_key = os.getenv("YDC_API_KEY")
                 rm = YouRM(ydc_api_key=api_key, k=config.max_search_results)
                 logger.info(f"Using YouRM for project {project_id}")
             elif config.retriever_type == "duckduckgo":
