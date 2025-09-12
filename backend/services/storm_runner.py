@@ -194,7 +194,9 @@ class StormRunnerService:
                 )
             elif config.retriever_type == "tavily" and os.getenv("TAVILY_API_KEY"):
                 api_key = os.getenv("TAVILY_API_KEY")
-                rm = TavilySearchRM(tavily_search_api_key=api_key, k=config.max_search_results)
+                rm = TavilySearchRM(
+                    tavily_search_api_key=api_key, k=config.max_search_results
+                )
                 logger.info(f"Using TavilySearchRM for project {project_id}")
             elif config.retriever_type == "you" and os.getenv("YDC_API_KEY"):
                 api_key = os.getenv("YDC_API_KEY")
