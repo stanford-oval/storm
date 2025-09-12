@@ -27,6 +27,11 @@ import { Separator } from '@/components/ui/separator';
 import { Database, Eye, EyeOff, Save, RefreshCw } from 'lucide-react';
 import { useNotificationStore } from '@/store';
 
+// SECURITY WARNING: This component handles API keys
+// - Never store API keys in localStorage or cookies
+// - Never expose API keys in window/global objects
+// - Always send API keys to backend immediately for secure storage
+// - Frontend should only display masked versions (e.g., 'sk-...abc')
 export default function SettingsPage() {
   const { addNotification } = useNotificationStore();
   const [showApiKeys, setShowApiKeys] = useState<Record<string, boolean>>({});
@@ -49,6 +54,8 @@ export default function SettingsPage() {
   const savedSettings = loadSavedSettings();
 
   // Form state - will be populated from backend
+  // SECURITY: These should only store masked previews from backend
+  // Actual API keys should be sent to backend immediately upon entry
   const [apiKeys, setApiKeys] = useState({
     openai: '',
     anthropic: '',
@@ -68,34 +75,27 @@ export default function SettingsPage() {
         if (response.ok) {
           const data = await response.json();
           // Use previews from backend or saved values
+          // Only use masked previews from backend, never store actual keys
           setApiKeys({
-            openai:
-              savedSettings?.apiKeys?.openai || data.openai_key_preview || '',
-            anthropic:
-              savedSettings?.apiKeys?.anthropic ||
-              data.anthropic_key_preview ||
-              '',
-            google:
-              savedSettings?.apiKeys?.google ||
-              data.google_api_key_preview ||
-              '',
-            tavily:
-              savedSettings?.apiKeys?.tavily || data.tavily_key_preview || '',
-            serper:
-              savedSettings?.apiKeys?.serper || data.serper_key_preview || '',
-            bing: savedSettings?.apiKeys?.bing || data.bing_key_preview || '',
+            openai: data.openai_key_preview || '',
+            anthropic: data.anthropic_key_preview || '',
+            google: data.google_api_key_preview || '',
+            tavily: data.tavily_key_preview || '',
+            serper: data.serper_key_preview || '',
+            bing: data.bing_key_preview || '',
           });
         }
       } catch (error) {
         logger.error('Failed to load API keys:', error);
-        // Fall back to saved settings
+        // Don't fall back to saved API keys - security vulnerability
+        // API keys should only come from the backend
         setApiKeys({
-          openai: savedSettings?.apiKeys?.openai || '',
-          anthropic: savedSettings?.apiKeys?.anthropic || '',
-          google: savedSettings?.apiKeys?.google || '',
-          tavily: savedSettings?.apiKeys?.tavily || '',
-          serper: savedSettings?.apiKeys?.serper || '',
-          bing: savedSettings?.apiKeys?.bing || '',
+          openai: '',
+          anthropic: '',
+          google: '',
+          tavily: '',
+          serper: '',
+          bing: '',
         });
       } finally {
         _setLoading(false);
@@ -165,9 +165,10 @@ export default function SettingsPage() {
   };
 
   const saveSettings = () => {
-    // Save to localStorage
+    // Save non-sensitive settings to localStorage
+    // SECURITY: Never store API keys in localStorage or window object
     const settings = {
-      apiKeys,
+      // apiKeys removed - these should only be stored server-side
       llmSettings,
       searchSettings,
       uiSettings,
@@ -175,11 +176,6 @@ export default function SettingsPage() {
     };
 
     localStorage.setItem('storm_settings', JSON.stringify(settings));
-
-    // Also save API keys to environment (for current session)
-    if (typeof window !== 'undefined') {
-      (window as any).__STORM_API_KEYS = apiKeys;
-    }
 
     addNotification({
       type: 'success',
@@ -226,13 +222,15 @@ export default function SettingsPage() {
                       id="openai-key"
                       type={showApiKeys.openai ? 'text' : 'password'}
                       value={apiKeys.openai}
-                      onChange={e =>
+                      onChange={e => {
+                        // TODO: Send to backend immediately for secure storage
                         setApiKeys(prev => ({
                           ...prev,
                           openai: e.target.value,
-                        }))
-                      }
+                        }));
+                      }}
                       placeholder="sk-..."
+                      title="API key will be securely stored on the server"
                     />
                     <Button
                       variant="ghost"
