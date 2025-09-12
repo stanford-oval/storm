@@ -122,7 +122,6 @@ describe('ProjectCard Performance Tests', () => {
       const cards = screen.getAllByTestId('project-card');
       expect(cards.length).toBeGreaterThan(0);
     });
-  });
 
   describe('Re-render Performance', () => {
     it('optimizes re-renders when props change', () => {
@@ -202,7 +201,6 @@ describe('ProjectCard Performance Tests', () => {
 
       expect(renderCount).toBe(2);
     });
-  });
 
   describe('Memory Performance', () => {
     it('does not cause memory leaks with event handlers', () => {
@@ -224,7 +222,6 @@ describe('ProjectCard Performance Tests', () => {
 
       // Unmount all components
       components.forEach(unmount => unmount());
-
       // Verify event handlers are cleaned up
       expect(mockOnSelect).not.toHaveBeenCalled();
       expect(mockOnDelete).not.toHaveBeenCalled();
@@ -255,7 +252,6 @@ describe('ProjectCard Performance Tests', () => {
       // 50 mount/unmount cycles should complete within 200ms
       expect(totalTime).toBeLessThan(200);
     });
-  });
 
   describe('Interaction Performance', () => {
     it('responds to clicks quickly', async () => {
@@ -313,7 +309,6 @@ describe('ProjectCard Performance Tests', () => {
       expect(totalTime).toBeLessThan(50);
       expect(mockOnSelect).toHaveBeenCalledTimes(10);
     });
-  });
 
   describe('Animation Performance', () => {
     it('maintains smooth animations during hover', async () => {
@@ -335,12 +330,8 @@ describe('ProjectCard Performance Tests', () => {
 
       // Multiple hover states
       for (let i = 0; i < 20; i++) {
-        projectCard.dispatchEvent(
-          new MouseEvent('mouseenter', { bubbles: true })
-        );
-        projectCard.dispatchEvent(
-          new MouseEvent('mouseleave', { bubbles: true })
-        );
+        projectCard.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+        projectCard.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
       }
 
       const endTime = performance.now();
@@ -349,7 +340,6 @@ describe('ProjectCard Performance Tests', () => {
       // Hover animations should be smooth (under 100ms for 20 cycles)
       expect(totalTime).toBeLessThan(100);
     });
-  });
 
   describe('Bundle Size Impact', () => {
     it('keeps component bundle size reasonable', () => {
@@ -371,7 +361,6 @@ describe('ProjectCard Performance Tests', () => {
       const elements = container.querySelectorAll('*');
       expect(elements.length).toBeLessThan(20); // Reasonable DOM size
     });
-  });
 
   describe('Edge Cases Performance', () => {
     it('handles very long text content efficiently', () => {
@@ -428,5 +417,4 @@ describe('ProjectCard Performance Tests', () => {
 
       expect(renderTime).toBeLessThan(50);
     });
-  });
 });

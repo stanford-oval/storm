@@ -5,7 +5,8 @@
 import { ProjectService, SettingsService, PipelineService } from '../api';
 
 // Mock fetch globally
-global.fetch = jest.fn();
+const mockFetch = jest.fn();
+global.fetch = mockFetch as any;
 
 describe('API Services', () => {
   beforeEach(() => {
@@ -25,7 +26,7 @@ describe('API Services', () => {
         ],
       };
 
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockProjects,
       });
@@ -36,13 +37,12 @@ describe('API Services', () => {
         expect.stringContaining('/api/projects'),
         expect.objectContaining({
           method: 'GET',
-        })
-      );
+        });
       expect(result).toEqual(mockProjects);
     });
 
     it('should handle API errors gracefully', async () => {
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 500,
         statusText: 'Internal Server Error',
@@ -67,7 +67,7 @@ describe('API Services', () => {
         created_at: '2024-01-01T00:00:00Z',
       };
 
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
       });
@@ -82,11 +82,9 @@ describe('API Services', () => {
             'Content-Type': 'application/json',
           }),
           body: JSON.stringify(newProject),
-        })
-      );
+        });
       expect(result).toEqual(mockResponse);
     });
-  });
 
   describe('SettingsService', () => {
     it('should fetch settings', async () => {
@@ -95,7 +93,7 @@ describe('API Services', () => {
         anthropic_key_preview: 'sk-ant-...xyz',
       };
 
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockSettings,
       });
@@ -106,8 +104,7 @@ describe('API Services', () => {
         expect.stringContaining('/api/settings'),
         expect.objectContaining({
           method: 'GET',
-        })
-      );
+        });
       expect(result).toEqual(mockSettings);
     });
 
@@ -117,7 +114,7 @@ describe('API Services', () => {
         anthropic_key_preview: 'sk-ant-...xyz',
       };
 
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockSettings,
       });
@@ -131,7 +128,6 @@ describe('API Services', () => {
           expect(value.length).toBeLessThan(50); // Should not be a full key
         }
       });
-    });
   });
 
   describe('PipelineService', () => {
@@ -147,7 +143,7 @@ describe('API Services', () => {
         message: 'Pipeline started successfully',
       };
 
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
       });
@@ -162,8 +158,7 @@ describe('API Services', () => {
             'Content-Type': 'application/json',
           }),
           body: JSON.stringify(config),
-        })
-      );
+        });
       expect(result).toEqual(mockResponse);
     });
 
@@ -175,7 +170,7 @@ describe('API Services', () => {
         message: 'Conducting research...',
       };
 
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockProgress,
       });
@@ -186,9 +181,7 @@ describe('API Services', () => {
         expect.stringContaining(`/api/pipeline/${projectId}/progress`),
         expect.objectContaining({
           method: 'GET',
-        })
-      );
+        });
       expect(result).toEqual(mockProgress);
     });
-  });
 });

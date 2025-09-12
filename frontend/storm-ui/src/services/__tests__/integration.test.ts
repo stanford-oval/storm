@@ -1,4 +1,4 @@
-import { rest } from 'msw';
+import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
 import { projectService } from '../project';
 import { pipelineService } from '../pipeline';
@@ -98,11 +98,8 @@ const mockConfig: StormConfig = {
 // Mock server setup
 const server = setupServer(
   // Project endpoints
-  rest.get('http://localhost:8000/api/v1/projects', (req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json({
-        success: true,
+  http.get('http://localhost:8000/api/v1/projects', () => {
+    return HttpResponse.json({success: true,
         data: {
           items: [mockProject],
           total: 1,
@@ -111,112 +108,67 @@ const server = setupServer(
           totalPages: 1,
           hasNext: false,
           hasPrevious: false,
-        },
-      })
-    );
+        });
   }),
 
-  rest.get('http://localhost:8000/api/v1/projects/:id', (req, res, ctx) => {
-    const { id } = req.params;
+  http.get('http://localhost:8000/api/v1/projects/:id', ({ request }) => {
+    const { id } = request.params;
     if (id === 'test-project-id') {
-      return res(
-        ctx.status(200),
-        ctx.json({
-          success: true,
-          data: mockProject,
-        })
-      );
+      return HttpResponse.json({success: true,
+          data: mockProject,});
     }
-    return res(
-      ctx.status(404),
-      ctx.json({
-        success: false,
-        error: 'Project not found',
-      })
-    );
+    return HttpResponse.json({success: false,
+        error: 'Project not found',});
   }),
 
-  rest.post('http://localhost:8000/api/v1/projects', (req, res, ctx) => {
-    return res(
-      ctx.status(201),
-      ctx.json({
-        success: true,
-        data: { ...mockProject, id: 'new-project-id' },
-      })
-    );
+  http.post('http://localhost:8000/api/v1/projects', () => {
+    return HttpResponse.json({success: true,
+        data: { ...mockProject, id: 'new-project-id' });
   }),
 
-  rest.put('http://localhost:8000/api/v1/projects/:id', (req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json({
-        success: true,
-        data: mockProject,
-      })
-    );
+  http.put('http://localhost:8000/api/v1/projects/:id', () => {
+    return HttpResponse.json({success: true,
+        data: mockProject,});
   }),
 
-  rest.delete('http://localhost:8000/api/v1/projects/:id', (req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json({
-        success: true,
-        data: null,
-      })
-    );
+  http.delete('http://localhost:8000/api/v1/projects/:id', () => {
+    return HttpResponse.json({success: true,
+        data: null,});
   }),
 
   // Pipeline endpoints
-  rest.post(
+  http.post(
     'http://localhost:8000/api/v1/projects/:id/pipeline/start',
-    (req, res, ctx) => {
-      return res(
-        ctx.status(200),
-        ctx.json({
-          success: true,
-          data: mockPipelineProgress,
-        })
-      );
+    () {
+      return HttpResponse.json({success: true,
+          data: mockPipelineProgress,});
     }
   ),
 
-  rest.get(
+  http.get(
     'http://localhost:8000/api/v1/projects/:id/pipeline/status',
-    (req, res, ctx) => {
-      return res(
-        ctx.status(200),
-        ctx.json({
-          success: true,
+    () {
+      return HttpResponse.json({success: true,
           data: {
-            projectId: req.params.id,
+            projectId: request.params.id,
             isRunning: true,
             progress: mockPipelineProgress,
             logs: [],
-          },
-        })
-      );
+          });
     }
   ),
 
-  rest.post(
+  http.post(
     'http://localhost:8000/api/v1/projects/:id/pipeline/stop',
-    (req, res, ctx) => {
-      return res(
-        ctx.status(200),
-        ctx.json({
-          success: true,
-          data: { ...mockPipelineProgress, isRunning: false },
-        })
-      );
+    () {
+      return HttpResponse.json({success: true,
+          data: { ...mockPipelineProgress, isRunning: false });
     }
   ),
 
   // Config endpoints
-  rest.get('http://localhost:8000/api/v1/config/templates', (req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json({
-        success: true,
+  http.get('http://localhost:8000/api/v1/config/templates', () => {
+    return HttpResponse.json({success: true,
         data: [
           {
             id: 'default',
@@ -228,31 +180,21 @@ const server = setupServer(
             createdAt: new Date(),
             updatedAt: new Date(),
           },
-        ],
-      })
-    );
+        ],});
   }),
 
-  rest.post('http://localhost:8000/api/v1/config/validate', (req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json({
-        success: true,
+  http.post('http://localhost:8000/api/v1/config/validate', () => {
+    return HttpResponse.json({success: true,
         data: {
           isValid: true,
           errors: [],
           warnings: [],
-        },
-      })
-    );
+        });
   }),
 
   // Session endpoints
-  rest.post('http://localhost:8000/api/v1/sessions', (req, res, ctx) => {
-    return res(
-      ctx.status(201),
-      ctx.json({
-        success: true,
+  http.post('http://localhost:8000/api/v1/sessions', () => {
+    return HttpResponse.json({success: true,
         data: {
           id: 'test-session-id',
           projectId: 'test-project-id',
@@ -270,55 +212,43 @@ const server = setupServer(
             autoSaveInterval: 30,
             expertModels: ['gpt-4'],
           },
-        },
-      })
-    );
+        },});
   }),
 
   // Analytics endpoints
-  rest.post(
+  http.post(
     'http://localhost:8000/api/v1/analytics/events',
-    (req, res, ctx) => {
-      return res(
-        ctx.status(201),
-        ctx.json({
-          success: true,
+    () {
+      return HttpResponse.json({success: true,
           data: {
             id: 'event-id',
             eventType: 'project_created',
             timestamp: new Date(),
-          },
-        })
-      );
+          });
     }
   ),
 
   // Error scenarios
-  rest.get(
+  http.get(
     'http://localhost:8000/api/v1/projects/error-test',
-    (req, res, ctx) => {
-      return res(
-        ctx.status(500),
-        ctx.json({
-          success: false,
-          error: 'Internal server error',
-        })
-      );
+    () {
+      return HttpResponse.json({success: false,
+          error: 'Internal server error',});
     }
   ),
 
-  rest.get(
+  http.get(
     'http://localhost:8000/api/v1/projects/timeout-test',
-    (req, res, ctx) => {
+    () {
       // Simulate timeout by never resolving
       return new Promise(() => {});
     }
   )
 );
 
-beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
-afterEach(() => server.resetHandlers());
-afterAll(() => server.close());
+beforeAll(() => server.listen({ onUnhandledRequest: 'error' });
+afterEach(() => server.resetHandlers(, { status: 200 });
+afterAll(() => server.close(, { status: 200 });
 
 describe('ProjectService Integration Tests', () => {
   test('should get projects list successfully', async () => {
@@ -401,7 +331,6 @@ describe('ProjectService Integration Tests', () => {
     expect(response.data.limit).toBe(20); // Server might override
     expect(response.data.hasNext).toBe(false);
   });
-});
 
 describe('PipelineService Integration Tests', () => {
   test('should start pipeline successfully', async () => {
@@ -444,13 +373,10 @@ describe('PipelineService Integration Tests', () => {
   test('should handle pipeline stage transitions', async () => {
     // Mock server responses for different stages
     server.use(
-      rest.get(
+      http.get(
         'http://localhost:8000/api/v1/projects/test-project-id/pipeline/status',
-        (req, res, ctx) => {
-          return res(
-            ctx.status(200),
-            ctx.json({
-              success: true,
+        () {
+          return HttpResponse.json({success: true,
               data: {
                 ...mockPipelineProgress,
                 stage: 'outline',
@@ -469,9 +395,7 @@ describe('PipelineService Integration Tests', () => {
                   article: { status: 'pending', progress: 0, startedAt: null },
                   polish: { status: 'pending', progress: 0, startedAt: null },
                 },
-              },
-            })
-          );
+              },});
         }
       )
     );
@@ -482,7 +406,6 @@ describe('PipelineService Integration Tests', () => {
     expect(response.data.stages.research.status).toBe('completed');
     expect(response.data.stages.outline.status).toBe('running');
   });
-});
 
 describe('ConfigService Integration Tests', () => {
   test('should get configuration templates', async () => {
@@ -504,13 +427,10 @@ describe('ConfigService Integration Tests', () => {
 
   test('should handle invalid configuration', async () => {
     server.use(
-      rest.post(
+      http.post(
         'http://localhost:8000/api/v1/config/validate',
-        (req, res, ctx) => {
-          return res(
-            ctx.status(200),
-            ctx.json({
-              success: true,
+        () {
+          return HttpResponse.json({success: true,
               data: {
                 isValid: false,
                 errors: [
@@ -528,9 +448,7 @@ describe('ConfigService Integration Tests', () => {
                       'Consider reducing to 5-15 for optimal performance',
                   },
                 ],
-              },
-            })
-          );
+              },});
         }
       )
     );
@@ -551,7 +469,6 @@ describe('ConfigService Integration Tests', () => {
     expect(response.data.errors).toHaveLength(1);
     expect(response.data.warnings).toHaveLength(1);
   });
-});
 
 describe('SessionService Integration Tests', () => {
   test('should create Co-STORM session successfully', async () => {
@@ -575,7 +492,6 @@ describe('SessionService Integration Tests', () => {
     expect(response.data.projectId).toBe('test-project-id');
     expect(response.data.status).toBe('active');
   });
-});
 
 describe('AnalyticsService Integration Tests', () => {
   test('should track events successfully', async () => {
@@ -594,7 +510,6 @@ describe('AnalyticsService Integration Tests', () => {
     expect(response.data.id).toBe('event-id');
     expect(response.data.eventType).toBe('project_created');
   });
-});
 
 describe('Cross-Service Integration Tests', () => {
   test('should complete full project workflow', async () => {
@@ -664,16 +579,11 @@ describe('Cross-Service Integration Tests', () => {
     };
 
     server.use(
-      rest.post(
+      http.post(
         'http://localhost:8000/api/v1/projects/nonexistent-project/pipeline/start',
-        (req, res, ctx) => {
-          return res(
-            ctx.status(404),
-            ctx.json({
-              success: false,
-              error: 'Project not found',
-            })
-          );
+        () {
+          return HttpResponse.json({success: false,
+              error: 'Project not found',});
         }
       )
     );
@@ -682,7 +592,6 @@ describe('Cross-Service Integration Tests', () => {
       pipelineService.startPipeline(invalidPipelineRequest)
     ).rejects.toThrow();
   });
-});
 
 describe('Error Handling Integration Tests', () => {
   test('should handle network errors gracefully', async () => {
@@ -697,20 +606,15 @@ describe('Error Handling Integration Tests', () => {
 
   test('should handle server errors with proper error messages', async () => {
     server.use(
-      rest.get(
+      http.get(
         'http://localhost:8000/api/v1/projects/error-test',
-        (req, res, ctx) => {
-          return res(
-            ctx.status(500),
-            ctx.json({
-              success: false,
+        () {
+          return HttpResponse.json({success: false,
               error: 'Database connection failed',
               details: {
                 code: 'DB_CONNECTION_ERROR',
                 timestamp: new Date().toISOString(),
-              },
-            })
-          );
+              });
         }
       )
     );
@@ -721,10 +625,10 @@ describe('Error Handling Integration Tests', () => {
   test('should handle timeout errors', async () => {
     // Create a request that will timeout
     server.use(
-      rest.get(
+      http.get(
         'http://localhost:8000/api/v1/projects/timeout-test',
-        (req, res, ctx) => {
-          return res(ctx.delay('infinite'));
+        () {
+          return HttpResponse.json(delay('infinite', { status: 200 });
         }
       )
     );
@@ -741,23 +645,15 @@ describe('Error Handling Integration Tests', () => {
 
   test('should handle validation errors properly', async () => {
     server.use(
-      rest.post('http://localhost:8000/api/v1/projects', (req, res, ctx) => {
-        return res(
-          ctx.status(422),
-          ctx.json({
-            success: false,
+      http.post('http://localhost:8000/api/v1/projects', () => {
+        return HttpResponse.json({success: false,
             error: 'Validation error',
             details: {
               fields: {
                 title: 'Title is required',
                 topic: 'Topic must be at least 3 characters long',
               },
-            },
-          })
-        );
-      })
-    );
-
+            },});
     const invalidRequest: CreateProjectRequest = {
       title: '', // Invalid
       topic: 'AI', // Too short
@@ -768,16 +664,14 @@ describe('Error Handling Integration Tests', () => {
       projectService.createProject(invalidRequest)
     ).rejects.toThrow();
   });
-});
 
 describe('Rate Limiting and Caching Tests', () => {
   test('should handle rate limiting gracefully', async () => {
     server.use(
-      rest.get('http://localhost:8000/api/v1/projects', (req, res, ctx) => {
-        return res(
-          ctx.status(429),
+      http.get('http://localhost:8000/api/v1/projects', () => {
+        return HttpResponse.json(
           ctx.set('Retry-After', '60'),
-          ctx.json({
+          {
             success: false,
             error: 'Rate limit exceeded',
             details: {
@@ -785,11 +679,7 @@ describe('Rate Limiting and Caching Tests', () => {
               remaining: 0,
               resetAt: new Date(Date.now() + 60000).toISOString(),
             },
-          })
-        );
-      })
-    );
-
+          });
     await expect(projectService.getProjects()).rejects.toThrow();
   });
 
@@ -805,7 +695,6 @@ describe('Rate Limiting and Caching Tests', () => {
       expect(response.success).toBe(true);
       expect(response.data).toEqual(mockProject);
     });
-  });
 });
 
 describe('Real-time Updates Integration Tests', () => {
@@ -822,7 +711,7 @@ describe('Real-time Updates Integration Tests', () => {
     // Mock the WebSocket creation
     jest.doMock('../../lib/websocket', () => ({
       createProjectWebSocket: () => mockWebSocket,
-    }));
+    });
 
     const callbacks = {
       onProjectUpdate: jest.fn(),
@@ -854,4 +743,3 @@ describe('Real-time Updates Integration Tests', () => {
     );
     expect(mockWebSocket.disconnect).toHaveBeenCalled();
   });
-});

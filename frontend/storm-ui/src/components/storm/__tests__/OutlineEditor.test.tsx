@@ -26,7 +26,7 @@ jest.mock('@dnd-kit/core', () => ({
   DragOverlay: ({ children }: any) => (
     <div data-testid="drag-overlay">{children}</div>
   ),
-}));
+});
 
 jest.mock('@dnd-kit/sortable', () => ({
   SortableContext: ({ children }: any) => children,
@@ -43,7 +43,7 @@ jest.mock('@dnd-kit/sortable', () => ({
     newArray.splice(newIndex, 0, moved);
     return newArray;
   },
-}));
+});
 
 const mockOutline: ArticleOutline = {
   id: 'outline-1',
@@ -184,7 +184,6 @@ describe('OutlineEditor', () => {
         screen.queryByRole('button', { name: /delete/i })
       ).not.toBeInTheDocument();
     });
-  });
 
   describe('Section Management', () => {
     it('adds new section at top level', async () => {
@@ -216,7 +215,6 @@ describe('OutlineEditor', () => {
           }),
         ],
       });
-    });
 
     it('adds subsection to existing section', async () => {
       render(
@@ -254,9 +252,7 @@ describe('OutlineEditor', () => {
               ]),
             }),
           ]),
-        })
-      );
-    });
+        });
 
     it('edits existing section title', async () => {
       render(
@@ -283,9 +279,7 @@ describe('OutlineEditor', () => {
               title: 'Updated Introduction',
             }),
           ]),
-        })
-      );
-    });
+        });
 
     it('deletes section with confirmation', async () => {
       render(
@@ -316,7 +310,6 @@ describe('OutlineEditor', () => {
           section => section.id !== 'section-3'
         ),
       });
-    });
 
     it('cancels section deletion', async () => {
       render(
@@ -341,7 +334,6 @@ describe('OutlineEditor', () => {
 
       expect(mockOnChange).not.toHaveBeenCalled();
     });
-  });
 
   describe('Section Expansion/Collapse', () => {
     it('expands collapsed sections', async () => {
@@ -369,9 +361,7 @@ describe('OutlineEditor', () => {
               isExpanded: true,
             }),
           ]),
-        })
-      );
-    });
+        });
 
     it('collapses expanded sections', async () => {
       render(
@@ -398,9 +388,7 @@ describe('OutlineEditor', () => {
               isExpanded: false,
             }),
           ]),
-        })
-      );
-    });
+        });
 
     it('expands all sections', async () => {
       render(
@@ -423,9 +411,7 @@ describe('OutlineEditor', () => {
             expect.objectContaining({ isExpanded: true }),
             expect.objectContaining({ isExpanded: true }),
           ]),
-        })
-      );
-    });
+        });
 
     it('collapses all sections', async () => {
       render(
@@ -448,9 +434,7 @@ describe('OutlineEditor', () => {
             expect.objectContaining({ isExpanded: false }),
             expect.objectContaining({ isExpanded: false }),
           ]),
-        })
-      );
-    });
+        });
   });
 
   describe('Drag and Drop', () => {
@@ -475,17 +459,13 @@ describe('OutlineEditor', () => {
         };
 
         // This would be called by the DnD system
-        fireEvent(
-          dndContext,
-          new CustomEvent('dragend', { detail: dragEndEvent })
-        );
+        fireEvent(dndContext, new CustomEvent('dragend', { detail: dragEndEvent  }));
       }
 
       // Verify that the onChange was called with reordered sections
       await waitFor(() => {
         expect(mockOnChange).toHaveBeenCalled();
       });
-    });
 
     it('handles drag without drop', async () => {
       render(
@@ -504,15 +484,10 @@ describe('OutlineEditor', () => {
         over: null,
       };
 
-      fireEvent(
-        dndContext,
-        new CustomEvent('dragend', { detail: dragEndEvent })
-      );
-
+      fireEvent(dndContext, new CustomEvent('dragend', { detail: dragEndEvent  }));
       // Should not call onChange when drag is cancelled
       expect(mockOnChange).not.toHaveBeenCalled();
     });
-  });
 
   describe('Save Functionality', () => {
     it('saves outline changes', async () => {
@@ -551,7 +526,6 @@ describe('OutlineEditor', () => {
       await waitFor(() => {
         expect(screen.getByText(/saved/i)).toBeInTheDocument();
       });
-    });
   });
 
   describe('Keyboard Navigation', () => {
@@ -605,7 +579,6 @@ describe('OutlineEditor', () => {
 
       expect(screen.getByText(/delete this section/i)).toBeInTheDocument();
     });
-  });
 
   describe('Validation', () => {
     it('prevents empty section titles', async () => {
@@ -648,7 +621,6 @@ describe('OutlineEditor', () => {
       expect(screen.getByText(/title already exists/i)).toBeInTheDocument();
       expect(mockOnChange).not.toHaveBeenCalled();
     });
-  });
 
   describe('Accessibility', () => {
     it('meets accessibility standards', async () => {
@@ -703,7 +675,6 @@ describe('OutlineEditor', () => {
 
       expect(screen.getByText(/section added/i)).toBeInTheDocument();
     });
-  });
 
   describe('Performance', () => {
     it('handles large outlines efficiently', () => {
@@ -737,5 +708,4 @@ describe('OutlineEditor', () => {
 
       expect(endTime - startTime).toBeLessThan(1000);
     });
-  });
 });

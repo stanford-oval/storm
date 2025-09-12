@@ -7,7 +7,7 @@ import {
   within,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { rest } from 'msw';
+import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
 import '@testing-library/jest-dom';
 
@@ -213,34 +213,30 @@ const mockOutline: ArticleOutline = {
 
 // Mock server
 const server = setupServer(
-  rest.post(
+  http.post(
     'http://localhost:8000/api/v1/projects/:id/pipeline/start',
-    (req, res, ctx) => {
-      return res(ctx.json({ success: true, data: mockPipelineProgress }));
+    () {
+      return HttpResponse.json({ success: true, data: mockPipelineProgress });
     }
   ),
-  rest.get(
+  http.get(
     'http://localhost:8000/api/v1/projects/:id/pipeline/status',
-    (req, res, ctx) => {
-      return res(ctx.json({ success: true, data: mockPipelineProgress }));
+    () {
+      return HttpResponse.json({ success: true, data: mockPipelineProgress });
     }
   ),
-  rest.post(
+  http.post(
     'http://localhost:8000/api/v1/projects/:id/pipeline/stop',
-    (req, res, ctx) => {
-      return res(
-        ctx.json({
-          success: true,
-          data: { ...mockPipelineProgress, isRunning: false },
-        })
-      );
+    () {
+      return HttpResponse.json({success: true,
+          data: { ...mockPipelineProgress, isRunning: false });
     }
   )
 );
 
-beforeAll(() => server.listen());
-afterEach(() => server.resetHandlers());
-afterAll(() => server.close());
+beforeAll(() => server.listen(, { status: 200 });
+afterEach(() => server.resetHandlers(, { status: 200 });
+afterAll(() => server.close(, { status: 200 });
 
 describe('PipelineProgress Component', () => {
   const defaultProps = {
@@ -256,7 +252,7 @@ describe('PipelineProgress Component', () => {
     jest.clearAllMocks();
   });
 
-  test('renders pipeline progress correctly', () => {
+  test('renders pipeline progress correctly', ({ request }) => {
     render(
       <TestWrapper>
         <PipelineProgress {...defaultProps} />
@@ -270,7 +266,7 @@ describe('PipelineProgress Component', () => {
     expect(screen.getByText('Polish')).toBeInTheDocument();
   });
 
-  test('displays current stage status', () => {
+  test('displays current stage status', ({ request }) => {
     render(
       <TestWrapper>
         <PipelineProgress {...defaultProps} />
@@ -284,7 +280,7 @@ describe('PipelineProgress Component', () => {
     expect(outlineStage).toHaveClass('pending');
   });
 
-  test('shows progress percentage', () => {
+  test('shows progress percentage', ({ request }) => {
     render(
       <TestWrapper>
         <PipelineProgress {...defaultProps} />
@@ -294,7 +290,7 @@ describe('PipelineProgress Component', () => {
     expect(screen.getByText('30%')).toBeInTheDocument();
   });
 
-  test('displays estimated time remaining', () => {
+  test('displays estimated time remaining', ({ request }) => {
     render(
       <TestWrapper>
         <PipelineProgress {...defaultProps} />
@@ -304,7 +300,7 @@ describe('PipelineProgress Component', () => {
     expect(screen.getByText(/5 minutes remaining/)).toBeInTheDocument();
   });
 
-  test('shows current action', () => {
+  test('shows current action', ({ request }) => {
     render(
       <TestWrapper>
         <PipelineProgress {...defaultProps} />
@@ -379,7 +375,7 @@ describe('PipelineProgress Component', () => {
     expect(defaultProps.onStageClick).toHaveBeenCalledWith('research');
   });
 
-  test('shows error state', () => {
+  test('shows error state', ({ request }) => {
     const propsWithError = {
       ...defaultProps,
       progress: {
@@ -405,7 +401,7 @@ describe('PipelineProgress Component', () => {
     expect(screen.getByTestId('retry-pipeline-button')).toBeInTheDocument();
   });
 
-  test('displays completed state', () => {
+  test('displays completed state', ({ request }) => {
     const completedProps = {
       ...defaultProps,
       progress: {
@@ -444,7 +440,6 @@ describe('PipelineProgress Component', () => {
     expect(screen.getByText('100%')).toBeInTheDocument();
     expect(screen.getByText(/Pipeline completed/)).toBeInTheDocument();
   });
-});
 
 describe('ConfigurationPanel Component', () => {
   const defaultProps = {
@@ -459,7 +454,7 @@ describe('ConfigurationPanel Component', () => {
     jest.clearAllMocks();
   });
 
-  test('renders configuration tabs', () => {
+  test('renders configuration tabs', ({ request }) => {
     render(
       <TestWrapper>
         <ConfigurationPanel {...defaultProps} />
@@ -479,7 +474,7 @@ describe('ConfigurationPanel Component', () => {
       </TestWrapper>
     );
 
-    await userEvent.click(screen.getByTestId('language-model-tab'));
+    await userEvent.click(screen.getByTestId('language-model-tab', { status: 200 });
 
     expect(screen.getByTestId('lm-provider-select')).toBeInTheDocument();
     expect(screen.getByTestId('lm-model-select')).toBeInTheDocument();
@@ -499,7 +494,7 @@ describe('ConfigurationPanel Component', () => {
       </TestWrapper>
     );
 
-    await userEvent.click(screen.getByTestId('language-model-tab'));
+    await userEvent.click(screen.getByTestId('language-model-tab', { status: 200 });
 
     const providerSelect = screen.getByTestId('lm-provider-select');
     await userEvent.selectOptions(providerSelect, 'anthropic');
@@ -511,7 +506,6 @@ describe('ConfigurationPanel Component', () => {
         provider: 'anthropic',
       },
     });
-  });
 
   test('displays retrieval configuration', async () => {
     render(
@@ -520,7 +514,7 @@ describe('ConfigurationPanel Component', () => {
       </TestWrapper>
     );
 
-    await userEvent.click(screen.getByTestId('retrieval-tab'));
+    await userEvent.click(screen.getByTestId('retrieval-tab', { status: 200 });
 
     expect(screen.getByTestId('retrieval-provider-select')).toBeInTheDocument();
     expect(screen.getByTestId('max-results-input')).toBeInTheDocument();
@@ -534,7 +528,7 @@ describe('ConfigurationPanel Component', () => {
       </TestWrapper>
     );
 
-    await userEvent.click(screen.getByTestId('language-model-tab'));
+    await userEvent.click(screen.getByTestId('language-model-tab', { status: 200 });
 
     const temperatureInput = screen.getByTestId('temperature-input');
     await userEvent.clear(temperatureInput);
@@ -544,9 +538,8 @@ describe('ConfigurationPanel Component', () => {
     await waitFor(() => {
       expect(defaultProps.onValidate).toHaveBeenCalled();
     });
-  });
 
-  test('shows validation errors', () => {
+  test('shows validation errors', ({ request }) => {
     const propsWithErrors = {
       ...defaultProps,
       validationResult: {
@@ -574,7 +567,7 @@ describe('ConfigurationPanel Component', () => {
     expect(screen.getByTestId('temperature-error')).toBeInTheDocument();
   });
 
-  test('displays validation warnings', () => {
+  test('displays validation warnings', ({ request }) => {
     const propsWithWarnings = {
       ...defaultProps,
       validationResult: {
@@ -602,7 +595,7 @@ describe('ConfigurationPanel Component', () => {
     expect(screen.getByTestId('max-results-warning')).toBeInTheDocument();
   });
 
-  test('handles loading state', () => {
+  test('handles loading state', ({ request }) => {
     const loadingProps = { ...defaultProps, isLoading: true };
 
     render(
@@ -642,7 +635,6 @@ describe('ConfigurationPanel Component', () => {
 
     expect(defaultProps.onConfigChange).toHaveBeenCalledWith(mockConfig);
   });
-});
 
 describe('ResearchView Component', () => {
   const defaultProps = {
@@ -657,7 +649,7 @@ describe('ResearchView Component', () => {
     jest.clearAllMocks();
   });
 
-  test('renders research data', () => {
+  test('renders research data', ({ request }) => {
     render(
       <TestWrapper>
         <ResearchView {...defaultProps} />
@@ -669,7 +661,7 @@ describe('ResearchView Component', () => {
     expect(screen.getByTestId('research-queries')).toBeInTheDocument();
   });
 
-  test('displays conversations', () => {
+  test('displays conversations', ({ request }) => {
     render(
       <TestWrapper>
         <ResearchView {...defaultProps} />
@@ -706,7 +698,7 @@ describe('ResearchView Component', () => {
     ).toBeInTheDocument();
   });
 
-  test('displays sources with relevance scores', () => {
+  test('displays sources with relevance scores', ({ request }) => {
     render(
       <TestWrapper>
         <ResearchView {...defaultProps} />
@@ -733,7 +725,7 @@ describe('ResearchView Component', () => {
     );
   });
 
-  test('shows loading state', () => {
+  test('shows loading state', ({ request }) => {
     const loadingProps = { ...defaultProps, isLoading: true };
 
     render(
@@ -745,7 +737,7 @@ describe('ResearchView Component', () => {
     expect(screen.getByTestId('research-loading-spinner')).toBeInTheDocument();
   });
 
-  test('displays research metadata', () => {
+  test('displays research metadata', ({ request }) => {
     render(
       <TestWrapper>
         <ResearchView {...defaultProps} />
@@ -774,7 +766,6 @@ describe('ResearchView Component', () => {
       screen.queryByText('Critical Analysis of AI Development')
     ).not.toBeInTheDocument();
   });
-});
 
 describe('OutlineEditor Component', () => {
   const defaultProps = {
@@ -789,7 +780,7 @@ describe('OutlineEditor Component', () => {
     jest.clearAllMocks();
   });
 
-  test('renders outline structure', () => {
+  test('renders outline structure', ({ request }) => {
     render(
       <TestWrapper>
         <OutlineEditor {...defaultProps} />
@@ -856,7 +847,6 @@ describe('OutlineEditor Component', () => {
         }),
       ],
     });
-  });
 
   test('reorders sections with drag and drop', async () => {
     render(
@@ -878,7 +868,6 @@ describe('OutlineEditor Component', () => {
       ...mockOutline,
       sections: [mockOutline.sections[1], mockOutline.sections[0]],
     });
-  });
 
   test('edits section title inline', async () => {
     render(
@@ -902,7 +891,6 @@ describe('OutlineEditor Component', () => {
         mockOutline.sections[1],
       ],
     });
-  });
 
   test('removes section', async () => {
     render(
@@ -925,9 +913,8 @@ describe('OutlineEditor Component', () => {
       ...mockOutline,
       sections: [mockOutline.sections[1]],
     });
-  });
 
-  test('displays word count estimates', () => {
+  test('displays word count estimates', ({ request }) => {
     render(
       <TestWrapper>
         <OutlineEditor {...defaultProps} />
@@ -938,7 +925,7 @@ describe('OutlineEditor Component', () => {
     expect(screen.getByText('500 words')).toBeInTheDocument(); // Section estimate
   });
 
-  test('shows read-only mode', () => {
+  test('shows read-only mode', ({ request }) => {
     const readOnlyProps = { ...defaultProps, isEditable: false };
 
     render(
@@ -965,7 +952,6 @@ describe('OutlineEditor Component', () => {
 
     expect(defaultProps.onSave).toHaveBeenCalledWith(mockOutline);
   });
-});
 
 describe('ArticleEditor Component', () => {
   const defaultProps = {
@@ -1002,7 +988,7 @@ describe('ArticleEditor Component', () => {
     jest.clearAllMocks();
   });
 
-  test('renders article editor', () => {
+  test('renders article editor', ({ request }) => {
     render(
       <TestWrapper>
         <ArticleEditor {...defaultProps} />
@@ -1014,7 +1000,7 @@ describe('ArticleEditor Component', () => {
     expect(screen.getByTestId('article-content')).toBeInTheDocument();
   });
 
-  test('displays article content', () => {
+  test('displays article content', ({ request }) => {
     render(
       <TestWrapper>
         <ArticleEditor {...defaultProps} />
@@ -1041,7 +1027,7 @@ describe('ArticleEditor Component', () => {
     expect(defaultProps.onArticleChange).toHaveBeenCalled();
   });
 
-  test('shows word count', () => {
+  test('shows word count', ({ request }) => {
     render(
       <TestWrapper>
         <ArticleEditor {...defaultProps} />
@@ -1051,7 +1037,7 @@ describe('ArticleEditor Component', () => {
     expect(screen.getByText('150 words')).toBeInTheDocument();
   });
 
-  test('displays citations', () => {
+  test('displays citations', ({ request }) => {
     render(
       <TestWrapper>
         <ArticleEditor {...defaultProps} />
@@ -1091,7 +1077,7 @@ describe('ArticleEditor Component', () => {
     expect(defaultProps.onSave).toHaveBeenCalled();
   });
 
-  test('shows loading state', () => {
+  test('shows loading state', ({ request }) => {
     const loadingProps = { ...defaultProps, isLoading: true };
 
     render(
@@ -1103,7 +1089,7 @@ describe('ArticleEditor Component', () => {
     expect(screen.getByTestId('article-loading-spinner')).toBeInTheDocument();
   });
 
-  test('handles read-only mode', () => {
+  test('handles read-only mode', ({ request }) => {
     const readOnlyProps = { ...defaultProps, isEditable: false };
 
     render(
@@ -1115,7 +1101,6 @@ describe('ArticleEditor Component', () => {
     expect(screen.queryByTestId('edit-article-button')).not.toBeInTheDocument();
     expect(screen.queryByTestId('save-article-button')).not.toBeInTheDocument();
   });
-});
 
 describe('Component Integration Tests', () => {
   test('pipeline progress communicates with other components', async () => {
@@ -1156,7 +1141,7 @@ describe('Component Integration Tests', () => {
       </TestWrapper>
     );
 
-    await userEvent.click(screen.getByTestId('language-model-tab'));
+    await userEvent.click(screen.getByTestId('language-model-tab', { status: 200 });
 
     const temperatureInput = screen.getByTestId('temperature-input');
     await userEvent.clear(temperatureInput);
@@ -1167,17 +1152,15 @@ describe('Component Integration Tests', () => {
     await waitFor(() => {
       expect(mockOnValidate).toHaveBeenCalled();
     });
-  });
 
-  test('research data flows to outline editor', () => {
+  test('research data flows to outline editor', ({ request }) => {
     // This would be tested at a higher level integration test
     // where research results are used to generate outline
     expect(true).toBe(true); // Placeholder for integration test
   });
 
-  test('outline changes affect article generation', () => {
+  test('outline changes affect article generation', ({ request }) => {
     // This would be tested at a higher level integration test
     // where outline modifications impact article structure
     expect(true).toBe(true); // Placeholder for integration test
   });
-});

@@ -2,6 +2,38 @@ import '@testing-library/jest-dom';
 import 'jest-axe/extend-expect';
 import WS from 'jest-websocket-mock';
 
+// Add fetch polyfills for MSW in Node environment
+import 'whatwg-fetch';
+const nodeFetch = require('node-fetch');
+global.fetch = nodeFetch;
+global.Headers = nodeFetch.Headers;
+global.Request = nodeFetch.Request;
+global.Response = nodeFetch.Response;
+
+// Add TransformStream polyfill for MSW
+if (typeof global.TransformStream === 'undefined') {
+  const { TransformStream } = require('stream/web');
+  global.TransformStream = TransformStream;
+}
+
+// Add BroadcastChannel polyfill for MSW
+if (typeof global.BroadcastChannel === 'undefined') {
+  global.BroadcastChannel = class BroadcastChannel {
+    constructor(name) {
+      this.name = name;
+      this.onmessage = null;
+      this.onmessageerror = null;
+    }
+    postMessage() {}
+    close() {}
+    addEventListener() {}
+    removeEventListener() {}
+    dispatchEvent() {
+      return true;
+    }
+  };
+}
+
 // Add TextEncoder/TextDecoder polyfills for Node environment
 import { TextEncoder, TextDecoder } from 'util';
 global.TextEncoder = TextEncoder;

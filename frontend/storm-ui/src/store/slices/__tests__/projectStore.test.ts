@@ -72,7 +72,7 @@ const createTestStore = (initialState?: Partial<ProjectSlice>) => {
 describe('projectStore', () => {
   describe('initial state', () => {
     it('has correct initial state', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
       const state = result.current;
 
       expect(state.projects).toEqual([]);
@@ -87,12 +87,11 @@ describe('projectStore', () => {
         limit: 10,
         total: 0,
       });
-    });
   });
 
   describe('project management', () => {
     it('sets projects', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setProjects(mockProjects);
@@ -102,7 +101,7 @@ describe('projectStore', () => {
     });
 
     it('adds a new project', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setProjects([mockProjects[0]]);
@@ -119,7 +118,7 @@ describe('projectStore', () => {
     });
 
     it('updates existing project', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setProjects(mockProjects);
@@ -129,7 +128,6 @@ describe('projectStore', () => {
 
       act(() => {
         result.current.updateProject('project-1', { title: updatedTitle });
-      });
 
       const updatedProject = result.current.projects.find(
         p => p.id === 'project-1'
@@ -138,7 +136,7 @@ describe('projectStore', () => {
     });
 
     it('removes project', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setProjects(mockProjects);
@@ -155,7 +153,7 @@ describe('projectStore', () => {
     });
 
     it('sets current project', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setProjects(mockProjects);
@@ -169,7 +167,7 @@ describe('projectStore', () => {
     });
 
     it('clears current project', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setProjects(mockProjects);
@@ -184,11 +182,10 @@ describe('projectStore', () => {
 
       expect(result.current.currentProject).toBeNull();
     });
-  });
 
   describe('loading and error states', () => {
     it('sets loading state', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setLoading(true);
@@ -204,7 +201,7 @@ describe('projectStore', () => {
     });
 
     it('sets error state', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
       const error = 'Something went wrong';
 
       act(() => {
@@ -215,7 +212,7 @@ describe('projectStore', () => {
     });
 
     it('clears error state', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setError('Initial error');
@@ -229,11 +226,10 @@ describe('projectStore', () => {
 
       expect(result.current.error).toBeNull();
     });
-  });
 
   describe('filtering', () => {
     it('sets filters', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
       const filters: ProjectFilters = {
         status: ['completed', 'draft'],
         searchQuery: 'AI',
@@ -247,12 +243,11 @@ describe('projectStore', () => {
     });
 
     it('gets filtered projects by status', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setProjects(mockProjects);
         result.current.setFilters({ status: ['completed'] });
-      });
 
       const filteredProjects = result.current.getFilteredProjects();
 
@@ -261,12 +256,11 @@ describe('projectStore', () => {
     });
 
     it('gets filtered projects by search query', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setProjects(mockProjects);
         result.current.setFilters({ searchQuery: 'AI' });
-      });
 
       const filteredProjects = result.current.getFilteredProjects();
 
@@ -275,7 +269,7 @@ describe('projectStore', () => {
     });
 
     it('gets filtered projects by date range', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setProjects(mockProjects);
@@ -285,7 +279,6 @@ describe('projectStore', () => {
             end: new Date('2024-01-02'),
           },
         });
-      });
 
       const filteredProjects = result.current.getFilteredProjects();
 
@@ -294,7 +287,7 @@ describe('projectStore', () => {
     });
 
     it('combines multiple filters', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setProjects(mockProjects);
@@ -302,7 +295,6 @@ describe('projectStore', () => {
           status: ['completed'],
           searchQuery: 'First',
         });
-      });
 
       const filteredProjects = result.current.getFilteredProjects();
 
@@ -311,11 +303,10 @@ describe('projectStore', () => {
     });
 
     it('clears filters', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setFilters({ status: ['completed'] });
-      });
 
       expect(result.current.filters).toEqual({ status: ['completed'] });
 
@@ -324,12 +315,11 @@ describe('projectStore', () => {
       });
 
       expect(result.current.filters).toEqual({});
-    });
   });
 
   describe('sorting', () => {
     it('sets sort criteria', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setSorting('title', 'asc');
@@ -340,7 +330,7 @@ describe('projectStore', () => {
     });
 
     it('gets sorted projects by title ascending', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setProjects(mockProjects);
@@ -354,7 +344,7 @@ describe('projectStore', () => {
     });
 
     it('gets sorted projects by title descending', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setProjects(mockProjects);
@@ -368,7 +358,7 @@ describe('projectStore', () => {
     });
 
     it('gets sorted projects by date', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setProjects(mockProjects);
@@ -382,7 +372,7 @@ describe('projectStore', () => {
     });
 
     it('gets sorted projects by status', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setProjects(mockProjects);
@@ -395,37 +385,33 @@ describe('projectStore', () => {
       expect(sortedProjects[0].status).toBe('completed');
       expect(sortedProjects[1].status).toBe('draft');
     });
-  });
 
   describe('pagination', () => {
     it('sets pagination', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setPagination({ page: 2, limit: 5, total: 20 });
-      });
 
       expect(result.current.pagination).toEqual({
         page: 2,
         limit: 5,
         total: 20,
       });
-    });
 
     it('gets paginated projects', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       // Create more projects for pagination testing
       const moreProjects = Array.from({ length: 15 }, (_, i) => ({
         ...mockProjects[0],
         id: `project-${i + 1}`,
         title: `Project ${i + 1}`,
-      }));
+      });
 
       act(() => {
         result.current.setProjects(moreProjects);
         result.current.setPagination({ page: 2, limit: 5, total: 15 });
-      });
 
       const paginatedProjects = result.current.getPaginatedProjects();
 
@@ -436,22 +422,20 @@ describe('projectStore', () => {
     });
 
     it('handles last page with fewer items', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setProjects(mockProjects); // Only 2 projects
         result.current.setPagination({ page: 2, limit: 5, total: 2 });
-      });
 
       const paginatedProjects = result.current.getPaginatedProjects();
 
       expect(paginatedProjects).toHaveLength(0); // No projects on page 2
     });
-  });
 
   describe('project queries', () => {
     it('finds project by id', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setProjects(mockProjects);
@@ -463,7 +447,7 @@ describe('projectStore', () => {
     });
 
     it('returns undefined for non-existent project', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setProjects(mockProjects);
@@ -475,7 +459,7 @@ describe('projectStore', () => {
     });
 
     it('gets projects by status', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setProjects(mockProjects);
@@ -491,7 +475,7 @@ describe('projectStore', () => {
     });
 
     it('searches projects by title and topic', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setProjects(mockProjects);
@@ -507,7 +491,7 @@ describe('projectStore', () => {
     });
 
     it('searches projects case-insensitively', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setProjects(mockProjects);
@@ -518,11 +502,10 @@ describe('projectStore', () => {
       expect(results).toHaveLength(1);
       expect(results[0].title).toBe('First Project');
     });
-  });
 
   describe('bulk operations', () => {
     it('selects multiple projects', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setProjects(mockProjects);
@@ -540,7 +523,7 @@ describe('projectStore', () => {
     });
 
     it('deselects projects', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setProjects(mockProjects);
@@ -556,7 +539,7 @@ describe('projectStore', () => {
     });
 
     it('selects all projects', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setProjects(mockProjects);
@@ -573,7 +556,7 @@ describe('projectStore', () => {
     });
 
     it('clears all selections', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setProjects(mockProjects);
@@ -590,7 +573,7 @@ describe('projectStore', () => {
     });
 
     it('deletes selected projects', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setProjects(mockProjects);
@@ -605,11 +588,10 @@ describe('projectStore', () => {
       expect(result.current.projects[0].id).toBe('project-2');
       expect(result.current.selectedProjects).toEqual([]);
     });
-  });
 
   describe('computed values', () => {
     it('computes project statistics', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setProjects(mockProjects);
@@ -628,7 +610,7 @@ describe('projectStore', () => {
     });
 
     it('computes recent projects', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setProjects(mockProjects);
@@ -641,7 +623,7 @@ describe('projectStore', () => {
     });
 
     it('checks if store has projects', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       expect(result.current.hasProjects()).toBe(false);
 
@@ -653,7 +635,7 @@ describe('projectStore', () => {
     });
 
     it('checks if project is selected', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setProjects(mockProjects);
@@ -663,11 +645,10 @@ describe('projectStore', () => {
       expect(result.current.isProjectSelected('project-1')).toBe(true);
       expect(result.current.isProjectSelected('project-2')).toBe(false);
     });
-  });
 
   describe('persistence', () => {
     it('resets store to initial state', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setProjects(mockProjects);
@@ -692,11 +673,10 @@ describe('projectStore', () => {
       expect(result.current.selectedProjects).toEqual([]);
       expect(result.current.error).toBeNull();
     });
-  });
 
   describe('optimistic updates', () => {
     it('handles optimistic project updates', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setProjects(mockProjects);
@@ -708,14 +688,13 @@ describe('projectStore', () => {
         result.current.optimisticUpdateProject('project-1', {
           title: updatedTitle,
         });
-      });
 
       const project = result.current.getProjectById('project-1');
       expect(project?.title).toBe(updatedTitle);
     });
 
     it('reverts optimistic updates on error', () => {
-      const { result } = renderHook(() => createTestStore()());
+      const { result } = renderHook(() => createTestStore());
 
       act(() => {
         result.current.setProjects(mockProjects);
@@ -728,7 +707,6 @@ describe('projectStore', () => {
         result.current.optimisticUpdateProject('project-1', {
           title: updatedTitle,
         });
-      });
 
       expect(result.current.getProjectById('project-1')?.title).toBe(
         updatedTitle
@@ -742,5 +720,4 @@ describe('projectStore', () => {
         originalTitle
       );
     });
-  });
 });

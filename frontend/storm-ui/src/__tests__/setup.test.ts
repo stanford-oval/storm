@@ -54,4 +54,3 @@ describe('Test Environment Setup', () => {
     };
     expect(throwError).toThrow('Test error');
   });
-});
