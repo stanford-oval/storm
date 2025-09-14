@@ -405,11 +405,12 @@ describe('projectStore', () => {
         ...mockProjects[0],
         id: `project-${i + 1}`,
         title: `Project ${i + 1}`,
-      });
+      }));
 
       act(() => {
         result.current.setProjects(moreProjects);
         result.current.setPagination({ page: 2, limit: 5, total: 15 });
+      });
 
       const paginatedProjects = result.current.getPaginatedProjects();
 
