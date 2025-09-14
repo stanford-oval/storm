@@ -86,6 +86,7 @@ describe('ConfigurationPanel', () => {
       expect(screen.getByTestId('loading-spinner')).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /save/i })).toBeDisabled();
     });
+  });
 
   describe('LLM Configuration', () => {
     it('updates model selection', async () => {
