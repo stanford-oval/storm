@@ -374,6 +374,8 @@ describe('usePipeline', () => {
         expect(response.success).toBe(false);
         expect(response.error).toBe('Server error');
       });
+    });
+  });
 
   describe('concurrent operations', () => {
     it('prevents multiple simultaneous starts', async () => {

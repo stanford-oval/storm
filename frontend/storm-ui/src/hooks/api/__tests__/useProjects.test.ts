@@ -282,7 +282,11 @@ describe('useProjects', () => {
 
           return HttpResponse.json({
             success: true,
-            data: updatedProject,});
+            data: updatedProject,
+          });
+        })
+      );
+
       const { result } = renderHook(() => useProjects());
 
       await act(async () => {

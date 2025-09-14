@@ -461,7 +461,7 @@ describe('useWebSocket', () => {
           pingMessage: { type: 'ping' },
           pongMessage: { type: 'pong' },
           onPong,
-        });
+        }));
       act(() => {
         result.current.connect();
       });
@@ -469,11 +469,11 @@ describe('useWebSocket', () => {
       await server.connected;
 
       // Wait for ping
-      await expect(server).toReceiveMessage(JSON.stringify({ type: 'ping' });
+      await expect(server).toReceiveMessage(JSON.stringify({ type: 'ping' }));
 
       // Send pong response
       act(() => {
-        server.send(JSON.stringify({ type: 'pong' });
+        server.send(JSON.stringify({ type: 'pong' }));
 
       expect(onPong).toHaveBeenCalled();
     });
@@ -495,7 +495,7 @@ describe('useWebSocket', () => {
       await server.connected;
 
       // Wait for ping
-      await expect(server).toReceiveMessage(JSON.stringify({ type: 'ping' });
+      await expect(server).toReceiveMessage(JSON.stringify({ type: 'ping' }));
 
       // Don't send pong response to simulate timeout
       await waitFor(
@@ -583,7 +583,7 @@ describe('useWebSocket', () => {
       await server.connected;
 
       act(() => {
-        server.send(JSON.stringify({ type: 'test_message', data: {} });
+        server.send(JSON.stringify({ type: 'test_message', data: {} }));
 
       // Handler from unmounted component should not be called
       expect(handler).not.toHaveBeenCalled();
