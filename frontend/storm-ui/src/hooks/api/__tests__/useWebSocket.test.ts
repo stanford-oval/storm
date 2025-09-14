@@ -49,7 +49,7 @@ describe('useWebSocket', () => {
 
     it('auto-connects when autoConnect is true', async () => {
       const { result } = renderHook(() =>
-        useWebSocket(TEST_WS_URL, { autoConnect: true  }));
+        useWebSocket(TEST_WS_URL, { autoConnect: true }));
       await server.connected;
 
       expect(result.current.isConnected).toBe(true);
@@ -57,7 +57,7 @@ describe('useWebSocket', () => {
 
     it('does not auto-connect when autoConnect is false', async () => {
       const { result } = renderHook(() =>
-        useWebSocket(TEST_WS_URL, { autoConnect: false  }));
+        useWebSocket(TEST_WS_URL, { autoConnect: false }));
       // Wait a bit to ensure no connection attempt
       await act(async () => {
         await new Promise(resolve => setTimeout(resolve, 100));
@@ -65,6 +65,7 @@ describe('useWebSocket', () => {
 
       expect(result.current.isConnected).toBe(false);
     });
+  });
 
   describe('message handling', () => {
     it('sends messages successfully', async () => {
@@ -107,7 +108,7 @@ describe('useWebSocket', () => {
 
     it('handles message history', async () => {
       const { result } = renderHook(() =>
-        useWebSocket(TEST_WS_URL, { saveMessageHistory: true  }));
+        useWebSocket(TEST_WS_URL, { saveMessageHistory: true }));
       act(() => {
         result.current.connect();
       });
@@ -179,6 +180,7 @@ describe('useWebSocket', () => {
       expect(onPipelineMessage).toHaveBeenCalledTimes(1);
       expect(onPipelineMessage).toHaveBeenCalledWith(pipelineMessage);
     });
+  });
 
   describe('reconnection logic', () => {
     it('attempts reconnection on connection loss', async () => {
@@ -206,6 +208,7 @@ describe('useWebSocket', () => {
       await waitFor(() => {
         expect(onReconnectAttempt).toHaveBeenCalled();
       });
+    });
 
     it('stops reconnecting after max attempts', async () => {
       const onReconnectFailed = jest.fn();
@@ -231,6 +234,7 @@ describe('useWebSocket', () => {
       await waitFor(() => {
         expect(onReconnectFailed).toHaveBeenCalled();
       });
+    });
 
     it('exponentially backs off reconnection attempts', async () => {
       const onReconnectAttempt = jest.fn();
@@ -268,6 +272,7 @@ describe('useWebSocket', () => {
       // With exponential backoff: 100ms + 200ms + 400ms = 700ms minimum
       expect(elapsed).toBeGreaterThan(600);
     });
+  });
 
   describe('subscription management', () => {
     it('subscribes to specific message types', async () => {
@@ -365,6 +370,7 @@ describe('useWebSocket', () => {
       expect(handler1).toHaveBeenCalledWith(message);
       expect(handler2).toHaveBeenCalledWith(message);
     });
+  });
 
   describe('error handling', () => {
     it('handles connection errors', async () => {
@@ -385,7 +391,7 @@ describe('useWebSocket', () => {
     it('handles malformed message errors', async () => {
       const onError = jest.fn();
       const { result } = renderHook(() =>
-        useWebSocket(TEST_WS_URL, { onError  }));
+        useWebSocket(TEST_WS_URL, { onError }));
       act(() => {
         result.current.connect();
       });
@@ -421,6 +427,7 @@ describe('useWebSocket', () => {
 
       act(() => {
         result.current.sendMessage({ type: 'test' });
+      });
 
       // Reconnect server
       server = new WS(TEST_WS_URL);
@@ -474,6 +481,7 @@ describe('useWebSocket', () => {
       // Send pong response
       act(() => {
         server.send(JSON.stringify({ type: 'pong' }));
+      });
 
       expect(onPong).toHaveBeenCalled();
     });
@@ -487,7 +495,7 @@ describe('useWebSocket', () => {
           pingMessage: { type: 'ping' },
           pongMessage: { type: 'pong' },
           onConnectionTimeout,
-        });
+        }));
       act(() => {
         result.current.connect();
       });
@@ -505,6 +513,7 @@ describe('useWebSocket', () => {
         { timeout: 200 }
       );
     });
+  });
 
   describe('binary data handling', () => {
     it('sends binary data', async () => {
@@ -545,10 +554,11 @@ describe('useWebSocket', () => {
 
       expect(onBinaryMessage).toHaveBeenCalledWith(binaryData);
     });
+  });
 
   describe('cleanup', () => {
     it('cleans up on unmount', async () => {
-      const { result, unmount } = renderHook(() => useWebSocket(TEST_WS_URL, { status: 200  }));
+      const { result, unmount } = renderHook(() => useWebSocket(TEST_WS_URL, { status: 200 }));
 
       act(() => {
         result.current.connect();
@@ -563,7 +573,7 @@ describe('useWebSocket', () => {
 
     it('clears subscriptions on unmount', async () => {
       const handler = jest.fn();
-      const { result, unmount } = renderHook(() => useWebSocket(TEST_WS_URL, { status: 200  }));
+      const { result, unmount } = renderHook(() => useWebSocket(TEST_WS_URL, { status: 200 }));
 
       act(() => {
         result.current.connect();
@@ -574,7 +584,7 @@ describe('useWebSocket', () => {
 
       unmount();
       // Create new connection
-      const { result: result2 } = renderHook(() => useWebSocket(TEST_WS_URL, { status: 200  }));
+      const { result: result2 } = renderHook(() => useWebSocket(TEST_WS_URL, { status: 200 }));
 
       act(() => {
         result2.current.connect();
@@ -584,10 +594,12 @@ describe('useWebSocket', () => {
 
       act(() => {
         server.send(JSON.stringify({ type: 'test_message', data: {} }));
+      });
 
       // Handler from unmounted component should not be called
       expect(handler).not.toHaveBeenCalled();
     });
+  });
 
   describe('advanced features', () => {
     it('supports custom protocols', async () => {
@@ -625,8 +637,8 @@ describe('useWebSocket', () => {
 
       await server.connected;
 
-      await expect(server).toReceiveMessage(JSON.stringify(message1);
-      await expect(server).toReceiveMessage(JSON.stringify(message2);
+      await expect(server).toReceiveMessage(JSON.stringify(message1));
+      await expect(server).toReceiveMessage(JSON.stringify(message2));
 
       expect(result.current.bufferedMessages).toHaveLength(0);
     });
@@ -653,5 +665,7 @@ describe('useWebSocket', () => {
       });
 
       // In a real implementation, you'd verify compression was applied
-      await expect(server).toReceiveMessage(expect.any(String, { status: 200 });
+      await expect(server).toReceiveMessage(expect.any(String));
+    });
+  });
 });

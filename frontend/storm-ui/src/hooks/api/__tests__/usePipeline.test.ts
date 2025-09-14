@@ -399,11 +399,15 @@ describe('usePipeline', () => {
         expect(response.success).toBe(false);
         expect(response.error).toContain('already starting');
       });
+    });
 
     it('allows start after previous operation completes', async () => {
       server.use(
         http.post('/api/pipeline/start', () => {
           return HttpResponse.json({success: true, data: { pipelineId: 'pipeline-123' } });
+        })
+      );
+
       const { result } = renderHook(() => usePipeline());
 
       await act(async () => {
@@ -416,6 +420,8 @@ describe('usePipeline', () => {
         const response = await result.current.startPipeline(mockProject);
         expect(response.success).toBe(true);
       });
+    });
+  });
 
   describe('cleanup', () => {
     it('cancels pending requests on unmount', async () => {
@@ -437,6 +443,7 @@ describe('usePipeline', () => {
       unmount();
       // Should not throw any errors or warnings about setting state after unmount
     });
+  });
 
   describe('error recovery', () => {
     it('clears errors when starting new pipeline', async () => {

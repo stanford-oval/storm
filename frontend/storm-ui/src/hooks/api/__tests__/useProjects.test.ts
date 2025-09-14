@@ -305,7 +305,11 @@ describe('useProjects', () => {
         http.put('/api/projects/:id', () => {
           return HttpResponse.json({
             success: false,
-            error: 'Project not found',});
+            error: 'Project not found',
+          });
+        })
+      );
+
       const { result } = renderHook(() => useProjects());
 
       await act(async () => {
@@ -326,7 +330,11 @@ describe('useProjects', () => {
 
           return HttpResponse.json({
             success: true,
-            data: { id: 'project-1' });
+            data: { id: 'project-1' },
+          });
+        })
+      );
+
       const { result } = renderHook(() => useProjects());
 
       await act(async () => {
@@ -342,7 +350,11 @@ describe('useProjects', () => {
         http.delete('/api/projects/:id', () => {
           return HttpResponse.json({
             success: false,
-            error: 'Cannot delete project in progress',});
+            error: 'Cannot delete project in progress',
+          });
+        })
+      );
+
       const { result } = renderHook(() => useProjects());
 
       await act(async () => {
@@ -383,7 +395,11 @@ describe('useProjects', () => {
 
           return HttpResponse.json({
             success: true,
-            data: duplicatedProject,});
+            data: duplicatedProject,
+          });
+        })
+      );
+
       const { result } = renderHook(() => useProjects());
 
       await act(async () => {
@@ -391,13 +407,18 @@ describe('useProjects', () => {
         expect(response.success).toBe(true);
         expect(response.data.title).toBe('First Project (Copy)');
       });
+    });
 
     it('handles duplicate errors', async () => {
       server.use(
         http.post('/api/projects/:id/duplicate', () => {
           return HttpResponse.json({
             success: false,
-            error: 'Original project not found',});
+            error: 'Original project not found',
+          });
+        })
+      );
+
       const { result } = renderHook(() => useProjects());
 
       await act(async () => {
@@ -416,7 +437,11 @@ describe('useProjects', () => {
 
           return HttpResponse.json({
             success: true,
-            data: { id: 'project-1', archived: true });
+            data: { id: 'project-1', archived: true },
+          });
+        })
+      );
+
       const { result } = renderHook(() => useProjects());
 
       await act(async () => {
@@ -432,7 +457,11 @@ describe('useProjects', () => {
 
           return HttpResponse.json({
             success: true,
-            data: { id: 'project-1', archived: false });
+            data: { id: 'project-1', archived: false },
+          });
+        })
+      );
+
       const { result } = renderHook(() => useProjects());
 
       await act(async () => {
@@ -500,7 +529,11 @@ describe('useProjects', () => {
         http.get('/api/projects', () => {
           return HttpResponse.json({
             success: false,
-            error: 'Refresh failed',});
+            error: 'Refresh failed',
+          });
+        })
+      );
+
       await act(async () => {
         await result.current.refetch();
       });
@@ -509,6 +542,7 @@ describe('useProjects', () => {
       expect(result.current.projects).toEqual(mockProjects);
       expect(result.current.error).toBe('Refresh failed');
     });
+  });
 
   describe('optimistic updates', () => {
     it('optimistically updates project title', async () => {
@@ -537,13 +571,16 @@ describe('useProjects', () => {
       server.use(
         http.put('/api/projects/:id', async () => {
           await new Promise(resolve => setTimeout(resolve, 1000));
-            {
-              success: true,
-              data: {
-                ...mockProjects[0],
-                title: 'Updated Title',
-              },
-            });
+          return HttpResponse.json({
+            success: true,
+            data: {
+              ...mockProjects[0],
+              title: 'Updated Title',
+            },
+          });
+        })
+      );
+      
       act(() => {
         result.current.updateProject(
           'project-1',
@@ -589,7 +626,11 @@ describe('useProjects', () => {
         http.put('/api/projects/:id', () => {
           return HttpResponse.json({
             success: false,
-            error: 'Update failed',});
+            error: 'Update failed',
+          });
+        })
+      );
+
       await act(async () => {
         await result.current.updateProject(
           'project-1',
@@ -604,6 +645,7 @@ describe('useProjects', () => {
       const project = result.current.projects.find(p => p.id === 'project-1');
       expect(project?.title).toBe(originalTitle);
     });
+  });
 
   describe('caching', () => {
     it('caches project data', async () => {
@@ -619,8 +661,12 @@ describe('useProjects', () => {
                 total: mockProjects.length,
                 page: 1,
                 limit: 10,
-              });
-      const { result, rerender } = renderHook(() => useProjects();
+              },
+          });
+        })
+      );
+
+      const { result, rerender } = renderHook(() => useProjects());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -646,12 +692,17 @@ describe('useProjects', () => {
                 total: mockProjects.length,
                 page: 1,
                 limit: 10,
-              });
+              },
+          });
         }),
         http.post('/api/projects', () => {
           return HttpResponse.json({
             success: true,
-            data: { id: 'new-project' });
+            data: { id: 'new-project' },
+          });
+        })
+      );
+
       const { result } = renderHook(() => useProjects());
 
       await waitFor(() => {
@@ -667,10 +718,12 @@ describe('useProjects', () => {
           topic: 'New Topic',
           config: mockProjects[0].config,
         });
-    });
+      });
 
       // Should trigger new request to refresh data
       await waitFor(() => {
         expect(getRequestCount).toBe(2);
       });
+    });
+  });
 });
