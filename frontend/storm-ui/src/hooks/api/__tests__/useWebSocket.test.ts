@@ -82,7 +82,7 @@ describe('useWebSocket', () => {
         result.current.sendMessage(message);
       });
 
-      await expect(server).toReceiveMessage(JSON.stringify(message);
+      await expect(server).toReceiveMessage(JSON.stringify(message));
     });
 
     it('receives messages successfully', async () => {

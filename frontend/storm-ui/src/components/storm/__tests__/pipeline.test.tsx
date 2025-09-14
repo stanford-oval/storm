@@ -215,7 +215,7 @@ const mockOutline: ArticleOutline = {
 const server = setupServer(
   http.post(
     'http://localhost:8000/api/v1/projects/:id/pipeline/start',
-    () {
+    () => {
       return HttpResponse.json({ success: true, data: mockPipelineProgress });
     }
   ),

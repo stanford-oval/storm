@@ -27,7 +27,7 @@ jest.mock('@tiptap/react', () => ({
       </div>
     </div>
   ),
-});
+}));
 
 const mockArticle: GeneratedArticle = {
   title: 'Test Article',

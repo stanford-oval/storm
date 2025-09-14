@@ -719,4 +719,5 @@ describe('projectStore', () => {
         originalTitle
       );
     });
+  });
 });

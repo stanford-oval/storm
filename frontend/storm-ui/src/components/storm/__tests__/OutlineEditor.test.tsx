@@ -26,7 +26,7 @@ jest.mock('@dnd-kit/core', () => ({
   DragOverlay: ({ children }: any) => (
     <div data-testid="drag-overlay">{children}</div>
   ),
-});
+}));
 
 jest.mock('@dnd-kit/sortable', () => ({
   SortableContext: ({ children }: any) => children,

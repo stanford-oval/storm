@@ -88,12 +88,12 @@ describe('ProjectCard', () => {
     expect(screen.getByText('Delete')).toBeInTheDocument();
 
     // Test duplicate action
-    fireEvent.click(screen.getByText('Duplicate', { status: 200 });
+    fireEvent.click(screen.getByText('Duplicate'));
     expect(defaultProps.onDuplicate).toHaveBeenCalledWith(mockProject);
 
     // Re-open menu for delete test
     fireEvent.click(dropdownTrigger);
-    fireEvent.click(screen.getByText('Delete', { status: 200 });
+    fireEvent.click(screen.getByText('Delete'));
     expect(defaultProps.onDelete).toHaveBeenCalledWith(mockProject.id);
   });
 

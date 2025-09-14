@@ -417,4 +417,5 @@ describe('ProjectCard Performance Tests', () => {
 
       expect(renderTime).toBeLessThan(50);
     });
+  });
 });

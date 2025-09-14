@@ -108,17 +108,23 @@ const server = setupServer(
           totalPages: 1,
           hasNext: false,
           hasPrevious: false,
-        });
-  }),
+        },
+      });
+    }
+  ),
 
   http.get('http://localhost:8000/api/v1/projects/:id', ({ request }) => {
     const { id } = request.params;
     if (id === 'test-project-id') {
-      return HttpResponse.json({success: true,
-          data: mockProject,});
+      return HttpResponse.json({
+        success: true,
+        data: mockProject,
+      });
     }
-    return HttpResponse.json({success: false,
-        error: 'Project not found',});
+    return HttpResponse.json({
+      success: false,
+      error: 'Project not found',
+    }, { status: 404 });
   }),
 
   http.post('http://localhost:8000/api/v1/projects', () => {

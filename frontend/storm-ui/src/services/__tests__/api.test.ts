@@ -37,7 +37,8 @@ describe('API Services', () => {
         expect.stringContaining('/api/projects'),
         expect.objectContaining({
           method: 'GET',
-        });
+        })
+      );
       expect(result).toEqual(mockProjects);
     });
 
