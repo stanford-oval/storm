@@ -101,7 +101,11 @@ describe('useProjects', () => {
         http.get('/api/projects', () => {
           return HttpResponse.json({
             success: false,
-            error: 'Server error',});
+            error: 'Server error',
+          });
+        })
+      );
+
       const { result } = renderHook(() => useProjects());
 
       await waitFor(() => {
@@ -128,8 +132,12 @@ describe('useProjects', () => {
                 total: 2,
                 page: 2,
                 limit: 5,
-            return HttpResponse.json(
-      const { result } = renderHook(() => useProjects({ page: 2, limit: 5 });
+            },
+          });
+        })
+      );
+
+      const { result } = renderHook(() => useProjects({ page: 2, limit: 5 }));
 
       await waitFor(() => {
         expect(result.current.projects).toEqual([mockProjects[1]]);
@@ -150,9 +158,13 @@ describe('useProjects', () => {
                 total: 1,
                 page: 1,
                 limit: 10,
-              });
+            },
+          });
+        })
+      );
+
       const { result } = renderHook(() =>
-        useProjects({ filters: { status: ['completed'] } });
+        useProjects({ filters: { status: ['completed'] } }));
       await waitFor(() => {
         expect(result.current.projects).toEqual([mockProjects[0]]);
       });
@@ -171,9 +183,13 @@ describe('useProjects', () => {
                 total: 1,
                 page: 1,
                 limit: 10,
-              });
+            },
+          });
+        })
+      );
+
       const { result } = renderHook(() =>
-        useProjects({ filters: { searchQuery: 'AI' } });
+        useProjects({ filters: { searchQuery: 'AI' } }));
       await waitFor(() => {
         expect(result.current.projects).toEqual([mockProjects[0]]);
       });

@@ -341,6 +341,9 @@ describe('usePipeline', () => {
           }
 
           return HttpResponse.json({success: true, data: { pipelineId: 'pipeline-123' } });
+        })
+      );
+
       const { result } = renderHook(() => usePipeline());
 
       await act(async () => {
@@ -358,6 +361,9 @@ describe('usePipeline', () => {
       server.use(
         http.post('/api/pipeline/start', () => {
           return HttpResponse.json({success: false, error: 'Server error' });
+        })
+      );
+
       const { result } = renderHook(() => usePipeline());
 
       await act(async () => {
@@ -373,8 +379,11 @@ describe('usePipeline', () => {
     it('prevents multiple simultaneous starts', async () => {
       server.use(
         http.post('/api/pipeline/start', async () => {
-          await new Promise(resolve => setTimeout(resolve(100),
-            { success: true, data: { pipelineId: 'pipeline-123' } });
+          await new Promise(resolve => setTimeout(resolve, 100));
+          return HttpResponse.json({ success: true, data: { pipelineId: 'pipeline-123' } });
+        })
+      );
+
       const { result } = renderHook(() => usePipeline());
 
       act(() => {
@@ -410,9 +419,12 @@ describe('usePipeline', () => {
     it('cancels pending requests on unmount', async () => {
       server.use(
         http.post('/api/pipeline/start', async () => {
-          await new Promise(resolve => setTimeout(resolve(1000),
-            { success: true, data: { pipelineId: 'pipeline-123' } });
-      const { result, unmount } = renderHook(() => usePipeline();
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          return HttpResponse.json({ success: true, data: { pipelineId: 'pipeline-123' } });
+        })
+      );
+
+      const { result, unmount } = renderHook(() => usePipeline());
 
       act(() => {
         result.current.startPipeline(mockProject);
@@ -442,6 +454,9 @@ describe('usePipeline', () => {
       server.use(
         http.post('/api/pipeline/start', ({ request }) => {
           return HttpResponse.json({success: true, data: { pipelineId: 'pipeline-123' } });
+        })
+      );
+
       // Second request succeeds and clears error
       await act(async () => {
         await result.current.startPipeline(mockProject);
@@ -449,6 +464,7 @@ describe('usePipeline', () => {
 
       expect(result.current.error).toBeNull();
     });
+  });
 
   describe('configuration validation', () => {
     it('validates LLM configuration', async () => {

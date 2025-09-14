@@ -172,8 +172,8 @@ describe('useWebSocket', () => {
       const otherMessage = { type: 'other', data: {} };
 
       act(() => {
-        server.send(JSON.stringify(pipelineMessage);
-        server.send(JSON.stringify(otherMessage);
+        server.send(JSON.stringify(pipelineMessage));
+        server.send(JSON.stringify(otherMessage));
       });
 
       expect(onPipelineMessage).toHaveBeenCalledTimes(1);
@@ -297,8 +297,8 @@ describe('useWebSocket', () => {
       };
 
       act(() => {
-        server.send(JSON.stringify(pipelineMessage);
-        server.send(JSON.stringify(researchMessage);
+        server.send(JSON.stringify(pipelineMessage));
+        server.send(JSON.stringify(researchMessage));
       });
 
       expect(pipelineHandler).toHaveBeenCalledWith(pipelineMessage);
@@ -370,7 +370,7 @@ describe('useWebSocket', () => {
     it('handles connection errors', async () => {
       const onError = jest.fn();
       const { result } = renderHook(() =>
-        useWebSocket('ws://invalid-url:9999', { onError });
+        useWebSocket('ws://invalid-url:9999', { onError }));
       act(() => {
         result.current.connect();
       });
@@ -399,7 +399,9 @@ describe('useWebSocket', () => {
       expect(onError).toHaveBeenCalledWith(
         expect.objectContaining({
           type: 'parse_error',
-        });
+        })
+      );
+    });
 
     it('retries failed send operations', async () => {
       const { result } = renderHook(() =>
