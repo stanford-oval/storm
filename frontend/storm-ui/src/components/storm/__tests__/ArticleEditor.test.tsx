@@ -152,6 +152,7 @@ describe('ArticleEditor', () => {
       expect(screen.getByText('Test citation 1')).toBeInTheDocument();
       expect(screen.getByText('Test citation 2')).toBeInTheDocument();
     });
+  });
 
   describe('User Interactions', () => {
     it('handles title changes', async () => {
@@ -172,6 +173,8 @@ describe('ArticleEditor', () => {
           ...mockArticle,
           title: 'Updated Article Title',
         });
+      });
+    });
 
     it('handles save button click', async () => {
       render(
@@ -222,6 +225,7 @@ describe('ArticleEditor', () => {
       // Verify scroll behavior was triggered
       expect(Element.prototype.scrollIntoView).toHaveBeenCalled();
     });
+  });
 
   describe('Editor Integration', () => {
     it('initializes editor with article content', () => {
@@ -241,6 +245,7 @@ describe('ArticleEditor', () => {
           editable: true,
         })
       );
+    });
 
     it('disables editor in read-only mode', () => {
       const { useEditor } = require('@tiptap/react');
@@ -296,6 +301,7 @@ describe('ArticleEditor', () => {
 
       expect(mockOnSave).toHaveBeenCalled();
     });
+  });
 
   describe('Error Handling', () => {
     it('handles save errors gracefully', async () => {
@@ -333,6 +339,7 @@ describe('ArticleEditor', () => {
       expect(screen.getByText(/title is required/i)).toBeInTheDocument();
       expect(mockOnSave).not.toHaveBeenCalled();
     });
+  });
 
   describe('Performance', () => {
     it('renders large articles efficiently', () => {
@@ -361,6 +368,7 @@ describe('ArticleEditor', () => {
       // Should render within reasonable time (less than 500ms)
       expect(endTime - startTime).toBeLessThan(500);
     });
+  });
 
   describe('Accessibility', () => {
     it('meets accessibility standards', async () => {
@@ -413,6 +421,7 @@ describe('ArticleEditor', () => {
       await user.tab();
       expect(screen.getByText('Main Content')).toHaveFocus();
     });
+  });
 
   describe('Visual States', () => {
     it('shows loading state during save', async () => {
@@ -438,6 +447,7 @@ describe('ArticleEditor', () => {
         expect(screen.queryByText(/saving/i)).not.toBeInTheDocument();
         expect(saveButton).not.toBeDisabled();
       });
+    });
 
     it('shows word count', () => {
       render(
