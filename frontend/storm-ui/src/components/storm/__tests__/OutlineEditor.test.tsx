@@ -43,7 +43,7 @@ jest.mock('@dnd-kit/sortable', () => ({
     newArray.splice(newIndex, 0, moved);
     return newArray;
   },
-});
+}));
 
 const mockOutline: ArticleOutline = {
   id: 'outline-1',

@@ -221,7 +221,7 @@ const server = setupServer(
   ),
   http.get(
     'http://localhost:8000/api/v1/projects/:id/pipeline/status',
-    () {
+    () => {
       return HttpResponse.json({ success: true, data: mockPipelineProgress });
     }
   ),

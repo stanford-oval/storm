@@ -128,13 +128,17 @@ const server = setupServer(
   }),
 
   http.post('http://localhost:8000/api/v1/projects', () => {
-    return HttpResponse.json({success: true,
-        data: { ...mockProject, id: 'new-project-id' });
+    return HttpResponse.json({
+      success: true,
+      data: { ...mockProject, id: 'new-project-id' },
+    });
   }),
 
   http.put('http://localhost:8000/api/v1/projects/:id', () => {
-    return HttpResponse.json({success: true,
-        data: mockProject,});
+    return HttpResponse.json({
+      success: true,
+      data: mockProject,
+    });
   }),
 
   http.delete('http://localhost:8000/api/v1/projects/:id', () => {

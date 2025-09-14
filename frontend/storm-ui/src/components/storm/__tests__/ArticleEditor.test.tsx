@@ -239,7 +239,8 @@ describe('ArticleEditor', () => {
         expect.objectContaining({
           content: mockArticle.content,
           editable: true,
-        });
+        })
+      );
 
     it('disables editor in read-only mode', () => {
       const { useEditor } = require('@tiptap/react');

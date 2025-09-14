@@ -69,8 +69,13 @@ describe('pipelineService', () => {
     it('handles start pipeline errors', async () => {
       server.use(
         http.post('/api/pipeline/start', () => {
-          return HttpResponse.json({success: false,
-              error: 'Invalid configuration',});
+          return HttpResponse.json({
+            success: false,
+            error: 'Invalid configuration',
+          });
+        })
+      );
+
       const result = await pipelineService.startPipeline(mockProject);
 
       expect(result.success).toBe(false);

@@ -88,7 +88,7 @@ describe('useWebSocket', () => {
     it('receives messages successfully', async () => {
       const onMessage = jest.fn();
       const { result } = renderHook(() =>
-        useWebSocket(TEST_WS_URL, { onMessage  }));
+        useWebSocket(TEST_WS_URL, { onMessage }));
       act(() => {
         result.current.connect();
       });

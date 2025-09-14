@@ -83,9 +83,11 @@ describe('API Services', () => {
             'Content-Type': 'application/json',
           }),
           body: JSON.stringify(newProject),
-        });
+        })
+      );
       expect(result).toEqual(mockResponse);
     });
+  });
 
   describe('SettingsService', () => {
     it('should fetch settings', async () => {

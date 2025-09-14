@@ -597,7 +597,7 @@ describe('ConfigurationPanel', () => {
             maxConvTurns: 2,
             maxPerspectives: 2,
           }),
-        })
+        }),
       });
     });
 
