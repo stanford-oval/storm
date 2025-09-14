@@ -99,8 +99,9 @@ describe('useProjects', () => {
     it('handles fetch errors', async () => {
       server.use(
         http.get('/api/projects', () => {
-          return HttpResponse.json({success: false,
-              error: 'Server error',});
+          return HttpResponse.json({
+            success: false,
+            error: 'Server error',});
       const { result } = renderHook(() => useProjects());
 
       await waitFor(() => {
@@ -120,19 +121,21 @@ describe('useProjects', () => {
           expect(page).toBe('2');
           expect(limit).toBe('5');
 
-          return HttpResponse.json({success: true,
-              data: {
+          return HttpResponse.json({
+            success: true,
+            data: {
                 projects: [mockProjects[1]],
                 total: 2,
                 page: 2,
                 limit: 5,
-              });
+            return HttpResponse.json(
       const { result } = renderHook(() => useProjects({ page: 2, limit: 5 });
 
       await waitFor(() => {
         expect(result.current.projects).toEqual([mockProjects[1]]);
         expect(result.current.currentPage).toBe(2);
       });
+    });
 
     it('supports filtering by status', async () => {
       server.use(
@@ -140,8 +143,9 @@ describe('useProjects', () => {
           const status = request.url.searchParams.get('status');
           expect(status).toBe('completed');
 
-          return HttpResponse.json({success: true,
-              data: {
+          return HttpResponse.json({
+            success: true,
+            data: {
                 projects: [mockProjects[0]],
                 total: 1,
                 page: 1,
@@ -152,6 +156,7 @@ describe('useProjects', () => {
       await waitFor(() => {
         expect(result.current.projects).toEqual([mockProjects[0]]);
       });
+    });
 
     it('supports search query', async () => {
       server.use(
@@ -159,8 +164,9 @@ describe('useProjects', () => {
           const search = request.url.searchParams.get('search');
           expect(search).toBe('AI');
 
-          return HttpResponse.json({success: true,
-              data: {
+          return HttpResponse.json({
+            success: true,
+            data: {
                 projects: [mockProjects[0]],
                 total: 1,
                 page: 1,
@@ -171,6 +177,8 @@ describe('useProjects', () => {
       await waitFor(() => {
         expect(result.current.projects).toEqual([mockProjects[0]]);
       });
+    });
+  });
 
   describe('creating projects', () => {
     it('creates project successfully', async () => {
@@ -192,8 +200,9 @@ describe('useProjects', () => {
 
       server.use(
         http.post('/api/projects', () => {
-          return HttpResponse.json({success: true,
-              data: createdProject,});
+          return HttpResponse.json({
+            success: true,
+            data: createdProject,});
       const { result } = renderHook(() => useProjects());
 
       await act(async () => {
@@ -208,8 +217,9 @@ describe('useProjects', () => {
     it('handles create errors', async () => {
       server.use(
         http.post('/api/projects', () => {
-          return HttpResponse.json({success: false,
-              error: 'Invalid project data',});
+          return HttpResponse.json({
+            success: false,
+            error: 'Invalid project data',});
       const { result } = renderHook(() => useProjects());
 
       await act(async () => {
@@ -217,6 +227,7 @@ describe('useProjects', () => {
         expect(response.success).toBe(false);
         expect(response.error).toBe('Invalid project data');
       });
+    });
 
     it('validates project data before creating', async () => {
       const { result } = renderHook(() => useProjects());
@@ -230,6 +241,8 @@ describe('useProjects', () => {
         expect(response.success).toBe(false);
         expect(response.error).toContain('Title is required');
       });
+    });
+  });
 
   describe('updating projects', () => {
     it('updates project successfully', async () => {
@@ -243,8 +256,9 @@ describe('useProjects', () => {
         http.put('/api/projects/:id', ({ request }) => {
           expect(request.params.id).toBe('project-1');
 
-          return HttpResponse.json({success: true,
-              data: updatedProject,});
+          return HttpResponse.json({
+            success: true,
+            data: updatedProject,});
       const { result } = renderHook(() => useProjects());
 
       await act(async () => {
@@ -261,8 +275,9 @@ describe('useProjects', () => {
     it('handles update errors', async () => {
       server.use(
         http.put('/api/projects/:id', () => {
-          return HttpResponse.json({success: false,
-              error: 'Project not found',});
+          return HttpResponse.json({
+            success: false,
+            error: 'Project not found',});
       const { result } = renderHook(() => useProjects());
 
       await act(async () => {
@@ -272,6 +287,8 @@ describe('useProjects', () => {
         expect(response.success).toBe(false);
         expect(response.error).toBe('Project not found');
       });
+    });
+  });
 
   describe('deleting projects', () => {
     it('deletes project successfully', async () => {
@@ -279,8 +296,9 @@ describe('useProjects', () => {
         http.delete('/api/projects/:id', ({ request }) => {
           expect(request.params.id).toBe('project-1');
 
-          return HttpResponse.json({success: true,
-              data: { id: 'project-1' });
+          return HttpResponse.json({
+            success: true,
+            data: { id: 'project-1' });
       const { result } = renderHook(() => useProjects());
 
       await act(async () => {
@@ -294,8 +312,9 @@ describe('useProjects', () => {
     it('handles delete errors', async () => {
       server.use(
         http.delete('/api/projects/:id', () => {
-          return HttpResponse.json({success: false,
-              error: 'Cannot delete project in progress',});
+          return HttpResponse.json({
+            success: false,
+            error: 'Cannot delete project in progress',});
       const { result } = renderHook(() => useProjects());
 
       await act(async () => {
@@ -303,6 +322,7 @@ describe('useProjects', () => {
         expect(response.success).toBe(false);
         expect(response.error).toBe('Cannot delete project in progress');
       });
+    });
 
     it('requires confirmation for deletion', async () => {
       const { result } = renderHook(() => useProjects());
@@ -314,6 +334,8 @@ describe('useProjects', () => {
         expect(response.success).toBe(false);
         expect(response.error).toContain('confirmation required');
       });
+    });
+  });
 
   describe('duplicating projects', () => {
     it('duplicates project successfully', async () => {
@@ -331,8 +353,9 @@ describe('useProjects', () => {
         http.post('/api/projects/:id/duplicate', ({ request }) => {
           expect(request.params.id).toBe('project-1');
 
-          return HttpResponse.json({success: true,
-              data: duplicatedProject,});
+          return HttpResponse.json({
+            success: true,
+            data: duplicatedProject,});
       const { result } = renderHook(() => useProjects());
 
       await act(async () => {
@@ -344,8 +367,9 @@ describe('useProjects', () => {
     it('handles duplicate errors', async () => {
       server.use(
         http.post('/api/projects/:id/duplicate', () => {
-          return HttpResponse.json({success: false,
-              error: 'Original project not found',});
+          return HttpResponse.json({
+            success: false,
+            error: 'Original project not found',});
       const { result } = renderHook(() => useProjects());
 
       await act(async () => {
@@ -353,6 +377,8 @@ describe('useProjects', () => {
         expect(response.success).toBe(false);
         expect(response.error).toBe('Original project not found');
       });
+    });
+  });
 
   describe('archiving projects', () => {
     it('archives project successfully', async () => {
@@ -360,28 +386,33 @@ describe('useProjects', () => {
         http.post('/api/projects/:id/archive', ({ request }) => {
           expect(request.params.id).toBe('project-1');
 
-          return HttpResponse.json({success: true,
-              data: { id: 'project-1', archived: true });
+          return HttpResponse.json({
+            success: true,
+            data: { id: 'project-1', archived: true });
       const { result } = renderHook(() => useProjects());
 
       await act(async () => {
         const response = await result.current.archiveProject('project-1');
         expect(response.success).toBe(true);
       });
+    });
 
     it('unarchives project successfully', async () => {
       server.use(
         http.post('/api/projects/:id/unarchive', ({ request }) => {
           expect(request.params.id).toBe('project-1');
 
-          return HttpResponse.json({success: true,
-              data: { id: 'project-1', archived: false });
+          return HttpResponse.json({
+            success: true,
+            data: { id: 'project-1', archived: false });
       const { result } = renderHook(() => useProjects());
 
       await act(async () => {
         const response = await result.current.unarchiveProject('project-1');
         expect(response.success).toBe(true);
       });
+    });
+  });
 
   describe('refresh functionality', () => {
     it('refreshes projects list', async () => {
@@ -439,8 +470,9 @@ describe('useProjects', () => {
       // Mock refresh failure
       server.use(
         http.get('/api/projects', () => {
-          return HttpResponse.json({success: false,
-              error: 'Refresh failed',});
+          return HttpResponse.json({
+            success: false,
+            error: 'Refresh failed',});
       await act(async () => {
         await result.current.refetch();
       });
@@ -476,7 +508,7 @@ describe('useProjects', () => {
       // Mock slow update
       server.use(
         http.put('/api/projects/:id', async () => {
-          await new Promise(resolve => setTimeout(resolve(1000),
+          await new Promise(resolve => setTimeout(resolve, 1000));
             {
               success: true,
               data: {
@@ -527,8 +559,9 @@ describe('useProjects', () => {
       // Mock failed update
       server.use(
         http.put('/api/projects/:id', () => {
-          return HttpResponse.json({success: false,
-              error: 'Update failed',});
+          return HttpResponse.json({
+            success: false,
+            error: 'Update failed',});
       await act(async () => {
         await result.current.updateProject(
           'project-1',
@@ -551,8 +584,9 @@ describe('useProjects', () => {
       server.use(
         http.get('/api/projects', ({ request }) => {
           requestCount++;
-          return HttpResponse.json({success: true,
-              data: {
+          return HttpResponse.json({
+            success: true,
+            data: {
                 projects: mockProjects,
                 total: mockProjects.length,
                 page: 1,
@@ -577,8 +611,9 @@ describe('useProjects', () => {
       server.use(
         http.get('/api/projects', () => {
           getRequestCount++;
-          return HttpResponse.json({success: true,
-              data: {
+          return HttpResponse.json({
+            success: true,
+            data: {
                 projects: mockProjects,
                 total: mockProjects.length,
                 page: 1,
@@ -586,8 +621,9 @@ describe('useProjects', () => {
               });
         }),
         http.post('/api/projects', () => {
-          return HttpResponse.json({success: true,
-              data: { id: 'new-project' });
+          return HttpResponse.json({
+            success: true,
+            data: { id: 'new-project' });
       const { result } = renderHook(() => useProjects());
 
       await waitFor(() => {
@@ -603,6 +639,7 @@ describe('useProjects', () => {
           topic: 'New Topic',
           config: mockProjects[0].config,
         });
+    });
 
       // Should trigger new request to refresh data
       await waitFor(() => {
