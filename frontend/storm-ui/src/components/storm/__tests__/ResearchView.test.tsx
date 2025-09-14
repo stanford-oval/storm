@@ -195,6 +195,7 @@ describe('ResearchView', () => {
         screen.queryByLabelText(/filter by status/i)
       ).not.toBeInTheDocument();
     });
+  });
 
   describe('Conversations Section', () => {
     it('renders all conversations', () => {
@@ -289,6 +290,7 @@ describe('ResearchView', () => {
         mockResearchData.conversations[0]
       );
     });
+  });
 
   describe('Sources Section', () => {
     it('renders all sources', () => {
@@ -382,6 +384,7 @@ describe('ResearchView', () => {
       expect(sourceLink).toHaveAttribute('target', '_blank');
       expect(sourceLink).toHaveAttribute('rel', 'noopener noreferrer');
     });
+  });
 
   describe('Filtering and Search', () => {
     beforeEach(() => {
@@ -455,6 +458,7 @@ describe('ResearchView', () => {
       expect(screen.getByText('Industry Expert')).toBeInTheDocument();
       expect(screen.getByText('Technology Critic')).toBeInTheDocument();
     });
+  });
 
   describe('Sorting', () => {
     it('sorts sources by relevance score', async () => {
@@ -516,6 +520,7 @@ describe('ResearchView', () => {
       expect(conversationTitles[1]).toHaveTextContent('Industry Expert');
       expect(conversationTitles[2]).toHaveTextContent('Academic Researcher'); // Earliest
     });
+  });
 
   describe('Export Functionality', () => {
     it('exports research data to JSON', async () => {
@@ -560,6 +565,7 @@ describe('ResearchView', () => {
 
       expect(global.URL.createObjectURL).toHaveBeenCalled();
     });
+  });
 
   describe('View Modes', () => {
     it('switches to grid view', async () => {
@@ -593,6 +599,7 @@ describe('ResearchView', () => {
 
       expect(screen.getByTestId('research-timeline')).toBeInTheDocument();
     });
+  });
 
   describe('Performance', () => {
     it('virtualizes large lists of sources', () => {
@@ -624,6 +631,7 @@ describe('ResearchView', () => {
       const sourceCards = screen.getAllByTestId('source-card');
       expect(sourceCards.length).toBeLessThan(50);
     });
+  });
 
   describe('Error Handling', () => {
     it('handles empty research data gracefully', () => {
@@ -673,6 +681,7 @@ describe('ResearchView', () => {
         screen.getByText(/error loading conversation/i)
       ).toBeInTheDocument();
     });
+  });
 
   describe('Accessibility', () => {
     it('meets accessibility standards', async () => {
@@ -720,6 +729,7 @@ describe('ResearchView', () => {
 
       expect(screen.getByText(/1 source found/i)).toBeInTheDocument();
     });
+  });
 
   describe('Keyboard Navigation', () => {
     it('supports keyboard navigation through conversations', async () => {
@@ -762,14 +772,5 @@ describe('ResearchView', () => {
         mockResearchData.conversations[0]
       );
     });
-  });
-  });
-  });
-  });
-  });
-  });
-  });
-  });
-  });
   });
 });
