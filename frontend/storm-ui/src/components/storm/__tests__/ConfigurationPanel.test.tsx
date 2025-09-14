@@ -597,8 +597,8 @@ describe('ConfigurationPanel', () => {
             maxConvTurns: 2,
             maxPerspectives: 2,
           }),
-        }),
-      });
+        })
+      );
     });
 
     it('loads comprehensive preset', async () => {

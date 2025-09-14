@@ -257,7 +257,10 @@ describe('ArticleEditor', () => {
       expect(useEditor).toHaveBeenCalledWith(
         expect.objectContaining({
           editable: false,
-        });
+        })
+      );
+    });
+  });
 
   describe('Keyboard Shortcuts', () => {
     it('saves article with Ctrl+S', async () => {
@@ -460,4 +463,5 @@ describe('ArticleEditor', () => {
       expect(screen.getByText(/last modified/i)).toBeInTheDocument();
       expect(screen.getByText(/jan 1, 2024/i)).toBeInTheDocument();
     });
+  });
 });

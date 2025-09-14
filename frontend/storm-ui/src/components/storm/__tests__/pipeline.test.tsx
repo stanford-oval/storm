@@ -227,9 +227,11 @@ const server = setupServer(
   ),
   http.post(
     'http://localhost:8000/api/v1/projects/:id/pipeline/stop',
-    () {
-      return HttpResponse.json({success: true,
-          data: { ...mockPipelineProgress, isRunning: false });
+    () => {
+      return HttpResponse.json({
+        success: true,
+        data: { ...mockPipelineProgress, isRunning: false },
+      });
     }
   )
 );

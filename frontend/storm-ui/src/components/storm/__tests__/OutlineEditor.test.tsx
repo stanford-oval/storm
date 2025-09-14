@@ -252,7 +252,8 @@ describe('OutlineEditor', () => {
               ]),
             }),
           ]),
-        });
+        })
+      );
 
     it('edits existing section title', async () => {
       render(
