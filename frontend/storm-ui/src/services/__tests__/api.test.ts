@@ -107,7 +107,8 @@ describe('API Services', () => {
         expect.stringContaining('/api/settings'),
         expect.objectContaining({
           method: 'GET',
-        });
+        })
+      );
       expect(result).toEqual(mockSettings);
     });
 

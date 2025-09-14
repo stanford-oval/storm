@@ -41,11 +41,16 @@ describe('usePipeline', () => {
     it('starts pipeline successfully', async () => {
       server.use(
         http.post('/api/pipeline/start', () => {
-          return HttpResponse.json({success: true,
-              data: {
-                pipelineId: 'pipeline-123',
-                status: 'initializing',
-              });
+          return HttpResponse.json({
+            success: true,
+            data: {
+              pipelineId: 'pipeline-123',
+              status: 'initializing',
+            },
+          });
+        })
+      );
+
       const { result } = renderHook(() => usePipeline());
 
       await act(async () => {
@@ -60,8 +65,13 @@ describe('usePipeline', () => {
     it('handles start pipeline errors', async () => {
       server.use(
         http.post('/api/pipeline/start', () => {
-          return HttpResponse.json({success: false,
-              error: 'Invalid configuration',});
+          return HttpResponse.json({
+            success: false,
+            error: 'Invalid configuration',
+          });
+        })
+      );
+
       const { result } = renderHook(() => usePipeline());
 
       await act(async () => {
@@ -77,8 +87,14 @@ describe('usePipeline', () => {
     it('sets loading state during pipeline start', async () => {
       server.use(
         http.post('/api/pipeline/start', async () => {
-          await new Promise(resolve => setTimeout(resolve(100),
-            { success: true, data: { pipelineId: 'pipeline-123' } });
+          await new Promise(resolve => setTimeout(resolve, 100));
+          return HttpResponse.json({
+            success: true,
+            data: { pipelineId: 'pipeline-123' },
+          });
+        })
+      );
+
       const { result } = renderHook(() => usePipeline());
 
       act(() => {
@@ -115,8 +131,13 @@ describe('usePipeline', () => {
     it('stops pipeline successfully', async () => {
       server.use(
         http.post('/api/pipeline/stop', () => {
-          return HttpResponse.json({success: true,
-              data: { status: 'stopped' });
+          return HttpResponse.json({
+            success: true,
+            data: { status: 'stopped' },
+          });
+        })
+      );
+
       const { result } = renderHook(() => usePipeline());
 
       await act(async () => {

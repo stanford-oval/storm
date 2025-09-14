@@ -149,9 +149,11 @@ const server = setupServer(
   // Pipeline endpoints
   http.post(
     'http://localhost:8000/api/v1/projects/:id/pipeline/start',
-    () {
-      return HttpResponse.json({success: true,
-          data: mockPipelineProgress,});
+    () => {
+      return HttpResponse.json({
+        success: true,
+        data: mockPipelineProgress,
+      });
     }
   ),
 

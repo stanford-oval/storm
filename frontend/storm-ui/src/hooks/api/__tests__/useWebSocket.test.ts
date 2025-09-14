@@ -98,7 +98,7 @@ describe('useWebSocket', () => {
       const message = { type: 'response', payload: 'world' };
 
       act(() => {
-        server.send(JSON.stringify(message);
+        server.send(JSON.stringify(message));
       });
 
       expect(onMessage).toHaveBeenCalledWith(message);
@@ -122,7 +122,7 @@ describe('useWebSocket', () => {
 
       for (const message of messages) {
         act(() => {
-          server.send(JSON.stringify(message);
+          server.send(JSON.stringify(message));
         });
       }
 
@@ -148,7 +148,7 @@ describe('useWebSocket', () => {
 
       for (const message of messages) {
         act(() => {
-          server.send(JSON.stringify(message);
+          server.send(JSON.stringify(message));
         });
       }
 
@@ -322,7 +322,7 @@ describe('useWebSocket', () => {
       const message = { type: 'test_message', data: {} };
 
       act(() => {
-        server.send(JSON.stringify(message);
+        server.send(JSON.stringify(message));
       });
 
       expect(handler).toHaveBeenCalledTimes(1);
@@ -332,7 +332,7 @@ describe('useWebSocket', () => {
       });
 
       act(() => {
-        server.send(JSON.stringify(message);
+        server.send(JSON.stringify(message));
       });
 
       // Should not be called again after unsubscribing
@@ -359,7 +359,7 @@ describe('useWebSocket', () => {
       const message = { type: 'test_message', data: {} };
 
       act(() => {
-        server.send(JSON.stringify(message);
+        server.send(JSON.stringify(message));
       });
 
       expect(handler1).toHaveBeenCalledWith(message);

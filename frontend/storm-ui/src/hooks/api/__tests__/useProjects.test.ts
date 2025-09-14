@@ -71,13 +71,18 @@ describe('useProjects', () => {
     it('fetches projects successfully', async () => {
       server.use(
         http.get('/api/projects', () => {
-          return HttpResponse.json({success: true,
-              data: {
-                projects: mockProjects,
-                total: mockProjects.length,
-                page: 1,
-                limit: 10,
-              });
+          return HttpResponse.json({
+            success: true,
+            data: {
+              projects: mockProjects,
+              total: mockProjects.length,
+              page: 1,
+              limit: 10,
+            },
+          });
+        })
+      );
+
       const { result } = renderHook(() => useProjects());
 
       expect(result.current.isLoading).toBe(true);
@@ -382,13 +387,18 @@ describe('useProjects', () => {
     it('refreshes projects list', async () => {
       server.use(
         http.get('/api/projects', () => {
-          return HttpResponse.json({success: true,
-              data: {
-                projects: mockProjects,
-                total: mockProjects.length,
-                page: 1,
-                limit: 10,
-              });
+          return HttpResponse.json({
+            success: true,
+            data: {
+              projects: mockProjects,
+              total: mockProjects.length,
+              page: 1,
+              limit: 10,
+            },
+          });
+        })
+      );
+
       const { result } = renderHook(() => useProjects());
 
       // Wait for initial load
@@ -408,13 +418,18 @@ describe('useProjects', () => {
       // Initial successful load
       server.use(
         http.get('/api/projects', () => {
-          return HttpResponse.json({success: true,
-              data: {
-                projects: mockProjects,
-                total: mockProjects.length,
-                page: 1,
-                limit: 10,
-              });
+          return HttpResponse.json({
+            success: true,
+            data: {
+              projects: mockProjects,
+              total: mockProjects.length,
+              page: 1,
+              limit: 10,
+            },
+          });
+        })
+      );
+
       const { result } = renderHook(() => useProjects());
 
       await waitFor(() => {
@@ -440,13 +455,18 @@ describe('useProjects', () => {
       // Set up initial projects
       server.use(
         http.get('/api/projects', () => {
-          return HttpResponse.json({success: true,
-              data: {
-                projects: mockProjects,
-                total: mockProjects.length,
-                page: 1,
-                limit: 10,
-              });
+          return HttpResponse.json({
+            success: true,
+            data: {
+              projects: mockProjects,
+              total: mockProjects.length,
+              page: 1,
+              limit: 10,
+            },
+          });
+        })
+      );
+
       const { result } = renderHook(() => useProjects());
 
       await waitFor(() => {
@@ -484,13 +504,18 @@ describe('useProjects', () => {
     it('reverts optimistic updates on failure', async () => {
       server.use(
         http.get('/api/projects', () => {
-          return HttpResponse.json({success: true,
-              data: {
-                projects: mockProjects,
-                total: mockProjects.length,
-                page: 1,
-                limit: 10,
-              });
+          return HttpResponse.json({
+            success: true,
+            data: {
+              projects: mockProjects,
+              total: mockProjects.length,
+              page: 1,
+              limit: 10,
+            },
+          });
+        })
+      );
+
       const { result } = renderHook(() => useProjects());
 
       await waitFor(() => {

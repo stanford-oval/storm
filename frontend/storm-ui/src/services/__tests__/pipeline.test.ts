@@ -102,7 +102,7 @@ describe('pipelineService', () => {
 
     it('sends correct request payload', async () => {
       server.use(
-        http.post('/api/pipeline/start', async () {
+        http.post('/api/pipeline/start', async ({ request }) => {
           const body = await request.json();
 
           expect(body).toEqual({
@@ -110,8 +110,13 @@ describe('pipelineService', () => {
             options: {},
           });
 
-          return HttpResponse.json({success: true,
-              data: { pipelineId: 'pipeline-123' });
+          return HttpResponse.json({
+            success: true,
+            data: { pipelineId: 'pipeline-123' },
+          });
+        })
+      );
+
       await pipelineService.startPipeline(mockProject);
     });
 
