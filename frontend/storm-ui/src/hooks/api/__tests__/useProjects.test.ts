@@ -218,7 +218,11 @@ describe('useProjects', () => {
         http.post('/api/projects', () => {
           return HttpResponse.json({
             success: true,
-            data: createdProject,});
+            data: createdProject,
+          });
+        })
+      );
+
       const { result } = renderHook(() => useProjects());
 
       await act(async () => {
@@ -235,7 +239,11 @@ describe('useProjects', () => {
         http.post('/api/projects', () => {
           return HttpResponse.json({
             success: false,
-            error: 'Invalid project data',});
+            error: 'Invalid project data',
+          });
+        })
+      );
+
       const { result } = renderHook(() => useProjects());
 
       await act(async () => {

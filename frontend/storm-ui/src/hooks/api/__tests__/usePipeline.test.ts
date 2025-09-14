@@ -441,6 +441,9 @@ describe('usePipeline', () => {
       server.use(
         http.post('/api/pipeline/start', ({ request }) => {
           return HttpResponse.json({success: false, error: 'Initial error' });
+        })
+      );
+
       const { result } = renderHook(() => usePipeline());
 
       // First request fails

@@ -432,7 +432,9 @@ describe('useWebSocket', () => {
       await server.connected;
 
       // Should retry and succeed
-      await expect(server).toReceiveMessage(JSON.stringify({ type: 'test' });
+      await expect(server).toReceiveMessage(JSON.stringify({ type: 'test' }));
+    });
+  });
 
   describe('heartbeat/ping-pong', () => {
     it('sends periodic ping messages', async () => {
@@ -440,7 +442,7 @@ describe('useWebSocket', () => {
         useWebSocket(TEST_WS_URL, {
           heartbeatInterval: 100,
           pingMessage: { type: 'ping' },
-        });
+        }));
       act(() => {
         result.current.connect();
       });
@@ -448,7 +450,8 @@ describe('useWebSocket', () => {
       await server.connected;
 
       // Should receive ping message within interval
-      await expect(server).toReceiveMessage(JSON.stringify({ type: 'ping' });
+      await expect(server).toReceiveMessage(JSON.stringify({ type: 'ping' }));
+    });
 
     it('handles pong responses', async () => {
       const onPong = jest.fn();
