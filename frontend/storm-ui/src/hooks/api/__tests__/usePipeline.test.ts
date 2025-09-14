@@ -106,6 +106,7 @@ describe('usePipeline', () => {
       await waitFor(() => {
         expect(result.current.isStarting).toBe(false);
       });
+    });
 
     it('validates project config before starting', async () => {
       const invalidProject = {
@@ -126,6 +127,8 @@ describe('usePipeline', () => {
         expect(response.success).toBe(false);
         expect(response.error).toContain('API key is required');
       });
+    });
+  });
 
   describe('stopPipeline', () => {
     it('stops pipeline successfully', async () => {
@@ -151,8 +154,13 @@ describe('usePipeline', () => {
     it('handles stop pipeline errors', async () => {
       server.use(
         http.post('/api/pipeline/stop', () => {
-          return HttpResponse.json({success: false,
-              error: 'Pipeline not found',});
+          return HttpResponse.json({
+            success: false,
+            error: 'Pipeline not found',
+          });
+        })
+      );
+
       const { result } = renderHook(() => usePipeline());
 
       await act(async () => {
@@ -160,6 +168,8 @@ describe('usePipeline', () => {
         expect(response.success).toBe(false);
         expect(response.error).toBe('Pipeline not found');
       });
+    });
+  });
 
   describe('getPipelineStatus', () => {
     it('fetches pipeline status successfully', async () => {
@@ -174,8 +184,13 @@ describe('usePipeline', () => {
 
       server.use(
         http.get('/api/pipeline/status/:pipelineId', () => {
-          return HttpResponse.json({success: true,
-              data: mockProgress,});
+          return HttpResponse.json({
+            success: true,
+            data: mockProgress,
+          });
+        })
+      );
+
       const { result } = renderHook(() => usePipeline());
 
       await act(async () => {
@@ -184,12 +199,18 @@ describe('usePipeline', () => {
         expect(response.data.stage).toBe('research');
         expect(response.data.stageProgress).toBe(45);
       });
+    });
 
     it('handles status fetch errors', async () => {
       server.use(
         http.get('/api/pipeline/status/:pipelineId', () => {
-          return HttpResponse.json({success: false,
-              error: 'Pipeline not found',});
+          return HttpResponse.json({
+            success: false,
+            error: 'Pipeline not found',
+          });
+        })
+      );
+
       const { result } = renderHook(() => usePipeline());
 
       await act(async () => {
@@ -198,6 +219,8 @@ describe('usePipeline', () => {
         expect(response.success).toBe(false);
         expect(response.error).toBe('Pipeline not found');
       });
+    });
+  });
 
   describe('getPipelineLogs', () => {
     it('fetches pipeline logs successfully', async () => {
@@ -218,8 +241,13 @@ describe('usePipeline', () => {
 
       server.use(
         http.get('/api/pipeline/logs/:pipelineId', () => {
-          return HttpResponse.json({success: true,
-              data: mockLogs,});
+          return HttpResponse.json({
+            success: true,
+            data: mockLogs,
+          });
+        })
+      );
+
       const { result } = renderHook(() => usePipeline());
 
       await act(async () => {
@@ -228,6 +256,7 @@ describe('usePipeline', () => {
         expect(response.data).toHaveLength(2);
         expect(response.data[0].message).toBe('Starting research phase');
       });
+    });
 
     it('filters logs by level', async () => {
       server.use(
@@ -235,15 +264,20 @@ describe('usePipeline', () => {
           const level = request.url.searchParams.get('level');
           expect(level).toBe('error');
 
-          return HttpResponse.json({success: true,
-              data: [
-                {
-                  timestamp: new Date(),
-                  level: 'error',
-                  message: 'API rate limit exceeded',
-                  stage: 'research',
-                },
-              ],});
+          return HttpResponse.json({
+            success: true,
+            data: [
+              {
+                timestamp: new Date(),
+                level: 'error',
+                message: 'API rate limit exceeded',
+                stage: 'research',
+              },
+            ],
+          });
+        })
+      );
+
       const { result } = renderHook(() => usePipeline());
 
       await act(async () => {
@@ -253,31 +287,46 @@ describe('usePipeline', () => {
         expect(response.success).toBe(true);
         expect(response.data[0].level).toBe('error');
       });
+    });
+  });
 
   describe('pausePipeline', () => {
     it('pauses pipeline successfully', async () => {
       server.use(
         http.post('/api/pipeline/pause', () => {
-          return HttpResponse.json({success: true,
-              data: { status: 'paused' });
+          return HttpResponse.json({
+            success: true,
+            data: { status: 'paused' },
+          });
+        })
+      );
+
       const { result } = renderHook(() => usePipeline());
 
       await act(async () => {
         const response = await result.current.pausePipeline('pipeline-123');
         expect(response.success).toBe(true);
       });
+    });
 
     it('resumes pipeline successfully', async () => {
       server.use(
         http.post('/api/pipeline/resume', () => {
-          return HttpResponse.json({success: true,
-              data: { status: 'running' });
+          return HttpResponse.json({
+            success: true,
+            data: { status: 'running' },
+          });
+        })
+      );
+
       const { result } = renderHook(() => usePipeline());
 
       await act(async () => {
         const response = await result.current.resumePipeline('pipeline-123');
         expect(response.success).toBe(true);
       });
+    });
+  });
 
   describe('retry functionality', () => {
     it('retries failed requests', async () => {
@@ -421,6 +470,7 @@ describe('usePipeline', () => {
         expect(response.success).toBe(false);
         expect(response.error).toContain('temperature must be between 0 and 1');
       });
+    });
 
     it('validates retriever configuration', async () => {
       const invalidProject = {
@@ -441,6 +491,7 @@ describe('usePipeline', () => {
         expect(response.success).toBe(false);
         expect(response.error).toContain('maxResults must be positive');
       });
+    });
 
     it('validates pipeline configuration', async () => {
       const invalidProject = {
@@ -466,4 +517,6 @@ describe('usePipeline', () => {
           'at least one pipeline step must be enabled'
         );
       });
+    });
+  });
 });
