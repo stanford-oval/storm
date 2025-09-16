@@ -8,6 +8,7 @@ from fastapi import APIRouter, HTTPException, Query, BackgroundTasks
 from typing import List, Optional, Dict, Any
 from uuid import UUID
 from pydantic import BaseModel, Field
+from uuid import UUID
 import logging
 
 from services.file_service import FileProjectService, ProjectConfig
@@ -175,10 +176,10 @@ async def create_project(request: CreateProjectRequest):
 
 
 @router.get("/{project_id}", response_model=ProjectDetailResponse)
-async def get_project(project_id: str):
+async def get_project(project_id: UUID):
     """Get a specific project by ID."""
     try:
-        project = file_service.get_project(project_id)
+        project = file_service.get_project(str(project_id))
 
         if not project:
             raise HTTPException(status_code=404, detail="Project not found")
@@ -191,7 +192,7 @@ async def get_project(project_id: str):
 
 
 @router.put("/{project_id}", response_model=ProjectResponse)
-async def update_project(project_id: str, request: UpdateProjectRequest):
+async def update_project(project_id: UUID, request: UpdateProjectRequest):
     """Update a project."""
     try:
         # Convert request to dict, excluding None values
@@ -200,13 +201,13 @@ async def update_project(project_id: str, request: UpdateProjectRequest):
         if not updates:
             raise HTTPException(status_code=400, detail="No updates provided")
 
-        success = file_service.update_project(project_id, updates)
+        success = file_service.update_project(str(project_id), updates)
 
         if not success:
             raise HTTPException(status_code=404, detail="Project not found")
 
         # Return updated project summary
-        updated_project = file_service.get_project_summary(project_id)
+        updated_project = file_service.get_project_summary(str(project_id))
         if not updated_project:
             raise HTTPException(status_code=500, detail="Failed to get updated project")
 
@@ -220,10 +221,10 @@ async def update_project(project_id: str, request: UpdateProjectRequest):
 
 
 @router.delete("/{project_id}")
-async def delete_project(project_id: str):
+async def delete_project(project_id: UUID):
     """Delete a project."""
     try:
-        success = file_service.delete_project(project_id)
+        success = file_service.delete_project(str(project_id))
 
         if not success:
             raise HTTPException(status_code=404, detail="Project not found")
@@ -236,10 +237,10 @@ async def delete_project(project_id: str):
 
 
 @router.post("/{project_id}/duplicate", response_model=ProjectResponse)
-async def duplicate_project(project_id: str, request: DuplicateProjectRequest):
+async def duplicate_project(project_id: UUID, request: DuplicateProjectRequest):
     """Duplicate a project."""
     try:
-        new_project = file_service.duplicate_project(project_id, request.new_title)
+        new_project = file_service.duplicate_project(str(project_id), request.new_title)
 
         if not new_project:
             raise HTTPException(status_code=404, detail="Project not found")
@@ -252,10 +253,10 @@ async def duplicate_project(project_id: str, request: DuplicateProjectRequest):
 
 
 @router.get("/{project_id}/config", response_model=Dict[str, Any])
-async def get_project_config(project_id: str):
+async def get_project_config(project_id: UUID):
     """Get project configuration."""
     try:
-        project = file_service.get_project(project_id)
+        project = file_service.get_project(str(project_id))
 
         if not project:
             raise HTTPException(status_code=404, detail="Project not found")
@@ -270,10 +271,10 @@ async def get_project_config(project_id: str):
 
 
 @router.put("/{project_id}/config")
-async def update_project_config(project_id: str, config: ProjectConfig):
+async def update_project_config(project_id: UUID, config: ProjectConfig):
     """Update project configuration."""
     try:
-        success = file_service.update_project_config(project_id, config)
+        success = file_service.update_project_config(str(project_id), config)
 
         if not success:
             raise HTTPException(status_code=404, detail="Project not found")
@@ -288,10 +289,10 @@ async def update_project_config(project_id: str, config: ProjectConfig):
 
 
 @router.get("/{project_id}/progress")
-async def get_project_progress(project_id: str):
+async def get_project_progress(project_id: UUID):
     """Get project progress information."""
     try:
-        progress = file_service._load_project_progress(project_id)
+        progress = file_service._load_project_progress(str(project_id))
 
         if not progress:
             raise HTTPException(status_code=404, detail="Project not found")
@@ -305,11 +306,11 @@ async def get_project_progress(project_id: str):
 
 @router.get("/{project_id}/export")
 async def export_project(
-    project_id: str, format: str = Query("markdown", regex="^(markdown|json|html|pdf)$")
+    project_id: UUID, format: str = Query("markdown", regex="^(markdown|json|html|pdf)$")
 ):
     """Export project content."""
     try:
-        content = file_service.export_project(project_id, format)
+        content = file_service.export_project(str(project_id), format)
 
         if content is None:
             if format == "pdf":
@@ -321,7 +322,7 @@ async def export_project(
             )
 
         # Get project for filename
-        project_summary = file_service.get_project_summary(project_id)
+        project_summary = file_service.get_project_summary(str(project_id))
         filename = (
             f"{project_summary['title']}.{format}"
             if project_summary
@@ -352,14 +353,14 @@ async def export_project(
 
 
 @router.get("/{project_id}/files")
-async def get_project_files(project_id: str):
+async def get_project_files(project_id: UUID):
     """Get project file paths."""
     try:
         # Check if project exists
-        if not file_service.get_project_summary(project_id):
+        if not file_service.get_project_summary(str(project_id)):
             raise HTTPException(status_code=404, detail="Project not found")
 
-        files = file_service.get_project_files(project_id)
+        files = file_service.get_project_files(str(project_id))
         return files
 
     except HTTPException:
@@ -407,7 +408,7 @@ async def get_projects_stats():
 
 
 @router.get("/{project_id}/conversations")
-async def get_project_conversations(project_id: str, live: bool = Query(False)):
+async def get_project_conversations(project_id: UUID, live: bool = Query(False)):
     """Get project research conversations.
 
     Args:
@@ -420,12 +421,12 @@ async def get_project_conversations(project_id: str, live: bool = Query(False)):
 
     try:
         # Get project to ensure it exists
-        project = file_service.get_project_summary(project_id)
+        project = file_service.get_project_summary(str(project_id))
         if not project:
             raise HTTPException(status_code=404, detail="Project not found")
 
         # Look for conversation log in various possible locations
-        project_path = Path(file_service._get_project_path(project_id))
+        project_path = Path(file_service._get_project_path(str(project_id)))
 
         # Try to find conversation log in subdirectories
         conversation_file = None

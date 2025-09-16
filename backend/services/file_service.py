@@ -107,8 +107,30 @@ class FileProjectService:
             json.dump(index_data, f, indent=2, default=str)
 
     def _get_project_path(self, project_id: str) -> Path:
-        """Get project directory path."""
-        return self.projects_dir / project_id
+        """Get project directory path with validation to prevent path traversal."""
+        # Validate that project_id is a valid UUID format
+        try:
+            uuid.UUID(project_id)
+        except ValueError:
+            raise ValueError(f"Invalid project ID format: {project_id}")
+        
+        # Construct the path
+        project_path = self.projects_dir / project_id
+        
+        # Ensure the resolved path is within the projects directory
+        try:
+            resolved_path = project_path.resolve()
+            resolved_base = self.projects_dir.resolve()
+            
+            # Check if the resolved path is within the base directory
+            if not str(resolved_path).startswith(str(resolved_base)):
+                raise ValueError(f"Path traversal attempt detected for project ID: {project_id}")
+        except Exception as e:
+            if "Path traversal" in str(e):
+                raise
+            raise ValueError(f"Invalid project path: {e}")
+        
+        return project_path
 
     def _load_project_file(self, project_id: str) -> Optional[frontmatter.Post]:
         """Load project markdown file with frontmatter."""
