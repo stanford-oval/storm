@@ -90,7 +90,7 @@ manager = ConnectionManager()
 class RunPipelineRequest(BaseModel):
     """Request model for running pipeline."""
 
-    config: Optional[ProjectConfig] = Field(None, description="Pipeline configuration")
+    config: Optional[Dict[str, Any]] = Field(None, description="Pipeline configuration")
     mock_mode: bool = Field(False, description="Run in mock mode for testing")
 
 
@@ -138,21 +138,29 @@ async def run_pipeline(
         # Get project config and merge with request config
         project_config = file_service._load_project_config(project_id)
         if request.config:
-            # Merge request config with saved config (request config takes precedence)
-            merged_config = (
-                project_config.model_copy() if project_config else ProjectConfig()
-            )
-            for field, value in request.config.model_dump(exclude_unset=True).items():
-                setattr(merged_config, field, value)
-            final_config = merged_config
+            # Convert dict to ProjectConfig
+            try:
+                final_config = ProjectConfig(**request.config)
+            except Exception as e:
+                logger.error(f"Failed to create ProjectConfig from request: {e}")
+                logger.error(f"Request config: {request.config}")
+                raise HTTPException(
+                    status_code=400, detail=f"Invalid configuration: {str(e)}"
+                )
         else:
             # Use saved project config or default
             final_config = project_config or ProjectConfig()
 
         # Log the configuration being used
         logger.info(f"Running pipeline for project {project_id} with config:")
-        logger.info(f"  max_perspective: {final_config.max_perspective}")
-        logger.info(f"  max_conv_turn: {final_config.max_conv_turn}")
+        # Handle both old flat structure and new nested structure
+        if hasattr(final_config, "pipeline") and final_config.pipeline:
+            logger.info(f"  max_perspective: {final_config.pipeline.max_perspective}")
+            logger.info(f"  max_conv_turn: {final_config.pipeline.max_conv_turn}")
+        else:
+            # Old flat structure (shouldn't happen with new config)
+            logger.info(f"  Config structure: {type(final_config)}")
+            logger.info(f"  Config: {final_config}")
 
         # Progress callback for real-time updates
         async def progress_callback(proj_id: str, progress: ProgressData):

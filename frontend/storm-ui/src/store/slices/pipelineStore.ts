@@ -25,6 +25,7 @@ const initialState: PipelineState = {
   loading: false,
   error: null,
   lastUpdated: null,
+  updateIntervals: {},
 };
 
 // Pipeline store actions interface
@@ -117,85 +118,146 @@ export const usePipelineStore = create<PipelineStore>()(
 
           // Pipeline execution
           startPipeline: async (projectId, config) => {
+            console.log('[PipelineStore] Starting pipeline for project:', projectId);
+            console.log('[PipelineStore] Config received:', config);
+            
             set(draft => {
               draft.loading = true;
               draft.error = null;
             });
 
             try {
-              // Map frontend config to backend format
+              // Map frontend config to backend nested format
               const backendConfig = config
                 ? {
-                    // Map pipeline fields from camelCase to snake_case
-                    max_conv_turn:
-                      config.pipeline?.maxConvTurns ??
-                      config.max_conv_turn ??
-                      3,
-                    max_perspective:
-                      config.pipeline?.maxPerspectives ??
-                      config.max_perspective ??
-                      4,
-                    max_search_queries_per_turn:
-                      config.pipeline?.maxSearchQueriesPerTurn ??
-                      config.max_search_queries_per_turn ??
-                      3,
-                    // Map other fields
-                    llm_provider:
-                      config.llm?.provider ?? config.llm_provider ?? 'openai',
-                    llm_model:
-                      config.llm?.model ?? config.llm_model ?? 'gpt-4o',
-                    temperature:
-                      config.llm?.temperature ?? config.temperature ?? 0.7,
-                    max_tokens:
-                      config.llm?.maxTokens ?? config.max_tokens ?? 4000,
-                    retriever_type:
-                      config.retriever?.type ??
-                      config.retriever_type ??
-                      'tavily',
-                    max_search_results:
-                      config.retriever?.maxResults ??
-                      config.max_search_results ??
-                      10,
-                    search_top_k:
-                      config.retriever?.topK ?? config.search_top_k ?? 3,
-                    // Pipeline flags
-                    do_research:
-                      config.pipeline?.doResearch ?? config.do_research ?? true,
-                    do_generate_outline:
-                      config.pipeline?.doGenerateOutline ??
-                      config.do_generate_outline ??
-                      true,
-                    do_generate_article:
-                      config.pipeline?.doGenerateArticle ??
-                      config.do_generate_article ??
-                      true,
-                    do_polish_article:
-                      config.pipeline?.doPolishArticle ??
-                      config.do_polish_article ??
-                      true,
-                    // Output settings
-                    output_format:
-                      config.output?.format ??
-                      config.output_format ??
-                      'markdown',
-                    include_citations:
-                      config.output?.includeCitations ??
-                      config.include_citations ??
-                      true,
+                    llm: {
+                      provider: config.llm?.provider ?? 'openai',
+                      model: config.llm?.model ?? 'gpt-4o',
+                      temperature: config.llm?.temperature ?? 0.7,
+                      max_tokens: config.llm?.maxTokens ?? 4000,
+                    },
+                    retriever: {
+                      retriever_type: config.retriever?.type ?? 'tavily',
+                      max_search_results: config.retriever?.maxResults ?? 10,
+                      search_top_k: config.retriever?.topK ?? 3,
+                    },
+                    pipeline: {
+                      max_conv_turn: config.pipeline?.maxConvTurns ?? 3,
+                      max_perspective: config.pipeline?.maxPerspectives ?? 4,
+                      max_search_queries_per_turn:
+                        config.pipeline?.maxSearchQueriesPerTurn ?? 3,
+                      do_research: config.pipeline?.doResearch ?? true,
+                      do_generate_outline: config.pipeline?.doGenerateOutline ?? true,
+                      do_generate_article: config.pipeline?.doGenerateArticle ?? true,
+                      do_polish_article: config.pipeline?.doPolishArticle ?? true,
+                    },
+                    output: {
+                      output_format: config.output?.format ?? 'markdown',
+                      include_citations: config.output?.includeCitations ?? true,
+                    },
                   }
                 : undefined;
 
-              const response = await fetch(
-                `http://localhost:8000/api/pipeline/${projectId}/run`,
-                {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ config: backendConfig }),
-                }
-              );
+              console.log('[PipelineStore] Backend config:', backendConfig);
+              
+              const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+              const url = `${apiUrl}/pipeline/${projectId}/run`;
+              const requestBody = { config: backendConfig, mock_mode: false };
+              
+              console.log('[PipelineStore] API URL:', url);
+              console.log('[PipelineStore] Request body:', requestBody);
+              
+              const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestBody),
+              });
+
+              console.log('[PipelineStore] Response status:', response.status);
+              console.log('[PipelineStore] Response ok:', response.ok);
 
               if (!response.ok) {
-                throw new Error('Failed to start pipeline');
+                const errorText = await response.text();
+                console.error('[PipelineStore] Error response:', errorText);
+                
+                // Check if the error is about an already running pipeline
+                if (response.status === 400 && errorText.includes('already running')) {
+                  // Offer to cancel the stuck pipeline
+                  const shouldCancel = window.confirm(
+                    'A pipeline appears to be already running or stuck. Would you like to cancel it and start a new one?'
+                  );
+                  
+                  if (shouldCancel) {
+                    console.log('[PipelineStore] User chose to cancel stuck pipeline');
+                    // Cancel the stuck pipeline
+                    const cancelUrl = `${apiUrl}/pipeline/${projectId}/cancel`;
+                    const cancelResponse = await fetch(cancelUrl, { method: 'POST' });
+                    
+                    if (cancelResponse.ok) {
+                      console.log('[PipelineStore] Successfully cancelled stuck pipeline, retrying...');
+                      // Wait a moment for the cancellation to process
+                      await new Promise(resolve => setTimeout(resolve, 500));
+                      
+                      // Retry the pipeline start
+                      const retryResponse = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(requestBody),
+                      });
+                      
+                      if (retryResponse.ok) {
+                        const data = await retryResponse.json();
+                        // Continue with normal flow
+                        const pipelineId = data.pipelineId || `pipeline-${projectId}-${Date.now()}`;
+                        
+                        const pipelineExecution: PipelineExecution = {
+                          id: pipelineId,
+                          projectId,
+                          progress: {
+                            stage: 'initializing',
+                            stageProgress: 0,
+                            overallProgress: 0,
+                            startTime: new Date(),
+                            currentTask: 'Initializing pipeline...',
+                            errors: [],
+                          },
+                          logs: [],
+                          startTime: new Date(),
+                          status: 'running',
+                          config,
+                          resourceUsage: {
+                            tokensUsed: 0,
+                            apiCalls: 0,
+                            estimatedCost: 0,
+                            duration: 0,
+                          },
+                        };
+                        
+                        set(draft => {
+                          draft.runningPipelines[pipelineId] = pipelineExecution;
+                          draft.activeStage = 'initializing';
+                          draft.canCancel = true;
+                          draft.loading = false;
+                          draft.lastUpdated = new Date();
+                        });
+                        
+                        // Subscribe to pipeline updates
+                        get().subscribeToUpdates(pipelineId);
+                        
+                        return pipelineId;
+                      } else {
+                        const retryError = await retryResponse.text();
+                        throw new Error(`Failed to restart pipeline: ${retryError}`);
+                      }
+                    } else {
+                      throw new Error('Failed to cancel stuck pipeline. Please try manually cancelling from the backend.');
+                    }
+                  } else {
+                    throw new Error('Pipeline is already running. Please cancel it first or wait for it to complete.');
+                  }
+                } else {
+                  throw new Error(`Failed to start pipeline: ${response.status} - ${errorText}`);
+                }
               }
 
               const data = await response.json();
@@ -760,14 +822,78 @@ export const usePipelineStore = create<PipelineStore>()(
               );
               return;
             }
-            // WebSocket subscription logic would be implemented here
-            // This is a placeholder for the actual implementation
-            // logger.log(`Subscribing to updates for pipeline ${pipelineId}`);
+            
+            console.log(`[PipelineStore] Subscribing to WebSocket updates for pipeline ${pipelineId}`);
+            
+            // For now, use polling until WebSocket is fully integrated
+            const pollInterval = setInterval(async () => {
+              try {
+                const pipeline = get().runningPipelines[pipelineId];
+                if (!pipeline || pipeline.status !== 'running') {
+                  clearInterval(pollInterval);
+                  return;
+                }
+                
+                const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+                const response = await fetch(`${apiUrl}/pipeline/${pipeline.projectId}/status`);
+                
+                if (response.ok) {
+                  const status = await response.json();
+                  console.log('[PipelineStore] Poll status:', status);
+                  
+                  if (status.progress) {
+                    // Update pipeline progress
+                    set(draft => {
+                      if (draft.runningPipelines[pipelineId]) {
+                        draft.runningPipelines[pipelineId].progress = {
+                          stage: status.progress.stage || 'initializing',
+                          stageProgress: status.progress.stage_progress || 0,
+                          overallProgress: status.progress.overall_progress || 0,
+                          startTime: draft.runningPipelines[pipelineId].progress.startTime,
+                          currentTask: status.progress.current_task || '',
+                          errors: status.progress.errors || [],
+                          estimatedTimeRemaining: status.progress.estimated_time_remaining,
+                        };
+                        
+                        // Update global progress
+                        draft.globalProgress = status.progress.overall_progress || 0;
+                        draft.activeStage = status.progress.stage || 'initializing';
+                        
+                        // Check if completed or failed
+                        if (status.progress.status === 'completed') {
+                          draft.runningPipelines[pipelineId].status = 'completed';
+                          clearInterval(pollInterval);
+                        } else if (status.progress.status === 'error' || status.progress.status === 'cancelled') {
+                          draft.runningPipelines[pipelineId].status = 'failed';
+                          clearInterval(pollInterval);
+                        }
+                      }
+                    });
+                  }
+                }
+              } catch (error) {
+                console.error('[PipelineStore] Poll error:', error);
+              }
+            }, 2000); // Poll every 2 seconds
+            
+            // Store interval ID for cleanup
+            set(draft => {
+              if (!draft.updateIntervals) {
+                draft.updateIntervals = {};
+              }
+              draft.updateIntervals[pipelineId] = pollInterval;
+            });
           },
 
           unsubscribeFromUpdates: pipelineId => {
-            // WebSocket unsubscription logic would be implemented here
-            // logger.log(`Unsubscribing from updates for pipeline ${pipelineId}`);
+            const state = get();
+            if (state.updateIntervals && state.updateIntervals[pipelineId]) {
+              console.log(`[PipelineStore] Unsubscribing from updates for pipeline ${pipelineId}`);
+              clearInterval(state.updateIntervals[pipelineId]);
+              set(draft => {
+                delete draft.updateIntervals[pipelineId];
+              });
+            }
           },
         }))
       ),
