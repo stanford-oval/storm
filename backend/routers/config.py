@@ -81,7 +81,10 @@ async def get_project_config(project_id: str):
     base_dir = Path("./storm-projects/projects").resolve()
     project_config_file = (base_dir / project_id / "config.json").resolve()
     # Check containment to prevent directory traversal attacks
-    if not str(project_config_file).startswith(str(base_dir)):
+    try:
+        # Ensures project_config_file is contained within base_dir
+        project_config_file.relative_to(base_dir)
+    except ValueError:
         raise HTTPException(status_code=403, detail="Access denied.")
     project_overrides = {}
     if project_config_file.exists():
@@ -112,7 +115,9 @@ async def update_project_config(project_id: str, request: ConfigUpdateRequest):
     base_dir = Path("./storm-projects/projects").resolve()
     project_config_file = (base_dir / project_id / "config.json").resolve()
     # Check containment to prevent directory traversal attacks
-    if not str(project_config_file).startswith(str(base_dir)):
+    try:
+        project_config_file.relative_to(base_dir)
+    except ValueError:
         raise HTTPException(status_code=403, detail="Access denied.")
     project_config_file.parent.mkdir(parents=True, exist_ok=True)
 
