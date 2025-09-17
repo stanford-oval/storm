@@ -274,15 +274,20 @@ async def get_project_config(project_id: UUID):
 async def update_project_config(project_id: UUID, config: ProjectConfig):
     """Update project configuration."""
     try:
+        logger.info(f"Updating config for project {project_id}")
+        logger.info(f"Received config: {config.model_dump()}")
+
         success = file_service.update_project_config(str(project_id), config)
 
         if not success:
             raise HTTPException(status_code=404, detail="Project not found")
 
+        logger.info(f"Successfully updated config for project {project_id}")
         return {"message": "Configuration updated successfully"}
 
     except Exception as e:
         logger.error(f"Error updating project config {project_id}: {e}")
+        logger.error(f"Exception details: {str(e)}")
         raise HTTPException(
             status_code=500, detail="Failed to update project configuration"
         )
@@ -306,7 +311,8 @@ async def get_project_progress(project_id: UUID):
 
 @router.get("/{project_id}/export")
 async def export_project(
-    project_id: UUID, format: str = Query("markdown", regex="^(markdown|json|html|pdf)$")
+    project_id: UUID,
+    format: str = Query("markdown", regex="^(markdown|json|html|pdf)$"),
 ):
     """Export project content."""
     try:

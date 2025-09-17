@@ -12,6 +12,7 @@ import { devtools } from '../middleware/devtools';
 import { immer } from '../middleware/immer';
 import { subscriptions } from '../middleware/subscriptions';
 import { logger } from '@/utils/logger';
+import { mapConfigToBackend, mapConfigFromBackend } from '@/utils/config-mapper';
 
 // Initial state
 const initialState: ProjectState = {
@@ -132,11 +133,11 @@ export const useProjectStore = create<ProjectStore>()(
             try {
               const apiUrl =
                 process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-              // Only send fields the backend expects
+              // Map frontend config to backend format
               const requestData = {
                 title: projectData.title,
                 topic: projectData.topic,
-                config: projectData.config,
+                config: mapConfigToBackend(projectData.config),
               };
               logger.log('Sending request to:', `${apiUrl}/projects/`);
               logger.log('Request data:', requestData);
@@ -400,53 +401,8 @@ export const useProjectStore = create<ProjectStore>()(
               if (data.projects) {
                 data.projects = data.projects.map((project: any) => {
                   if (project.config) {
-                    // Check if config is already in frontend format (has nested structure)
-                    const isBackendFormat =
-                      project.config.llm_provider !== undefined ||
-                      project.config.max_perspective !== undefined ||
-                      project.config.max_conv_turn !== undefined;
-
-                    if (isBackendFormat) {
-                      // Map from backend snake_case to frontend camelCase nested structure
-                      project.config = {
-                        ...project.config,
-                        llm: project.config.llm || {
-                          provider: project.config.llm_provider || 'openai',
-                          model: project.config.llm_model || 'gpt-4o',
-                          temperature: project.config.temperature || 0.7,
-                          maxTokens: project.config.max_tokens || 4000,
-                        },
-                        retriever:
-                          !project.config.retriever ||
-                          project.config.retriever === null
-                            ? {
-                                type: project.config.retriever_type || 'tavily',
-                                maxResults:
-                                  project.config.max_search_results || 10,
-                                topK: project.config.search_top_k || 3,
-                              }
-                            : project.config.retriever,
-                        pipeline: project.config.pipeline || {
-                          maxConvTurns: project.config.max_conv_turn || 3,
-                          maxPerspectives: project.config.max_perspective || 4,
-                          maxSearchQueriesPerTurn:
-                            project.config.max_search_queries_per_turn || 3,
-                          doResearch: project.config.do_research !== false,
-                          doGenerateOutline:
-                            project.config.do_generate_outline !== false,
-                          doGenerateArticle:
-                            project.config.do_generate_article !== false,
-                          doPolishArticle:
-                            project.config.do_polish_article !== false,
-                        },
-                        output: project.config.output || {
-                          format: project.config.output_format || 'markdown',
-                          includeCitations:
-                            project.config.include_citations !== false,
-                        },
-                      };
-                    }
-                    // If already in frontend format, keep it as is
+                    // Use the mapper function to handle both old flat and new nested formats
+                    project.config = mapConfigFromBackend(project.config);
                   }
                   return project;
                 });
@@ -488,65 +444,14 @@ export const useProjectStore = create<ProjectStore>()(
 
               // Map backend config to frontend format if config exists
               if (project.config) {
-                // Check if config is already in frontend format (has nested structure)
+                // Check if it's backend format (has retriever_type or do_research fields)
                 const isBackendFormat =
-                  project.config.llm_provider !== undefined ||
-                  project.config.max_perspective !== undefined ||
-                  project.config.max_conv_turn !== undefined;
+                  (project.config as any).retriever?.retriever_type !== undefined ||
+                  (project.config as any).pipeline?.do_research !== undefined ||
+                  (project.config as any).llm?.max_tokens !== undefined;
 
                 if (isBackendFormat) {
-                  // Map from backend snake_case to frontend camelCase nested structure
-                  project.config = {
-                    ...project.config,
-                    llm: project.config.llm || {
-                      provider: (project.config.llm_provider || 'openai') as
-                        | 'openai'
-                        | 'anthropic'
-                        | 'azure'
-                        | 'gemini'
-                        | 'ollama'
-                        | 'groq',
-                      model: project.config.llm_model || 'gpt-4o',
-                      temperature: project.config.temperature || 0.7,
-                      maxTokens: project.config.max_tokens || 4000,
-                    },
-                    retriever:
-                      !project.config.retriever ||
-                      project.config.retriever === null
-                        ? {
-                            type: (project.config.retriever_type ||
-                              'tavily') as
-                              | 'google'
-                              | 'bing'
-                              | 'you'
-                              | 'duckduckgo'
-                              | 'tavily'
-                              | 'serper'
-                              | 'brave'
-                              | 'vector',
-                            maxResults: project.config.max_search_results || 10,
-                            topK: project.config.search_top_k || 3,
-                          }
-                        : project.config.retriever,
-                    pipeline: project.config.pipeline || {
-                      maxConvTurns: project.config.max_conv_turn || 3,
-                      maxPerspectives: project.config.max_perspective || 4,
-                      maxSearchQueriesPerTurn:
-                        project.config.max_search_queries_per_turn || 3,
-                      doResearch: project.config.do_research !== false,
-                      doGenerateOutline:
-                        project.config.do_generate_outline !== false,
-                      doGenerateArticle:
-                        project.config.do_generate_article !== false,
-                      doPolishArticle:
-                        project.config.do_polish_article !== false,
-                    },
-                    output: project.config.output || {
-                      format: project.config.output_format || 'markdown',
-                      includeCitations:
-                        project.config.include_citations !== false,
-                    },
-                  };
+                  project.config = mapConfigFromBackend(project.config);
                 }
                 // If already in frontend format, keep it as is
               }
@@ -824,38 +729,18 @@ export const useProjectStore = create<ProjectStore>()(
               const apiUrl =
                 process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
-              // Config from ConfigurationPanel has frontend structure
-              // Map directly from the frontend config to backend format
-              // Note: API keys are not stored in project config on backend
-              const backendConfig = {
-                // Map pipeline fields from camelCase to snake_case
-                max_conv_turn: config.pipeline?.maxConvTurns ?? 3,
-                max_perspective: config.pipeline?.maxPerspectives ?? 4,
-                max_search_queries_per_turn:
-                  config.pipeline?.maxSearchQueriesPerTurn ?? 3,
-                // Map other fields
-                llm_provider: config.llm?.provider ?? 'openai',
-                llm_model: config.llm?.model ?? 'gpt-4o',
-                temperature: config.llm?.temperature ?? 0.7,
-                max_tokens: config.llm?.maxTokens ?? 4000,
-                retriever_type: config.retriever?.type ?? 'tavily',
-                max_search_results: config.retriever?.maxResults ?? 10,
-                search_top_k: config.retriever?.topK ?? 3,
-                // Pipeline flags
-                do_research: config.pipeline?.doResearch ?? true,
-                do_generate_outline: config.pipeline?.doGenerateOutline ?? true,
-                do_generate_article: config.pipeline?.doGenerateArticle ?? true,
-                do_polish_article: config.pipeline?.doPolishArticle ?? true,
-                // Output settings
-                output_format: config.output?.format ?? 'markdown',
-                include_citations: config.output?.includeCitations ?? true,
-              };
+              // Use the mapper to convert frontend config to backend format
+              const backendConfig = mapConfigToBackend(config);
 
               logger.log('Saving configuration to backend:', {
-                max_conv_turn: backendConfig.max_conv_turn,
-                max_perspective: backendConfig.max_perspective,
-                llm_provider: backendConfig.llm_provider,
-                retriever_type: backendConfig.retriever_type,
+                max_conv_turn: backendConfig.pipeline?.max_conv_turn,
+                max_perspective: backendConfig.pipeline?.max_perspective,
+                llm_provider: backendConfig.llm?.provider,
+                retriever_type: backendConfig.retriever?.retriever_type,
+                do_research: backendConfig.pipeline?.do_research,
+                do_generate_outline: backendConfig.pipeline?.do_generate_outline,
+                do_generate_article: backendConfig.pipeline?.do_generate_article,
+                do_polish_article: backendConfig.pipeline?.do_polish_article,
               });
 
               const response = await fetch(

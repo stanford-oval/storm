@@ -62,6 +62,13 @@ class LLMProviderConfig(BaseModel):
         None, description="Deployment name (for Azure)"
     )
 
+    # Ollama-specific settings
+    ollama_host: Optional[str] = Field("localhost", description="Ollama server host")
+    ollama_port: Optional[int] = Field(11434, description="Ollama server port")
+    stop_sequences: Optional[List[str]] = Field(
+        None, description="Stop sequences for generation"
+    )
+
     @validator("model")
     def validate_model(cls, v, values):
         """Validate model based on provider."""

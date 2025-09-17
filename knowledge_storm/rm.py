@@ -1,5 +1,7 @@
 import logging
 import os
+
+logger = logging.getLogger(__name__)
 from typing import Callable, Union, List
 
 import backoff
@@ -940,7 +942,19 @@ class TavilySearchRM(dspy.Retrieve):
                 "include_raw_contents": self.include_raw_content,
             }
             #  list of dicts that will be parsed to return
-            responseData = self.tavily_client.search(query)
+            # Validate query is not empty before sending to Tavily
+            if not query or not query.strip():
+                logger.warning(f"Empty query detected, skipping search")
+                continue
+
+            # Log the query for debugging
+            logger.info(f"Searching Tavily with query: '{query}'")
+
+            try:
+                responseData = self.tavily_client.search(query)
+            except Exception as e:
+                logger.error(f"Tavily search failed for query '{query}': {e}")
+                continue
             results = responseData.get("results")
             for d in results:
                 # assert d is dict

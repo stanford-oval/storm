@@ -1,9 +1,10 @@
 'use client';
 
 import { logger } from '@/utils/logger';
+import { mapConfigFromBackend } from '@/utils/config-mapper';
 // Removed unused ErrorBoundary import
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { PipelineProgress } from '@/components/storm/PipelineProgress';
 import { ConfigurationPanel } from '@/components/storm/ConfigurationPanel';
@@ -48,6 +49,8 @@ import {
   Eye,
   AlertCircle,
   CheckCircle,
+  Circle,
+  X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -113,115 +116,23 @@ export default function ProjectDetailPage() {
 
             // Map backend config to frontend format if config exists
             if (freshProject.config) {
-              // Check if config is already in frontend format (has nested structure)
-              const isBackendFormat =
-                freshProject.config.llm_provider !== undefined ||
-                freshProject.config.max_perspective !== undefined ||
-                freshProject.config.max_conv_turn !== undefined;
-
-              if (isBackendFormat) {
-                // Map from backend snake_case to frontend camelCase nested structure
-                freshProject.config = {
-                  ...freshProject.config,
-                  llm: freshProject.config.llm || {
-                    provider:
-                      freshProject.config.llm_provider ||
-                      defaultConfig?.llm?.model?.includes('claude')
-                        ? 'anthropic'
-                        : 'openai',
-                    model:
-                      freshProject.config.llm_model ||
-                      defaultConfig?.llm?.model ||
-                      'gpt-4o',
-                    temperature:
-                      freshProject.config.temperature ||
-                      defaultConfig?.llm?.temperature ||
-                      0.7,
-                    maxTokens:
-                      freshProject.config.max_tokens ||
-                      defaultConfig?.llm?.max_tokens ||
-                      4000,
-                  },
-                  retriever: freshProject.config.retriever || {
-                    type:
-                      freshProject.config.retriever_type ||
-                      defaultConfig?.retriever?.type ||
-                      'tavily',
-                    maxResults:
-                      freshProject.config.max_search_results ||
-                      defaultConfig?.retriever?.max_results ||
-                      10,
-                    topK: freshProject.config.search_top_k || 3,
-                  },
-                  pipeline: freshProject.config.pipeline || {
-                    maxConvTurns: freshProject.config.max_conv_turn || 3,
-                    maxPerspectives: freshProject.config.max_perspective || 4,
-                    maxSearchQueriesPerTurn:
-                      freshProject.config.max_search_queries_per_turn || 3,
-                    doResearch:
-                      freshProject.config.pipeline?.doResearch !== false,
-                    doGenerateOutline:
-                      freshProject.config.pipeline?.doGenerateOutline !== false,
-                    doGenerateArticle:
-                      freshProject.config.pipeline?.doGenerateArticle !== false,
-                    doPolishArticle:
-                      freshProject.config.do_polish_article !== false,
-                  },
-                  output: freshProject.config.output || {
-                    format: freshProject.config.output_format || 'markdown',
-                    includeCitations:
-                      freshProject.config.include_citations !== false,
-                  },
-                };
-              }
-              // If already in frontend format, merge with defaults
-              else {
-                freshProject.config = {
-                  llm: {
-                    ...freshProject.config.llm,
-                    model:
-                      freshProject.config.llm?.model ||
-                      defaultConfig?.llm?.model ||
-                      'gpt-4o',
-                    provider:
-                      freshProject.config.llm?.provider ||
-                      (defaultConfig?.llm?.model?.includes('claude')
-                        ? 'anthropic'
-                        : 'openai'),
-                  },
-                  retriever: {
-                    ...freshProject.config.retriever,
-                    type:
-                      freshProject.config.retriever?.type ||
-                      defaultConfig?.retriever?.type ||
-                      'tavily',
-                  },
-                  pipeline: freshProject.config.pipeline || {
-                    doResearch: true,
-                    doGenerateOutline: true,
-                    doGenerateArticle: true,
-                    doPolishArticle: true,
-                  },
-                  output: freshProject.config.output || {
-                    format: 'markdown',
-                    includeCitations: true,
-                  },
-                };
-              }
+              // Use the mapper function to handle both old flat and new nested formats
+              freshProject.config = mapConfigFromBackend(freshProject.config);
             } else if (defaultConfig) {
               // If no config exists, use default config from backend
+              freshProject.config = mapConfigFromBackend(defaultConfig);
+            } else {
+              // Last resort: minimal defaults without hardcoded models
               freshProject.config = {
                 llm: {
-                  model: defaultConfig.llm?.model || 'gpt-4o',
-                  provider: defaultConfig.llm?.model?.includes('claude')
-                    ? 'anthropic'
-                    : 'openai',
-                  temperature: defaultConfig.llm?.temperature || 0.7,
-                  maxTokens: defaultConfig.llm?.max_tokens || 4000,
+                  model: '', // Will be populated from available models
+                  provider: 'openai',
+                  temperature: 0.7,
+                  maxTokens: 4000,
                 },
                 retriever: {
-                  type: defaultConfig.retriever?.type || 'tavily',
-                  maxResults: defaultConfig.retriever?.max_results || 10,
+                  type: 'tavily',
+                  maxResults: 10,
                 },
                 pipeline: {
                   doResearch: true,
@@ -343,7 +254,7 @@ export default function ProjectDetailPage() {
       const configToUse = projectConfig ||
         project.config || {
           llm: {
-            model: 'gpt-4o',
+            model: '', // Will be populated from available models
             provider: 'openai',
           },
           retriever: {
@@ -823,34 +734,42 @@ export default function ProjectDetailPage() {
                   <CardContent className="space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Research</span>
-                      {project.config?.pipeline?.doResearch ? (
+                      {pipelineProgress?.stages_completed?.includes('research') ? (
                         <CheckCircle className="h-4 w-4 text-green-500" />
+                      ) : project.config?.pipeline?.doResearch ? (
+                        <Circle className="h-4 w-4 text-muted-foreground" />
                       ) : (
-                        <div className="h-4 w-4 rounded-full bg-muted" />
+                        <X className="h-4 w-4 text-muted-foreground/50" />
                       )}
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Generate Outline</span>
-                      {project.config?.pipeline?.doGenerateOutline ? (
+                      {pipelineProgress?.stages_completed?.includes('outline') ? (
                         <CheckCircle className="h-4 w-4 text-green-500" />
+                      ) : project.config?.pipeline?.doGenerateOutline ? (
+                        <Circle className="h-4 w-4 text-muted-foreground" />
                       ) : (
-                        <div className="h-4 w-4 rounded-full bg-muted" />
+                        <X className="h-4 w-4 text-muted-foreground/50" />
                       )}
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Write Article</span>
-                      {project.config?.pipeline?.doGenerateArticle ? (
+                      {pipelineProgress?.stages_completed?.includes('article') ? (
                         <CheckCircle className="h-4 w-4 text-green-500" />
+                      ) : project.config?.pipeline?.doGenerateArticle ? (
+                        <Circle className="h-4 w-4 text-muted-foreground" />
                       ) : (
-                        <div className="h-4 w-4 rounded-full bg-muted" />
+                        <X className="h-4 w-4 text-muted-foreground/50" />
                       )}
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Polish Article</span>
-                      {project.config?.pipeline?.doPolishArticle ? (
+                      {pipelineProgress?.stages_completed?.includes('polish') ? (
                         <CheckCircle className="h-4 w-4 text-green-500" />
+                      ) : project.config?.pipeline?.doPolishArticle ? (
+                        <Circle className="h-4 w-4 text-muted-foreground" />
                       ) : (
-                        <div className="h-4 w-4 rounded-full bg-muted" />
+                        <X className="h-4 w-4 text-muted-foreground/50" />
                       )}
                     </div>
                   </CardContent>
@@ -1170,7 +1089,7 @@ export default function ProjectDetailPage() {
                 projectConfig ||
                 project.config || {
                   llm: {
-                    model: 'gpt-4o',
+                    model: '', // Will be populated from available models
                     provider: 'openai',
                   },
                   retriever: {
@@ -1184,8 +1103,8 @@ export default function ProjectDetailPage() {
                   },
                 }
               }
-              onChange={config => {
-                // Update local state immediately for responsive UI
+              onChange={(config: StormConfig) => {
+                // Update local state when config changes
                 setProjectConfig(config);
               }}
               onSave={handleConfigSave}

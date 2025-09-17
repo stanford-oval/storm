@@ -15,6 +15,7 @@ from datetime import datetime
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field
 import uuid
+from services.config_service import ProjectConfig
 
 
 class ProjectMetadata(BaseModel):
@@ -31,34 +32,7 @@ class ProjectMetadata(BaseModel):
     tags: List[str] = Field(default_factory=list)
 
 
-class ProjectConfig(BaseModel):
-    """Project configuration for STORM pipeline."""
-
-    # LLM Configuration
-    llm_provider: str = "openai"
-    llm_model: str = "gpt-4o"
-    temperature: float = 0.7
-    max_tokens: int = 4000
-
-    # Retriever Configuration
-    retriever_type: str = "tavily"  # Default to tavily (bing is not implemented)
-    max_search_results: int = 10
-    search_top_k: int = 3
-
-    # Pipeline Configuration
-    do_research: bool = True
-    do_generate_outline: bool = True
-    do_generate_article: bool = True
-    do_polish_article: bool = True
-
-    # STORM-specific settings
-    max_conv_turn: int = 3
-    max_perspective: int = 4
-    max_search_queries_per_turn: int = 3
-
-    # Output settings
-    output_format: str = "markdown"
-    include_citations: bool = True
+# ProjectConfig now imported from config_service.py for nested structure
 
 
 class ProgressData(BaseModel):
@@ -113,23 +87,25 @@ class FileProjectService:
             uuid.UUID(project_id)
         except ValueError:
             raise ValueError(f"Invalid project ID format: {project_id}")
-        
+
         # Construct the path
         project_path = self.projects_dir / project_id
-        
+
         # Ensure the resolved path is within the projects directory
         try:
             resolved_path = project_path.resolve()
             resolved_base = self.projects_dir.resolve()
-            
+
             # Check if the resolved path is within the base directory
             if not str(resolved_path).startswith(str(resolved_base)):
-                raise ValueError(f"Path traversal attempt detected for project ID: {project_id}")
+                raise ValueError(
+                    f"Path traversal attempt detected for project ID: {project_id}"
+                )
         except Exception as e:
             if "Path traversal" in str(e):
                 raise
             raise ValueError(f"Invalid project path: {e}")
-        
+
         return project_path
 
     def _load_project_file(self, project_id: str) -> Optional[frontmatter.Post]:
@@ -166,7 +142,60 @@ class FileProjectService:
         try:
             with open(config_file, "r", encoding="utf-8") as f:
                 config_data = json.load(f)
-                return ProjectConfig(**config_data)
+
+                # Check if this is old flat format (has llm_provider instead of nested llm)
+                if "llm_provider" in config_data or "do_research" in config_data:
+                    # Convert old flat format to new nested format
+                    print(f"Converting old config format for project {project_id}")
+                    print(
+                        f"Old config: do_research={config_data.get('do_research')}, do_generate_article={config_data.get('do_generate_article')}"
+                    )
+
+                    converted_config = {
+                        "config_version": "1.0.0",
+                        "llm": {
+                            "provider": config_data.get("llm_provider", "openai"),
+                            "model": config_data.get("llm_model", "gpt-4o"),
+                            "temperature": config_data.get("temperature", 0.7),
+                            "max_tokens": config_data.get("max_tokens", 4000),
+                        },
+                        "retriever": {
+                            "retriever_type": config_data.get(
+                                "retriever_type", "duckduckgo"
+                            ),
+                            "max_search_results": config_data.get(
+                                "max_search_results", 10
+                            ),
+                            "search_top_k": config_data.get("search_top_k", 3),
+                        },
+                        "pipeline": {
+                            "do_research": config_data.get("do_research", True),
+                            "do_generate_outline": config_data.get(
+                                "do_generate_outline", True
+                            ),
+                            "do_generate_article": config_data.get(
+                                "do_generate_article", True
+                            ),
+                            "do_polish_article": config_data.get(
+                                "do_polish_article", True
+                            ),
+                            "max_conv_turn": config_data.get("max_conv_turn", 3),
+                            "max_perspective": config_data.get("max_perspective", 4),
+                            "search_queries_per_turn": config_data.get(
+                                "max_search_queries_per_turn", 3
+                            ),
+                        },
+                    }
+
+                    # Save the converted config back to fix the format permanently
+                    new_config = ProjectConfig(**converted_config)
+                    self._save_project_config(project_id, new_config)
+                    print(f"Saved converted config with nested structure")
+
+                    return new_config
+                else:
+                    # New nested format
+                    return ProjectConfig(**config_data)
         except Exception as e:
             print(f"Error loading config for {project_id}: {e}")
             return ProjectConfig()
@@ -362,6 +391,13 @@ class FileProjectService:
             return None
 
         config = self._load_project_config(project_id)
+        # Debug: Log the config structure AFTER loading and conversion
+        import logging
+
+        logger = logging.getLogger(__name__)
+        logger.info(
+            f"Config for project {project_id} after loading (nested structure): {config.model_dump()}"
+        )
         progress = self._load_project_progress(project_id)
         references = self._load_project_references(project_id)
 

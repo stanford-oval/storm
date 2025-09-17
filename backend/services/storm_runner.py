@@ -149,6 +149,10 @@ class StormRunnerService:
             # Import LM class for all models
             from knowledge_storm.lm import LitellmModel
 
+            # Note: Stanford's examples use OllamaClient directly:
+            # from knowledge_storm.lm import OllamaClient
+            # We use LitellmModel (v1.1.0+) for better caching and unified interface
+
             # Log the configuration for debugging
             # Handle both old flat structure and new nested structure
             if hasattr(config, "llm") and hasattr(config.llm, "provider"):
@@ -215,33 +219,89 @@ class StormRunnerService:
 
             # Determine which LM class to use based on provider
             if llm_provider == "ollama":
-                # Use LitellmModel with Ollama (recommended approach as per v1.1.0+)
+                # Note: Stanford's examples use OllamaClient, but we use LitellmModel
+                # which is the recommended approach for v1.1.0+
+
+                # Check if we have new config structure with Ollama settings
+                if hasattr(config, "llm") and hasattr(config.llm, "ollama_host"):
+                    # Use configurable Ollama settings from new config
+                    ollama_host = config.llm.ollama_host or "localhost"
+                    ollama_port = config.llm.ollama_port or 11434
+                    api_base = f"http://{ollama_host}:{ollama_port}"
+
+                    # Get configurable stop sequences
+                    stop_sequences = config.llm.stop_sequences or ["\n\n---"]
+
+                    # Get stage-specific max tokens if configured
+                    conv_max_tokens = (
+                        getattr(config.llm_stages, "conv_simulator_max_tokens", 500)
+                        if hasattr(config, "llm_stages")
+                        else 500
+                    )
+                    qa_max_tokens = (
+                        getattr(config.llm_stages, "question_asker_max_tokens", 500)
+                        if hasattr(config, "llm_stages")
+                        else 500
+                    )
+                    outline_max_tokens = (
+                        getattr(config.llm_stages, "outline_gen_max_tokens", 1000)
+                        if hasattr(config, "llm_stages")
+                        else 400
+                    )
+                    article_max_tokens = (
+                        getattr(config.llm_stages, "article_gen_max_tokens", 4000)
+                        if hasattr(config, "llm_stages")
+                        else 700
+                    )
+                    polish_max_tokens = (
+                        getattr(config.llm_stages, "article_polish_max_tokens", 4000)
+                        if hasattr(config, "llm_stages")
+                        else min(max_tokens, 4000)
+                    )
+                else:
+                    # Fallback to defaults for backward compatibility
+                    api_base = "http://localhost:11434"
+                    stop_sequences = ["\n\n---"]
+                    conv_max_tokens = 500
+                    qa_max_tokens = 500
+                    outline_max_tokens = 400
+                    article_max_tokens = 700
+                    polish_max_tokens = min(max_tokens, 4000)
+
                 # Format model name for litellm with ollama/ prefix
                 model_name = f"ollama/{llm_model}"
 
                 # Base configuration for Ollama via litellm
                 lm_kwargs = {
                     "model": model_name,
-                    "api_base": "http://localhost:11434",  # Default Ollama URL
+                    "api_base": api_base,
                     "temperature": temperature,
                     "request_timeout": 600,  # 10 minute timeout for slower models
+                    "stop": stop_sequences,  # Configurable stop sequences
                 }
 
-                # Configure different models for different stages with appropriate max_tokens
+                # Configure different models for different stages with configurable max_tokens
                 lm_configs.set_conv_simulator_lm(
-                    LitellmModel(max_tokens=500, **lm_kwargs)
+                    LitellmModel(max_tokens=conv_max_tokens, **lm_kwargs)
                 )
                 lm_configs.set_question_asker_lm(
-                    LitellmModel(max_tokens=500, **lm_kwargs)
+                    LitellmModel(max_tokens=qa_max_tokens, **lm_kwargs)
                 )
-                lm_configs.set_outline_gen_lm(LitellmModel(max_tokens=400, **lm_kwargs))
-                lm_configs.set_article_gen_lm(LitellmModel(max_tokens=700, **lm_kwargs))
+                lm_configs.set_outline_gen_lm(
+                    LitellmModel(max_tokens=outline_max_tokens, **lm_kwargs)
+                )
+                lm_configs.set_article_gen_lm(
+                    LitellmModel(max_tokens=article_max_tokens, **lm_kwargs)
+                )
                 lm_configs.set_article_polish_lm(
-                    LitellmModel(max_tokens=min(max_tokens, 4000), **lm_kwargs)
+                    LitellmModel(max_tokens=polish_max_tokens, **lm_kwargs)
                 )
                 logger.info(f"Using Ollama model: {llm_model} via LitellmModel")
                 logger.info(f"Formatted model name: {model_name}")
-                logger.info(f"Ollama API base: {lm_kwargs['api_base']}")
+                logger.info(f"Ollama API base: {api_base}")
+                logger.info(
+                    f"Max tokens - Conv: {conv_max_tokens}, QA: {qa_max_tokens}, Outline: {outline_max_tokens}, Article: {article_max_tokens}, Polish: {polish_max_tokens}"
+                )
 
             elif llm_provider == "lmstudio":
                 # Use LitellmModel for LMStudio with OpenAI-compatible format

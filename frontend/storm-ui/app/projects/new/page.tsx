@@ -30,21 +30,20 @@ import {
   Brain,
   Search,
   Wand2,
-  CheckCircle,
   AlertTriangle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-// Default configuration
+// Default configuration - model will be selected from available models
 const DEFAULT_CONFIG: StormConfig = {
   llm: {
-    model: 'gpt-4o', // Updated to match .env.local default
+    model: '', // Will be populated from API
     provider: 'openai',
-    temperature: 0.7, // Updated to match .env.local default
+    temperature: 0.7,
     maxTokens: 4000,
   },
   retriever: {
-    type: 'tavily', // Changed to tavily since we have the API key configured
+    type: 'tavily',
     maxResults: 10,
   },
   pipeline: {
@@ -488,7 +487,9 @@ export default function NewProjectPage() {
                     </p>
                   </div>
                   {formData.config.pipeline?.doResearch && (
-                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    <Badge variant="secondary" className="text-xs">
+                      Enabled
+                    </Badge>
                   )}
                 </div>
 
@@ -510,7 +511,9 @@ export default function NewProjectPage() {
                     </p>
                   </div>
                   {formData.config.pipeline?.doGenerateOutline && (
-                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    <Badge variant="secondary" className="text-xs">
+                      Enabled
+                    </Badge>
                   )}
                 </div>
 
@@ -532,7 +535,9 @@ export default function NewProjectPage() {
                     </p>
                   </div>
                   {formData.config.pipeline?.doGenerateArticle && (
-                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    <Badge variant="secondary" className="text-xs">
+                      Enabled
+                    </Badge>
                   )}
                 </div>
 
@@ -554,7 +559,9 @@ export default function NewProjectPage() {
                     </p>
                   </div>
                   {formData.config.pipeline?.doPolishArticle && (
-                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    <Badge variant="secondary" className="text-xs">
+                      Enabled
+                    </Badge>
                   )}
                 </div>
               </CardContent>

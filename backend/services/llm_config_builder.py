@@ -23,6 +23,7 @@ class LLMConfigBuilder:
             "api_base": "http://localhost:11434",
             "request_timeout": 600,
             "requires_api_key": False,
+            "stop": ["\n\n---"],  # Default stop sequence for dspy
         },
         "lmstudio": {
             "api_base": "http://localhost:1234/v1",
@@ -130,6 +131,23 @@ class LLMConfigBuilder:
 
         # Add API base if configured
         api_base = llm_config.api_base or provider_defaults.get("api_base")
+
+        # Handle Ollama-specific settings
+        if provider == "ollama":
+            # Build API base from host and port if configured
+            if hasattr(llm_config, "ollama_host") and hasattr(
+                llm_config, "ollama_port"
+            ):
+                ollama_host = llm_config.ollama_host or "localhost"
+                ollama_port = llm_config.ollama_port or 11434
+                api_base = f"http://{ollama_host}:{ollama_port}"
+
+            # Add stop sequences if configured
+            if hasattr(llm_config, "stop_sequences") and llm_config.stop_sequences:
+                kwargs["stop"] = llm_config.stop_sequences
+            elif "stop" in provider_defaults:
+                kwargs["stop"] = provider_defaults["stop"]
+
         if api_base:
             kwargs["api_base"] = api_base
 

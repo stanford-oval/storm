@@ -176,6 +176,51 @@ async def get_available_providers():
 async def get_provider_models(provider: str):
     """Get available models for a specific provider."""
 
+    # Special handling for Ollama - fetch models dynamically
+    if provider == "ollama":
+        import requests
+        from services.config_service import get_config_service
+
+        try:
+            # Get Ollama configuration
+            config_service = get_config_service()
+            config = config_service.load_global_config()
+
+            # Build Ollama URL from config
+            host = (
+                getattr(config.llm, "ollama_host", "localhost")
+                if hasattr(config, "llm")
+                else "localhost"
+            )
+            port = (
+                getattr(config.llm, "ollama_port", 11434)
+                if hasattr(config, "llm")
+                else 11434
+            )
+            ollama_url = f"http://{host}:{port}"
+
+            # Fetch available models from Ollama
+            response = requests.get(f"{ollama_url}/api/tags", timeout=2)
+            if response.status_code == 200:
+                data = response.json()
+                models = [model["name"] for model in data.get("models", [])]
+
+                # Check if Ollama is configured
+                is_configured, message = LLMConfigBuilder.validate_provider_setup(
+                    provider
+                )
+
+                return {
+                    "provider": provider,
+                    "configured": is_configured,
+                    "message": message,
+                    "models": models,
+                    "dynamic": True,  # Indicate these were fetched dynamically
+                }
+        except Exception as e:
+            # Fall back to static list if can't connect
+            pass
+
     # Model lists for each provider
     provider_models = {
         "openai": [

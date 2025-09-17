@@ -26,6 +26,7 @@ import { Separator } from '@/components/ui/separator';
 // import { Badge } from '@/components/ui/badge'; // Removed unused import
 import { Database, Eye, EyeOff, Save, RefreshCw } from 'lucide-react';
 import { useNotificationStore } from '@/store';
+import { useAvailableModels } from '@/hooks/useAvailableModels';
 
 // SECURITY WARNING: This component handles API keys
 // - Never store API keys in localStorage or cookies
@@ -106,11 +107,17 @@ export default function SettingsPage() {
   }, []);
 
   const [llmSettings, setLlmSettings] = useState({
-    defaultModel: savedSettings?.llmSettings?.defaultModel || 'gpt-4',
+    defaultProvider: savedSettings?.llmSettings?.defaultProvider || 'openai',
+    defaultModel: savedSettings?.llmSettings?.defaultModel || '',
     temperature: savedSettings?.llmSettings?.temperature ?? 0.7,
     maxTokens: savedSettings?.llmSettings?.maxTokens || 4000,
     topP: savedSettings?.llmSettings?.topP ?? 1.0,
   });
+
+  // Fetch available models for the selected provider
+  const { models: availableModels, loading: modelsLoading } = useAvailableModels(
+    llmSettings.defaultProvider
+  );
 
   const [searchSettings, setSearchSettings] = useState({
     defaultProvider: savedSettings?.searchSettings?.defaultProvider || 'tavily',
@@ -378,6 +385,28 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
+                <Label htmlFor="default-provider">Default Provider</Label>
+                <Select
+                  value={llmSettings.defaultProvider}
+                  onValueChange={value =>
+                    setLlmSettings(prev => ({ ...prev, defaultProvider: value, defaultModel: '' }))
+                  }
+                >
+                  <SelectTrigger id="default-provider">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="openai">OpenAI</SelectItem>
+                    <SelectItem value="anthropic">Anthropic</SelectItem>
+                    <SelectItem value="gemini">Google Gemini</SelectItem>
+                    <SelectItem value="ollama">Ollama (Local)</SelectItem>
+                    <SelectItem value="lmstudio">LM Studio (Local)</SelectItem>
+                    <SelectItem value="cohere">Cohere</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="default-model">Default Model</Label>
                 <Select
                   value={llmSettings.defaultModel}
@@ -389,12 +418,17 @@ export default function SettingsPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="gpt-4">GPT-4</SelectItem>
-                    <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
-                    <SelectItem value="claude-3-opus">Claude 3 Opus</SelectItem>
-                    <SelectItem value="claude-3-sonnet">
-                      Claude 3 Sonnet
-                    </SelectItem>
+                    {modelsLoading ? (
+                      <SelectItem value="" disabled>Loading models...</SelectItem>
+                    ) : availableModels.length > 0 ? (
+                      availableModels.map(model => (
+                        <SelectItem key={model.id} value={model.id}>
+                          {model.name || model.id}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="" disabled>No models available</SelectItem>
+                    )}
                   </SelectContent>
                 </Select>
               </div>
