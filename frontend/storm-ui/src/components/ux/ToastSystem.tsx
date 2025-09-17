@@ -2,9 +2,16 @@
 
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  CheckCircle, AlertCircle, XCircle, Info, X, 
-  Loader2, ExternalLink, Download, Copy 
+import {
+  CheckCircle,
+  AlertCircle,
+  XCircle,
+  Info,
+  X,
+  Loader2,
+  ExternalLink,
+  Download,
+  Copy,
 } from 'lucide-react';
 import { Button } from '../ui/button';
 
@@ -45,53 +52,63 @@ export const useToast = () => {
 };
 
 // Toast provider component
-export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [toasts, setToasts] = useState<Toast[]>([]);
-
-  const addToast = useCallback((toast: Omit<Toast, 'id'>) => {
-    const id = `toast-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    const newToast: Toast = {
-      ...toast,
-      id,
-      duration: toast.duration ?? (toast.type === 'loading' ? undefined : 5000),
-    };
-
-    setToasts(prev => [...prev, newToast]);
-
-    // Auto-remove toast after duration (unless persistent or loading)
-    if (!newToast.persistent && newToast.type !== 'loading' && newToast.duration) {
-      setTimeout(() => {
-        removeToast(id);
-      }, newToast.duration);
-    }
-
-    return id;
-  }, []);
 
   const removeToast = useCallback((id: string) => {
     setToasts(prev => prev.filter(toast => toast.id !== id));
   }, []);
+
+  const addToast = useCallback(
+    (toast: Omit<Toast, 'id'>) => {
+      const id = `toast-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      const newToast: Toast = {
+        ...toast,
+        id,
+        duration:
+          toast.duration ?? (toast.type === 'loading' ? undefined : 5000),
+      };
+
+      setToasts(prev => [...prev, newToast]);
+
+      // Auto-remove toast after duration (unless persistent or loading)
+      if (
+        !newToast.persistent &&
+        newToast.type !== 'loading' &&
+        newToast.duration
+      ) {
+        setTimeout(() => {
+          removeToast(id);
+        }, newToast.duration);
+      }
+
+      return id;
+    },
+    [removeToast]
+  );
 
   const removeAllToasts = useCallback(() => {
     setToasts([]);
   }, []);
 
   const updateToast = useCallback((id: string, updates: Partial<Toast>) => {
-    setToasts(prev => 
-      prev.map(toast => 
-        toast.id === id ? { ...toast, ...updates } : toast
-      )
+    setToasts(prev =>
+      prev.map(toast => (toast.id === id ? { ...toast, ...updates } : toast))
     );
   }, []);
 
   return (
-    <ToastContext.Provider value={{
-      toasts,
-      addToast,
-      removeToast,
-      removeAllToasts,
-      updateToast,
-    }}>
+    <ToastContext.Provider
+      value={{
+        toasts,
+        addToast,
+        removeToast,
+        removeAllToasts,
+        updateToast,
+      }}
+    >
       {children}
       <ToastContainer />
     </ToastContext.Provider>
@@ -156,18 +173,18 @@ const ToastItem: React.FC<{ toast: Toast }> = ({ toast }) => {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: -20, scale: 0.95 }}
       layout
-      className={`max-w-md w-full ${styles.bg} border rounded-lg shadow-lg p-4 pointer-events-auto`}
+      className={`w-full max-w-md ${styles.bg} pointer-events-auto rounded-lg border p-4 shadow-lg`}
     >
       <div className="flex items-start gap-3">
         {/* Icon */}
         <div className="flex-shrink-0 pt-0.5">
-          <IconComponent 
-            className={`w-5 h-5 ${styles.iconColor} ${toast.type === 'loading' ? 'animate-spin' : ''}`} 
+          <IconComponent
+            className={`h-5 w-5 ${styles.iconColor} ${toast.type === 'loading' ? 'animate-spin' : ''}`}
           />
         </div>
 
         {/* Content */}
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0 flex-1">
           <p className={`text-sm font-semibold ${styles.titleColor}`}>
             {toast.title}
           </p>
@@ -179,7 +196,7 @@ const ToastItem: React.FC<{ toast: Toast }> = ({ toast }) => {
 
           {/* Actions */}
           {toast.actions && toast.actions.length > 0 && (
-            <div className="flex items-center gap-2 mt-3">
+            <div className="mt-3 flex items-center gap-2">
               {toast.actions.map((action, index) => (
                 <Button
                   key={index}
@@ -188,7 +205,7 @@ const ToastItem: React.FC<{ toast: Toast }> = ({ toast }) => {
                   onClick={() => action.action(toast.data)}
                   className="h-8 text-xs"
                 >
-                  {action.icon && <action.icon className="w-3 h-3 mr-1.5" />}
+                  {action.icon && <action.icon className="mr-1.5 h-3 w-3" />}
                   {action.label}
                 </Button>
               ))}
@@ -204,7 +221,7 @@ const ToastItem: React.FC<{ toast: Toast }> = ({ toast }) => {
             onClick={() => removeToast(toast.id)}
             className="h-6 w-6 p-0 text-gray-400 hover:text-gray-600"
           >
-            <X className="w-4 h-4" />
+            <X className="h-4 w-4" />
           </Button>
         </div>
       </div>
@@ -212,7 +229,7 @@ const ToastItem: React.FC<{ toast: Toast }> = ({ toast }) => {
       {/* Progress bar for timed toasts */}
       {toast.duration && !toast.persistent && toast.type !== 'loading' && (
         <motion.div
-          className="absolute bottom-0 left-0 h-1 bg-current opacity-20 rounded-b-lg"
+          className="absolute bottom-0 left-0 h-1 rounded-b-lg bg-current opacity-20"
           initial={{ width: '100%' }}
           animate={{ width: '0%' }}
           transition={{ duration: toast.duration / 1000, ease: 'linear' }}
@@ -227,7 +244,7 @@ const ToastContainer: React.FC = () => {
   const { toasts } = useToast();
 
   return (
-    <div className="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-md w-full pointer-events-none">
+    <div className="pointer-events-none fixed right-4 top-4 z-50 flex w-full max-w-md flex-col gap-2">
       <AnimatePresence mode="popLayout">
         {toasts.map(toast => (
           <ToastItem key={toast.id} toast={toast} />
@@ -241,99 +258,135 @@ const ToastContainer: React.FC = () => {
 export const useToastActions = () => {
   const { addToast, updateToast, removeToast } = useToast();
 
-  const showSuccess = useCallback((title: string, message?: string, actions?: ToastAction[]) => {
-    return addToast({ title, message, type: 'success', actions });
-  }, [addToast]);
+  const showSuccess = useCallback(
+    (title: string, message?: string, actions?: ToastAction[]) => {
+      return addToast({ title, message, type: 'success', actions });
+    },
+    [addToast]
+  );
 
-  const showError = useCallback((title: string, message?: string, actions?: ToastAction[]) => {
-    return addToast({ title, message, type: 'error', actions, persistent: true });
-  }, [addToast]);
-
-  const showWarning = useCallback((title: string, message?: string, actions?: ToastAction[]) => {
-    return addToast({ title, message, type: 'warning', actions });
-  }, [addToast]);
-
-  const showInfo = useCallback((title: string, message?: string, actions?: ToastAction[]) => {
-    return addToast({ title, message, type: 'info', actions });
-  }, [addToast]);
-
-  const showLoading = useCallback((title: string, message?: string) => {
-    return addToast({ title, message, type: 'loading', persistent: true });
-  }, [addToast]);
-
-  const showProgress = useCallback((title: string, message?: string, duration?: number) => {
-    const toastId = addToast({ 
-      title, 
-      message, 
-      type: 'loading', 
-      persistent: true,
-      data: { progress: 0 }
-    });
-
-    const updateProgress = (progress: number, newMessage?: string) => {
-      updateToast(toastId, { 
-        message: newMessage || message,
-        data: { progress: Math.min(100, Math.max(0, progress)) }
-      });
-    };
-
-    const complete = (successTitle?: string, successMessage?: string) => {
-      updateToast(toastId, {
-        title: successTitle || title,
-        message: successMessage,
-        type: 'success',
-        persistent: false,
-        duration: 3000
-      });
-    };
-
-    const fail = (errorTitle?: string, errorMessage?: string) => {
-      updateToast(toastId, {
-        title: errorTitle || title,
-        message: errorMessage,
+  const showError = useCallback(
+    (title: string, message?: string, actions?: ToastAction[]) => {
+      return addToast({
+        title,
+        message,
         type: 'error',
-        persistent: true
+        actions,
+        persistent: true,
       });
-    };
+    },
+    [addToast]
+  );
 
-    return { toastId, updateProgress, complete, fail };
-  }, [addToast, updateToast]);
+  const showWarning = useCallback(
+    (title: string, message?: string, actions?: ToastAction[]) => {
+      return addToast({ title, message, type: 'warning', actions });
+    },
+    [addToast]
+  );
 
-  const showWithActions = useCallback((
-    type: Toast['type'],
-    title: string,
-    message: string,
-    actions: ToastAction[]
-  ) => {
-    return addToast({ title, message, type, actions, persistent: true });
-  }, [addToast]);
+  const showInfo = useCallback(
+    (title: string, message?: string, actions?: ToastAction[]) => {
+      return addToast({ title, message, type: 'info', actions });
+    },
+    [addToast]
+  );
+
+  const showLoading = useCallback(
+    (title: string, message?: string) => {
+      return addToast({ title, message, type: 'loading', persistent: true });
+    },
+    [addToast]
+  );
+
+  const showProgress = useCallback(
+    (title: string, message?: string, duration?: number) => {
+      const toastId = addToast({
+        title,
+        message,
+        type: 'loading',
+        persistent: true,
+        data: { progress: 0 },
+      });
+
+      const updateProgress = (progress: number, newMessage?: string) => {
+        updateToast(toastId, {
+          message: newMessage || message,
+          data: { progress: Math.min(100, Math.max(0, progress)) },
+        });
+      };
+
+      const complete = (successTitle?: string, successMessage?: string) => {
+        updateToast(toastId, {
+          title: successTitle || title,
+          message: successMessage,
+          type: 'success',
+          persistent: false,
+          duration: 3000,
+        });
+      };
+
+      const fail = (errorTitle?: string, errorMessage?: string) => {
+        updateToast(toastId, {
+          title: errorTitle || title,
+          message: errorMessage,
+          type: 'error',
+          persistent: true,
+        });
+      };
+
+      return { toastId, updateProgress, complete, fail };
+    },
+    [addToast, updateToast]
+  );
+
+  const showWithActions = useCallback(
+    (
+      type: Toast['type'],
+      title: string,
+      message: string,
+      actions: ToastAction[]
+    ) => {
+      return addToast({ title, message, type, actions, persistent: true });
+    },
+    [addToast]
+  );
 
   // Pre-configured action creators
-  const createCopyAction = useCallback((text: string): ToastAction => ({
-    label: 'Copy',
-    icon: Copy,
-    action: () => {
-      navigator.clipboard.writeText(text);
-      showSuccess('Copied to clipboard');
-    }
-  }), [showSuccess]);
+  const createCopyAction = useCallback(
+    (text: string): ToastAction => ({
+      label: 'Copy',
+      icon: Copy,
+      action: () => {
+        navigator.clipboard.writeText(text);
+        showSuccess('Copied to clipboard');
+      },
+    }),
+    [showSuccess]
+  );
 
-  const createDownloadAction = useCallback((url: string, filename?: string): ToastAction => ({
-    label: 'Download',
-    icon: Download,
-    action: () => {
-      const a = document.createElement('a');
-      a.href = url;
-      if (filename) a.download = filename;
-      a.click();
-    }
-  }), []);
+  const createDownloadAction = useCallback(
+    (url: string, filename?: string): ToastAction => ({
+      label: 'Download',
+      icon: Download,
+      action: () => {
+        const a = document.createElement('a');
+        a.href = url;
+        if (filename) a.download = filename;
+        a.click();
+      },
+    }),
+    []
+  );
 
-  const createViewAction = useCallback((url: string): ToastAction => ({
-    label: 'View',
-    icon: ExternalLink,
-    action: () => window.open(url, '_blank')
-  }), []);
+  const createViewAction = useCallback(
+    (url: string): ToastAction => ({
+      label: 'View',
+      icon: ExternalLink,
+      action: () => window.open(url, '_blank'),
+    }),
+    []
+  );
 
   return {
     showSuccess,

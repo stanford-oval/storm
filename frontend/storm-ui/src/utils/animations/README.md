@@ -9,6 +9,7 @@ Comprehensive animation utilities built with Framer Motion for smooth, accessibl
 Page transition wrapper with predefined animation variants.
 
 **Usage:**
+
 ```tsx
 import { AnimatedPage } from '@/utils/animations/AnimatedPage';
 
@@ -23,6 +24,7 @@ function MyPage() {
 ```
 
 **Variants:**
+
 - `fadeIn`: Simple opacity transition
 - `slideUp/Down/Left/Right`: Slide animations
 - `scale`: Scale-based transitions
@@ -32,6 +34,7 @@ function MyPage() {
 ### Animated Components
 
 #### AnimatedCard
+
 Interactive card with hover and interaction effects.
 
 ```tsx
@@ -40,10 +43,11 @@ import { AnimatedCard } from '@/utils/animations/AnimatedComponents';
 <AnimatedCard hover lift>
   <h3>Card Title</h3>
   <p>Card content</p>
-</AnimatedCard>
+</AnimatedCard>;
 ```
 
 #### AnimatedButton
+
 Enhanced button with micro-interactions.
 
 ```tsx
@@ -54,17 +58,21 @@ import { AnimatedButton } from '@/utils/animations/AnimatedComponents';
   hover
   focus
   onClick={handleClick}
-  className="px-4 py-2 bg-blue-500 text-white rounded"
+  className="rounded bg-blue-500 px-4 py-2 text-white"
 >
   Click Me
-</AnimatedButton>
+</AnimatedButton>;
 ```
 
 #### AnimatedList / AnimatedListItem
+
 Staggered list animations.
 
 ```tsx
-import { AnimatedList, AnimatedListItem } from '@/utils/animations/AnimatedComponents';
+import {
+  AnimatedList,
+  AnimatedListItem,
+} from '@/utils/animations/AnimatedComponents';
 
 <AnimatedList stagger staggerDelay={0.1}>
   {items.map((item, index) => (
@@ -72,25 +80,28 @@ import { AnimatedList, AnimatedListItem } from '@/utils/animations/AnimatedCompo
       {item.content}
     </AnimatedListItem>
   ))}
-</AnimatedList>
+</AnimatedList>;
 ```
 
 #### LoadingSpinner
+
 Customizable loading indicators.
 
 ```tsx
 import { LoadingSpinner } from '@/utils/animations/AnimatedComponents';
 
-<LoadingSpinner size="lg" variant="bounce" />
+<LoadingSpinner size="lg" variant="bounce" />;
 ```
 
 **Variants:**
+
 - `spinner`: Rotating circle
 - `pulse`: Pulsing effect
 - `bounce`: Bouncing animation
 - `wave`: Wave-like animation
 
 #### AnimatedProgress
+
 Smooth progress bar animations.
 
 ```tsx
@@ -102,10 +113,11 @@ import { AnimatedProgress } from '@/utils/animations/AnimatedComponents';
   color="#3b82f6"
   showLabel
   labelPosition="inside"
-/>
+/>;
 ```
 
 #### FloatingActionButton
+
 Animated floating action button with ripple effects.
 
 ```tsx
@@ -117,10 +129,11 @@ import { Plus } from 'lucide-react';
   label="Add New Item"
   position="bottom-right"
   onClick={handleAdd}
-/>
+/>;
 ```
 
 #### AnimatedCounter
+
 Number counter with smooth transitions.
 
 ```tsx
@@ -129,70 +142,74 @@ import { AnimatedCounter } from '@/utils/animations/AnimatedComponents';
 <AnimatedCounter
   value={1234}
   duration={2}
-  format={(val) => val.toLocaleString()}
-/>
+  format={val => val.toLocaleString()}
+/>;
 ```
 
 #### Skeleton
+
 Loading skeleton with pulse animation.
 
 ```tsx
 import { Skeleton } from '@/utils/animations/AnimatedComponents';
 
-<Skeleton width="200px" height="20px" lines={3} />
+<Skeleton width="200px" height="20px" lines={3} />;
 ```
 
 ## Animation Variants
 
 ### Page Transitions
+
 ```typescript
 const pageTransitions = {
   fadeIn: {
     initial: { opacity: 0 },
     animate: { opacity: 1 },
-    exit: { opacity: 0 }
+    exit: { opacity: 0 },
   },
   slideUp: {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: -20 }
-  }
+    exit: { opacity: 0, y: -20 },
+  },
   // ... more variants
 };
 ```
 
 ### Modal Transitions
+
 ```typescript
 const modalTransitions = {
   backdrop: {
     initial: { opacity: 0 },
     animate: { opacity: 1 },
-    exit: { opacity: 0 }
+    exit: { opacity: 0 },
   },
   modal: {
     initial: { opacity: 0, scale: 0.95, y: 20 },
     animate: { opacity: 1, scale: 1, y: 0 },
-    exit: { opacity: 0, scale: 0.95, y: 20 }
-  }
+    exit: { opacity: 0, scale: 0.95, y: 20 },
+  },
 };
 ```
 
 ### List Animations
+
 ```typescript
 const listTransitions = {
   container: {
     animate: {
       transition: {
         staggerChildren: 0.1,
-        delayChildren: 0.1
-      }
-    }
+        delayChildren: 0.1,
+      },
+    },
   },
   item: {
     initial: { opacity: 0, y: 20, scale: 0.95 },
     animate: { opacity: 1, y: 0, scale: 1 },
-    exit: { opacity: 0, y: -20, scale: 0.95 }
-  }
+    exit: { opacity: 0, y: -20, scale: 0.95 },
+  },
 };
 ```
 
@@ -207,13 +224,14 @@ const easings = {
   easeIn: [0.4, 0, 1, 1],
   spring: { type: 'spring', stiffness: 300, damping: 30 },
   gentle: { type: 'spring', stiffness: 100, damping: 20 },
-  bouncy: { type: 'spring', stiffness: 400, damping: 10 }
+  bouncy: { type: 'spring', stiffness: 400, damping: 10 },
 };
 ```
 
 ## Usage Examples
 
 ### Page Navigation
+
 ```tsx
 import { AnimatedPage } from '@/utils/animations';
 import { AnimatePresence } from 'framer-motion';
@@ -230,6 +248,7 @@ function App() {
 ```
 
 ### Modal Implementation
+
 ```tsx
 import { motion, AnimatePresence } from 'framer-motion';
 import { modalTransitions } from '@/utils/animations';
@@ -252,7 +271,7 @@ function Modal({ isOpen, onClose, children }) {
             initial="initial"
             animate="animate"
             exit="exit"
-            className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform"
           >
             {children}
           </motion.div>
@@ -264,6 +283,7 @@ function Modal({ isOpen, onClose, children }) {
 ```
 
 ### Staggered Grid
+
 ```tsx
 import { motion } from 'framer-motion';
 import { listTransitions } from '@/utils/animations';
@@ -276,11 +296,11 @@ function Grid({ items }) {
       animate="animate"
       className="grid grid-cols-3 gap-4"
     >
-      {items.map((item) => (
+      {items.map(item => (
         <motion.div
           key={item.id}
           variants={listTransitions.item}
-          className="bg-white rounded-lg p-4 shadow"
+          className="rounded-lg bg-white p-4 shadow"
         >
           {item.content}
         </motion.div>

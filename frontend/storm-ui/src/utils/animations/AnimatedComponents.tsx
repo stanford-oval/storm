@@ -2,12 +2,12 @@
 
 import React, { forwardRef } from 'react';
 import { motion, HTMLMotionProps, Variants } from 'framer-motion';
-import { 
-  cardTransitions, 
-  buttonAnimations, 
-  loadingAnimations, 
+import {
+  cardTransitions,
+  buttonAnimations,
+  loadingAnimations,
   listTransitions,
-  transitions 
+  transitions,
 } from './transitions';
 
 // Animated Card Component
@@ -18,36 +18,41 @@ interface AnimatedCardProps extends HTMLMotionProps<'div'> {
   children: React.ReactNode;
 }
 
-export const AnimatedCard = forwardRef<HTMLDivElement, AnimatedCardProps>(({
-  hover = false,
-  lift = false,
-  flip = false,
-  children,
-  className,
-  ...props
-}, ref) => {
-  let variants: Variants = {};
-  
-  if (hover) variants = cardTransitions.hover;
-  if (lift) variants = { ...variants, ...cardTransitions.lift };
-  if (flip) variants = { ...variants, ...cardTransitions.flip };
+export const AnimatedCard = forwardRef<HTMLDivElement, AnimatedCardProps>(
+  (
+    {
+      hover = false,
+      lift = false,
+      flip = false,
+      children,
+      className,
+      ...props
+    },
+    ref
+  ) => {
+    let variants: Variants = {};
 
-  return (
-    <motion.div
-      ref={ref}
-      variants={variants}
-      initial={lift || flip ? 'initial' : hover ? 'rest' : undefined}
-      animate={lift || flip ? 'animate' : hover ? 'rest' : undefined}
-      whileHover={hover ? 'hover' : undefined}
-      exit={lift || flip ? 'exit' : undefined}
-      transition={transitions.default}
-      className={className}
-      {...props}
-    >
-      {children}
-    </motion.div>
-  );
-});
+    if (hover) variants = cardTransitions.hover;
+    if (lift) variants = { ...variants, ...cardTransitions.lift };
+    if (flip) variants = { ...variants, ...cardTransitions.flip };
+
+    return (
+      <motion.div
+        ref={ref}
+        variants={variants}
+        initial={lift || flip ? 'initial' : hover ? 'rest' : undefined}
+        animate={lift || flip ? 'animate' : hover ? 'rest' : undefined}
+        whileHover={hover ? 'hover' : undefined}
+        exit={lift || flip ? 'exit' : undefined}
+        transition={transitions.default}
+        className={className}
+        {...props}
+      >
+        {children}
+      </motion.div>
+    );
+  }
+);
 
 AnimatedCard.displayName = 'AnimatedCard';
 
@@ -59,13 +64,10 @@ interface AnimatedButtonProps extends HTMLMotionProps<'button'> {
   children: React.ReactNode;
 }
 
-export const AnimatedButton = forwardRef<HTMLButtonElement, AnimatedButtonProps>(({
-  tap = true,
-  hover = true,
-  focus = true,
-  children,
-  ...props
-}, ref) => {
+export const AnimatedButton = forwardRef<
+  HTMLButtonElement,
+  AnimatedButtonProps
+>(({ tap = true, hover = true, focus = true, children, ...props }, ref) => {
   return (
     <motion.button
       ref={ref}
@@ -89,38 +91,35 @@ interface AnimatedListProps extends HTMLMotionProps<'div'> {
   children: React.ReactNode;
 }
 
-export const AnimatedList = forwardRef<HTMLDivElement, AnimatedListProps>(({
-  stagger = true,
-  staggerDelay = 0.1,
-  children,
-  ...props
-}, ref) => {
-  const variants = stagger 
-    ? {
-        ...listTransitions.container,
-        animate: {
-          ...listTransitions.container.animate,
-          transition: {
-            staggerChildren: staggerDelay,
-            delayChildren: 0.1,
+export const AnimatedList = forwardRef<HTMLDivElement, AnimatedListProps>(
+  ({ stagger = true, staggerDelay = 0.1, children, ...props }, ref) => {
+    const variants = stagger
+      ? {
+          ...listTransitions.container,
+          animate: {
+            ...listTransitions.container.animate,
+            transition: {
+              staggerChildren: staggerDelay,
+              delayChildren: 0.1,
+            },
           },
-        },
-      }
-    : {};
+        }
+      : {};
 
-  return (
-    <motion.div
-      ref={ref}
-      variants={variants}
-      initial="initial"
-      animate="animate"
-      exit="exit"
-      {...props}
-    >
-      {children}
-    </motion.div>
-  );
-});
+    return (
+      <motion.div
+        ref={ref}
+        variants={variants}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        {...props}
+      >
+        {children}
+      </motion.div>
+    );
+  }
+);
 
 AnimatedList.displayName = 'AnimatedList';
 
@@ -130,11 +129,10 @@ interface AnimatedListItemProps extends HTMLMotionProps<'div'> {
   children: React.ReactNode;
 }
 
-export const AnimatedListItem = forwardRef<HTMLDivElement, AnimatedListItemProps>(({
-  variant = 'item',
-  children,
-  ...props
-}, ref) => {
+export const AnimatedListItem = forwardRef<
+  HTMLDivElement,
+  AnimatedListItemProps
+>(({ variant = 'item', children, ...props }, ref) => {
   return (
     <motion.div
       ref={ref}
@@ -167,9 +165,10 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
     lg: 'w-8 h-8',
   };
 
-  const baseClasses = variant === 'spinner' 
-    ? `${sizeClasses[size]} border-2 border-gray-200 border-t-blue-500 rounded-full`
-    : `${sizeClasses[size]} bg-blue-500 rounded-full`;
+  const baseClasses =
+    variant === 'spinner'
+      ? `${sizeClasses[size]} border-2 border-gray-200 border-t-blue-500 rounded-full`
+      : `${sizeClasses[size]} bg-blue-500 rounded-full`;
 
   return (
     <motion.div
@@ -206,18 +205,18 @@ export const AnimatedProgress: React.FC<AnimatedProgressProps> = ({
   return (
     <div className={`relative ${className || ''}`}>
       {showLabel && labelPosition === 'outside' && (
-        <div className="flex justify-between text-sm text-gray-600 mb-1">
+        <div className="mb-1 flex justify-between text-sm text-gray-600">
           <span>Progress</span>
           <span>{Math.round(clampedProgress)}%</span>
         </div>
       )}
-      
-      <div 
-        className="w-full rounded-full overflow-hidden"
+
+      <div
+        className="w-full overflow-hidden rounded-full"
         style={{ height, backgroundColor }}
       >
         <motion.div
-          className="h-full rounded-full flex items-center justify-center relative"
+          className="relative flex h-full items-center justify-center rounded-full"
           style={{ backgroundColor: color }}
           initial={{ width: '0%' }}
           animate={{ width: `${clampedProgress}%` }}
@@ -225,7 +224,7 @@ export const AnimatedProgress: React.FC<AnimatedProgressProps> = ({
           {...props}
         >
           {showLabel && labelPosition === 'inside' && (
-            <span className="text-xs text-white font-medium px-2">
+            <span className="px-2 text-xs font-medium text-white">
               {Math.round(clampedProgress)}%
             </span>
           )}
@@ -258,7 +257,7 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
 
   return (
     <motion.button
-      className={`fixed ${positionClasses[position]} bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-full shadow-lg z-50 ${className || ''}`}
+      className={`fixed ${positionClasses[position]} z-50 rounded-full bg-blue-500 p-4 text-white shadow-lg hover:bg-blue-600 ${className || ''}`}
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.95 }}
       initial={{ scale: 0, rotate: -180 }}
@@ -267,16 +266,13 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
       title={label}
       {...props}
     >
-      <motion.div
-        whileHover={{ rotate: 15 }}
-        transition={transitions.quick}
-      >
+      <motion.div whileHover={{ rotate: 15 }} transition={transitions.quick}>
         {icon}
       </motion.div>
-      
+
       {/* Ripple effect on click */}
       <motion.div
-        className="absolute inset-0 bg-white rounded-full opacity-20"
+        className="absolute inset-0 rounded-full bg-white opacity-20"
         initial={{ scale: 0 }}
         whileTap={{ scale: 1 }}
         transition={{ duration: 0.2 }}
@@ -296,7 +292,7 @@ interface AnimatedCounterProps {
 export const AnimatedCounter: React.FC<AnimatedCounterProps> = ({
   value,
   duration = 1,
-  format = (val) => Math.round(val).toString(),
+  format = val => Math.round(val).toString(),
   className,
 }) => {
   return (
@@ -304,12 +300,12 @@ export const AnimatedCounter: React.FC<AnimatedCounterProps> = ({
       className={className}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: duration * 0.3 }}
     >
       <motion.span
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: duration * 0.5 }}
       >
         {format(value)}
       </motion.span>

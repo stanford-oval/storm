@@ -25,7 +25,8 @@ export function useAnalytics() {
       }
       return null;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to get analytics';
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to get analytics';
       setError(errorMessage);
       return null;
     } finally {
@@ -33,22 +34,31 @@ export function useAnalytics() {
     }
   }, []);
 
-  const getProjectAnalytics = useCallback(async (projectId: string, options?: any) => {
-    setLoading(true);
-    try {
-      const response = await analyticsService.getProjectAnalytics(projectId, options);
-      if (response.success && response.data) {
-        return response.data;
+  const getProjectAnalytics = useCallback(
+    async (projectId: string, options?: any) => {
+      setLoading(true);
+      try {
+        const response = await analyticsService.getProjectAnalytics(
+          projectId,
+          options
+        );
+        if (response.success && response.data) {
+          return response.data;
+        }
+        return null;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error
+            ? err.message
+            : 'Failed to get project analytics';
+        setError(errorMessage);
+        return null;
+      } finally {
+        setLoading(false);
       }
-      return null;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to get project analytics';
-      setError(errorMessage);
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    },
+    []
+  );
 
   return {
     loading,

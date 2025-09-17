@@ -34,8 +34,8 @@ interface BreakpointState {
 
 export const useBreakpoint = (): BreakpointState => {
   const { width } = useWindowSize();
-  const [breakpointState, setBreakpointState] = useState<BreakpointState>(() => 
-    getBreakpointState(width || 1024) // Default to desktop width
+  const [breakpointState, setBreakpointState] = useState<BreakpointState>(
+    () => getBreakpointState(width || 1024) // Default to desktop width
   );
 
   useEffect(() => {
@@ -109,12 +109,24 @@ export const useBreakpointValue = <T>(values: {
   '2xl'?: T;
 }): T | undefined => {
   const { current } = useBreakpoint();
-  
+
   // Return the value for current breakpoint or fallback to smaller breakpoints
   if (current === '2xl' && values['2xl'] !== undefined) return values['2xl'];
-  if ((current === '2xl' || current === 'xl') && values.xl !== undefined) return values.xl;
-  if ((current === '2xl' || current === 'xl' || current === 'lg') && values.lg !== undefined) return values.lg;
-  if ((current === '2xl' || current === 'xl' || current === 'lg' || current === 'md') && values.md !== undefined) return values.md;
+  if ((current === '2xl' || current === 'xl') && values.xl !== undefined)
+    return values.xl;
+  if (
+    (current === '2xl' || current === 'xl' || current === 'lg') &&
+    values.lg !== undefined
+  )
+    return values.lg;
+  if (
+    (current === '2xl' ||
+      current === 'xl' ||
+      current === 'lg' ||
+      current === 'md') &&
+    values.md !== undefined
+  )
+    return values.md;
   if (current !== 'xs' && values.sm !== undefined) return values.sm;
   return values.xs;
 };
@@ -147,7 +159,7 @@ export const useResponsiveSpacing = (config: {
 // Hook to check if we're on mobile/tablet/desktop
 export const useDeviceType = () => {
   const { isSmDown, isMdDown, isLgUp } = useBreakpoint();
-  
+
   return {
     isMobile: isSmDown,
     isTablet: !isSmDown && isMdDown,
@@ -180,7 +192,7 @@ export const useMediaQuery = (query: string): boolean => {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    
+
     const mediaQuery = window.matchMedia(query);
     setMatches(mediaQuery.matches);
 
@@ -201,10 +213,14 @@ export const useCommonMediaQueries = () => {
   const isTablet = useMediaQuery('(min-width: 768px) and (max-width: 1023px)');
   const isDesktop = useMediaQuery('(min-width: 1024px)');
   const isTouch = useMediaQuery('(hover: none) and (pointer: coarse)');
-  const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
+  const prefersReducedMotion = useMediaQuery(
+    '(prefers-reduced-motion: reduce)'
+  );
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  const isHighDensity = useMediaQuery('(-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi)');
-  
+  const isHighDensity = useMediaQuery(
+    '(-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi)'
+  );
+
   return {
     isMobile,
     isTablet,

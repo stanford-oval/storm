@@ -1,3 +1,9 @@
+// Import hooks for internal use in composite functions
+import { useProject } from './useProjects';
+import { usePipeline } from './usePipeline';
+import { useResearch } from './useResearch';
+import { usePipelineWebSocket } from './useWebSocket';
+
 // API hooks exports
 export {
   useProjects,
@@ -54,7 +60,7 @@ export { useApiKeys } from './useApiKeys';
 export function useProjectWithPipeline(projectId: string) {
   const project = useProject({ projectId });
   const pipeline = usePipeline({ projectId });
-  
+
   return {
     ...project,
     pipeline: pipeline.status,
@@ -70,7 +76,7 @@ export function useProjectWithPipeline(projectId: string) {
 export function useProjectWithResearch(projectId: string) {
   const project = useProject({ projectId });
   const research = useResearch({ projectId });
-  
+
   return {
     ...project,
     research: research.research,
@@ -83,7 +89,13 @@ export function useProjectWithResearch(projectId: string) {
 }
 
 // Hook for managing multiple projects
+// Note: This hook is commented out as it violates React Hook rules
+// (hooks cannot be called inside loops/callbacks)
+// TODO: Refactor to use a different pattern if needed
+/*
 export function useMultipleProjects(projectIds: string[]) {
+  // This pattern violates React Hook rules - hooks must be called unconditionally
+  // Consider using a single hook with multiple IDs or a different state management approach
   const projects = projectIds.map(id => useProject({ projectId: id }));
   
   const loading = projects.some(p => p.loading);
@@ -98,15 +110,16 @@ export function useMultipleProjects(projectIds: string[]) {
     refetchAll: () => Promise.all(projects.map(p => p.refetch())),
   };
 }
+*/
 
 // Hook for real-time project updates
 export function useRealTimeProject(projectId: string) {
   const project = useProject({ projectId });
-  const pipeline = usePipelineWebSocket(projectId, (update) => {
+  const pipeline = usePipelineWebSocket(projectId, update => {
     // Handle pipeline updates
     console.log('Pipeline update:', update);
   });
-  
+
   return {
     ...project,
     isConnected: pipeline.isConnected,
@@ -118,7 +131,7 @@ export function useRealTimeProject(projectId: string) {
 export function useProjectCollaboration(projectId: string) {
   const project = useProject({ projectId });
   // This would integrate with session management for collaborative features
-  
+
   return {
     ...project,
     // Add collaboration-specific methods here

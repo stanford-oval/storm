@@ -17,7 +17,9 @@ export class ResearchService extends BaseApiService {
   /**
    * Get research data for a project
    */
-  async getProjectResearch(projectId: string): Promise<ApiResponse<ResearchData>> {
+  async getProjectResearch(
+    projectId: string
+  ): Promise<ApiResponse<ResearchData>> {
     return this.get<ResearchData>(`${this.basePath}/projects/${projectId}`);
   }
 
@@ -56,7 +58,7 @@ export class ResearchService extends BaseApiService {
    * Get a specific conversation
    */
   async getConversation(
-    projectId: string, 
+    projectId: string,
     conversationId: string
   ): Promise<ApiResponse<ConversationData>> {
     return this.get<ConversationData>(
@@ -93,8 +95,13 @@ export class ResearchService extends BaseApiService {
   /**
    * Get a specific source
    */
-  async getSource(projectId: string, sourceId: string): Promise<ApiResponse<SourceData>> {
-    return this.get<SourceData>(`${this.basePath}/projects/${projectId}/sources/${sourceId}`);
+  async getSource(
+    projectId: string,
+    sourceId: string
+  ): Promise<ApiResponse<SourceData>> {
+    return this.get<SourceData>(
+      `${this.basePath}/projects/${projectId}/sources/${sourceId}`
+    );
   }
 
   /**
@@ -110,7 +117,10 @@ export class ResearchService extends BaseApiService {
       metadata?: Record<string, any>;
     }
   ): Promise<ApiResponse<SourceData>> {
-    return this.post<SourceData>(`${this.basePath}/projects/${projectId}/sources`, source);
+    return this.post<SourceData>(
+      `${this.basePath}/projects/${projectId}/sources`,
+      source
+    );
   }
 
   /**
@@ -130,8 +140,13 @@ export class ResearchService extends BaseApiService {
   /**
    * Delete a source
    */
-  async deleteSource(projectId: string, sourceId: string): Promise<ApiResponse<void>> {
-    return this.delete<void>(`${this.basePath}/projects/${projectId}/sources/${sourceId}`);
+  async deleteSource(
+    projectId: string,
+    sourceId: string
+  ): Promise<ApiResponse<void>> {
+    return this.delete<void>(
+      `${this.basePath}/projects/${projectId}/sources/${sourceId}`
+    );
   }
 
   /**
@@ -151,8 +166,12 @@ export class ResearchService extends BaseApiService {
   /**
    * Get research perspectives
    */
-  async getPerspectives(projectId: string): Promise<ApiResponse<ResearchPerspective[]>> {
-    return this.get<ResearchPerspective[]>(`${this.basePath}/projects/${projectId}/perspectives`);
+  async getPerspectives(
+    projectId: string
+  ): Promise<ApiResponse<ResearchPerspective[]>> {
+    return this.get<ResearchPerspective[]>(
+      `${this.basePath}/projects/${projectId}/perspectives`
+    );
   }
 
   /**
@@ -190,7 +209,10 @@ export class ResearchService extends BaseApiService {
   /**
    * Delete a research perspective
    */
-  async deletePerspective(projectId: string, perspectiveId: string): Promise<ApiResponse<void>> {
+  async deletePerspective(
+    projectId: string,
+    perspectiveId: string
+  ): Promise<ApiResponse<void>> {
     return this.delete<void>(
       `${this.basePath}/projects/${projectId}/perspectives/${perspectiveId}`
     );
@@ -222,17 +244,24 @@ export class ResearchService extends BaseApiService {
       filters?: SearchFilters;
     }
   ): Promise<ApiResponse<QueryResult>> {
-    return this.post<QueryResult>(`${this.basePath}/projects/${projectId}/query`, {
-      query,
-      ...options
-    });
+    return this.post<QueryResult>(
+      `${this.basePath}/projects/${projectId}/query`,
+      {
+        query,
+        ...options,
+      }
+    );
   }
 
   /**
    * Get research analytics
    */
-  async getResearchAnalytics(projectId: string): Promise<ApiResponse<ResearchAnalytics>> {
-    return this.get<ResearchAnalytics>(`${this.basePath}/projects/${projectId}/analytics`);
+  async getResearchAnalytics(
+    projectId: string
+  ): Promise<ApiResponse<ResearchAnalytics>> {
+    return this.get<ResearchAnalytics>(
+      `${this.basePath}/projects/${projectId}/analytics`
+    );
   }
 
   /**
@@ -274,21 +303,32 @@ export class ResearchService extends BaseApiService {
       includeStats?: boolean;
     }
   ): Promise<ApiResponse<ResearchSummary>> {
-    return this.post<ResearchSummary>(`${this.basePath}/projects/${projectId}/summarize`, options);
+    return this.post<ResearchSummary>(
+      `${this.basePath}/projects/${projectId}/summarize`,
+      options
+    );
   }
 
   /**
    * Find research gaps
    */
-  async findResearchGaps(projectId: string): Promise<ApiResponse<ResearchGap[]>> {
-    return this.get<ResearchGap[]>(`${this.basePath}/projects/${projectId}/gaps`);
+  async findResearchGaps(
+    projectId: string
+  ): Promise<ApiResponse<ResearchGap[]>> {
+    return this.get<ResearchGap[]>(
+      `${this.basePath}/projects/${projectId}/gaps`
+    );
   }
 
   /**
    * Get research timeline
    */
-  async getResearchTimeline(projectId: string): Promise<ApiResponse<ResearchTimelineEntry[]>> {
-    return this.get<ResearchTimelineEntry[]>(`${this.basePath}/projects/${projectId}/timeline`);
+  async getResearchTimeline(
+    projectId: string
+  ): Promise<ApiResponse<ResearchTimelineEntry[]>> {
+    return this.get<ResearchTimelineEntry[]>(
+      `${this.basePath}/projects/${projectId}/timeline`
+    );
   }
 
   /**
@@ -361,7 +401,9 @@ export class ResearchService extends BaseApiService {
   /**
    * Get report generation status
    */
-  async getReportStatus(jobId: string): Promise<ApiResponse<ReportGenerationJob>> {
+  async getReportStatus(
+    jobId: string
+  ): Promise<ApiResponse<ReportGenerationJob>> {
     return this.get<ReportGenerationJob>(`${this.basePath}/reports/${jobId}`);
   }
 
@@ -430,8 +472,13 @@ export class ResearchService extends BaseApiService {
   /**
    * Delete research bookmark
    */
-  async deleteBookmark(projectId: string, bookmarkId: string): Promise<ApiResponse<void>> {
-    return this.delete<void>(`${this.basePath}/projects/${projectId}/bookmarks/${bookmarkId}`);
+  async deleteBookmark(
+    projectId: string,
+    bookmarkId: string
+  ): Promise<ApiResponse<void>> {
+    return this.delete<void>(
+      `${this.basePath}/projects/${projectId}/bookmarks/${bookmarkId}`
+    );
   }
 }
 
@@ -557,7 +604,11 @@ export interface ResearchGap {
 export interface ResearchTimelineEntry {
   id: string;
   timestamp: Date;
-  type: 'conversation' | 'source_added' | 'query_executed' | 'perspective_added';
+  type:
+    | 'conversation'
+    | 'source_added'
+    | 'query_executed'
+    | 'perspective_added';
   title: string;
   description: string;
   metadata?: Record<string, any>;
@@ -623,5 +674,5 @@ export interface ResearchBookmark {
 
 // Create and export singleton instance
 export const researchService = new ResearchService({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
 });

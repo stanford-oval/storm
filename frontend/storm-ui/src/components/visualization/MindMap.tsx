@@ -3,7 +3,16 @@
 import React, { useEffect, useRef, useCallback, useMemo } from 'react';
 import * as d3 from 'd3';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, ZoomIn, ZoomOut, RotateCcw, Download, Upload, Filter, Settings } from 'lucide-react';
+import {
+  Search,
+  ZoomIn,
+  ZoomOut,
+  RotateCcw,
+  Download,
+  Upload,
+  Filter,
+  Settings,
+} from 'lucide-react';
 import { useMindMap } from '../../hooks/useMindMap';
 import { MindMapNode, MindMapLink } from '../../types/mindmap';
 import { Button } from '../ui/button';
@@ -37,9 +46,15 @@ export const MindMap: React.FC<MindMapProps> = ({
   showControls = true,
   showMinimap = true,
 }) => {
-  const { state, actions, computed, refs } = useMindMap(initialNodes, initialLinks);
+  const { state, actions, computed, refs } = useMindMap(
+    initialNodes,
+    initialLinks
+  );
   const containerRef = useRef<HTMLDivElement>(null);
-  const zoomBehaviorRef = useRef<d3.ZoomBehavior<SVGSVGElement, unknown>>();
+  const zoomBehaviorRef = useRef<d3.ZoomBehavior<
+    SVGSVGElement,
+    unknown
+  > | null>(null);
 
   // Update viewport dimensions
   useEffect(() => {
@@ -52,7 +67,7 @@ export const MindMap: React.FC<MindMapProps> = ({
 
     const svg = d3.select(refs.svg.current);
     const container = d3.select(containerRef.current);
-    
+
     // Clear previous content
     svg.selectAll('*').remove();
 
@@ -69,14 +84,15 @@ export const MindMap: React.FC<MindMapProps> = ({
     const nodesGroup = g.append('g').attr('class', 'nodes');
 
     // Set up zoom behavior
-    const zoom = d3.zoom<SVGSVGElement, unknown>()
+    const zoom = d3
+      .zoom<SVGSVGElement, unknown>()
       .scaleExtent([0.1, 5])
-      .on('zoom', (event) => {
+      .on('zoom', event => {
         const { x, y, k } = event.transform;
-        actions.updateViewport({ 
-          scale: k, 
-          translateX: x, 
-          translateY: y 
+        actions.updateViewport({
+          scale: k,
+          translateX: x,
+          translateY: y,
         });
         g.attr('transform', event.transform);
       });
@@ -94,178 +110,226 @@ export const MindMap: React.FC<MindMapProps> = ({
   }, [refs.svg, state.viewport, actions]);
 
   // Render clusters
-  const renderClusters = useCallback((clustersGroup: d3.Selection<SVGGElement, unknown, null, undefined>) => {
-    const clusters = clustersGroup
-      .selectAll<SVGCircleElement, any>('.cluster')
-      .data(state.clusters, (d: any) => d.id);
+  const renderClusters = useCallback(
+    (clustersGroup: d3.Selection<SVGGElement, unknown, null, undefined>) => {
+      const clusters = clustersGroup
+        .selectAll<SVGCircleElement, any>('.cluster')
+        .data(state.clusters, (d: any) => d.id);
 
-    clusters.exit().remove();
+      clusters.exit().remove();
 
-    const clustersEnter = clusters.enter()
-      .append('circle')
-      .attr('class', 'cluster')
-      .attr('fill', d => d.color)
-      .attr('opacity', d => d.opacity)
-      .attr('stroke', 'none')
-      .attr('pointer-events', 'none');
+      const clustersEnter = clusters
+        .enter()
+        .append('circle')
+        .attr('class', 'cluster')
+        .attr('fill', d => d.color)
+        .attr('opacity', d => d.opacity)
+        .attr('stroke', 'none')
+        .attr('pointer-events', 'none');
 
-    clusters.merge(clustersEnter)
-      .transition()
-      .duration(state.config.animation.duration)
-      .attr('cx', d => d.center.x)
-      .attr('cy', d => d.center.y)
-      .attr('r', d => d.radius);
-  }, [state.clusters, state.config.animation.duration]);
+      clusters
+        .merge(clustersEnter)
+        .transition()
+        .duration(state.config.animation.duration)
+        .attr('cx', d => d.center.x)
+        .attr('cy', d => d.center.y)
+        .attr('r', d => d.radius);
+    },
+    [state.clusters, state.config.animation.duration]
+  );
 
   // Render links
-  const renderLinks = useCallback((linksGroup: d3.Selection<SVGGElement, unknown, null, undefined>) => {
-    const links = linksGroup
-      .selectAll<SVGLineElement, any>('.link')
-      .data(computed.visibleLinks, (d: any) => d.id);
+  const renderLinks = useCallback(
+    (linksGroup: d3.Selection<SVGGElement, unknown, null, undefined>) => {
+      const links = linksGroup
+        .selectAll<SVGLineElement, any>('.link')
+        .data(computed.visibleLinks, (d: any) => d.id);
 
-    links.exit().remove();
+      links.exit().remove();
 
-    const linksEnter = links.enter()
-      .append('line')
-      .attr('class', 'link')
-      .attr('stroke-width', d => d.style?.width || 2)
-      .attr('stroke', d => d.style?.color || state.config.linkColors[d.type])
-      .attr('stroke-opacity', d => d.style?.opacity || 0.7)
-      .attr('stroke-dasharray', d => d.style?.animated ? '5,5' : 'none')
-      .style('cursor', onLinkClick ? 'pointer' : 'default');
+      const linksEnter = links
+        .enter()
+        .append('line')
+        .attr('class', 'link')
+        .attr('stroke-width', d => d.style?.width || 2)
+        .attr('stroke', d => d.style?.color || state.config.linkColors[d.type])
+        .attr('stroke-opacity', d => d.style?.opacity || 0.7)
+        .attr('stroke-dasharray', d => (d.style?.animated ? '5,5' : 'none'))
+        .style('cursor', onLinkClick ? 'pointer' : 'default');
 
-    if (onLinkClick) {
-      linksEnter.on('click', (event, d) => {
-        event.stopPropagation();
-        onLinkClick(d);
-      });
-    }
+      if (onLinkClick) {
+        linksEnter.on('click', (event, d) => {
+          event.stopPropagation();
+          onLinkClick(d);
+        });
+      }
 
-    links.merge(linksEnter)
-      .attr('x1', d => {
-        const source = computed.visibleNodes.find(n => n.id === d.source);
-        return source?.position?.x || 0;
-      })
-      .attr('y1', d => {
-        const source = computed.visibleNodes.find(n => n.id === d.source);
-        return source?.position?.y || 0;
-      })
-      .attr('x2', d => {
-        const target = computed.visibleNodes.find(n => n.id === d.target);
-        return target?.position?.x || 0;
-      })
-      .attr('y2', d => {
-        const target = computed.visibleNodes.find(n => n.id === d.target);
-        return target?.position?.y || 0;
-      });
-  }, [computed.visibleLinks, computed.visibleNodes, state.config.linkColors, onLinkClick]);
+      links
+        .merge(linksEnter)
+        .attr('x1', d => {
+          const source = computed.visibleNodes.find(n => n.id === d.source);
+          return source?.position?.x || 0;
+        })
+        .attr('y1', d => {
+          const source = computed.visibleNodes.find(n => n.id === d.source);
+          return source?.position?.y || 0;
+        })
+        .attr('x2', d => {
+          const target = computed.visibleNodes.find(n => n.id === d.target);
+          return target?.position?.x || 0;
+        })
+        .attr('y2', d => {
+          const target = computed.visibleNodes.find(n => n.id === d.target);
+          return target?.position?.y || 0;
+        });
+    },
+    [
+      computed.visibleLinks,
+      computed.visibleNodes,
+      state.config.linkColors,
+      onLinkClick,
+    ]
+  );
 
   // Render nodes
-  const renderNodes = useCallback((nodesGroup: d3.Selection<SVGGElement, unknown, null, undefined>) => {
-    const nodes = nodesGroup
-      .selectAll<SVGGElement, any>('.node')
-      .data(computed.visibleNodes, (d: any) => d.id);
+  const renderNodes = useCallback(
+    (nodesGroup: d3.Selection<SVGGElement, unknown, null, undefined>) => {
+      const nodes = nodesGroup
+        .selectAll<SVGGElement, any>('.node')
+        .data(computed.visibleNodes, (d: any) => d.id);
 
-    nodes.exit().remove();
+      nodes.exit().remove();
 
-    const nodesEnter = nodes.enter()
-      .append('g')
-      .attr('class', 'node')
-      .style('cursor', 'pointer')
-      .call(d3.drag<SVGGElement, MindMapNode>()
-        .on('start', (event, d) => {
-          if (!event.active && refs.simulation.current) {
-            refs.simulation.current.alphaTarget(0.3).restart();
+      const nodesEnter = nodes
+        .enter()
+        .append('g')
+        .attr('class', 'node')
+        .style('cursor', 'pointer')
+        .call(
+          d3
+            .drag<SVGGElement, MindMapNode>()
+            .on('start', (event, d) => {
+              if (!event.active && refs.simulation.current) {
+                refs.simulation.current.alphaTarget(0.3).restart();
+              }
+              (d as any).fx = d.position?.x;
+              (d as any).fy = d.position?.y;
+            })
+            .on('drag', (event, d) => {
+              (d as any).fx = event.x;
+              (d as any).fy = event.y;
+              actions.updateNode(d.id, {
+                position: { x: event.x, y: event.y },
+              });
+            })
+            .on('end', (event, d) => {
+              if (!event.active && refs.simulation.current) {
+                refs.simulation.current.alphaTarget(0);
+              }
+              (d as any).fx = null;
+              (d as any).fy = null;
+            })
+        );
+
+      // Add circle for node
+      nodesEnter
+        .append('circle')
+        .attr('class', 'node-circle')
+        .attr('r', d => d.style?.size || 20)
+        .attr('fill', d => d.style?.color || state.config.nodeColors[d.type])
+        .attr('stroke', '#fff')
+        .attr('stroke-width', 2);
+
+      // Add text label
+      nodesEnter
+        .append('text')
+        .attr('class', 'node-label')
+        .attr('text-anchor', 'middle')
+        .attr('dy', '.35em')
+        .style('font-size', '12px')
+        .style('font-weight', '500')
+        .style('fill', '#fff')
+        .style('pointer-events', 'none')
+        .text(d =>
+          d.label.length > 10 ? d.label.substring(0, 10) + '...' : d.label
+        );
+
+      // Add expansion indicator for nodes with children
+      nodesEnter
+        .append('circle')
+        .attr('class', 'expansion-indicator')
+        .attr('r', 4)
+        .attr('cx', 15)
+        .attr('cy', -15)
+        .attr('fill', '#fff')
+        .attr('stroke', d => d.style?.color || state.config.nodeColors[d.type])
+        .attr('stroke-width', 2)
+        .style('display', d =>
+          d.children && d.children.length > 0 ? 'block' : 'none'
+        );
+
+      // Event handlers
+      const nodeGroups = nodes.merge(nodesEnter);
+
+      nodeGroups
+        .on('click', (event, d) => {
+          event.stopPropagation();
+          if (event.detail === 1) {
+            // Single click
+            actions.selectNodes([d.id]);
+            onNodeClick?.(d);
           }
-          d.fx = d.position?.x;
-          d.fy = d.position?.y;
         })
-        .on('drag', (event, d) => {
-          d.fx = event.x;
-          d.fy = event.y;
-          actions.updateNode(d.id, { position: { x: event.x, y: event.y } });
+        .on('dblclick', (event, d) => {
+          event.stopPropagation();
+          onNodeDoubleClick?.(d);
+          actions.toggleNodeExpansion(d.id);
         })
-        .on('end', (event, d) => {
-          if (!event.active && refs.simulation.current) {
-            refs.simulation.current.alphaTarget(0);
-          }
-          d.fx = null;
-          d.fy = null;
+        .on('mouseenter', (event, d) => {
+          actions.setHoveredNode(d.id);
         })
-      );
+        .on('mouseleave', () => {
+          actions.setHoveredNode(undefined);
+        });
 
-    // Add circle for node
-    nodesEnter.append('circle')
-      .attr('class', 'node-circle')
-      .attr('r', d => d.style?.size || 20)
-      .attr('fill', d => d.style?.color || state.config.nodeColors[d.type])
-      .attr('stroke', '#fff')
-      .attr('stroke-width', 2);
+      // Update positions
+      nodeGroups
+        .transition()
+        .duration(100)
+        .attr(
+          'transform',
+          d => `translate(${d.position?.x || 0}, ${d.position?.y || 0})`
+        );
 
-    // Add text label
-    nodesEnter.append('text')
-      .attr('class', 'node-label')
-      .attr('text-anchor', 'middle')
-      .attr('dy', '.35em')
-      .style('font-size', '12px')
-      .style('font-weight', '500')
-      .style('fill', '#fff')
-      .style('pointer-events', 'none')
-      .text(d => d.label.length > 10 ? d.label.substring(0, 10) + '...' : d.label);
-
-    // Add expansion indicator for nodes with children
-    nodesEnter.append('circle')
-      .attr('class', 'expansion-indicator')
-      .attr('r', 4)
-      .attr('cx', 15)
-      .attr('cy', -15)
-      .attr('fill', '#fff')
-      .attr('stroke', d => d.style?.color || state.config.nodeColors[d.type])
-      .attr('stroke-width', 2)
-      .style('display', d => d.children && d.children.length > 0 ? 'block' : 'none');
-
-    // Event handlers
-    const nodeGroups = nodes.merge(nodesEnter);
-
-    nodeGroups
-      .on('click', (event, d) => {
-        event.stopPropagation();
-        if (event.detail === 1) {
-          // Single click
-          actions.selectNodes([d.id]);
-          onNodeClick?.(d);
-        }
-      })
-      .on('dblclick', (event, d) => {
-        event.stopPropagation();
-        onNodeDoubleClick?.(d);
-        actions.toggleNodeExpansion(d.id);
-      })
-      .on('mouseenter', (event, d) => {
-        actions.setHoveredNode(d.id);
-      })
-      .on('mouseleave', () => {
-        actions.setHoveredNode(undefined);
-      });
-
-    // Update positions
-    nodeGroups
-      .transition()
-      .duration(100)
-      .attr('transform', d => `translate(${d.position?.x || 0}, ${d.position?.y || 0})`);
-
-    // Update selection highlighting
-    nodeGroups.select('.node-circle')
-      .attr('stroke-width', d => 
-        state.selectedNodes.includes(d.id) ? 4 : 
-        state.hoveredNode === d.id ? 3 : 2
-      )
-      .attr('stroke', d => 
-        state.selectedNodes.includes(d.id) ? '#fbbf24' :
-        state.hoveredNode === d.id ? '#60a5fa' : '#fff'
-      );
-
-  }, [computed.visibleNodes, state.config.nodeColors, state.selectedNodes, state.hoveredNode, actions, refs.simulation, onNodeClick, onNodeDoubleClick]);
+      // Update selection highlighting
+      nodeGroups
+        .select('.node-circle')
+        .attr('stroke-width', d =>
+          state.selectedNodes.includes(d.id)
+            ? 4
+            : state.hoveredNode === d.id
+              ? 3
+              : 2
+        )
+        .attr('stroke', d =>
+          state.selectedNodes.includes(d.id)
+            ? '#fbbf24'
+            : state.hoveredNode === d.id
+              ? '#60a5fa'
+              : '#fff'
+        );
+    },
+    [
+      computed.visibleNodes,
+      state.config.nodeColors,
+      state.selectedNodes,
+      state.hoveredNode,
+      actions,
+      refs.simulation,
+      onNodeClick,
+      onNodeDoubleClick,
+    ]
+  );
 
   // Main render effect
   useEffect(() => {
@@ -309,63 +373,85 @@ export const MindMap: React.FC<MindMapProps> = ({
   }, [refs.svg, actions]);
 
   // Node type filter options
-  const nodeTypeOptions = useMemo(() => [
-    { value: 'topic', label: 'Topics', color: state.config.nodeColors.topic },
-    { value: 'subtopic', label: 'Subtopics', color: state.config.nodeColors.subtopic },
-    { value: 'research', label: 'Research', color: state.config.nodeColors.research },
-    { value: 'expert', label: 'Experts', color: state.config.nodeColors.expert },
-    { value: 'concept', label: 'Concepts', color: state.config.nodeColors.concept },
-  ], [state.config.nodeColors]);
+  const nodeTypeOptions = useMemo(
+    () => [
+      { value: 'topic', label: 'Topics', color: state.config.nodeColors.topic },
+      {
+        value: 'subtopic',
+        label: 'Subtopics',
+        color: state.config.nodeColors.subtopic,
+      },
+      {
+        value: 'research',
+        label: 'Research',
+        color: state.config.nodeColors.research,
+      },
+      {
+        value: 'expert',
+        label: 'Experts',
+        color: state.config.nodeColors.expert,
+      },
+      {
+        value: 'concept',
+        label: 'Concepts',
+        color: state.config.nodeColors.concept,
+      },
+    ],
+    [state.config.nodeColors]
+  );
 
   return (
-    <div className={`relative mind-map-container ${className}`} ref={containerRef}>
+    <div
+      className={`mind-map-container relative ${className}`}
+      ref={containerRef}
+    >
       {/* Controls */}
       <AnimatePresence>
         {showControls && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="absolute top-4 left-4 z-10 flex gap-2 flex-wrap"
+            className="absolute left-4 top-4 z-10 flex flex-wrap gap-2"
           >
             {/* Search */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
               <Input
                 type="text"
                 placeholder="Search nodes..."
                 value={state.searchQuery}
-                onChange={(e) => actions.setSearchQuery(e.target.value)}
-                className="pl-10 w-64"
+                onChange={e => actions.setSearchQuery(e.target.value)}
+                className="w-64 pl-10"
               />
             </div>
 
             {/* Zoom Controls */}
             <div className="flex gap-1">
               <Button variant="outline" size="sm" onClick={handleZoomIn}>
-                <ZoomIn className="w-4 h-4" />
+                <ZoomIn className="h-4 w-4" />
               </Button>
               <Button variant="outline" size="sm" onClick={handleZoomOut}>
-                <ZoomOut className="w-4 h-4" />
+                <ZoomOut className="h-4 w-4" />
               </Button>
               <Button variant="outline" size="sm" onClick={handleResetView}>
-                <RotateCcw className="w-4 h-4" />
+                <RotateCcw className="h-4 w-4" />
               </Button>
             </div>
 
             {/* Filter */}
             <Button variant="outline" size="sm">
-              <Filter className="w-4 h-4 mr-2" />
+              <Filter className="mr-2 h-4 w-4" />
               Filter
             </Button>
 
             {/* Export/Import */}
             <div className="flex gap-1">
               <Button variant="outline" size="sm">
-                <Download className="w-4 h-4" />
+                <Download className="h-4 w-4" />
               </Button>
               <Button variant="outline" size="sm">
-                <Upload className="w-4 h-4" />
+                <Upload className="h-4 w-4" />
               </Button>
             </div>
           </motion.div>
@@ -379,20 +465,29 @@ export const MindMap: React.FC<MindMapProps> = ({
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 20 }}
-            className="absolute top-4 right-4 z-10"
+            className="absolute right-4 top-4 z-10"
           >
             <Card className="p-3">
-              <h3 className="text-sm font-semibold mb-2">Node Types</h3>
+              <h3 className="mb-2 text-sm font-semibold">Node Types</h3>
               <div className="space-y-1">
                 {nodeTypeOptions.map(option => (
-                  <div key={option.value} className="flex items-center gap-2 text-xs">
-                    <div 
-                      className="w-3 h-3 rounded-full"
+                  <div
+                    key={option.value}
+                    className="flex items-center gap-2 text-xs"
+                  >
+                    <div
+                      className="h-3 w-3 rounded-full"
                       style={{ backgroundColor: option.color }}
                     />
                     <span>{option.label}</span>
                     <span className="text-gray-400">
-                      ({computed.visibleNodes.filter(n => n.type === option.value).length})
+                      (
+                      {
+                        computed.visibleNodes.filter(
+                          n => n.type === option.value
+                        ).length
+                      }
+                      )
                     </span>
                   </div>
                 ))}
@@ -407,7 +502,7 @@ export const MindMap: React.FC<MindMapProps> = ({
         ref={refs.svg}
         width={width}
         height={height}
-        className="border rounded-lg bg-white"
+        className="rounded-lg border bg-white"
         style={{ userSelect: 'none' }}
       />
 
@@ -424,7 +519,7 @@ export const MindMap: React.FC<MindMapProps> = ({
               <svg
                 width={120}
                 height={80}
-                className="border rounded bg-gray-50"
+                className="rounded border bg-gray-50"
               >
                 {/* Minimap implementation */}
                 <rect
@@ -458,9 +553,9 @@ export const MindMap: React.FC<MindMapProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-20"
+            className="absolute inset-0 z-20 flex items-center justify-center bg-white bg-opacity-75"
           >
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+            <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-blue-500" />
           </motion.div>
         )}
       </AnimatePresence>

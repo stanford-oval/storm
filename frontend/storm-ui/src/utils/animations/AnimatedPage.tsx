@@ -26,9 +26,12 @@ export const AnimatedPage: React.FC<AnimatedPageProps> = ({
     ? {
         ...variants,
         animate: {
-          ...variants.animate,
+          ...(typeof variants.animate === 'object' ? variants.animate : {}),
           transition: {
-            ...variants.animate?.transition,
+            ...(typeof variants.animate === 'object' &&
+            'transition' in variants.animate
+              ? (variants.animate as any).transition
+              : {}),
             staggerChildren: staggerDelay,
             delayChildren: 0.2,
           },
@@ -51,9 +54,11 @@ export const AnimatedPage: React.FC<AnimatedPageProps> = ({
 };
 
 // Animated component for staggered children
-export const AnimatedChild: React.FC<HTMLMotionProps<'div'> & {
-  children: React.ReactNode;
-}> = ({ children, ...props }) => {
+export const AnimatedChild: React.FC<
+  HTMLMotionProps<'div'> & {
+    children: React.ReactNode;
+  }
+> = ({ children, ...props }) => {
   return (
     <motion.div
       variants={{

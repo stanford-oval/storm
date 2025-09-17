@@ -13,21 +13,29 @@ export class AnalyticsService extends BaseApiService {
   /**
    * Track a user event
    */
-  async trackEvent(event: CreateEventRequest): Promise<ApiResponse<AnalyticsEvent>> {
+  async trackEvent(
+    event: CreateEventRequest
+  ): Promise<ApiResponse<AnalyticsEvent>> {
     return this.post<AnalyticsEvent>(`${this.basePath}/events`, event);
   }
 
   /**
    * Track multiple events in batch
    */
-  async trackEvents(events: CreateEventRequest[]): Promise<ApiResponse<BatchTrackingResult>> {
-    return this.post<BatchTrackingResult>(`${this.basePath}/events/batch`, { events });
+  async trackEvents(
+    events: CreateEventRequest[]
+  ): Promise<ApiResponse<BatchTrackingResult>> {
+    return this.post<BatchTrackingResult>(`${this.basePath}/events/batch`, {
+      events,
+    });
   }
 
   /**
    * Get analytics summary
    */
-  async getAnalyticsSummary(query: AnalyticsQuery): Promise<ApiResponse<AnalyticsSummary>> {
+  async getAnalyticsSummary(
+    query: AnalyticsQuery
+  ): Promise<ApiResponse<AnalyticsSummary>> {
     return this.post<AnalyticsSummary>(`${this.basePath}/summary`, query);
   }
 
@@ -43,8 +51,10 @@ export class AnalyticsService extends BaseApiService {
     }
   ): Promise<ApiResponse<ProjectAnalytics>> {
     const params = new URLSearchParams();
-    if (options?.startDate) params.append('startDate', options.startDate.toISOString());
-    if (options?.endDate) params.append('endDate', options.endDate.toISOString());
+    if (options?.startDate)
+      params.append('startDate', options.startDate.toISOString());
+    if (options?.endDate)
+      params.append('endDate', options.endDate.toISOString());
     if (options?.metrics) params.append('metrics', options.metrics.join(','));
 
     const url = `${this.basePath}/projects/${projectId}${
@@ -66,8 +76,10 @@ export class AnalyticsService extends BaseApiService {
   ): Promise<ApiResponse<UserAnalytics>> {
     const params = new URLSearchParams();
     if (userId) params.append('userId', userId);
-    if (options?.startDate) params.append('startDate', options.startDate.toISOString());
-    if (options?.endDate) params.append('endDate', options.endDate.toISOString());
+    if (options?.startDate)
+      params.append('startDate', options.startDate.toISOString());
+    if (options?.endDate)
+      params.append('endDate', options.endDate.toISOString());
     if (options?.includeProjects) params.append('includeProjects', 'true');
 
     const url = `${this.basePath}/users${params.toString() ? '?' + params.toString() : ''}`;
@@ -77,18 +89,18 @@ export class AnalyticsService extends BaseApiService {
   /**
    * Get pipeline analytics
    */
-  async getPipelineAnalytics(
-    options?: {
-      projectId?: string;
-      startDate?: Date;
-      endDate?: Date;
-      stage?: string;
-    }
-  ): Promise<ApiResponse<PipelineAnalytics>> {
+  async getPipelineAnalytics(options?: {
+    projectId?: string;
+    startDate?: Date;
+    endDate?: Date;
+    stage?: string;
+  }): Promise<ApiResponse<PipelineAnalytics>> {
     const params = new URLSearchParams();
     if (options?.projectId) params.append('projectId', options.projectId);
-    if (options?.startDate) params.append('startDate', options.startDate.toISOString());
-    if (options?.endDate) params.append('endDate', options.endDate.toISOString());
+    if (options?.startDate)
+      params.append('startDate', options.startDate.toISOString());
+    if (options?.endDate)
+      params.append('endDate', options.endDate.toISOString());
     if (options?.stage) params.append('stage', options.stage);
 
     const url = `${this.basePath}/pipeline${params.toString() ? '?' + params.toString() : ''}`;
@@ -98,18 +110,18 @@ export class AnalyticsService extends BaseApiService {
   /**
    * Get usage analytics
    */
-  async getUsageAnalytics(
-    options?: {
-      period: 'day' | 'week' | 'month' | 'year';
-      startDate?: Date;
-      endDate?: Date;
-      granularity?: 'hour' | 'day' | 'week' | 'month';
-    }
-  ): Promise<ApiResponse<UsageAnalytics>> {
+  async getUsageAnalytics(options?: {
+    period: 'day' | 'week' | 'month' | 'year';
+    startDate?: Date;
+    endDate?: Date;
+    granularity?: 'hour' | 'day' | 'week' | 'month';
+  }): Promise<ApiResponse<UsageAnalytics>> {
     const params = new URLSearchParams();
     if (options?.period) params.append('period', options.period);
-    if (options?.startDate) params.append('startDate', options.startDate.toISOString());
-    if (options?.endDate) params.append('endDate', options.endDate.toISOString());
+    if (options?.startDate)
+      params.append('startDate', options.startDate.toISOString());
+    if (options?.endDate)
+      params.append('endDate', options.endDate.toISOString());
     if (options?.granularity) params.append('granularity', options.granularity);
 
     const url = `${this.basePath}/usage${params.toString() ? '?' + params.toString() : ''}`;
@@ -119,18 +131,18 @@ export class AnalyticsService extends BaseApiService {
   /**
    * Get performance metrics
    */
-  async getPerformanceMetrics(
-    options?: {
-      component?: string;
-      startDate?: Date;
-      endDate?: Date;
-      aggregation?: 'avg' | 'min' | 'max' | 'p95' | 'p99';
-    }
-  ): Promise<ApiResponse<PerformanceMetrics>> {
+  async getPerformanceMetrics(options?: {
+    component?: string;
+    startDate?: Date;
+    endDate?: Date;
+    aggregation?: 'avg' | 'min' | 'max' | 'p95' | 'p99';
+  }): Promise<ApiResponse<PerformanceMetrics>> {
     const params = new URLSearchParams();
     if (options?.component) params.append('component', options.component);
-    if (options?.startDate) params.append('startDate', options.startDate.toISOString());
-    if (options?.endDate) params.append('endDate', options.endDate.toISOString());
+    if (options?.startDate)
+      params.append('startDate', options.startDate.toISOString());
+    if (options?.endDate)
+      params.append('endDate', options.endDate.toISOString());
     if (options?.aggregation) params.append('aggregation', options.aggregation);
 
     const url = `${this.basePath}/performance${params.toString() ? '?' + params.toString() : ''}`;
@@ -140,19 +152,19 @@ export class AnalyticsService extends BaseApiService {
   /**
    * Get error analytics
    */
-  async getErrorAnalytics(
-    options?: {
-      severity?: 'low' | 'medium' | 'high' | 'critical';
-      component?: string;
-      startDate?: Date;
-      endDate?: Date;
-    }
-  ): Promise<ApiResponse<ErrorAnalytics>> {
+  async getErrorAnalytics(options?: {
+    severity?: 'low' | 'medium' | 'high' | 'critical';
+    component?: string;
+    startDate?: Date;
+    endDate?: Date;
+  }): Promise<ApiResponse<ErrorAnalytics>> {
     const params = new URLSearchParams();
     if (options?.severity) params.append('severity', options.severity);
     if (options?.component) params.append('component', options.component);
-    if (options?.startDate) params.append('startDate', options.startDate.toISOString());
-    if (options?.endDate) params.append('endDate', options.endDate.toISOString());
+    if (options?.startDate)
+      params.append('startDate', options.startDate.toISOString());
+    if (options?.endDate)
+      params.append('endDate', options.endDate.toISOString());
 
     const url = `${this.basePath}/errors${params.toString() ? '?' + params.toString() : ''}`;
     return this.get<ErrorAnalytics>(url);
@@ -161,18 +173,18 @@ export class AnalyticsService extends BaseApiService {
   /**
    * Get feature usage analytics
    */
-  async getFeatureUsage(
-    options?: {
-      feature?: string;
-      startDate?: Date;
-      endDate?: Date;
-      groupBy?: 'user' | 'project' | 'date';
-    }
-  ): Promise<ApiResponse<FeatureUsageAnalytics>> {
+  async getFeatureUsage(options?: {
+    feature?: string;
+    startDate?: Date;
+    endDate?: Date;
+    groupBy?: 'user' | 'project' | 'date';
+  }): Promise<ApiResponse<FeatureUsageAnalytics>> {
     const params = new URLSearchParams();
     if (options?.feature) params.append('feature', options.feature);
-    if (options?.startDate) params.append('startDate', options.startDate.toISOString());
-    if (options?.endDate) params.append('endDate', options.endDate.toISOString());
+    if (options?.startDate)
+      params.append('startDate', options.startDate.toISOString());
+    if (options?.endDate)
+      params.append('endDate', options.endDate.toISOString());
     if (options?.groupBy) params.append('groupBy', options.groupBy);
 
     const url = `${this.basePath}/features${params.toString() ? '?' + params.toString() : ''}`;
@@ -182,18 +194,18 @@ export class AnalyticsService extends BaseApiService {
   /**
    * Get cost analytics
    */
-  async getCostAnalytics(
-    options?: {
-      projectId?: string;
-      startDate?: Date;
-      endDate?: Date;
-      groupBy?: 'project' | 'model' | 'date' | 'user';
-    }
-  ): Promise<ApiResponse<CostAnalytics>> {
+  async getCostAnalytics(options?: {
+    projectId?: string;
+    startDate?: Date;
+    endDate?: Date;
+    groupBy?: 'project' | 'model' | 'date' | 'user';
+  }): Promise<ApiResponse<CostAnalytics>> {
     const params = new URLSearchParams();
     if (options?.projectId) params.append('projectId', options.projectId);
-    if (options?.startDate) params.append('startDate', options.startDate.toISOString());
-    if (options?.endDate) params.append('endDate', options.endDate.toISOString());
+    if (options?.startDate)
+      params.append('startDate', options.startDate.toISOString());
+    if (options?.endDate)
+      params.append('endDate', options.endDate.toISOString());
     if (options?.groupBy) params.append('groupBy', options.groupBy);
 
     const url = `${this.basePath}/costs${params.toString() ? '?' + params.toString() : ''}`;
@@ -203,12 +215,10 @@ export class AnalyticsService extends BaseApiService {
   /**
    * Get retention analytics
    */
-  async getRetentionAnalytics(
-    options?: {
-      cohortBy?: 'day' | 'week' | 'month';
-      period?: number; // number of cohort periods to analyze
-    }
-  ): Promise<ApiResponse<RetentionAnalytics>> {
+  async getRetentionAnalytics(options?: {
+    cohortBy?: 'day' | 'week' | 'month';
+    period?: number; // number of cohort periods to analyze
+  }): Promise<ApiResponse<RetentionAnalytics>> {
     const params = new URLSearchParams();
     if (options?.cohortBy) params.append('cohortBy', options.cohortBy);
     if (options?.period) params.append('period', options.period.toString());
@@ -230,8 +240,10 @@ export class AnalyticsService extends BaseApiService {
   ): Promise<ApiResponse<FunnelAnalytics>> {
     const params = new URLSearchParams();
     steps.forEach(step => params.append('steps', step));
-    if (options?.startDate) params.append('startDate', options.startDate.toISOString());
-    if (options?.endDate) params.append('endDate', options.endDate.toISOString());
+    if (options?.startDate)
+      params.append('startDate', options.startDate.toISOString());
+    if (options?.endDate)
+      params.append('endDate', options.endDate.toISOString());
     if (options?.groupBy) params.append('groupBy', options.groupBy);
 
     const url = `${this.basePath}/funnel${params.toString() ? '?' + params.toString() : ''}`;
@@ -248,8 +260,13 @@ export class AnalyticsService extends BaseApiService {
   /**
    * Create custom dashboard
    */
-  async createDashboard(dashboard: CreateDashboardRequest): Promise<ApiResponse<AnalyticsDashboard>> {
-    return this.post<AnalyticsDashboard>(`${this.basePath}/dashboards`, dashboard);
+  async createDashboard(
+    dashboard: CreateDashboardRequest
+  ): Promise<ApiResponse<AnalyticsDashboard>> {
+    return this.post<AnalyticsDashboard>(
+      `${this.basePath}/dashboards`,
+      dashboard
+    );
   }
 
   /**
@@ -262,8 +279,12 @@ export class AnalyticsService extends BaseApiService {
   /**
    * Get dashboard data
    */
-  async getDashboardData(dashboardId: string): Promise<ApiResponse<DashboardData>> {
-    return this.get<DashboardData>(`${this.basePath}/dashboards/${dashboardId}/data`);
+  async getDashboardData(
+    dashboardId: string
+  ): Promise<ApiResponse<DashboardData>> {
+    return this.get<DashboardData>(
+      `${this.basePath}/dashboards/${dashboardId}/data`
+    );
   }
 
   /**
@@ -273,7 +294,10 @@ export class AnalyticsService extends BaseApiService {
     dashboardId: string,
     updates: Partial<AnalyticsDashboard>
   ): Promise<ApiResponse<AnalyticsDashboard>> {
-    return this.patch<AnalyticsDashboard>(`${this.basePath}/dashboards/${dashboardId}`, updates);
+    return this.patch<AnalyticsDashboard>(
+      `${this.basePath}/dashboards/${dashboardId}`,
+      updates
+    );
   }
 
   /**
@@ -302,7 +326,9 @@ export class AnalyticsService extends BaseApiService {
   /**
    * Set up analytics alerts
    */
-  async createAlert(alert: CreateAlertRequest): Promise<ApiResponse<AnalyticsAlert>> {
+  async createAlert(
+    alert: CreateAlertRequest
+  ): Promise<ApiResponse<AnalyticsAlert>> {
     return this.post<AnalyticsAlert>(`${this.basePath}/alerts`, alert);
   }
 
@@ -320,7 +346,10 @@ export class AnalyticsService extends BaseApiService {
     alertId: string,
     updates: Partial<AnalyticsAlert>
   ): Promise<ApiResponse<AnalyticsAlert>> {
-    return this.patch<AnalyticsAlert>(`${this.basePath}/alerts/${alertId}`, updates);
+    return this.patch<AnalyticsAlert>(
+      `${this.basePath}/alerts/${alertId}`,
+      updates
+    );
   }
 
   /**
@@ -350,17 +379,17 @@ export class AnalyticsService extends BaseApiService {
   /**
    * Get analytics insights
    */
-  async getInsights(
-    options?: {
-      type?: 'anomaly' | 'trend' | 'pattern' | 'recommendation';
-      startDate?: Date;
-      endDate?: Date;
-    }
-  ): Promise<ApiResponse<AnalyticsInsight[]>> {
+  async getInsights(options?: {
+    type?: 'anomaly' | 'trend' | 'pattern' | 'recommendation';
+    startDate?: Date;
+    endDate?: Date;
+  }): Promise<ApiResponse<AnalyticsInsight[]>> {
     const params = new URLSearchParams();
     if (options?.type) params.append('type', options.type);
-    if (options?.startDate) params.append('startDate', options.startDate.toISOString());
-    if (options?.endDate) params.append('endDate', options.endDate.toISOString());
+    if (options?.startDate)
+      params.append('startDate', options.startDate.toISOString());
+    if (options?.endDate)
+      params.append('endDate', options.endDate.toISOString());
 
     const url = `${this.basePath}/insights${params.toString() ? '?' + params.toString() : ''}`;
     return this.get<AnalyticsInsight[]>(url);
@@ -369,7 +398,9 @@ export class AnalyticsService extends BaseApiService {
   /**
    * Configure analytics settings
    */
-  async updateSettings(settings: AnalyticsSettings): Promise<ApiResponse<AnalyticsSettings>> {
+  async updateSettings(
+    settings: AnalyticsSettings
+  ): Promise<ApiResponse<AnalyticsSettings>> {
     return this.put<AnalyticsSettings>(`${this.basePath}/settings`, settings);
   }
 
@@ -395,13 +426,18 @@ export class AnalyticsService extends BaseApiService {
     type: 'daily' | 'weekly' | 'monthly' | 'custom',
     options?: Record<string, any>
   ): Promise<ApiResponse<ComputationJob>> {
-    return this.post<ComputationJob>(`${this.basePath}/compute`, { type, options });
+    return this.post<ComputationJob>(`${this.basePath}/compute`, {
+      type,
+      options,
+    });
   }
 
   /**
    * Get computation job status
    */
-  async getComputationStatus(jobId: string): Promise<ApiResponse<ComputationJob>> {
+  async getComputationStatus(
+    jobId: string
+  ): Promise<ApiResponse<ComputationJob>> {
     return this.get<ComputationJob>(`${this.basePath}/compute/${jobId}`);
   }
 }
@@ -481,19 +517,25 @@ export interface PipelineAnalytics {
   averageRunTime: number;
   totalTokensUsed: number;
   estimatedTotalCost: number;
-  runsByStage: Record<string, {
-    total: number;
-    successful: number;
-    failed: number;
-    averageTime: number;
-  }>;
-  runsByModel: Record<string, {
-    total: number;
-    successful: number;
-    failed: number;
-    tokensUsed: number;
-    cost: number;
-  }>;
+  runsByStage: Record<
+    string,
+    {
+      total: number;
+      successful: number;
+      failed: number;
+      averageTime: number;
+    }
+  >;
+  runsByModel: Record<
+    string,
+    {
+      total: number;
+      successful: number;
+      failed: number;
+      tokensUsed: number;
+      cost: number;
+    }
+  >;
   timeDistribution: Array<{
     date: string;
     runs: number;
@@ -547,11 +589,14 @@ export interface PerformanceMetrics {
   };
   errorRate: number;
   availability: number;
-  componentMetrics: Record<string, {
-    responseTime: number;
-    errorRate: number;
-    availability: number;
-  }>;
+  componentMetrics: Record<
+    string,
+    {
+      responseTime: number;
+      errorRate: number;
+      availability: number;
+    }
+  >;
   timeSeriesData: Array<{
     timestamp: Date;
     responseTime: number;
@@ -582,41 +627,56 @@ export interface ErrorAnalytics {
 }
 
 export interface FeatureUsageAnalytics {
-  featureUsage: Record<string, {
-    totalUsage: number;
-    uniqueUsers: number;
-    averageUsagePerUser: number;
-    adoptionRate: number;
-  }>;
+  featureUsage: Record<
+    string,
+    {
+      totalUsage: number;
+      uniqueUsers: number;
+      averageUsagePerUser: number;
+      adoptionRate: number;
+    }
+  >;
   featureAdoption: Array<{
     feature: string;
     adoptionRate: number;
     trend: 'increasing' | 'decreasing' | 'stable';
   }>;
-  userSegmentation: Record<string, {
-    users: number;
-    topFeatures: string[];
-    engagementLevel: 'low' | 'medium' | 'high';
-  }>;
+  userSegmentation: Record<
+    string,
+    {
+      users: number;
+      topFeatures: string[];
+      engagementLevel: 'low' | 'medium' | 'high';
+    }
+  >;
 }
 
 export interface CostAnalytics {
   totalCost: number;
-  costByModel: Record<string, {
-    cost: number;
-    tokensUsed: number;
-    requests: number;
-  }>;
-  costByProject: Record<string, {
-    cost: number;
-    tokensUsed: number;
-    percentage: number;
-  }>;
-  costByUser: Record<string, {
-    cost: number;
-    tokensUsed: number;
-    projects: number;
-  }>;
+  costByModel: Record<
+    string,
+    {
+      cost: number;
+      tokensUsed: number;
+      requests: number;
+    }
+  >;
+  costByProject: Record<
+    string,
+    {
+      cost: number;
+      tokensUsed: number;
+      percentage: number;
+    }
+  >;
+  costByUser: Record<
+    string,
+    {
+      cost: number;
+      tokensUsed: number;
+      projects: number;
+    }
+  >;
   costTrends: Array<{
     date: string;
     cost: number;
@@ -743,11 +803,14 @@ export interface DashboardLayout {
 
 export interface DashboardData {
   dashboardId: string;
-  widgets: Record<string, {
-    data: any;
-    lastUpdated: Date;
-    error?: string;
-  }>;
+  widgets: Record<
+    string,
+    {
+      data: any;
+      lastUpdated: Date;
+      error?: string;
+    }
+  >;
   generatedAt: Date;
 }
 
@@ -853,5 +916,5 @@ export interface ComputationJob {
 
 // Create and export singleton instance
 export const analyticsService = new AnalyticsService({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
 });

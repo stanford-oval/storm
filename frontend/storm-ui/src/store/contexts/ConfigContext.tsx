@@ -1,7 +1,13 @@
 'use client';
 
 // Configuration context provider
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from 'react';
 import { StormConfig } from '@/types/storm';
 
 // Application configuration interface
@@ -13,10 +19,10 @@ export interface AppConfig {
     retries: number;
     retryDelay: number;
   };
-  
+
   // Default STORM configuration
   storm: StormConfig;
-  
+
   // Feature flags
   features: {
     enableCoStorm: boolean;
@@ -26,7 +32,7 @@ export interface AppConfig {
     enableExperimentalFeatures: boolean;
     enableOfflineMode: boolean;
   };
-  
+
   // UI configuration
   ui: {
     defaultLanguage: string;
@@ -37,7 +43,7 @@ export interface AppConfig {
     currency: string;
     numberFormat: string;
   };
-  
+
   // Performance configuration
   performance: {
     enableVirtualization: boolean;
@@ -46,7 +52,7 @@ export interface AppConfig {
     debounceDelay: number;
     throttleDelay: number;
   };
-  
+
   // Security configuration
   security: {
     enableCSP: boolean;
@@ -55,7 +61,7 @@ export interface AppConfig {
     maxLoginAttempts: number;
     lockoutDuration: number;
   };
-  
+
   // Development configuration
   development: {
     enableHotReload: boolean;
@@ -73,7 +79,7 @@ const defaultConfig: AppConfig = {
     retries: 3,
     retryDelay: 1000,
   },
-  
+
   storm: {
     llm: {
       model: 'gpt-4',
@@ -94,7 +100,7 @@ const defaultConfig: AppConfig = {
       maxPerspectives: 4,
     },
   },
-  
+
   features: {
     enableCoStorm: true,
     enableAnalytics: process.env.NODE_ENV === 'production',
@@ -103,7 +109,7 @@ const defaultConfig: AppConfig = {
     enableExperimentalFeatures: process.env.NODE_ENV === 'development',
     enableOfflineMode: false,
   },
-  
+
   ui: {
     defaultLanguage: 'en',
     supportedLanguages: ['en', 'es', 'fr', 'de', 'ja', 'zh'],
@@ -113,7 +119,7 @@ const defaultConfig: AppConfig = {
     currency: 'USD',
     numberFormat: 'en-US',
   },
-  
+
   performance: {
     enableVirtualization: true,
     lazyLoadingThreshold: 100,
@@ -121,7 +127,7 @@ const defaultConfig: AppConfig = {
     debounceDelay: 300,
     throttleDelay: 100,
   },
-  
+
   security: {
     enableCSP: true,
     allowedOrigins: ['http://localhost:3000', 'http://localhost:8000'],
@@ -129,7 +135,7 @@ const defaultConfig: AppConfig = {
     maxLoginAttempts: 5,
     lockoutDuration: 900, // 15 minutes
   },
-  
+
   development: {
     enableHotReload: process.env.NODE_ENV === 'development',
     enableSourceMaps: process.env.NODE_ENV === 'development',
@@ -219,18 +225,23 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
       if (enableConfigValidation) {
         const validationResult = validateConfig(loadedConfig);
         if (!validationResult.isValid) {
-          console.warn('Configuration validation warnings:', validationResult.warnings);
+          console.warn(
+            'Configuration validation warnings:',
+            validationResult.warnings
+          );
           if (validationResult.errors.length > 0) {
-            throw new Error(`Configuration validation failed: ${validationResult.errors.join(', ')}`);
+            throw new Error(
+              `Configuration validation failed: ${validationResult.errors.join(', ')}`
+            );
           }
         }
       }
 
       setConfig(loadedConfig);
-      setVersion(loadedConfig.version || '1.0.0');
-
+      setVersion((loadedConfig as any).version || '1.0.0');
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load configuration';
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to load configuration';
       setError(errorMessage);
       console.error('Configuration loading error:', err);
     } finally {
@@ -242,14 +253,14 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
   const updateConfig = (updates: Partial<AppConfig>) => {
     setConfig(prev => {
       const newConfig = mergeConfig(prev, updates);
-      
+
       // Save to localStorage
       try {
         localStorage.setItem('app-config', JSON.stringify(updates));
       } catch (error) {
         console.warn('Failed to save configuration to localStorage:', error);
       }
-      
+
       return newConfig;
     });
   };
@@ -257,7 +268,7 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
   // Reset configuration to defaults
   const resetConfig = () => {
     setConfig(defaultConfig);
-    
+
     // Clear localStorage
     try {
       localStorage.removeItem('app-config');
@@ -301,7 +312,9 @@ export const useSecurityConfig = () => useConfig().config.security;
 export const useDevelopmentConfig = () => useConfig().config.development;
 
 // Feature flag hook
-export const useFeature = (featureName: keyof AppConfig['features']): boolean => {
+export const useFeature = (
+  featureName: keyof AppConfig['features']
+): boolean => {
   const features = useFeatureFlags();
   return features[featureName];
 };
@@ -314,25 +327,27 @@ const loadFromEnvironment = (): Partial<AppConfig> | null => {
     // API configuration from environment
     if (process.env.NEXT_PUBLIC_API_BASE_URL) {
       envConfig.api = {
-        ...envConfig.api,
+        ...(envConfig.api || {}),
         baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
-      };
+      } as AppConfig['api'];
     }
 
     // Feature flags from environment
     const features: Partial<AppConfig['features']> = {};
     if (process.env.NEXT_PUBLIC_ENABLE_ANALYTICS !== undefined) {
-      features.enableAnalytics = process.env.NEXT_PUBLIC_ENABLE_ANALYTICS === 'true';
+      features.enableAnalytics =
+        process.env.NEXT_PUBLIC_ENABLE_ANALYTICS === 'true';
     }
     if (process.env.NEXT_PUBLIC_ENABLE_TELEMETRY !== undefined) {
-      features.enableTelemetry = process.env.NEXT_PUBLIC_ENABLE_TELEMETRY === 'true';
+      features.enableTelemetry =
+        process.env.NEXT_PUBLIC_ENABLE_TELEMETRY === 'true';
     }
     if (process.env.NEXT_PUBLIC_DEBUG_MODE !== undefined) {
       features.enableDebugMode = process.env.NEXT_PUBLIC_DEBUG_MODE === 'true';
     }
 
     if (Object.keys(features).length > 0) {
-      envConfig.features = features;
+      envConfig.features = features as AppConfig['features'];
     }
 
     return Object.keys(envConfig).length > 0 ? envConfig : null;
@@ -355,7 +370,9 @@ const loadFromLocalStorage = (): Partial<AppConfig> | null => {
   }
 };
 
-const loadFromRemote = async (url: string): Promise<Partial<AppConfig> | null> => {
+const loadFromRemote = async (
+  url: string
+): Promise<Partial<AppConfig> | null> => {
   try {
     const response = await fetch(url, {
       method: 'GET',
@@ -406,15 +423,18 @@ const validateConfig = (config: AppConfig): ValidationResult => {
   }
 
   // Validate STORM configuration
-  if (!config.storm.llm.model) {
+  if (!config.storm.llm?.model) {
     errors.push('STORM LLM model is required');
   }
 
-  if (!config.storm.llm.provider) {
+  if (!config.storm.llm?.provider) {
     errors.push('STORM LLM provider is required');
   }
 
-  if (config.storm.llm.temperature < 0 || config.storm.llm.temperature > 2) {
+  if (
+    config.storm.llm?.temperature !== undefined &&
+    (config.storm.llm.temperature < 0 || config.storm.llm.temperature > 2)
+  ) {
     warnings.push('STORM LLM temperature should be between 0 and 2');
   }
 
@@ -444,13 +464,16 @@ const validateConfig = (config: AppConfig): ValidationResult => {
 };
 
 // Configuration merging utility
-const mergeConfig = (base: AppConfig, updates: Partial<AppConfig>): AppConfig => {
+const mergeConfig = (
+  base: AppConfig,
+  updates: Partial<AppConfig>
+): AppConfig => {
   const merged = { ...base };
 
   Object.keys(updates).forEach(key => {
     const section = key as keyof AppConfig;
     const update = updates[section];
-    
+
     if (update && typeof update === 'object' && !Array.isArray(update)) {
       merged[section] = {
         ...merged[section],
@@ -470,12 +493,14 @@ export const withConfig = <P extends object>(
 ) => {
   return React.forwardRef<any, P>((props, ref) => {
     const { config } = useConfig();
-    return <Component {...props} config={config} ref={ref} />;
+    return <Component {...(props as P)} config={config} ref={ref} />;
   });
 };
 
 // Configuration debug component
-export const ConfigDebug: React.FC<{ expanded?: boolean }> = ({ expanded = false }) => {
+export const ConfigDebug: React.FC<{ expanded?: boolean }> = ({
+  expanded = false,
+}) => {
   const { config, version, isLoading, error } = useConfig();
   const [isExpanded, setIsExpanded] = useState(expanded);
 
@@ -484,40 +509,44 @@ export const ConfigDebug: React.FC<{ expanded?: boolean }> = ({ expanded = false
   }
 
   return (
-    <div style={{ 
-      position: 'fixed', 
-      bottom: '10px', 
-      right: '10px', 
-      backgroundColor: '#1f2937', 
-      color: '#f9fafb', 
-      padding: '8px', 
-      borderRadius: '4px', 
-      fontSize: '12px',
-      maxWidth: isExpanded ? '400px' : '150px',
-      maxHeight: isExpanded ? '300px' : '40px',
-      overflow: 'auto',
-      zIndex: 10000,
-      boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-    }}>
-      <div 
+    <div
+      style={{
+        position: 'fixed',
+        bottom: '10px',
+        right: '10px',
+        backgroundColor: '#1f2937',
+        color: '#f9fafb',
+        padding: '8px',
+        borderRadius: '4px',
+        fontSize: '12px',
+        maxWidth: isExpanded ? '400px' : '150px',
+        maxHeight: isExpanded ? '300px' : '40px',
+        overflow: 'auto',
+        zIndex: 10000,
+        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+      }}
+    >
+      <div
         style={{ cursor: 'pointer', fontWeight: 'bold' }}
         onClick={() => setIsExpanded(!isExpanded)}
       >
         Config Debug v{version} {isExpanded ? '▼' : '▲'}
       </div>
-      
+
       {isExpanded && (
         <div style={{ marginTop: '8px' }}>
           {isLoading && <div>Loading configuration...</div>}
           {error && <div style={{ color: '#f87171' }}>Error: {error}</div>}
-          
-          <pre style={{ 
-            margin: 0, 
-            whiteSpace: 'pre-wrap', 
-            fontSize: '10px',
-            maxHeight: '200px',
-            overflow: 'auto'
-          }}>
+
+          <pre
+            style={{
+              margin: 0,
+              whiteSpace: 'pre-wrap',
+              fontSize: '10px',
+              maxHeight: '200px',
+              overflow: 'auto',
+            }}
+          >
             {JSON.stringify(config, null, 2)}
           </pre>
         </div>

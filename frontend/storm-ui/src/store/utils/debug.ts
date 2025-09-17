@@ -18,7 +18,7 @@ export class StorePerformanceMonitor {
 
   recordUpdate(duration: number) {
     this.updateTimes.push(duration);
-    
+
     if (this.updateTimes.length > this.maxHistorySize) {
       this.updateTimes.shift();
     }
@@ -26,7 +26,7 @@ export class StorePerformanceMonitor {
 
   getAverageUpdateTime(): number {
     if (this.updateTimes.length === 0) return 0;
-    
+
     const sum = this.updateTimes.reduce((acc, time) => acc + time, 0);
     return sum / this.updateTimes.length;
   }
@@ -55,8 +55,14 @@ export const debugMiddleware = <T>(
     performanceTracking?: boolean;
   }
 ) => {
-  const { name, enabled = true, logActions = true, logStateChanges = false, performanceTracking = true } = options;
-  
+  const {
+    name,
+    enabled = true,
+    logActions = true,
+    logStateChanges = false,
+    performanceTracking = true,
+  } = options;
+
   if (!enabled) return config;
 
   const performanceMonitor = new StorePerformanceMonitor();
@@ -67,11 +73,11 @@ export const debugMiddleware = <T>(
     const store = config(
       (args: any, replace?: boolean, actionName?: string) => {
         const startTime = performance.now();
-        
+
         // Log action if enabled
         if (logActions && actionName) {
           console.log(`🎬 [${name}] Action: ${actionName}`);
-          
+
           // Track action history
           actionHistory.unshift(actionName);
           if (actionHistory.length > 50) {
@@ -81,14 +87,14 @@ export const debugMiddleware = <T>(
 
         // Get state before update for comparison
         const previousState = get();
-        
+
         // Execute the update
         set(args, replace, actionName);
-        
+
         // Calculate performance metrics
         const endTime = performance.now();
         const duration = endTime - startTime;
-        
+
         if (performanceTracking) {
           performanceMonitor.recordUpdate(duration);
         }
@@ -97,15 +103,18 @@ export const debugMiddleware = <T>(
         if (logStateChanges && actionName) {
           const newState = get();
           const changes = getStateChanges(previousState, newState);
-          
+
           if (changes.length > 0) {
             console.log(`📊 [${name}] State changes:`, changes);
           }
         }
 
         // Warn about slow updates
-        if (duration > 16) { // More than one frame at 60fps
-          console.warn(`⚠️ [${name}] Slow update detected: ${duration.toFixed(2)}ms for action "${actionName}"`);
+        if (duration > 16) {
+          // More than one frame at 60fps
+          console.warn(
+            `⚠️ [${name}] Slow update detected: ${duration.toFixed(2)}ms for action "${actionName}"`
+          );
         }
 
         lastState = get();
@@ -127,29 +136,31 @@ export const debugMiddleware = <T>(
           lastUpdateTime: performanceMonitor.getLastUpdateTime(),
         },
       }),
-      
+
       logState: () => {
         console.log(`🏪 [${name}] Current state:`, get());
       },
-      
+
       logActions: () => {
         console.log(`📜 [${name}] Action history:`, actionHistory);
       },
-      
+
       resetPerformance: () => {
         performanceMonitor.reset();
       },
-      
+
       subscribe: (callback: (state: T) => void) => {
         let previousState = get();
-        
-        return api.subscriptions?.subscribe(
-          (state: T) => state,
-          (currentState: T) => {
-            callback(currentState);
-            previousState = currentState;
-          }
-        ) || (() => {});
+
+        return (
+          api.subscriptions?.subscribe(
+            (state: T) => state,
+            (currentState: T) => {
+              callback(currentState);
+              previousState = currentState;
+            }
+          ) || (() => {})
+        );
       },
     };
 
@@ -158,29 +169,43 @@ export const debugMiddleware = <T>(
 };
 
 // Get differences between two states
-function getStateChanges<T>(oldState: T, newState: T, path: string = ''): Array<{ path: string; oldValue: any; newValue: any }> {
+function getStateChanges<T>(
+  oldState: T,
+  newState: T,
+  path: string = ''
+): Array<{ path: string; oldValue: any; newValue: any }> {
   const changes: Array<{ path: string; oldValue: any; newValue: any }> = [];
 
   if (oldState === newState) {
     return changes;
   }
 
-  if (typeof oldState !== 'object' || typeof newState !== 'object' || oldState === null || newState === null) {
+  if (
+    typeof oldState !== 'object' ||
+    typeof newState !== 'object' ||
+    oldState === null ||
+    newState === null
+  ) {
     return [{ path: path || 'root', oldValue: oldState, newValue: newState }];
   }
 
   const allKeys = new Set([
     ...Object.keys(oldState as any),
-    ...Object.keys(newState as any)
+    ...Object.keys(newState as any),
   ]);
 
-  for (const key of allKeys) {
+  for (const key of Array.from(allKeys)) {
     const oldValue = (oldState as any)[key];
     const newValue = (newState as any)[key];
     const currentPath = path ? `${path}.${key}` : key;
 
     if (oldValue !== newValue) {
-      if (typeof oldValue === 'object' && typeof newValue === 'object' && oldValue !== null && newValue !== null) {
+      if (
+        typeof oldValue === 'object' &&
+        typeof newValue === 'object' &&
+        oldValue !== null &&
+        newValue !== null
+      ) {
         changes.push(...getStateChanges(oldValue, newValue, currentPath));
       } else {
         changes.push({ path: currentPath, oldValue, newValue });
@@ -196,24 +221,24 @@ export const storeDebugUtils = {
   // Get all store debug info
   getAllStoreInfo: (): Record<string, StoreDebugInfo> => {
     const info: Record<string, StoreDebugInfo> = {};
-    
+
     // This would need to be populated by each store that uses the debug middleware
     // In a real implementation, stores would register themselves here
-    
+
     return info;
   },
 
   // Log performance summary for all stores
   logPerformanceSummary: () => {
     const allInfo = storeDebugUtils.getAllStoreInfo();
-    
+
     console.table(
       Object.entries(allInfo).map(([name, info]) => ({
         Store: name,
         'Avg Update Time (ms)': info.performance.averageUpdateTime.toFixed(2),
         'Total Updates': info.performance.totalUpdates,
         'State Size (bytes)': info.stateSize,
-        'Subscriptions': info.subscriptionCount,
+        Subscriptions: info.subscriptionCount,
       }))
     );
   },
@@ -235,7 +260,7 @@ export const storeDebugUtils = {
   // Create a debug panel component data
   getDebugPanelData: () => {
     const allInfo = storeDebugUtils.getAllStoreInfo();
-    
+
     return {
       stores: Object.entries(allInfo).map(([name, info]) => ({
         name,
@@ -249,13 +274,19 @@ export const storeDebugUtils = {
 };
 
 // Determine store health status
-function getStoreHealthStatus(info: StoreDebugInfo): 'healthy' | 'warning' | 'critical' {
+function getStoreHealthStatus(
+  info: StoreDebugInfo
+): 'healthy' | 'warning' | 'critical' {
   const avgUpdateTime = info.performance.averageUpdateTime;
   const stateSize = info.stateSize;
   const subscriptionCount = info.subscriptionCount;
 
   // Critical conditions
-  if (avgUpdateTime > 50 || stateSize > 1024 * 1024 || subscriptionCount > 100) {
+  if (
+    avgUpdateTime > 50 ||
+    stateSize > 1024 * 1024 ||
+    subscriptionCount > 100
+  ) {
     return 'critical';
   }
 
@@ -270,40 +301,45 @@ function getStoreHealthStatus(info: StoreDebugInfo): 'healthy' | 'warning' | 'cr
 // Store action logger
 export const createActionLogger = (storeName: string) => {
   const actionTimes = new Map<string, number[]>();
-  
+
   return {
     logAction: (actionName: string, duration: number, payload?: any) => {
       const times = actionTimes.get(actionName) || [];
       times.push(duration);
-      
+
       // Keep only last 20 executions
       if (times.length > 20) {
         times.shift();
       }
-      
+
       actionTimes.set(actionName, times);
-      
+
       // Log if action is slow
       if (duration > 10) {
-        console.warn(`🐌 [${storeName}] Slow action "${actionName}": ${duration.toFixed(2)}ms`);
+        console.warn(
+          `🐌 [${storeName}] Slow action "${actionName}": ${duration.toFixed(2)}ms`
+        );
         if (payload) {
           console.log('Payload:', payload);
         }
       }
     },
-    
+
     getActionStats: (actionName?: string) => {
       if (actionName) {
         const times = actionTimes.get(actionName) || [];
         return {
           actionName,
           executionCount: times.length,
-          averageTime: times.length > 0 ? times.reduce((sum, time) => sum + time, 0) / times.length : 0,
+          averageTime:
+            times.length > 0
+              ? times.reduce((sum, time) => sum + time, 0) / times.length
+              : 0,
           maxTime: times.length > 0 ? Math.max(...times) : 0,
           minTime: times.length > 0 ? Math.min(...times) : 0,
         };
       }
-      
+
       return Array.from(actionTimes.entries()).map(([name, times]) => ({
         actionName: name,
         executionCount: times.length,
@@ -312,7 +348,7 @@ export const createActionLogger = (storeName: string) => {
         minTime: Math.min(...times),
       }));
     },
-    
+
     reset: () => {
       actionTimes.clear();
     },
@@ -321,9 +357,12 @@ export const createActionLogger = (storeName: string) => {
 
 // React DevTools integration
 export const connectToReactDevTools = (storeName: string, store: any) => {
-  if (typeof window !== 'undefined' && (window as any).__REACT_DEVTOOLS_GLOBAL_HOOK__) {
+  if (
+    typeof window !== 'undefined' &&
+    (window as any).__REACT_DEVTOOLS_GLOBAL_HOOK__
+  ) {
     const devTools = (window as any).__REACT_DEVTOOLS_GLOBAL_HOOK__;
-    
+
     // Register the store as a React component
     const fiberNode = {
       stateNode: store,
@@ -333,7 +372,7 @@ export const connectToReactDevTools = (storeName: string, store: any) => {
       sibling: null,
       memoizedState: store,
     };
-    
+
     devTools.onCommitFiberRoot(null, fiberNode, null, true);
   }
 };

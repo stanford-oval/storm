@@ -1,0 +1,66 @@
+# Unified Requirements for STORM + Backend
+# Compatible with macOS and Windows
+# Python 3.11+ required
+
+# =========================
+# Core STORM Dependencies
+# =========================
+dspy_ai==2.4.9
+wikipedia==1.4.0
+sentence-transformers==2.6.0
+toml==0.10.2
+langchain-text-splitters==0.2.0
+trafilatura==1.6.2
+langchain-huggingface==0.0.3
+qdrant-client>=1.7.0,<2.0.0
+langchain-qdrant>=0.1.0,<0.2.0
+numpy==1.26.4
+litellm>=1.61.15  # Updated to fix vulnerability 75075 (CWE-200: Exposure of Sensitive Information)
+diskcache==5.6.3
+
+# =========================
+# Backend Dependencies
+# =========================
+fastapi==0.109.2
+uvicorn[standard]==0.24.0
+python-multipart==0.0.9  # Updated to fix vulnerabilities
+python-frontmatter==1.0.0
+aiofiles==23.2.1
+pathlib2==2.3.7.post1
+PyJWT==2.8.0  # Secure JWT implementation (replaces vulnerable python-jose)
+cryptography==42.0.5  # For JWT signing
+passlib[bcrypt]==1.7.4
+markdown2>=2.4.0
+
+# =========================
+# Shared Dependencies (Resolved Conflicts)
+# =========================
+# Use newer versions to satisfy all requirements
+pydantic>=2.7.4,<3.0.0  # Satisfies langchain-qdrant requirement
+pydantic-core>=2.18.0,<3.0.0  # Compatible with newer pydantic
+typing-extensions>=4.12.0,<5.0.0  # Satisfies torch, openai, alembic
+httpx>=0.25.2,<0.29.0  # Compatible range for both
+python-dateutil>=2.9.0  # Newer version for htmldate
+
+# =========================
+# Development Dependencies (Optional)
+# =========================
+pytest==7.4.3
+pytest-asyncio==0.21.1
+black==23.11.0
+isort==5.12.0
+mypy==1.7.1
+types-requests==2.31.0.10
+types-toml==0.10.8.7
+types-pytz==2024.1.0.20240203
+
+# =========================
+# Platform Notes
+# =========================
+# For Windows users:
+# - Install Visual C++ Build Tools if compilation errors occur
+# - Some packages may need --no-binary flag for source installation
+#
+# For macOS users:
+# - Xcode Command Line Tools required (xcode-select --install)
+# - M1/M2 Macs may need Rosetta 2 for some packages

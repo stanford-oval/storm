@@ -1,0 +1,104 @@
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = false
+warn_unused_configs = true
+disallow_untyped_defs = false
+ignore_missing_imports = true
+no_implicit_optional = true
+no_site_packages = true
+
+# Exclude patterns to avoid checking third-party code
+exclude = [
+    "site-packages",
+    "venv",
+    ".venv",
+    "env",
+    ".env",
+    "node_modules",
+    "frontend",
+    "build",
+    "dist",
+    ".git",
+    "__pycache__",
+    "*.egg-info",
+    "transformers",
+    ".*/transformers/.*",
+    ".*site-packages.*",
+]
+
+# Only check our source code
+files = [
+    "backend/**/*.py",
+    "knowledge_storm/**/*.py",
+    "examples/**/*.py",
+]
+
+[[tool.mypy.overrides]]
+module = [
+    "transformers.*",
+    "torch.*",
+    "numpy.*",
+    "pandas.*",
+    "scipy.*",
+    "sklearn.*",
+    "sentence_transformers.*",
+    "dspy_ai.*",
+    "litellm.*",
+    "qdrant_client.*",
+    "langchain.*",
+    "langchain_qdrant.*",
+    "langchain_huggingface.*",
+    "langchain_text_splitters.*",
+    "wikipedia.*",
+    "trafilatura.*",
+    "diskcache.*",
+    "toml.*",
+    "fastapi.*",
+    "uvicorn.*",
+    "pydantic.*",
+    "passlib.*",
+    "jose.*",
+    "markdown2.*",
+    "aiofiles.*",
+    "python_multipart.*",
+    "frontmatter.*",
+    "pathlib2.*",
+]
+ignore_errors = true
+follow_imports = "skip"
+
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "knowledge-storm"
+dynamic = ["version"]
+description = "STORM: Synthesis of Topic Outlines through Retrieval and Multi-perspective question asking"
+authors = [
+    {name = "Yijia Shao", email = "shaoyj@stanford.edu"},
+    {name = "Yucheng Jiang", email = "yuchengj@stanford.edu"},
+]
+readme = "README.md"
+license = {text = "MIT"}
+keywords = ["information retrieval", "RAG", "grounding", "long-form generation", "knowledge curation"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Build Tools",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+requires-python = ">=3.11"
+
+[tool.setuptools.packages.find]
+include = ["knowledge_storm", "knowledge_storm.*"]
+exclude = ["tests*", "frontend*", "backend*", "deploy*", "assets*"]
+
+[tool.setuptools.package-data]
+knowledge_storm = ["*.json", "*.txt"]
+
+[project.urls]
+"Homepage" = "https://github.com/stanford-oval/storm"
+"Bug Tracker" = "https://github.com/stanford-oval/storm/issues"

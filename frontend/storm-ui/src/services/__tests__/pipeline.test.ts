@@ -1,6 +1,6 @@
 import { pipelineService } from '../pipeline';
 import { server } from '@/mocks/server';
-import { rest } from 'msw';
+import { http, HttpResponse } from 'msw';
 import { StormProject, PipelineProgress } from '@/types/storm';
 
 const mockProject: StormProject = {
@@ -49,17 +49,14 @@ describe('pipelineService', () => {
   describe('startPipeline', () => {
     it('starts pipeline successfully', async () => {
       server.use(
-        rest.post('/api/pipeline/start', (req, res, ctx) => {
-          return res(
-            ctx.status(200),
-            ctx.json({
-              success: true,
-              data: {
-                pipelineId: 'pipeline-123',
-                status: 'initializing',
-              },
-            })
-          );
+        http.post('/api/pipeline/start', () => {
+          return HttpResponse.json({
+            success: true,
+            data: {
+              pipelineId: 'pipeline-123',
+              status: 'initializing',
+            },
+          });
         })
       );
 
@@ -71,14 +68,11 @@ describe('pipelineService', () => {
 
     it('handles start pipeline errors', async () => {
       server.use(
-        rest.post('/api/pipeline/start', (req, res, ctx) => {
-          return res(
-            ctx.status(400),
-            ctx.json({
-              success: false,
-              error: 'Invalid configuration',
-            })
-          );
+        http.post('/api/pipeline/start', () => {
+          return HttpResponse.json({
+            success: false,
+            error: 'Invalid configuration',
+          });
         })
       );
 
@@ -108,21 +102,18 @@ describe('pipelineService', () => {
 
     it('sends correct request payload', async () => {
       server.use(
-        rest.post('/api/pipeline/start', async (req, res, ctx) => {
-          const body = await req.json();
-          
+        http.post('/api/pipeline/start', async ({ request }) => {
+          const body = await request.json();
+
           expect(body).toEqual({
             project: mockProject,
             options: {},
           });
 
-          return res(
-            ctx.status(200),
-            ctx.json({
-              success: true,
-              data: { pipelineId: 'pipeline-123' },
-            })
-          );
+          return HttpResponse.json({
+            success: true,
+            data: { pipelineId: 'pipeline-123' },
+          });
         })
       );
 
@@ -136,39 +127,22 @@ describe('pipelineService', () => {
       };
 
       server.use(
-        rest.post('/api/pipeline/start', async (req, res, ctx) => {
-          const body = await req.json();
-          
+        http.post('/api/pipeline/start', async () {
+          const body = await request.json();
+
           expect(body.options).toEqual(options);
 
-          return res(
-            ctx.status(200),
-            ctx.json({
-              success: true,
-              data: { pipelineId: 'pipeline-123' },
-            })
-          );
-        })
-      );
-
+          return HttpResponse.json({success: true,
+              data: { pipelineId: 'pipeline-123' });
       await pipelineService.startPipeline(mockProject, options);
     });
-  });
 
   describe('stopPipeline', () => {
     it('stops pipeline successfully', async () => {
       server.use(
-        rest.post('/api/pipeline/stop', (req, res, ctx) => {
-          return res(
-            ctx.status(200),
-            ctx.json({
-              success: true,
-              data: { status: 'stopped' },
-            })
-          );
-        })
-      );
-
+        http.post('/api/pipeline/stop', () => {
+          return HttpResponse.json({success: true,
+              data: { status: 'stopped' });
       const result = await pipelineService.stopPipeline('pipeline-123');
 
       expect(result.success).toBe(true);
@@ -177,17 +151,9 @@ describe('pipelineService', () => {
 
     it('handles stop pipeline errors', async () => {
       server.use(
-        rest.post('/api/pipeline/stop', (req, res, ctx) => {
-          return res(
-            ctx.status(404),
-            ctx.json({
-              success: false,
-              error: 'Pipeline not found',
-            })
-          );
-        })
-      );
-
+        http.post('/api/pipeline/stop', () => {
+          return HttpResponse.json({success: false,
+              error: 'Pipeline not found',});
       const result = await pipelineService.stopPipeline('invalid-pipeline');
 
       expect(result.success).toBe(false);
@@ -196,41 +162,24 @@ describe('pipelineService', () => {
 
     it('sends pipeline ID in request body', async () => {
       server.use(
-        rest.post('/api/pipeline/stop', async (req, res, ctx) => {
-          const body = await req.json();
-          
+        http.post('/api/pipeline/stop', async () {
+          const body = await request.json();
+
           expect(body.pipelineId).toBe('pipeline-123');
 
-          return res(
-            ctx.status(200),
-            ctx.json({
-              success: true,
-              data: { status: 'stopped' },
-            })
-          );
-        })
-      );
-
+          return HttpResponse.json({success: true,
+              data: { status: 'stopped' });
       await pipelineService.stopPipeline('pipeline-123');
     });
-  });
 
   describe('getPipelineStatus', () => {
     it('fetches pipeline status successfully', async () => {
       server.use(
-        rest.get('/api/pipeline/status/:pipelineId', (req, res, ctx) => {
-          expect(req.params.pipelineId).toBe('pipeline-123');
-          
-          return res(
-            ctx.status(200),
-            ctx.json({
-              success: true,
-              data: mockPipelineProgress,
-            })
-          );
-        })
-      );
+        http.get('/api/pipeline/status/:pipelineId', ({ request }) => {
+          expect(request.params.pipelineId).toBe('pipeline-123');
 
+          return HttpResponse.json({success: true,
+              data: mockPipelineProgress,});
       const result = await pipelineService.getPipelineStatus('pipeline-123');
 
       expect(result.success).toBe(true);
@@ -239,23 +188,15 @@ describe('pipelineService', () => {
 
     it('handles status fetch errors', async () => {
       server.use(
-        rest.get('/api/pipeline/status/:pipelineId', (req, res, ctx) => {
-          return res(
-            ctx.status(404),
-            ctx.json({
-              success: false,
-              error: 'Pipeline not found',
-            })
-          );
-        })
-      );
-
-      const result = await pipelineService.getPipelineStatus('invalid-pipeline');
+        http.get('/api/pipeline/status/:pipelineId', () => {
+          return HttpResponse.json({success: false,
+              error: 'Pipeline not found',});
+      const result =
+        await pipelineService.getPipelineStatus('invalid-pipeline');
 
       expect(result.success).toBe(false);
       expect(result.error).toBe('Pipeline not found');
     });
-  });
 
   describe('getPipelineLogs', () => {
     const mockLogs = [
@@ -275,17 +216,9 @@ describe('pipelineService', () => {
 
     it('fetches pipeline logs successfully', async () => {
       server.use(
-        rest.get('/api/pipeline/logs/:pipelineId', (req, res, ctx) => {
-          return res(
-            ctx.status(200),
-            ctx.json({
-              success: true,
-              data: mockLogs,
-            })
-          );
-        })
-      );
-
+        http.get('/api/pipeline/logs/:pipelineId', () => {
+          return HttpResponse.json({success: true,
+              data: mockLogs,});
       const result = await pipelineService.getPipelineLogs('pipeline-123');
 
       expect(result.success).toBe(true);
@@ -294,20 +227,12 @@ describe('pipelineService', () => {
 
     it('filters logs by level', async () => {
       server.use(
-        rest.get('/api/pipeline/logs/:pipelineId', (req, res, ctx) => {
-          const level = req.url.searchParams.get('level');
+        http.get('/api/pipeline/logs/:pipelineId', ({ request }) => {
+          const level = request.url.searchParams.get('level');
           expect(level).toBe('error');
-          
-          return res(
-            ctx.status(200),
-            ctx.json({
-              success: true,
-              data: [mockLogs[0]],
-            })
-          );
-        })
-      );
 
+          return HttpResponse.json({success: true,
+              data: [mockLogs[0]],});
       const result = await pipelineService.getPipelineLogs('pipeline-123', {
         level: 'error',
       });
@@ -317,60 +242,35 @@ describe('pipelineService', () => {
 
     it('limits log results', async () => {
       server.use(
-        rest.get('/api/pipeline/logs/:pipelineId', (req, res, ctx) => {
-          const limit = req.url.searchParams.get('limit');
+        http.get('/api/pipeline/logs/:pipelineId', ({ request }) => {
+          const limit = request.url.searchParams.get('limit');
           expect(limit).toBe('50');
-          
-          return res(
-            ctx.status(200),
-            ctx.json({
-              success: true,
-              data: mockLogs.slice(0, 50),
-            })
-          );
-        })
-      );
 
+          return HttpResponse.json({success: true,
+              data: mockLogs.slice(0, 50),});
       await pipelineService.getPipelineLogs('pipeline-123', { limit: 50 });
-    });
 
     it('filters logs by stage', async () => {
       server.use(
-        rest.get('/api/pipeline/logs/:pipelineId', (req, res, ctx) => {
-          const stage = req.url.searchParams.get('stage');
+        http.get('/api/pipeline/logs/:pipelineId', ({ request }) => {
+          const stage = request.url.searchParams.get('stage');
           expect(stage).toBe('research');
-          
-          return res(
-            ctx.status(200),
-            ctx.json({
-              success: true,
-              data: mockLogs.filter(log => log.stage === 'research'),
-            })
-          );
-        })
-      );
 
-      await pipelineService.getPipelineLogs('pipeline-123', { stage: 'research' });
-    });
-  });
+          return HttpResponse.json({success: true,
+              data: mockLogs.filter(log => log.stage === 'research'),});
+      await pipelineService.getPipelineLogs('pipeline-123', {
+        stage: 'research',
+      });
 
   describe('pausePipeline', () => {
     it('pauses pipeline successfully', async () => {
       server.use(
-        rest.post('/api/pipeline/pause', async (req, res, ctx) => {
-          const body = await req.json();
+        http.post('/api/pipeline/pause', async () {
+          const body = await request.json();
           expect(body.pipelineId).toBe('pipeline-123');
-          
-          return res(
-            ctx.status(200),
-            ctx.json({
-              success: true,
-              data: { status: 'paused' },
-            })
-          );
-        })
-      );
 
+          return HttpResponse.json({success: true,
+              data: { status: 'paused' });
       const result = await pipelineService.pausePipeline('pipeline-123');
 
       expect(result.success).toBe(true);
@@ -379,41 +279,24 @@ describe('pipelineService', () => {
 
     it('handles pause errors', async () => {
       server.use(
-        rest.post('/api/pipeline/pause', (req, res, ctx) => {
-          return res(
-            ctx.status(400),
-            ctx.json({
-              success: false,
-              error: 'Pipeline cannot be paused in current state',
-            })
-          );
-        })
-      );
-
+        http.post('/api/pipeline/pause', () => {
+          return HttpResponse.json({success: false,
+              error: 'Pipeline cannot be paused in current state',});
       const result = await pipelineService.pausePipeline('pipeline-123');
 
       expect(result.success).toBe(false);
       expect(result.error).toBe('Pipeline cannot be paused in current state');
     });
-  });
 
   describe('resumePipeline', () => {
     it('resumes pipeline successfully', async () => {
       server.use(
-        rest.post('/api/pipeline/resume', async (req, res, ctx) => {
-          const body = await req.json();
+        http.post('/api/pipeline/resume', async () {
+          const body = await request.json();
           expect(body.pipelineId).toBe('pipeline-123');
-          
-          return res(
-            ctx.status(200),
-            ctx.json({
-              success: true,
-              data: { status: 'running' },
-            })
-          );
-        })
-      );
 
+          return HttpResponse.json({success: true,
+              data: { status: 'running' });
       const result = await pipelineService.resumePipeline('pipeline-123');
 
       expect(result.success).toBe(true);
@@ -422,23 +305,14 @@ describe('pipelineService', () => {
 
     it('handles resume errors', async () => {
       server.use(
-        rest.post('/api/pipeline/resume', (req, res, ctx) => {
-          return res(
-            ctx.status(400),
-            ctx.json({
-              success: false,
-              error: 'Pipeline is not paused',
-            })
-          );
-        })
-      );
-
+        http.post('/api/pipeline/resume', () => {
+          return HttpResponse.json({success: false,
+              error: 'Pipeline is not paused',});
       const result = await pipelineService.resumePipeline('pipeline-123');
 
       expect(result.success).toBe(false);
       expect(result.error).toBe('Pipeline is not paused');
     });
-  });
 
   describe('listPipelines', () => {
     const mockPipelines = [
@@ -459,17 +333,9 @@ describe('pipelineService', () => {
 
     it('fetches pipelines list successfully', async () => {
       server.use(
-        rest.get('/api/pipelines', (req, res, ctx) => {
-          return res(
-            ctx.status(200),
-            ctx.json({
-              success: true,
-              data: mockPipelines,
-            })
-          );
-        })
-      );
-
+        http.get('/api/pipelines', () => {
+          return HttpResponse.json({success: true,
+              data: mockPipelines,});
       const result = await pipelineService.listPipelines();
 
       expect(result.success).toBe(true);
@@ -478,59 +344,32 @@ describe('pipelineService', () => {
 
     it('filters pipelines by status', async () => {
       server.use(
-        rest.get('/api/pipelines', (req, res, ctx) => {
-          const status = req.url.searchParams.get('status');
+        http.get('/api/pipelines', ({ request }) => {
+          const status = request.url.searchParams.get('status');
           expect(status).toBe('running');
-          
-          return res(
-            ctx.status(200),
-            ctx.json({
-              success: true,
-              data: mockPipelines.filter(p => p.status === 'running'),
-            })
-          );
-        })
-      );
 
+          return HttpResponse.json({success: true,
+              data: mockPipelines.filter(p => p.status === 'running'),});
       await pipelineService.listPipelines({ status: 'running' });
-    });
 
     it('filters pipelines by project ID', async () => {
       server.use(
-        rest.get('/api/pipelines', (req, res, ctx) => {
-          const projectId = req.url.searchParams.get('projectId');
+        http.get('/api/pipelines', ({ request }) => {
+          const projectId = request.url.searchParams.get('projectId');
           expect(projectId).toBe('project-1');
-          
-          return res(
-            ctx.status(200),
-            ctx.json({
-              success: true,
-              data: mockPipelines.filter(p => p.projectId === 'project-1'),
-            })
-          );
-        })
-      );
 
+          return HttpResponse.json({success: true,
+              data: mockPipelines.filter(p => p.projectId === 'project-1'),});
       await pipelineService.listPipelines({ projectId: 'project-1' });
-    });
-  });
 
   describe('deletePipeline', () => {
     it('deletes pipeline successfully', async () => {
       server.use(
-        rest.delete('/api/pipeline/:pipelineId', (req, res, ctx) => {
-          expect(req.params.pipelineId).toBe('pipeline-123');
-          
-          return res(
-            ctx.status(200),
-            ctx.json({
-              success: true,
-              data: { id: 'pipeline-123' },
-            })
-          );
-        })
-      );
+        http.delete('/api/pipeline/:pipelineId', ({ request }) => {
+          expect(request.params.pipelineId).toBe('pipeline-123');
 
+          return HttpResponse.json({success: true,
+              data: { id: 'pipeline-123' });
       const result = await pipelineService.deletePipeline('pipeline-123');
 
       expect(result.success).toBe(true);
@@ -539,46 +378,28 @@ describe('pipelineService', () => {
 
     it('handles delete errors', async () => {
       server.use(
-        rest.delete('/api/pipeline/:pipelineId', (req, res, ctx) => {
-          return res(
-            ctx.status(409),
-            ctx.json({
-              success: false,
-              error: 'Cannot delete running pipeline',
-            })
-          );
-        })
-      );
-
+        http.delete('/api/pipeline/:pipelineId', () => {
+          return HttpResponse.json({success: false,
+              error: 'Cannot delete running pipeline',});
       const result = await pipelineService.deletePipeline('pipeline-123');
 
       expect(result.success).toBe(false);
       expect(result.error).toBe('Cannot delete running pipeline');
     });
-  });
 
   describe('error handling and retries', () => {
     it('retries failed requests', async () => {
       let attemptCount = 0;
-      
-      server.use(
-        rest.get('/api/pipeline/status/pipeline-123', (req, res, ctx) => {
-          attemptCount++;
-          
-          if (attemptCount < 3) {
-            return res(
-              ctx.status(500),
-              ctx.json({ success: false, error: 'Server error' })
-            );
-          }
-          
-          return res(
-            ctx.status(200),
-            ctx.json({ success: true, data: mockPipelineProgress })
-          );
-        })
-      );
 
+      server.use(
+        http.get('/api/pipeline/status/pipeline-123', () => {
+          attemptCount++;
+
+          if (attemptCount < 3) {
+            return HttpResponse.json({success: false, error: 'Server error' });
+          }
+
+          return HttpResponse.json({success: true, data: mockPipelineProgress });
       const result = await pipelineService.getPipelineStatus('pipeline-123');
 
       expect(result.success).toBe(true);
@@ -587,14 +408,8 @@ describe('pipelineService', () => {
 
     it('gives up after max retries', async () => {
       server.use(
-        rest.get('/api/pipeline/status/pipeline-123', (req, res, ctx) => {
-          return res(
-            ctx.status(500),
-            ctx.json({ success: false, error: 'Persistent server error' })
-          );
-        })
-      );
-
+        http.get('/api/pipeline/status/pipeline-123', () => {
+          return HttpResponse.json({success: false, error: 'Persistent server error' });
       const result = await pipelineService.getPipelineStatus('pipeline-123');
 
       expect(result.success).toBe(false);
@@ -603,11 +418,9 @@ describe('pipelineService', () => {
 
     it('handles network errors', async () => {
       server.use(
-        rest.get('/api/pipeline/status/pipeline-123', (req, res, ctx) => {
-          return res.networkError('Network connection failed');
-        })
-      );
-
+        http.get('/api/pipeline/status/pipeline-123', () => {
+          return HttpResponse.error('Network connection failed');
+        });
       const result = await pipelineService.getPipelineStatus('pipeline-123');
 
       expect(result.success).toBe(false);
@@ -616,36 +429,23 @@ describe('pipelineService', () => {
 
     it('handles timeout errors', async () => {
       server.use(
-        rest.get('/api/pipeline/status/pipeline-123', (req, res, ctx) => {
-          return res(
-            ctx.delay(5000), // Longer than typical timeout
-            ctx.status(200),
-            ctx.json({ success: true, data: mockPipelineProgress })
-          );
-        })
-      );
-
+        http.get('/api/pipeline/status/pipeline-123', async () => {
+          await new Promise(resolve => setTimeout(resolve(5000), // Longer than typical timeout
+            { success: true, data: mockPipelineProgress });
       const result = await pipelineService.getPipelineStatus('pipeline-123');
 
       expect(result.success).toBe(false);
       expect(result.error).toContain('timeout');
     });
-  });
 
   describe('request interceptors', () => {
     it('adds authentication headers', async () => {
       server.use(
-        rest.get('/api/pipeline/status/pipeline-123', (req, res, ctx) => {
-          const authHeader = req.headers.get('Authorization');
+        http.get('/api/pipeline/status/pipeline-123', ({ request }) => {
+          const authHeader = request.headers.get('Authorization');
           expect(authHeader).toBe('Bearer test-token');
-          
-          return res(
-            ctx.status(200),
-            ctx.json({ success: true, data: mockPipelineProgress })
-          );
-        })
-      );
 
+          return HttpResponse.json({success: true, data: mockPipelineProgress });
       // Mock getting auth token
       localStorage.setItem('auth-token', 'test-token');
 
@@ -654,55 +454,33 @@ describe('pipelineService', () => {
 
     it('adds request ID for tracing', async () => {
       server.use(
-        rest.get('/api/pipeline/status/pipeline-123', (req, res, ctx) => {
-          const requestId = req.headers.get('X-Request-ID');
+        http.get('/api/pipeline/status/pipeline-123', ({ request }) => {
+          const requestId = request.headers.get('X-Request-ID');
           expect(requestId).toBeTruthy();
           expect(requestId).toMatch(/^[0-9a-f-]+$/i);
-          
-          return res(
-            ctx.status(200),
-            ctx.json({ success: true, data: mockPipelineProgress })
-          );
-        })
-      );
 
+          return HttpResponse.json({success: true, data: mockPipelineProgress });
       await pipelineService.getPipelineStatus('pipeline-123');
     });
-  });
 
   describe('response interceptors', () => {
     it('handles token refresh on 401', async () => {
       server.use(
-        rest.get('/api/pipeline/status/pipeline-123', (req, res, ctx) => {
-          const authHeader = req.headers.get('Authorization');
-          
-          if (authHeader === 'Bearer old-token') {
-            return res(
-              ctx.status(401),
-              ctx.json({ success: false, error: 'Token expired' })
-            );
-          }
-          
-          if (authHeader === 'Bearer new-token') {
-            return res(
-              ctx.status(200),
-              ctx.json({ success: true, data: mockPipelineProgress })
-            );
-          }
-          
-          return res(
-            ctx.status(401),
-            ctx.json({ success: false, error: 'Unauthorized' })
-          );
-        }),
-        rest.post('/api/auth/refresh', (req, res, ctx) => {
-          return res(
-            ctx.status(200),
-            ctx.json({ success: true, data: { token: 'new-token' } })
-          );
-        })
-      );
+        http.get('/api/pipeline/status/pipeline-123', ({ request }) => {
+          const authHeader = request.headers.get('Authorization');
 
+          if (authHeader === 'Bearer old-token') {
+            return HttpResponse.json({success: false, error: 'Token expired' });
+          }
+
+          if (authHeader === 'Bearer new-token') {
+            return HttpResponse.json({success: true, data: mockPipelineProgress });
+          }
+
+          return HttpResponse.json({success: false, error: 'Unauthorized' });
+        }),
+        http.post('/api/auth/refresh', () => {
+          return HttpResponse.json({success: true, data: { token: 'new-token' } });
       localStorage.setItem('auth-token', 'old-token');
 
       const result = await pipelineService.getPipelineStatus('pipeline-123');
@@ -710,22 +488,15 @@ describe('pipelineService', () => {
       expect(result.success).toBe(true);
       expect(localStorage.getItem('auth-token')).toBe('new-token');
     });
-  });
 
   describe('caching', () => {
     it('caches GET requests', async () => {
       let requestCount = 0;
-      
-      server.use(
-        rest.get('/api/pipeline/status/pipeline-123', (req, res, ctx) => {
-          requestCount++;
-          return res(
-            ctx.status(200),
-            ctx.json({ success: true, data: mockPipelineProgress })
-          );
-        })
-      );
 
+      server.use(
+        http.get('/api/pipeline/status/pipeline-123', ({ request }) => {
+          requestCount++;
+          return HttpResponse.json({success: true, data: mockPipelineProgress });
       // First request
       await pipelineService.getPipelineStatus('pipeline-123');
       expect(requestCount).toBe(1);
@@ -738,17 +509,11 @@ describe('pipelineService', () => {
     it('invalidates cache after TTL', async () => {
       jest.useFakeTimers();
       let requestCount = 0;
-      
-      server.use(
-        rest.get('/api/pipeline/status/pipeline-123', (req, res, ctx) => {
-          requestCount++;
-          return res(
-            ctx.status(200),
-            ctx.json({ success: true, data: mockPipelineProgress })
-          );
-        })
-      );
 
+      server.use(
+        http.get('/api/pipeline/status/pipeline-123', ({ request }) => {
+          requestCount++;
+          return HttpResponse.json({success: true, data: mockPipelineProgress });
       // First request
       await pipelineService.getPipelineStatus('pipeline-123');
       expect(requestCount).toBe(1);
@@ -765,17 +530,11 @@ describe('pipelineService', () => {
 
     it('does not cache error responses', async () => {
       let requestCount = 0;
-      
-      server.use(
-        rest.get('/api/pipeline/status/pipeline-123', (req, res, ctx) => {
-          requestCount++;
-          return res(
-            ctx.status(500),
-            ctx.json({ success: false, error: 'Server error' })
-          );
-        })
-      );
 
+      server.use(
+        http.get('/api/pipeline/status/pipeline-123', ({ request }) => {
+          requestCount++;
+          return HttpResponse.json({success: false, error: 'Server error' });
       // First request (fails)
       await pipelineService.getPipelineStatus('pipeline-123');
       expect(requestCount).toBe(1);
@@ -784,5 +543,4 @@ describe('pipelineService', () => {
       await pipelineService.getPipelineStatus('pipeline-123');
       expect(requestCount).toBeGreaterThan(1);
     });
-  });
 });

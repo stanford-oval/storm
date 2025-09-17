@@ -6,8 +6,22 @@
 import { env } from '@/lib/env';
 
 // API Provider Types
-export type LLMProvider = 'openai' | 'anthropic' | 'azure' | 'gemini' | 'ollama' | 'groq';
-export type RetrieverType = 'google' | 'bing' | 'you' | 'duckduckgo' | 'tavily' | 'serper' | 'brave' | 'vector';
+export type LLMProvider =
+  | 'openai'
+  | 'anthropic'
+  | 'azure'
+  | 'gemini'
+  | 'ollama'
+  | 'groq';
+export type RetrieverType =
+  | 'google'
+  | 'bing'
+  | 'you'
+  | 'duckduckgo'
+  | 'tavily'
+  | 'serper'
+  | 'brave'
+  | 'vector';
 
 // Configuration Interfaces
 interface LLMConfig {
@@ -63,12 +77,14 @@ const getEnv = (key: string, defaultValue = ''): string => {
   }
   // Client-side - Next.js prefixes with NEXT_PUBLIC_
   const value = process.env[key];
-  
+
   // Debug logging for key environment variables
   if (key.includes('API_KEY') && typeof window !== 'undefined') {
-    console.log(`🔑 getEnv('${key}'): ${value ? `Found (${value.substring(0, 10)}...)` : 'NOT FOUND'}`);
+    console.log(
+      `🔑 getEnv('${key}'): ${value ? `Found (${value.substring(0, 10)}...)` : 'NOT FOUND'}`
+    );
   }
-  
+
   return value || defaultValue;
 };
 
@@ -150,7 +166,9 @@ const buildLLMProviders = (): Partial<Record<LLMProvider, LLMConfig>> => {
 };
 
 // Build retriever configurations
-const buildRetrieverProviders = (): Partial<Record<RetrieverType, RetrieverConfig>> => {
+const buildRetrieverProviders = (): Partial<
+  Record<RetrieverType, RetrieverConfig>
+> => {
   const providers: Partial<Record<RetrieverType, RetrieverConfig>> = {};
 
   // Tavily
@@ -227,7 +245,7 @@ const buildRetrieverProviders = (): Partial<Record<RetrieverType, RetrieverConfi
 export const apiConfig: APIConfig = {
   backendUrl: env.API_URL,
   wsUrl: env.WS_URL,
-  
+
   llm: {
     providers: buildLLMProviders(),
     default: env.DEFAULT_LLM_PROVIDER as LLMProvider,
@@ -235,24 +253,30 @@ export const apiConfig: APIConfig = {
     defaultTemperature: env.DEFAULT_TEMPERATURE,
     defaultMaxTokens: env.DEFAULT_MAX_TOKENS,
   },
-  
+
   retrievers: {
     providers: buildRetrieverProviders(),
     default: env.DEFAULT_RETRIEVER_TYPE as RetrieverType,
     defaultMaxResults: env.DEFAULT_MAX_SEARCH_RESULTS,
   },
-  
+
   features: {
     enableCoStorm: false,
     enableAnalytics: false,
     enableDebugMode: env.ENABLE_DEBUG_MODE,
   },
-  
+
   limits: {
-    maxConcurrentPipelines: getEnvNumber('NEXT_PUBLIC_MAX_CONCURRENT_PIPELINES', 3),
-    maxRequestsPerMinute: getEnvNumber('NEXT_PUBLIC_MAX_REQUESTS_PER_MINUTE', 60),
+    maxConcurrentPipelines: getEnvNumber(
+      'NEXT_PUBLIC_MAX_CONCURRENT_PIPELINES',
+      3
+    ),
+    maxRequestsPerMinute: getEnvNumber(
+      'NEXT_PUBLIC_MAX_REQUESTS_PER_MINUTE',
+      60
+    ),
   },
-  
+
   storage: {
     enabled: getEnvBool('NEXT_PUBLIC_ENABLE_LOCAL_STORAGE', true),
     prefix: getEnv('NEXT_PUBLIC_STORAGE_PREFIX', 'storm_ui_'),
@@ -265,7 +289,9 @@ export const getLLMConfig = (provider?: LLMProvider): LLMConfig | undefined => {
   return apiConfig.llm.providers[p];
 };
 
-export const getRetrieverConfig = (type?: RetrieverType): RetrieverConfig | undefined => {
+export const getRetrieverConfig = (
+  type?: RetrieverType
+): RetrieverConfig | undefined => {
   const t = type || apiConfig.retrievers.default;
   return apiConfig.retrievers.providers[t];
 };
@@ -295,24 +321,28 @@ export const getAvailableRetrievers = (): RetrieverType[] => {
 // Validate configuration
 export const validateConfig = (): { valid: boolean; errors: string[] } => {
   const errors: string[] = [];
-  
+
   // Check if at least one LLM provider is configured
   const llmProviders = getAvailableLLMProviders();
   if (llmProviders.length === 0) {
-    errors.push('No LLM providers configured. Please add at least one API key.');
+    errors.push(
+      'No LLM providers configured. Please add at least one API key.'
+    );
   }
-  
+
   // Check if at least one retriever is configured
   const retrievers = getAvailableRetrievers();
   if (retrievers.length === 0) {
-    errors.push('No retrievers configured. Please add at least one search API key.');
+    errors.push(
+      'No retrievers configured. Please add at least one search API key.'
+    );
   }
-  
+
   // Check if backend URL is configured
   if (!apiConfig.backendUrl) {
     errors.push('Backend API URL is not configured.');
   }
-  
+
   return {
     valid: errors.length === 0,
     errors,
@@ -322,5 +352,7 @@ export const validateConfig = (): { valid: boolean; errors: string[] } => {
 // Export configuration for debugging
 if (typeof window !== 'undefined' && apiConfig.features.enableDebugMode) {
   (window as any).__API_CONFIG__ = apiConfig;
-  console.log('🔧 API Configuration loaded. Access via __API_CONFIG__ in console.');
+  console.log(
+    '🔧 API Configuration loaded. Access via __API_CONFIG__ in console.'
+  );
 }

@@ -18,66 +18,79 @@ export function useSession(sessionId?: string) {
         setSession(response.data);
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch session';
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to fetch session';
       setError(errorMessage);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const createSession = useCallback(async (request: CreateSessionRequest) => {
-    setLoading(true);
-    try {
-      const response = await sessionService.createSession(request);
-      if (response.success && response.data) {
+  const createSession = useCallback(
+    async (request: CreateSessionRequest) => {
+      setLoading(true);
+      try {
+        const response = await sessionService.createSession(request);
+        if (response.success && response.data) {
+          toast({
+            title: 'Success',
+            description: 'Session created successfully',
+            variant: 'success',
+          });
+          return response.data;
+        }
+        return null;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Failed to create session';
+        setError(errorMessage);
         toast({
-          title: 'Success',
-          description: 'Session created successfully',
-          variant: 'success',
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
         });
-        return response.data;
+        return null;
+      } finally {
+        setLoading(false);
       }
-      return null;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to create session';
-      setError(errorMessage);
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, [toast]);
+    },
+    [toast]
+  );
 
-  const joinSession = useCallback(async (sessionId: string, participantName: string, role?: string) => {
-    setLoading(true);
-    try {
-      const response = await sessionService.joinSession({ sessionId, participantName, role });
-      if (response.success && response.data) {
-        toast({
-          title: 'Success',
-          description: 'Joined session successfully',
-          variant: 'success',
+  const joinSession = useCallback(
+    async (sessionId: string, participantName: string, role?: string) => {
+      setLoading(true);
+      try {
+        const response = await sessionService.joinSession({
+          sessionId,
+          participantName,
+          role,
         });
-        return response.data;
+        if (response.success && response.data) {
+          toast({
+            title: 'Success',
+            description: 'Joined session successfully',
+            variant: 'success',
+          });
+          return response.data;
+        }
+        return null;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Failed to join session';
+        setError(errorMessage);
+        toast({
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+        return null;
+      } finally {
+        setLoading(false);
       }
-      return null;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to join session';
-      setError(errorMessage);
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, [toast]);
+    },
+    [toast]
+  );
 
   return {
     session,

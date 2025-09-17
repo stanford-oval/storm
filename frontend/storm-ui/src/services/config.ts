@@ -21,14 +21,18 @@ export class ConfigService extends BaseApiService {
   /**
    * Get a specific configuration template
    */
-  async getConfigTemplate(templateId: string): Promise<ApiResponse<ConfigTemplate>> {
+  async getConfigTemplate(
+    templateId: string
+  ): Promise<ApiResponse<ConfigTemplate>> {
     return this.get<ConfigTemplate>(`${this.basePath}/templates/${templateId}`);
   }
 
   /**
    * Create a new configuration template
    */
-  async createConfigTemplate(request: SaveConfigRequest): Promise<ApiResponse<ConfigTemplate>> {
+  async createConfigTemplate(
+    request: SaveConfigRequest
+  ): Promise<ApiResponse<ConfigTemplate>> {
     return this.post<ConfigTemplate>(`${this.basePath}/templates`, request);
   }
 
@@ -39,7 +43,10 @@ export class ConfigService extends BaseApiService {
     templateId: string,
     updates: Partial<SaveConfigRequest>
   ): Promise<ApiResponse<ConfigTemplate>> {
-    return this.put<ConfigTemplate>(`${this.basePath}/templates/${templateId}`, updates);
+    return this.put<ConfigTemplate>(
+      `${this.basePath}/templates/${templateId}`,
+      updates
+    );
   }
 
   /**
@@ -52,8 +59,12 @@ export class ConfigService extends BaseApiService {
   /**
    * Set a template as default
    */
-  async setDefaultTemplate(templateId: string): Promise<ApiResponse<ConfigTemplate>> {
-    return this.post<ConfigTemplate>(`${this.basePath}/templates/${templateId}/set-default`);
+  async setDefaultTemplate(
+    templateId: string
+  ): Promise<ApiResponse<ConfigTemplate>> {
+    return this.post<ConfigTemplate>(
+      `${this.basePath}/templates/${templateId}/set-default`
+    );
   }
 
   /**
@@ -66,21 +77,30 @@ export class ConfigService extends BaseApiService {
   /**
    * Update the default configuration
    */
-  async updateDefaultConfig(config: StormConfig): Promise<ApiResponse<StormConfig>> {
+  async updateDefaultConfig(
+    config: StormConfig
+  ): Promise<ApiResponse<StormConfig>> {
     return this.put<StormConfig>(`${this.basePath}/default`, { config });
   }
 
   /**
    * Validate a configuration
    */
-  async validateConfig(request: ValidateConfigRequest): Promise<ApiResponse<ConfigValidationResponse>> {
-    return this.post<ConfigValidationResponse>(`${this.basePath}/validate`, request);
+  async validateConfig(
+    request: ValidateConfigRequest
+  ): Promise<ApiResponse<ConfigValidationResponse>> {
+    return this.post<ConfigValidationResponse>(
+      `${this.basePath}/validate`,
+      request
+    );
   }
 
   /**
    * Test LLM configuration
    */
-  async testLLMConfig(llmConfig: StormConfig['llm']): Promise<ApiResponse<LLMTestResult>> {
+  async testLLMConfig(
+    llmConfig: StormConfig['llm']
+  ): Promise<ApiResponse<LLMTestResult>> {
     return this.post<LLMTestResult>(`${this.basePath}/test/llm`, { llmConfig });
   }
 
@@ -90,13 +110,17 @@ export class ConfigService extends BaseApiService {
   async testRetrieverConfig(
     retrieverConfig: StormConfig['retriever']
   ): Promise<ApiResponse<RetrieverTestResult>> {
-    return this.post<RetrieverTestResult>(`${this.basePath}/test/retriever`, { retrieverConfig });
+    return this.post<RetrieverTestResult>(`${this.basePath}/test/retriever`, {
+      retrieverConfig,
+    });
   }
 
   /**
    * Get available LLM models
    */
-  async getAvailableLLMModels(provider?: string): Promise<ApiResponse<LLMModel[]>> {
+  async getAvailableLLMModels(
+    provider?: string
+  ): Promise<ApiResponse<LLMModel[]>> {
     const params = new URLSearchParams();
     if (provider) params.append('provider', provider);
 
@@ -128,7 +152,10 @@ export class ConfigService extends BaseApiService {
   async getConfigRecommendations(
     context: ConfigRecommendationContext
   ): Promise<ApiResponse<ConfigRecommendation[]>> {
-    return this.post<ConfigRecommendation[]>(`${this.basePath}/recommendations`, context);
+    return this.post<ConfigRecommendation[]>(
+      `${this.basePath}/recommendations`,
+      context
+    );
   }
 
   /**
@@ -152,7 +179,7 @@ export class ConfigService extends BaseApiService {
     );
 
     const blob = new Blob([response.data!.content], {
-      type: format === 'json' ? 'application/json' : 'text/plain'
+      type: format === 'json' ? 'application/json' : 'text/plain',
     });
 
     // Auto-download
@@ -173,17 +200,24 @@ export class ConfigService extends BaseApiService {
   /**
    * Get configuration history for a project
    */
-  async getConfigHistory(projectId: string): Promise<ApiResponse<ConfigHistoryEntry[]>> {
-    return this.get<ConfigHistoryEntry[]>(`${this.basePath}/history/${projectId}`);
+  async getConfigHistory(
+    projectId: string
+  ): Promise<ApiResponse<ConfigHistoryEntry[]>> {
+    return this.get<ConfigHistoryEntry[]>(
+      `${this.basePath}/history/${projectId}`
+    );
   }
 
   /**
    * Revert to a previous configuration
    */
-  async revertConfig(projectId: string, historyEntryId: string): Promise<ApiResponse<StormConfig>> {
+  async revertConfig(
+    projectId: string,
+    historyEntryId: string
+  ): Promise<ApiResponse<StormConfig>> {
     return this.post<StormConfig>(`${this.basePath}/revert`, {
       projectId,
-      historyEntryId
+      historyEntryId,
     });
   }
 
@@ -196,7 +230,7 @@ export class ConfigService extends BaseApiService {
   ): Promise<ApiResponse<ConfigComparison>> {
     return this.post<ConfigComparison>(`${this.basePath}/compare`, {
       config1,
-      config2
+      config2,
     });
   }
 
@@ -214,22 +248,31 @@ export class ConfigService extends BaseApiService {
     presetId: string,
     customizations?: Partial<StormConfig>
   ): Promise<ApiResponse<StormConfig>> {
-    return this.post<StormConfig>(`${this.basePath}/presets/${presetId}/apply`, {
-      customizations
-    });
+    return this.post<StormConfig>(
+      `${this.basePath}/presets/${presetId}/apply`,
+      {
+        customizations,
+      }
+    );
   }
 
   /**
    * Get API key validation status
    */
-  async validateApiKeys(config: StormConfig): Promise<ApiResponse<ApiKeyValidation>> {
-    return this.post<ApiKeyValidation>(`${this.basePath}/validate-keys`, { config });
+  async validateApiKeys(
+    config: StormConfig
+  ): Promise<ApiResponse<ApiKeyValidation>> {
+    return this.post<ApiKeyValidation>(`${this.basePath}/validate-keys`, {
+      config,
+    });
   }
 
   /**
    * Get quota information for API keys
    */
-  async getApiKeyQuotas(config: StormConfig): Promise<ApiResponse<ApiKeyQuota[]>> {
+  async getApiKeyQuotas(
+    config: StormConfig
+  ): Promise<ApiResponse<ApiKeyQuota[]>> {
     return this.post<ApiKeyQuota[]>(`${this.basePath}/quotas`, { config });
   }
 
@@ -242,7 +285,7 @@ export class ConfigService extends BaseApiService {
   ): Promise<ApiResponse<OptimizedConfig>> {
     return this.post<OptimizedConfig>(`${this.basePath}/optimize`, {
       config,
-      objectives
+      objectives,
     });
   }
 
@@ -256,7 +299,9 @@ export class ConfigService extends BaseApiService {
   /**
    * Generate configuration from requirements
    */
-  async generateConfig(requirements: ConfigRequirements): Promise<ApiResponse<StormConfig>> {
+  async generateConfig(
+    requirements: ConfigRequirements
+  ): Promise<ApiResponse<StormConfig>> {
     return this.post<StormConfig>(`${this.basePath}/generate`, requirements);
   }
 
@@ -270,8 +315,12 @@ export class ConfigService extends BaseApiService {
   /**
    * Switch to environment-specific configuration
    */
-  async switchEnvironment(environment: string): Promise<ApiResponse<StormConfig>> {
-    return this.post<StormConfig>(`${this.basePath}/environments/${environment}/activate`);
+  async switchEnvironment(
+    environment: string
+  ): Promise<ApiResponse<StormConfig>> {
+    return this.post<StormConfig>(
+      `${this.basePath}/environments/${environment}/activate`
+    );
   }
 }
 
@@ -349,7 +398,13 @@ export interface ModelPricing {
 }
 
 export interface ConfigRecommendationContext {
-  useCase: 'research' | 'creative_writing' | 'academic' | 'news' | 'technical' | 'general';
+  useCase:
+    | 'research'
+    | 'creative_writing'
+    | 'academic'
+    | 'news'
+    | 'technical'
+    | 'general';
   budget: 'low' | 'medium' | 'high' | 'unlimited';
   priority: 'speed' | 'quality' | 'cost' | 'balanced';
   language?: string;
@@ -458,7 +513,11 @@ export interface ApiKeyQuota {
 }
 
 export interface OptimizationObjective {
-  type: 'minimize_cost' | 'maximize_quality' | 'minimize_time' | 'maximize_throughput';
+  type:
+    | 'minimize_cost'
+    | 'maximize_quality'
+    | 'minimize_time'
+    | 'maximize_throughput';
   weight: number; // 0-1
   constraints?: Record<string, any>;
 }
@@ -510,5 +569,5 @@ export interface EnvironmentConfig {
 
 // Create and export singleton instance
 export const configService = new ConfigService({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
 });

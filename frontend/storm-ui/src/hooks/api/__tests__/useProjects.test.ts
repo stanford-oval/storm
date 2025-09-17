@@ -1,7 +1,7 @@
 import { renderHook, act, waitFor } from '@/test/utils';
 import { useProjects } from '../useProjects';
 import { server } from '@/mocks/server';
-import { rest } from 'msw';
+import { http, HttpResponse } from 'msw';
 import { StormProject } from '@/types/storm';
 
 const mockProjects: StormProject[] = [
@@ -70,19 +70,16 @@ describe('useProjects', () => {
   describe('fetching projects', () => {
     it('fetches projects successfully', async () => {
       server.use(
-        rest.get('/api/projects', (req, res, ctx) => {
-          return res(
-            ctx.status(200),
-            ctx.json({
-              success: true,
-              data: {
-                projects: mockProjects,
-                total: mockProjects.length,
-                page: 1,
-                limit: 10,
-              },
-            })
-          );
+        http.get('/api/projects', () => {
+          return HttpResponse.json({
+            success: true,
+            data: {
+              projects: mockProjects,
+              total: mockProjects.length,
+              page: 1,
+              limit: 10,
+            },
+          });
         })
       );
 
@@ -101,14 +98,11 @@ describe('useProjects', () => {
 
     it('handles fetch errors', async () => {
       server.use(
-        rest.get('/api/projects', (req, res, ctx) => {
-          return res(
-            ctx.status(500),
-            ctx.json({
-              success: false,
-              error: 'Server error',
-            })
-          );
+        http.get('/api/projects', () => {
+          return HttpResponse.json({
+            success: false,
+            error: 'Server error',
+          });
         })
       );
 
@@ -124,31 +118,26 @@ describe('useProjects', () => {
 
     it('supports pagination', async () => {
       server.use(
-        rest.get('/api/projects', (req, res, ctx) => {
-          const page = req.url.searchParams.get('page');
-          const limit = req.url.searchParams.get('limit');
-          
+        http.get('/api/projects', ({ request }) => {
+          const page = request.url.searchParams.get('page');
+          const limit = request.url.searchParams.get('limit');
+
           expect(page).toBe('2');
           expect(limit).toBe('5');
 
-          return res(
-            ctx.status(200),
-            ctx.json({
-              success: true,
-              data: {
+          return HttpResponse.json({
+            success: true,
+            data: {
                 projects: [mockProjects[1]],
                 total: 2,
                 page: 2,
                 limit: 5,
-              },
-            })
-          );
+            },
+          });
         })
       );
 
-      const { result } = renderHook(() => 
-        useProjects({ page: 2, limit: 5 })
-      );
+      const { result } = renderHook(() => useProjects({ page: 2, limit: 5 }));
 
       await waitFor(() => {
         expect(result.current.projects).toEqual([mockProjects[1]]);
@@ -158,29 +147,24 @@ describe('useProjects', () => {
 
     it('supports filtering by status', async () => {
       server.use(
-        rest.get('/api/projects', (req, res, ctx) => {
-          const status = req.url.searchParams.get('status');
+        http.get('/api/projects', ({ request }) => {
+          const status = request.url.searchParams.get('status');
           expect(status).toBe('completed');
 
-          return res(
-            ctx.status(200),
-            ctx.json({
-              success: true,
-              data: {
+          return HttpResponse.json({
+            success: true,
+            data: {
                 projects: [mockProjects[0]],
                 total: 1,
                 page: 1,
                 limit: 10,
-              },
-            })
-          );
+            },
+          });
         })
       );
 
-      const { result } = renderHook(() => 
-        useProjects({ filters: { status: ['completed'] } })
-      );
-
+      const { result } = renderHook(() =>
+        useProjects({ filters: { status: ['completed'] } }));
       await waitFor(() => {
         expect(result.current.projects).toEqual([mockProjects[0]]);
       });
@@ -188,29 +172,24 @@ describe('useProjects', () => {
 
     it('supports search query', async () => {
       server.use(
-        rest.get('/api/projects', (req, res, ctx) => {
-          const search = req.url.searchParams.get('search');
+        http.get('/api/projects', ({ request }) => {
+          const search = request.url.searchParams.get('search');
           expect(search).toBe('AI');
 
-          return res(
-            ctx.status(200),
-            ctx.json({
-              success: true,
-              data: {
+          return HttpResponse.json({
+            success: true,
+            data: {
                 projects: [mockProjects[0]],
                 total: 1,
                 page: 1,
                 limit: 10,
-              },
-            })
-          );
+            },
+          });
         })
       );
 
-      const { result } = renderHook(() => 
-        useProjects({ filters: { searchQuery: 'AI' } })
-      );
-
+      const { result } = renderHook(() =>
+        useProjects({ filters: { searchQuery: 'AI' } }));
       await waitFor(() => {
         expect(result.current.projects).toEqual([mockProjects[0]]);
       });
@@ -236,14 +215,11 @@ describe('useProjects', () => {
       };
 
       server.use(
-        rest.post('/api/projects', (req, res, ctx) => {
-          return res(
-            ctx.status(201),
-            ctx.json({
-              success: true,
-              data: createdProject,
-            })
-          );
+        http.post('/api/projects', () => {
+          return HttpResponse.json({
+            success: true,
+            data: createdProject,
+          });
         })
       );
 
@@ -260,14 +236,11 @@ describe('useProjects', () => {
 
     it('handles create errors', async () => {
       server.use(
-        rest.post('/api/projects', (req, res, ctx) => {
-          return res(
-            ctx.status(400),
-            ctx.json({
-              success: false,
-              error: 'Invalid project data',
-            })
-          );
+        http.post('/api/projects', () => {
+          return HttpResponse.json({
+            success: false,
+            error: 'Invalid project data',
+          });
         })
       );
 
@@ -304,16 +277,13 @@ describe('useProjects', () => {
       };
 
       server.use(
-        rest.put('/api/projects/:id', (req, res, ctx) => {
-          expect(req.params.id).toBe('project-1');
-          
-          return res(
-            ctx.status(200),
-            ctx.json({
-              success: true,
-              data: updatedProject,
-            })
-          );
+        http.put('/api/projects/:id', ({ request }) => {
+          expect(request.params.id).toBe('project-1');
+
+          return HttpResponse.json({
+            success: true,
+            data: updatedProject,
+          });
         })
       );
 
@@ -332,14 +302,11 @@ describe('useProjects', () => {
 
     it('handles update errors', async () => {
       server.use(
-        rest.put('/api/projects/:id', (req, res, ctx) => {
-          return res(
-            ctx.status(404),
-            ctx.json({
-              success: false,
-              error: 'Project not found',
-            })
-          );
+        http.put('/api/projects/:id', () => {
+          return HttpResponse.json({
+            success: false,
+            error: 'Project not found',
+          });
         })
       );
 
@@ -358,16 +325,13 @@ describe('useProjects', () => {
   describe('deleting projects', () => {
     it('deletes project successfully', async () => {
       server.use(
-        rest.delete('/api/projects/:id', (req, res, ctx) => {
-          expect(req.params.id).toBe('project-1');
-          
-          return res(
-            ctx.status(200),
-            ctx.json({
-              success: true,
-              data: { id: 'project-1' },
-            })
-          );
+        http.delete('/api/projects/:id', ({ request }) => {
+          expect(request.params.id).toBe('project-1');
+
+          return HttpResponse.json({
+            success: true,
+            data: { id: 'project-1' },
+          });
         })
       );
 
@@ -383,14 +347,11 @@ describe('useProjects', () => {
 
     it('handles delete errors', async () => {
       server.use(
-        rest.delete('/api/projects/:id', (req, res, ctx) => {
-          return res(
-            ctx.status(409),
-            ctx.json({
-              success: false,
-              error: 'Cannot delete project in progress',
-            })
-          );
+        http.delete('/api/projects/:id', () => {
+          return HttpResponse.json({
+            success: false,
+            error: 'Cannot delete project in progress',
+          });
         })
       );
 
@@ -429,16 +390,13 @@ describe('useProjects', () => {
       };
 
       server.use(
-        rest.post('/api/projects/:id/duplicate', (req, res, ctx) => {
-          expect(req.params.id).toBe('project-1');
-          
-          return res(
-            ctx.status(201),
-            ctx.json({
-              success: true,
-              data: duplicatedProject,
-            })
-          );
+        http.post('/api/projects/:id/duplicate', ({ request }) => {
+          expect(request.params.id).toBe('project-1');
+
+          return HttpResponse.json({
+            success: true,
+            data: duplicatedProject,
+          });
         })
       );
 
@@ -453,14 +411,11 @@ describe('useProjects', () => {
 
     it('handles duplicate errors', async () => {
       server.use(
-        rest.post('/api/projects/:id/duplicate', (req, res, ctx) => {
-          return res(
-            ctx.status(404),
-            ctx.json({
-              success: false,
-              error: 'Original project not found',
-            })
-          );
+        http.post('/api/projects/:id/duplicate', () => {
+          return HttpResponse.json({
+            success: false,
+            error: 'Original project not found',
+          });
         })
       );
 
@@ -477,16 +432,13 @@ describe('useProjects', () => {
   describe('archiving projects', () => {
     it('archives project successfully', async () => {
       server.use(
-        rest.post('/api/projects/:id/archive', (req, res, ctx) => {
-          expect(req.params.id).toBe('project-1');
-          
-          return res(
-            ctx.status(200),
-            ctx.json({
-              success: true,
-              data: { id: 'project-1', archived: true },
-            })
-          );
+        http.post('/api/projects/:id/archive', ({ request }) => {
+          expect(request.params.id).toBe('project-1');
+
+          return HttpResponse.json({
+            success: true,
+            data: { id: 'project-1', archived: true },
+          });
         })
       );
 
@@ -500,16 +452,13 @@ describe('useProjects', () => {
 
     it('unarchives project successfully', async () => {
       server.use(
-        rest.post('/api/projects/:id/unarchive', (req, res, ctx) => {
-          expect(req.params.id).toBe('project-1');
-          
-          return res(
-            ctx.status(200),
-            ctx.json({
-              success: true,
-              data: { id: 'project-1', archived: false },
-            })
-          );
+        http.post('/api/projects/:id/unarchive', ({ request }) => {
+          expect(request.params.id).toBe('project-1');
+
+          return HttpResponse.json({
+            success: true,
+            data: { id: 'project-1', archived: false },
+          });
         })
       );
 
@@ -525,19 +474,16 @@ describe('useProjects', () => {
   describe('refresh functionality', () => {
     it('refreshes projects list', async () => {
       server.use(
-        rest.get('/api/projects', (req, res, ctx) => {
-          return res(
-            ctx.status(200),
-            ctx.json({
-              success: true,
-              data: {
-                projects: mockProjects,
-                total: mockProjects.length,
-                page: 1,
-                limit: 10,
-              },
-            })
-          );
+        http.get('/api/projects', () => {
+          return HttpResponse.json({
+            success: true,
+            data: {
+              projects: mockProjects,
+              total: mockProjects.length,
+              page: 1,
+              limit: 10,
+            },
+          });
         })
       );
 
@@ -559,19 +505,16 @@ describe('useProjects', () => {
     it('handles refresh errors gracefully', async () => {
       // Initial successful load
       server.use(
-        rest.get('/api/projects', (req, res, ctx) => {
-          return res(
-            ctx.status(200),
-            ctx.json({
-              success: true,
-              data: {
-                projects: mockProjects,
-                total: mockProjects.length,
-                page: 1,
-                limit: 10,
-              },
-            })
-          );
+        http.get('/api/projects', () => {
+          return HttpResponse.json({
+            success: true,
+            data: {
+              projects: mockProjects,
+              total: mockProjects.length,
+              page: 1,
+              limit: 10,
+            },
+          });
         })
       );
 
@@ -583,14 +526,11 @@ describe('useProjects', () => {
 
       // Mock refresh failure
       server.use(
-        rest.get('/api/projects', (req, res, ctx) => {
-          return res(
-            ctx.status(500),
-            ctx.json({
-              success: false,
-              error: 'Refresh failed',
-            })
-          );
+        http.get('/api/projects', () => {
+          return HttpResponse.json({
+            success: false,
+            error: 'Refresh failed',
+          });
         })
       );
 
@@ -608,19 +548,16 @@ describe('useProjects', () => {
     it('optimistically updates project title', async () => {
       // Set up initial projects
       server.use(
-        rest.get('/api/projects', (req, res, ctx) => {
-          return res(
-            ctx.status(200),
-            ctx.json({
-              success: true,
-              data: {
-                projects: mockProjects,
-                total: mockProjects.length,
-                page: 1,
-                limit: 10,
-              },
-            })
-          );
+        http.get('/api/projects', () => {
+          return HttpResponse.json({
+            success: true,
+            data: {
+              projects: mockProjects,
+              total: mockProjects.length,
+              page: 1,
+              limit: 10,
+            },
+          });
         })
       );
 
@@ -632,47 +569,47 @@ describe('useProjects', () => {
 
       // Mock slow update
       server.use(
-        rest.put('/api/projects/:id', (req, res, ctx) => {
-          return res(
-            ctx.delay(1000),
-            ctx.status(200),
-            ctx.json({
-              success: true,
-              data: {
-                ...mockProjects[0],
-                title: 'Updated Title',
-              },
-            })
-          );
+        http.put('/api/projects/:id', async () => {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          return HttpResponse.json({
+            success: true,
+            data: {
+              ...mockProjects[0],
+              title: 'Updated Title',
+            },
+          });
         })
       );
-
+      
       act(() => {
-        result.current.updateProject('project-1', {
-          title: 'Updated Title',
-        }, { optimistic: true });
+        result.current.updateProject(
+          'project-1',
+          {
+            title: 'Updated Title',
+          },
+          { optimistic: true }
+        );
       });
 
       // Should immediately show optimistic update
-      const updatedProject = result.current.projects.find(p => p.id === 'project-1');
+      const updatedProject = result.current.projects.find(
+        p => p.id === 'project-1'
+      );
       expect(updatedProject?.title).toBe('Updated Title');
     });
 
     it('reverts optimistic updates on failure', async () => {
       server.use(
-        rest.get('/api/projects', (req, res, ctx) => {
-          return res(
-            ctx.status(200),
-            ctx.json({
-              success: true,
-              data: {
-                projects: mockProjects,
-                total: mockProjects.length,
-                page: 1,
-                limit: 10,
-              },
-            })
-          );
+        http.get('/api/projects', () => {
+          return HttpResponse.json({
+            success: true,
+            data: {
+              projects: mockProjects,
+              total: mockProjects.length,
+              page: 1,
+              limit: 10,
+            },
+          });
         })
       );
 
@@ -686,21 +623,22 @@ describe('useProjects', () => {
 
       // Mock failed update
       server.use(
-        rest.put('/api/projects/:id', (req, res, ctx) => {
-          return res(
-            ctx.status(500),
-            ctx.json({
-              success: false,
-              error: 'Update failed',
-            })
-          );
+        http.put('/api/projects/:id', () => {
+          return HttpResponse.json({
+            success: false,
+            error: 'Update failed',
+          });
         })
       );
 
       await act(async () => {
-        await result.current.updateProject('project-1', {
-          title: 'Failed Update',
-        }, { optimistic: true });
+        await result.current.updateProject(
+          'project-1',
+          {
+            title: 'Failed Update',
+          },
+          { optimistic: true }
+        );
       });
 
       // Should revert to original title
@@ -712,22 +650,19 @@ describe('useProjects', () => {
   describe('caching', () => {
     it('caches project data', async () => {
       let requestCount = 0;
-      
+
       server.use(
-        rest.get('/api/projects', (req, res, ctx) => {
+        http.get('/api/projects', ({ request }) => {
           requestCount++;
-          return res(
-            ctx.status(200),
-            ctx.json({
-              success: true,
-              data: {
+          return HttpResponse.json({
+            success: true,
+            data: {
                 projects: mockProjects,
                 total: mockProjects.length,
                 page: 1,
                 limit: 10,
               },
-            })
-          );
+          });
         })
       );
 
@@ -739,38 +674,32 @@ describe('useProjects', () => {
 
       // Rerender should not trigger new request
       rerender();
-      
+
       expect(requestCount).toBe(1);
       expect(result.current.projects).toEqual(mockProjects);
     });
 
     it('invalidates cache on mutations', async () => {
       let getRequestCount = 0;
-      
+
       server.use(
-        rest.get('/api/projects', (req, res, ctx) => {
+        http.get('/api/projects', () => {
           getRequestCount++;
-          return res(
-            ctx.status(200),
-            ctx.json({
-              success: true,
-              data: {
+          return HttpResponse.json({
+            success: true,
+            data: {
                 projects: mockProjects,
                 total: mockProjects.length,
                 page: 1,
                 limit: 10,
               },
-            })
-          );
+          });
         }),
-        rest.post('/api/projects', (req, res, ctx) => {
-          return res(
-            ctx.status(201),
-            ctx.json({
-              success: true,
-              data: { id: 'new-project' },
-            })
-          );
+        http.post('/api/projects', () => {
+          return HttpResponse.json({
+            success: true,
+            data: { id: 'new-project' },
+          });
         })
       );
 

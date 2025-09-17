@@ -1,15 +1,30 @@
 // API-specific types extending storm.ts types
-import { 
-  StormProject, 
-  StormConfig, 
-  PipelineProgress, 
-  ResearchData, 
-  GeneratedArticle, 
+import {
+  StormProject,
+  StormConfig,
+  PipelineProgress,
+  ResearchData,
+  GeneratedArticle,
   ArticleOutline,
   ProjectStatus,
   ProjectFilters,
-  ProjectListResponse
+  ProjectListResponse,
 } from './storm';
+
+// Re-export types from storm.ts that are used in API contexts
+export type {
+  StormProject,
+  StormConfig,
+  PipelineProgress,
+  ProjectFilters,
+  ProjectListResponse,
+  ResearchData,
+  ConversationData,
+  SourceData,
+} from './storm';
+
+// Re-export config service types
+export type { LLMModel, RetrieverInfo } from '../services/config';
 
 // Authentication types
 export interface AuthRequest {
@@ -81,7 +96,7 @@ export interface StartPipelineRequest {
 export interface PipelineStage {
   name: 'research' | 'outline' | 'article' | 'polish';
   enabled: boolean;
-  config?: Record<string, any>;
+  config?: Record<string, unknown>;
 }
 
 export interface StopPipelineRequest {
@@ -102,7 +117,7 @@ export interface PipelineLog {
   level: 'debug' | 'info' | 'warn' | 'error';
   message: string;
   stage?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 // Configuration API types
@@ -172,7 +187,7 @@ export interface SearchResult {
   source: string;
   publishedAt?: Date;
   relevanceScore: number;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface ResearchExportRequest {
@@ -212,7 +227,7 @@ export interface MindMapNode {
   content: string;
   position: { x: number; y: number };
   connections: string[];
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   createdBy: string;
   createdAt: Date;
 }
@@ -225,7 +240,7 @@ export interface DiscourseMessage {
   timestamp: Date;
   messageType: 'text' | 'query' | 'source' | 'mindmap_update';
   references?: string[];
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface SessionSettings {
@@ -291,14 +306,14 @@ export interface AnalyticsEvent {
   userId?: string;
   sessionId?: string;
   eventType: string;
-  eventData: Record<string, any>;
+  eventData: Record<string, unknown>;
   timestamp: Date;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface CreateEventRequest {
   eventType: string;
-  eventData: Record<string, any>;
+  eventData: Record<string, unknown>;
   sessionId?: string;
 }
 
@@ -320,7 +335,7 @@ export interface AnalyticsSummary {
 }
 
 // WebSocket message types
-export interface WebSocketMessage<T = any> {
+export interface WebSocketMessage<T = unknown> {
   type: string;
   data: T;
   timestamp: Date;
@@ -335,8 +350,12 @@ export interface PipelineUpdateMessage {
 
 export interface SessionUpdateMessage {
   sessionId: string;
-  updateType: 'participant_joined' | 'participant_left' | 'message' | 'mindmap_update';
-  data: any;
+  updateType:
+    | 'participant_joined'
+    | 'participant_left'
+    | 'message'
+    | 'mindmap_update';
+  data: Record<string, unknown>;
 }
 
 export interface NotificationMessage {
@@ -356,14 +375,14 @@ export interface ApiErrorDetails {
   code: string;
   message: string;
   field?: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
 }
 
 export interface ValidationError {
   field: string;
   message: string;
   code: string;
-  value?: any;
+  value?: unknown;
 }
 
 // File upload types
@@ -371,7 +390,7 @@ export interface FileUploadRequest {
   file: File;
   projectId?: string;
   type: 'document' | 'image' | 'data';
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface UploadedFile {
@@ -383,7 +402,7 @@ export interface UploadedFile {
   url: string;
   projectId?: string;
   uploadedAt: Date;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 // Rate limiting types

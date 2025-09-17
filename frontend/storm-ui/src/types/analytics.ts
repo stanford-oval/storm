@@ -2,7 +2,7 @@ export interface AnalyticsData {
   timestamp: string;
   value: number;
   category?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface PipelineMetrics {
@@ -81,10 +81,10 @@ export interface ChartTheme {
 
 export interface WidgetProps {
   title: string;
-  data: any[];
+  data: unknown[];
   loading?: boolean;
   error?: string;
-  config?: any;
+  config?: Record<string, unknown>;
   theme?: ChartTheme;
   onRefresh?: () => void;
   className?: string;

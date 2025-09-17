@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
+import { within } from '@storybook/test';
 import { PipelineProgress } from './PipelineProgress';
 import { PipelineProgress as PipelineProgressType } from '@/types/storm';
 
@@ -24,7 +25,8 @@ const baseProgress: PipelineProgressType = {
   stageProgress: 45,
   overallProgress: 25,
   startTime: new Date('2024-01-16T10:00:00Z'),
-  currentTask: 'Conducting perspective research on machine learning applications...',
+  currentTask:
+    'Conducting perspective research on machine learning applications...',
   errors: [],
 };
 
@@ -215,7 +217,8 @@ export const LongRunning: Story = {
       overallProgress: 65,
       startTime: new Date(Date.now() - 45 * 60 * 1000), // 45 minutes ago
       estimatedEndTime: new Date(Date.now() + 25 * 60 * 1000), // 25 minutes from now
-      currentTask: 'Generating comprehensive analysis of quantum computing applications in cryptography and security systems...',
+      currentTask:
+        'Generating comprehensive analysis of quantum computing applications in cryptography and security systems...',
       errors: [],
     },
     showDetails: true,
@@ -321,7 +324,7 @@ export const DarkTheme: Story = {
     backgrounds: { default: 'dark' },
   },
   decorators: [
-    (Story) => (
+    Story => (
       <div className="dark bg-gray-900 p-8">
         <Story />
       </div>
@@ -402,7 +405,11 @@ export const ManyErrors: Story = {
         stage: 'research' as const,
         message: `Error ${i + 1}: Service unavailable for source ${i + 1}`,
         timestamp: new Date(`2024-01-16T10:0${i}:00Z`),
-        severity: (i % 3 === 0 ? 'critical' : i % 2 === 0 ? 'error' : 'warning') as const,
+        severity: (i % 3 === 0
+          ? 'critical'
+          : i % 2 === 0
+            ? 'error'
+            : 'warning') as 'critical' | 'error' | 'warning',
       })),
     },
     showDetails: true,

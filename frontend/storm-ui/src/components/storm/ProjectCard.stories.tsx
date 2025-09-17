@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
+import { within, userEvent } from '@storybook/test';
 import { ProjectCard } from './ProjectCard';
 import { StormProject } from '@/types/storm';
 
@@ -24,7 +25,8 @@ const baseProject: StormProject = {
   id: 'project-1',
   title: 'Artificial Intelligence Overview',
   topic: 'Machine Learning and AI Technologies',
-  description: 'A comprehensive guide to modern AI technologies and their applications in various industries.',
+  description:
+    'A comprehensive guide to modern AI technologies and their applications in various industries.',
   status: 'draft',
   createdAt: new Date('2024-01-15T10:00:00Z'),
   updatedAt: new Date('2024-01-16T14:30:00Z'),
@@ -128,9 +130,12 @@ export const LongTitle: Story = {
   args: {
     project: {
       ...baseProject,
-      title: 'A Very Long Project Title That Might Wrap to Multiple Lines in the Card Layout',
-      topic: 'User Interface Design and Typography Considerations for Long Content',
-      description: 'This project has an exceptionally long title and topic to test how the component handles text overflow and wrapping in various layouts and screen sizes.',
+      title:
+        'A Very Long Project Title That Might Wrap to Multiple Lines in the Card Layout',
+      topic:
+        'User Interface Design and Typography Considerations for Long Content',
+      description:
+        'This project has an exceptionally long title and topic to test how the component handles text overflow and wrapping in various layouts and screen sizes.',
     },
     onSelect: action('onSelect'),
     onDelete: action('onDelete'),
@@ -272,7 +277,7 @@ export const InteractiveCard: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    
+
     // Test keyboard navigation
     const card = canvas.getByRole('article');
     await userEvent.tab();
@@ -286,11 +291,31 @@ export const AllStatusStates: Story = {
     <div className="grid grid-cols-2 gap-4 p-4">
       {[
         { ...baseProject, status: 'draft' as const, title: 'Draft Project' },
-        { ...baseProject, status: 'researching' as const, title: 'Researching Project' },
-        { ...baseProject, status: 'generating_outline' as const, title: 'Generating Outline' },
-        { ...baseProject, status: 'writing_article' as const, title: 'Writing Article' },
-        { ...baseProject, status: 'polishing' as const, title: 'Polishing Project' },
-        { ...baseProject, status: 'completed' as const, title: 'Completed Project' },
+        {
+          ...baseProject,
+          status: 'researching' as const,
+          title: 'Researching Project',
+        },
+        {
+          ...baseProject,
+          status: 'generating_outline' as const,
+          title: 'Generating Outline',
+        },
+        {
+          ...baseProject,
+          status: 'writing_article' as const,
+          title: 'Writing Article',
+        },
+        {
+          ...baseProject,
+          status: 'polishing' as const,
+          title: 'Polishing Project',
+        },
+        {
+          ...baseProject,
+          status: 'completed' as const,
+          title: 'Completed Project',
+        },
         { ...baseProject, status: 'failed' as const, title: 'Failed Project' },
       ].map((project, index) => (
         <ProjectCard
@@ -320,7 +345,7 @@ export const DarkTheme: Story = {
     backgrounds: { default: 'dark' },
   },
   decorators: [
-    (Story) => (
+    Story => (
       <div className="dark bg-gray-900 p-8">
         <Story />
       </div>

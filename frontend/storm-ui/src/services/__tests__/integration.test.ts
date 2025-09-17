@@ -1,17 +1,17 @@
-import { rest } from 'msw';
+import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
 import { projectService } from '../project';
 import { pipelineService } from '../pipeline';
 import { configService } from '../config';
 import { analyticsService } from '../analytics';
 import { sessionService } from '../session';
-import { 
-  StormProject, 
-  CreateProjectRequest, 
+import {
+  StormProject,
+  CreateProjectRequest,
   StartPipelineRequest,
   PipelineProgress,
   StormConfig,
-  CoStormSession 
+  CoStormSession,
 } from '../../types/api';
 
 // Mock data
@@ -98,11 +98,8 @@ const mockConfig: StormConfig = {
 // Mock server setup
 const server = setupServer(
   // Project endpoints
-  rest.get('http://localhost:8000/api/v1/projects', (req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json({
-        success: true,
+  http.get('http://localhost:8000/api/v1/projects', () => {
+    return HttpResponse.json({success: true,
         data: {
           items: [mockProject],
           total: 1,
@@ -112,102 +109,78 @@ const server = setupServer(
           hasNext: false,
           hasPrevious: false,
         },
-      })
-    );
-  }),
-
-  rest.get('http://localhost:8000/api/v1/projects/:id', (req, res, ctx) => {
-    const { id } = req.params;
-    if (id === 'test-project-id') {
-      return res(
-        ctx.status(200),
-        ctx.json({
-          success: true,
-          data: mockProject,
-        })
-      );
+      });
     }
-    return res(
-      ctx.status(404),
-      ctx.json({
-        success: false,
-        error: 'Project not found',
-      })
-    );
-  }),
+  ),
 
-  rest.post('http://localhost:8000/api/v1/projects', (req, res, ctx) => {
-    return res(
-      ctx.status(201),
-      ctx.json({
-        success: true,
-        data: { ...mockProject, id: 'new-project-id' },
-      })
-    );
-  }),
-
-  rest.put('http://localhost:8000/api/v1/projects/:id', (req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json({
+  http.get('http://localhost:8000/api/v1/projects/:id', ({ request }) => {
+    const { id } = request.params;
+    if (id === 'test-project-id') {
+      return HttpResponse.json({
         success: true,
         data: mockProject,
-      })
-    );
+      });
+    }
+    return HttpResponse.json({
+      success: false,
+      error: 'Project not found',
+    }, { status: 404 });
   }),
 
-  rest.delete('http://localhost:8000/api/v1/projects/:id', (req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json({
-        success: true,
-        data: null,
-      })
-    );
+  http.post('http://localhost:8000/api/v1/projects', () => {
+    return HttpResponse.json({
+      success: true,
+      data: { ...mockProject, id: 'new-project-id' },
+    });
+  }),
+
+  http.put('http://localhost:8000/api/v1/projects/:id', () => {
+    return HttpResponse.json({
+      success: true,
+      data: mockProject,
+    });
+  }),
+
+  http.delete('http://localhost:8000/api/v1/projects/:id', () => {
+    return HttpResponse.json({success: true,
+        data: null,});
   }),
 
   // Pipeline endpoints
-  rest.post('http://localhost:8000/api/v1/projects/:id/pipeline/start', (req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json({
+  http.post(
+    'http://localhost:8000/api/v1/projects/:id/pipeline/start',
+    () => {
+      return HttpResponse.json({
         success: true,
         data: mockPipelineProgress,
-      })
-    );
-  }),
+      });
+    }
+  ),
 
-  rest.get('http://localhost:8000/api/v1/projects/:id/pipeline/status', (req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json({
-        success: true,
-        data: {
-          projectId: req.params.id,
-          isRunning: true,
-          progress: mockPipelineProgress,
-          logs: [],
-        },
-      })
-    );
-  }),
+  http.get(
+    'http://localhost:8000/api/v1/projects/:id/pipeline/status',
+    () {
+      return HttpResponse.json({success: true,
+          data: {
+            projectId: request.params.id,
+            isRunning: true,
+            progress: mockPipelineProgress,
+            logs: [],
+          });
+    }
+  ),
 
-  rest.post('http://localhost:8000/api/v1/projects/:id/pipeline/stop', (req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json({
-        success: true,
-        data: { ...mockPipelineProgress, isRunning: false },
-      })
-    );
-  }),
+  http.post(
+    'http://localhost:8000/api/v1/projects/:id/pipeline/stop',
+    () {
+      return HttpResponse.json({success: true,
+          data: { ...mockPipelineProgress, isRunning: false });
+    }
+  ),
 
   // Config endpoints
-  rest.get('http://localhost:8000/api/v1/config/templates', (req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json({
-        success: true,
+  http.get('http://localhost:8000/api/v1/config/templates', () => {
+    return HttpResponse.json({success: true,
         data: [
           {
             id: 'default',
@@ -219,31 +192,21 @@ const server = setupServer(
             createdAt: new Date(),
             updatedAt: new Date(),
           },
-        ],
-      })
-    );
+        ],});
   }),
 
-  rest.post('http://localhost:8000/api/v1/config/validate', (req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json({
-        success: true,
+  http.post('http://localhost:8000/api/v1/config/validate', () => {
+    return HttpResponse.json({success: true,
         data: {
           isValid: true,
           errors: [],
           warnings: [],
-        },
-      })
-    );
+        });
   }),
 
   // Session endpoints
-  rest.post('http://localhost:8000/api/v1/sessions', (req, res, ctx) => {
-    return res(
-      ctx.status(201),
-      ctx.json({
-        success: true,
+  http.post('http://localhost:8000/api/v1/sessions', () => {
+    return HttpResponse.json({success: true,
         data: {
           id: 'test-session-id',
           projectId: 'test-project-id',
@@ -261,51 +224,48 @@ const server = setupServer(
             autoSaveInterval: 30,
             expertModels: ['gpt-4'],
           },
-        },
-      })
-    );
+        },});
   }),
 
   // Analytics endpoints
-  rest.post('http://localhost:8000/api/v1/analytics/events', (req, res, ctx) => {
-    return res(
-      ctx.status(201),
-      ctx.json({
-        success: true,
-        data: {
-          id: 'event-id',
-          eventType: 'project_created',
-          timestamp: new Date(),
-        },
-      })
-    );
-  }),
+  http.post(
+    'http://localhost:8000/api/v1/analytics/events',
+    () {
+      return HttpResponse.json({success: true,
+          data: {
+            id: 'event-id',
+            eventType: 'project_created',
+            timestamp: new Date(),
+          });
+    }
+  ),
 
   // Error scenarios
-  rest.get('http://localhost:8000/api/v1/projects/error-test', (req, res, ctx) => {
-    return res(
-      ctx.status(500),
-      ctx.json({
-        success: false,
-        error: 'Internal server error',
-      })
-    );
-  }),
+  http.get(
+    'http://localhost:8000/api/v1/projects/error-test',
+    () {
+      return HttpResponse.json({success: false,
+          error: 'Internal server error',});
+    }
+  ),
 
-  rest.get('http://localhost:8000/api/v1/projects/timeout-test', (req, res, ctx) => {
-    // Simulate timeout by never resolving
-    return new Promise(() => {});
-  }),
+  http.get(
+    'http://localhost:8000/api/v1/projects/timeout-test',
+    () {
+      // Simulate timeout by never resolving
+      return new Promise(() => {});
+    }
+  )
 );
 
-beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
-afterEach(() => server.resetHandlers());
-afterAll(() => server.close());
+beforeAll(() => server.listen({ onUnhandledRequest: 'error' });
+afterEach(() => server.resetHandlers(, { status: 200 });
+afterAll(() => server.close(, { status: 200 });
 
 describe('ProjectService Integration Tests', () => {
   test('should get projects list successfully', async () => {
     const response = await projectService.getProjects();
-    
+
     expect(response.success).toBe(true);
     expect(response.data.items).toHaveLength(1);
     expect(response.data.items[0]).toEqual(mockProject);
@@ -314,7 +274,7 @@ describe('ProjectService Integration Tests', () => {
 
   test('should get single project successfully', async () => {
     const response = await projectService.getProject('test-project-id');
-    
+
     expect(response.success).toBe(true);
     expect(response.data).toEqual(mockProject);
   });
@@ -332,7 +292,7 @@ describe('ProjectService Integration Tests', () => {
     };
 
     const response = await projectService.createProject(createRequest);
-    
+
     expect(response.success).toBe(true);
     expect(response.data.id).toBe('new-project-id');
     expect(response.data.title).toBe(mockProject.title);
@@ -346,14 +306,14 @@ describe('ProjectService Integration Tests', () => {
     };
 
     const response = await projectService.updateProject(updateRequest);
-    
+
     expect(response.success).toBe(true);
     expect(response.data).toEqual(mockProject);
   });
 
   test('should delete project successfully', async () => {
     const response = await projectService.deleteProject('test-project-id');
-    
+
     expect(response.success).toBe(true);
   });
 
@@ -365,7 +325,7 @@ describe('ProjectService Integration Tests', () => {
         end: new Date('2023-12-31'),
       },
     });
-    
+
     expect(response.success).toBe(true);
     expect(Array.isArray(response.data)).toBe(true);
   });
@@ -377,13 +337,12 @@ describe('ProjectService Integration Tests', () => {
       sortBy: 'createdAt',
       sortOrder: 'desc',
     });
-    
+
     expect(response.success).toBe(true);
     expect(response.data.page).toBe(1);
     expect(response.data.limit).toBe(20); // Server might override
     expect(response.data.hasNext).toBe(false);
   });
-});
 
 describe('PipelineService Integration Tests', () => {
   test('should start pipeline successfully', async () => {
@@ -399,7 +358,7 @@ describe('PipelineService Integration Tests', () => {
     };
 
     const response = await pipelineService.startPipeline(startRequest);
-    
+
     expect(response.success).toBe(true);
     expect(response.data.isRunning).toBe(true);
     expect(response.data.stage).toBe('research');
@@ -407,7 +366,7 @@ describe('PipelineService Integration Tests', () => {
 
   test('should get pipeline status', async () => {
     const response = await pipelineService.getPipelineStatus('test-project-id');
-    
+
     expect(response.success).toBe(true);
     expect(response.data.projectId).toBe('test-project-id');
     expect(response.data.isRunning).toBe(true);
@@ -418,7 +377,7 @@ describe('PipelineService Integration Tests', () => {
       projectId: 'test-project-id',
       reason: 'User requested stop',
     });
-    
+
     expect(response.success).toBe(true);
     expect(response.data.isRunning).toBe(false);
   });
@@ -426,39 +385,44 @@ describe('PipelineService Integration Tests', () => {
   test('should handle pipeline stage transitions', async () => {
     // Mock server responses for different stages
     server.use(
-      rest.get('http://localhost:8000/api/v1/projects/test-project-id/pipeline/status', (req, res, ctx) => {
-        return res(
-          ctx.status(200),
-          ctx.json({
-            success: true,
-            data: {
-              ...mockPipelineProgress,
-              stage: 'outline',
-              progress: 0.6,
-              stages: {
-                research: { status: 'completed', progress: 1.0, startedAt: new Date() },
-                outline: { status: 'running', progress: 0.6, startedAt: new Date() },
-                article: { status: 'pending', progress: 0, startedAt: null },
-                polish: { status: 'pending', progress: 0, startedAt: null },
-              },
-            },
-          })
-        );
-      })
+      http.get(
+        'http://localhost:8000/api/v1/projects/test-project-id/pipeline/status',
+        () {
+          return HttpResponse.json({success: true,
+              data: {
+                ...mockPipelineProgress,
+                stage: 'outline',
+                progress: 0.6,
+                stages: {
+                  research: {
+                    status: 'completed',
+                    progress: 1.0,
+                    startedAt: new Date(),
+                  },
+                  outline: {
+                    status: 'running',
+                    progress: 0.6,
+                    startedAt: new Date(),
+                  },
+                  article: { status: 'pending', progress: 0, startedAt: null },
+                  polish: { status: 'pending', progress: 0, startedAt: null },
+                },
+              },});
+        }
+      )
     );
 
     const response = await pipelineService.getPipelineStatus('test-project-id');
-    
+
     expect(response.data.stage).toBe('outline');
     expect(response.data.stages.research.status).toBe('completed');
     expect(response.data.stages.outline.status).toBe('running');
   });
-});
 
 describe('ConfigService Integration Tests', () => {
   test('should get configuration templates', async () => {
     const response = await configService.getConfigTemplates();
-    
+
     expect(response.success).toBe(true);
     expect(response.data).toHaveLength(1);
     expect(response.data[0].name).toBe('Default Configuration');
@@ -467,7 +431,7 @@ describe('ConfigService Integration Tests', () => {
 
   test('should validate configuration', async () => {
     const response = await configService.validateConfig({ config: mockConfig });
-    
+
     expect(response.success).toBe(true);
     expect(response.data.isValid).toBe(true);
     expect(response.data.errors).toHaveLength(0);
@@ -475,31 +439,30 @@ describe('ConfigService Integration Tests', () => {
 
   test('should handle invalid configuration', async () => {
     server.use(
-      rest.post('http://localhost:8000/api/v1/config/validate', (req, res, ctx) => {
-        return res(
-          ctx.status(200),
-          ctx.json({
-            success: true,
-            data: {
-              isValid: false,
-              errors: [
-                {
-                  field: 'languageModel.temperature',
-                  message: 'Temperature must be between 0 and 1',
-                  code: 'INVALID_RANGE',
-                },
-              ],
-              warnings: [
-                {
-                  field: 'retrieval.maxResults',
-                  message: 'High maxResults may increase processing time',
-                  suggestion: 'Consider reducing to 5-15 for optimal performance',
-                },
-              ],
-            },
-          })
-        );
-      })
+      http.post(
+        'http://localhost:8000/api/v1/config/validate',
+        () {
+          return HttpResponse.json({success: true,
+              data: {
+                isValid: false,
+                errors: [
+                  {
+                    field: 'languageModel.temperature',
+                    message: 'Temperature must be between 0 and 1',
+                    code: 'INVALID_RANGE',
+                  },
+                ],
+                warnings: [
+                  {
+                    field: 'retrieval.maxResults',
+                    message: 'High maxResults may increase processing time',
+                    suggestion:
+                      'Consider reducing to 5-15 for optimal performance',
+                  },
+                ],
+              },});
+        }
+      )
     );
 
     const invalidConfig = {
@@ -510,13 +473,14 @@ describe('ConfigService Integration Tests', () => {
       },
     };
 
-    const response = await configService.validateConfig({ config: invalidConfig });
-    
+    const response = await configService.validateConfig({
+      config: invalidConfig,
+    });
+
     expect(response.data.isValid).toBe(false);
     expect(response.data.errors).toHaveLength(1);
     expect(response.data.warnings).toHaveLength(1);
   });
-});
 
 describe('SessionService Integration Tests', () => {
   test('should create Co-STORM session successfully', async () => {
@@ -534,13 +498,12 @@ describe('SessionService Integration Tests', () => {
     };
 
     const response = await sessionService.createSession(createRequest);
-    
+
     expect(response.success).toBe(true);
     expect(response.data.id).toBe('test-session-id');
     expect(response.data.projectId).toBe('test-project-id');
     expect(response.data.status).toBe('active');
   });
-});
 
 describe('AnalyticsService Integration Tests', () => {
   test('should track events successfully', async () => {
@@ -554,12 +517,11 @@ describe('AnalyticsService Integration Tests', () => {
     };
 
     const response = await analyticsService.trackEvent(eventRequest);
-    
+
     expect(response.success).toBe(true);
     expect(response.data.id).toBe('event-id');
     expect(response.data.eventType).toBe('project_created');
   });
-});
 
 describe('Cross-Service Integration Tests', () => {
   test('should complete full project workflow', async () => {
@@ -573,7 +535,7 @@ describe('Cross-Service Integration Tests', () => {
 
     const projectResponse = await projectService.createProject(createRequest);
     expect(projectResponse.success).toBe(true);
-    
+
     const projectId = projectResponse.data.id;
 
     // 2. Start pipeline
@@ -586,7 +548,8 @@ describe('Cross-Service Integration Tests', () => {
       ],
     };
 
-    const pipelineResponse = await pipelineService.startPipeline(pipelineRequest);
+    const pipelineResponse =
+      await pipelineService.startPipeline(pipelineRequest);
     expect(pipelineResponse.success).toBe(true);
     expect(pipelineResponse.data.isRunning).toBe(true);
 
@@ -615,7 +578,8 @@ describe('Cross-Service Integration Tests', () => {
       },
     };
 
-    const analyticsResponse = await analyticsService.trackEvent(analyticsRequest);
+    const analyticsResponse =
+      await analyticsService.trackEvent(analyticsRequest);
     expect(analyticsResponse.success).toBe(true);
   });
 
@@ -627,20 +591,19 @@ describe('Cross-Service Integration Tests', () => {
     };
 
     server.use(
-      rest.post('http://localhost:8000/api/v1/projects/nonexistent-project/pipeline/start', (req, res, ctx) => {
-        return res(
-          ctx.status(404),
-          ctx.json({
-            success: false,
-            error: 'Project not found',
-          })
-        );
-      })
+      http.post(
+        'http://localhost:8000/api/v1/projects/nonexistent-project/pipeline/start',
+        () {
+          return HttpResponse.json({success: false,
+              error: 'Project not found',});
+        }
+      )
     );
 
-    await expect(pipelineService.startPipeline(invalidPipelineRequest)).rejects.toThrow();
+    await expect(
+      pipelineService.startPipeline(invalidPipelineRequest)
+    ).rejects.toThrow();
   });
-});
 
 describe('Error Handling Integration Tests', () => {
   test('should handle network errors gracefully', async () => {
@@ -655,19 +618,17 @@ describe('Error Handling Integration Tests', () => {
 
   test('should handle server errors with proper error messages', async () => {
     server.use(
-      rest.get('http://localhost:8000/api/v1/projects/error-test', (req, res, ctx) => {
-        return res(
-          ctx.status(500),
-          ctx.json({
-            success: false,
-            error: 'Database connection failed',
-            details: {
-              code: 'DB_CONNECTION_ERROR',
-              timestamp: new Date().toISOString(),
-            },
-          })
-        );
-      })
+      http.get(
+        'http://localhost:8000/api/v1/projects/error-test',
+        () {
+          return HttpResponse.json({success: false,
+              error: 'Database connection failed',
+              details: {
+                code: 'DB_CONNECTION_ERROR',
+                timestamp: new Date().toISOString(),
+              });
+        }
+      )
     );
 
     await expect(projectService.getProject('error-test')).rejects.toThrow();
@@ -676,11 +637,12 @@ describe('Error Handling Integration Tests', () => {
   test('should handle timeout errors', async () => {
     // Create a request that will timeout
     server.use(
-      rest.get('http://localhost:8000/api/v1/projects/timeout-test', (req, res, ctx) => {
-        return res(
-          ctx.delay('infinite')
-        );
-      })
+      http.get(
+        'http://localhost:8000/api/v1/projects/timeout-test',
+        () {
+          return HttpResponse.json(delay('infinite', { status: 200 });
+        }
+      )
     );
 
     // Set a short timeout for this test
@@ -695,41 +657,33 @@ describe('Error Handling Integration Tests', () => {
 
   test('should handle validation errors properly', async () => {
     server.use(
-      rest.post('http://localhost:8000/api/v1/projects', (req, res, ctx) => {
-        return res(
-          ctx.status(422),
-          ctx.json({
-            success: false,
+      http.post('http://localhost:8000/api/v1/projects', () => {
+        return HttpResponse.json({success: false,
             error: 'Validation error',
             details: {
               fields: {
                 title: 'Title is required',
                 topic: 'Topic must be at least 3 characters long',
               },
-            },
-          })
-        );
-      })
-    );
-
+            },});
     const invalidRequest: CreateProjectRequest = {
       title: '', // Invalid
       topic: 'AI', // Too short
       config: mockConfig,
     };
 
-    await expect(projectService.createProject(invalidRequest)).rejects.toThrow();
+    await expect(
+      projectService.createProject(invalidRequest)
+    ).rejects.toThrow();
   });
-});
 
 describe('Rate Limiting and Caching Tests', () => {
   test('should handle rate limiting gracefully', async () => {
     server.use(
-      rest.get('http://localhost:8000/api/v1/projects', (req, res, ctx) => {
-        return res(
-          ctx.status(429),
+      http.get('http://localhost:8000/api/v1/projects', () => {
+        return HttpResponse.json(
           ctx.set('Retry-After', '60'),
-          ctx.json({
+          {
             success: false,
             error: 'Rate limit exceeded',
             details: {
@@ -737,28 +691,22 @@ describe('Rate Limiting and Caching Tests', () => {
               remaining: 0,
               resetAt: new Date(Date.now() + 60000).toISOString(),
             },
-          })
-        );
-      })
-    );
-
+          });
     await expect(projectService.getProjects()).rejects.toThrow();
   });
 
   test('should handle concurrent requests efficiently', async () => {
     // Make multiple concurrent requests
-    const requests = Array.from({ length: 5 }, () => 
+    const requests = Array.from({ length: 5 }, () =>
       projectService.getProject('test-project-id')
     );
 
     const responses = await Promise.all(requests);
-    
+
     responses.forEach(response => {
       expect(response.success).toBe(true);
       expect(response.data).toEqual(mockProject);
     });
-  });
-});
 
 describe('Real-time Updates Integration Tests', () => {
   test('should handle WebSocket connection for project updates', async () => {
@@ -774,7 +722,7 @@ describe('Real-time Updates Integration Tests', () => {
     // Mock the WebSocket creation
     jest.doMock('../../lib/websocket', () => ({
       createProjectWebSocket: () => mockWebSocket,
-    }));
+    });
 
     const callbacks = {
       onProjectUpdate: jest.fn(),
@@ -783,18 +731,29 @@ describe('Real-time Updates Integration Tests', () => {
       onError: jest.fn(),
     };
 
-    const unsubscribe = await projectService.subscribeToProjectUpdates('test-project-id', callbacks);
+    const unsubscribe = await projectService.subscribeToProjectUpdates(
+      'test-project-id',
+      callbacks
+    );
 
     expect(mockWebSocket.connect).toHaveBeenCalled();
-    expect(mockWebSocket.send).toHaveBeenCalledWith('subscribe_project_updates', {
-      projectId: 'test-project-id',
-    });
+    expect(mockWebSocket.send).toHaveBeenCalledWith(
+      'subscribe_project_updates',
+      {
+        projectId: 'test-project-id',
+      }
+    );
 
     // Test cleanup
     unsubscribe();
-    expect(mockWebSocket.send).toHaveBeenCalledWith('unsubscribe_project_updates', {
-      projectId: 'test-project-id',
-    });
+    expect(mockWebSocket.send).toHaveBeenCalledWith(
+      'unsubscribe_project_updates',
+      {
+        projectId: 'test-project-id',
+      }
+    );
     expect(mockWebSocket.disconnect).toHaveBeenCalled();
   });
-});
+
+}}}}}}}}}}}}}}}}}}}
+)))))))))))))))))))

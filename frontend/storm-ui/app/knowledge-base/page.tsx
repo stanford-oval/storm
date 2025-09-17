@@ -1,25 +1,31 @@
 'use client';
 
+import { logger } from '@/utils/logger';
+
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { 
-  Search, 
-  FileText, 
-  Calendar, 
-  Tag, 
-  Filter,
+import {
+  Search,
+  FileText,
+  Tag,
   Download,
   Eye,
   BookOpen,
@@ -27,10 +33,10 @@ import {
   ChevronRight,
   Grid,
   List,
-  CheckCircle
+  CheckCircle,
 } from 'lucide-react';
 import { useProjectStore } from '@/store';
-import { cn } from '@/lib/utils';
+// import { cn } from '@/lib/utils'; // Removed unused import
 
 type ViewMode = 'grid' | 'list';
 type SortBy = 'date' | 'title' | 'words' | 'status';
@@ -43,7 +49,7 @@ export default function KnowledgeBasePage() {
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [sortBy, setSortBy] = useState<SortBy>('date');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
-  
+
   useEffect(() => {
     loadProjects();
   }, [loadProjects]);
@@ -52,10 +58,10 @@ export default function KnowledgeBasePage() {
   const allTags = React.useMemo(() => {
     const tagSet = new Set<string>();
     projects?.forEach(project => {
-      if (project.config?.topic) {
+      if (project.topic) {
         // Extract potential tags from topic (simple word extraction)
-        const words = project.config.topic.toLowerCase().split(/\s+/);
-        words.forEach(word => {
+        const words = project.topic.toLowerCase().split(/\s+/);
+        words.forEach((word: string) => {
           if (word.length > 3) tagSet.add(word);
         });
       }
@@ -66,29 +72,31 @@ export default function KnowledgeBasePage() {
   // Filter and sort projects
   const filteredProjects = React.useMemo(() => {
     let filtered = projects || [];
-    
+
     // Filter by search query
     if (searchQuery) {
-      filtered = filtered.filter(project => 
-        project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.config?.topic?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.content?.toLowerCase().includes(searchQuery.toLowerCase())
+      filtered = filtered.filter(
+        project =>
+          project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          project.topic?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          project.content?.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
-    
+
     // Filter by status
     if (selectedStatus !== 'all') {
       filtered = filtered.filter(project => project.status === selectedStatus);
     }
-    
+
     // Filter by tags
     if (selectedTags.length > 0) {
       filtered = filtered.filter(project => {
-        const projectText = `${project.title} ${project.config?.topic || ''}`.toLowerCase();
+        const projectText =
+          `${project.title} ${project.topic || ''}`.toLowerCase();
         return selectedTags.some(tag => projectText.includes(tag));
       });
     }
-    
+
     // Sort
     filtered = [...filtered].sort((a, b) => {
       switch (sortBy) {
@@ -100,49 +108,65 @@ export default function KnowledgeBasePage() {
           return a.status.localeCompare(b.status);
         case 'date':
         default:
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          return (
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
       }
     });
-    
+
     return filtered;
   }, [projects, searchQuery, selectedStatus, selectedTags, sortBy]);
 
-  const completedProjects = filteredProjects.filter(p => p.status === 'completed');
-  const inProgressProjects = filteredProjects.filter(p => 
-    ['researching', 'generating_outline', 'writing_article', 'polishing'].includes(p.status)
+  const completedProjects = filteredProjects.filter(
+    p => p.status === 'completed'
+  );
+  const inProgressProjects = filteredProjects.filter(p =>
+    [
+      'researching',
+      'generating_outline',
+      'writing_article',
+      'polishing',
+    ].includes(p.status)
   );
 
   const toggleTag = (tag: string) => {
-    setSelectedTags(prev => 
-      prev.includes(tag) 
-        ? prev.filter(t => t !== tag)
-        : [...prev, tag]
+    setSelectedTags(prev =>
+      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
     );
   };
 
   const exportProject = (projectId: string, format: 'md' | 'html' | 'pdf') => {
     // TODO: Implement export functionality
-    console.log(`Exporting project ${projectId} as ${format}`);
+    logger.log(`Exporting project ${projectId} as ${format}`);
   };
 
   const ProjectCard = ({ project }: { project: any }) => (
-    <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push(`/projects/${project.id}`)}>
+    <Card
+      className="cursor-pointer transition-shadow hover:shadow-lg"
+      onClick={() => router.push(`/projects/${project.id}`)}
+    >
       <CardHeader>
-        <div className="flex justify-between items-start">
+        <div className="flex items-start justify-between">
           <div>
-            <CardTitle className="text-lg line-clamp-1">{project.title}</CardTitle>
+            <CardTitle className="line-clamp-1 text-lg">
+              {project.title}
+            </CardTitle>
             <CardDescription className="mt-1">
               {new Date(project.createdAt).toLocaleDateString()}
             </CardDescription>
           </div>
-          <Badge variant={project.status === 'completed' ? 'default' : 'secondary'}>
+          <Badge
+            variant={project.status === 'completed' ? 'default' : 'secondary'}
+          >
             {project.status}
           </Badge>
         </div>
       </CardHeader>
       <CardContent>
-        <p className="text-sm text-muted-foreground line-clamp-3 mb-3">
-          {project.content?.substring(0, 200) || project.config?.topic || 'No content available'}
+        <p className="mb-3 line-clamp-3 text-sm text-muted-foreground">
+          {project.content?.substring(0, 200) ||
+            project.config?.topic ||
+            'No content available'}
         </p>
         <div className="flex items-center justify-between text-sm">
           <div className="flex items-center gap-4">
@@ -156,22 +180,22 @@ export default function KnowledgeBasePage() {
             </span>
           </div>
           <div className="flex gap-1">
-            <Button 
-              size="icon" 
-              variant="ghost" 
+            <Button
+              size="icon"
+              variant="ghost"
               className="h-7 w-7"
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation();
                 router.push(`/projects/${project.id}`);
               }}
             >
               <Eye className="h-3 w-3" />
             </Button>
-            <Button 
-              size="icon" 
-              variant="ghost" 
+            <Button
+              size="icon"
+              variant="ghost"
               className="h-7 w-7"
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation();
                 exportProject(project.id, 'md');
               }}
@@ -185,8 +209,8 @@ export default function KnowledgeBasePage() {
   );
 
   const ProjectListItem = ({ project }: { project: any }) => (
-    <Card 
-      className="hover:shadow-md transition-shadow cursor-pointer" 
+    <Card
+      className="cursor-pointer transition-shadow hover:shadow-md"
       onClick={() => router.push(`/projects/${project.id}`)}
     >
       <CardContent className="flex items-center justify-between p-4">
@@ -196,13 +220,16 @@ export default function KnowledgeBasePage() {
             <div className="flex-1">
               <h3 className="font-semibold">{project.title}</h3>
               <p className="text-sm text-muted-foreground">
-                {new Date(project.createdAt).toLocaleDateString()} • {project.word_count?.toLocaleString() || 0} words
+                {new Date(project.createdAt).toLocaleDateString()} •{' '}
+                {project.word_count?.toLocaleString() || 0} words
               </p>
             </div>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant={project.status === 'completed' ? 'default' : 'secondary'}>
+          <Badge
+            variant={project.status === 'completed' ? 'default' : 'secondary'}
+          >
             {project.status}
           </Badge>
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
@@ -212,11 +239,13 @@ export default function KnowledgeBasePage() {
   );
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="container mx-auto space-y-6 py-6">
+      <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Knowledge Base</h1>
-          <p className="text-muted-foreground">Browse and search all your generated articles</p>
+          <p className="text-muted-foreground">
+            Browse and search all your generated articles
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -242,11 +271,11 @@ export default function KnowledgeBasePage() {
           <div className="flex flex-col gap-4">
             <div className="flex gap-2">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
                 <Input
                   placeholder="Search articles..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={e => setSearchQuery(e.target.value)}
                   className="pl-9"
                 />
               </div>
@@ -258,13 +287,20 @@ export default function KnowledgeBasePage() {
                   <SelectItem value="all">All Status</SelectItem>
                   <SelectItem value="completed">Completed</SelectItem>
                   <SelectItem value="researching">Researching</SelectItem>
-                  <SelectItem value="generating_outline">Generating Outline</SelectItem>
-                  <SelectItem value="writing_article">Writing Article</SelectItem>
+                  <SelectItem value="generating_outline">
+                    Generating Outline
+                  </SelectItem>
+                  <SelectItem value="writing_article">
+                    Writing Article
+                  </SelectItem>
                   <SelectItem value="polishing">Polishing</SelectItem>
                   <SelectItem value="failed">Failed</SelectItem>
                 </SelectContent>
               </Select>
-              <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortBy)}>
+              <Select
+                value={sortBy}
+                onValueChange={v => setSortBy(v as SortBy)}
+              >
                 <SelectTrigger className="w-[150px]">
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
@@ -276,10 +312,10 @@ export default function KnowledgeBasePage() {
                 </SelectContent>
               </Select>
             </div>
-            
+
             {allTags.length > 0 && (
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-sm text-muted-foreground flex items-center gap-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="flex items-center gap-1 text-sm text-muted-foreground">
                   <Tag className="h-3 w-3" />
                   Tags:
                 </span>
@@ -305,7 +341,7 @@ export default function KnowledgeBasePage() {
       </Card>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
@@ -333,7 +369,9 @@ export default function KnowledgeBasePage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">In Progress</p>
-                <p className="text-2xl font-bold">{inProgressProjects.length}</p>
+                <p className="text-2xl font-bold">
+                  {inProgressProjects.length}
+                </p>
               </div>
               <Clock className="h-8 w-8 text-blue-500" />
             </div>
@@ -345,7 +383,9 @@ export default function KnowledgeBasePage() {
               <div>
                 <p className="text-sm text-muted-foreground">Total Words</p>
                 <p className="text-2xl font-bold">
-                  {filteredProjects.reduce((sum, p) => sum + (p.word_count || 0), 0).toLocaleString()}
+                  {filteredProjects
+                    .reduce((sum, p) => sum + (p.word_count || 0), 0)
+                    .toLocaleString()}
                 </p>
               </div>
               <BookOpen className="h-8 w-8 text-muted-foreground" />
@@ -357,14 +397,20 @@ export default function KnowledgeBasePage() {
       {/* Content Tabs */}
       <Tabs defaultValue="all" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="all">All Articles ({filteredProjects.length})</TabsTrigger>
-          <TabsTrigger value="completed">Completed ({completedProjects.length})</TabsTrigger>
-          <TabsTrigger value="in-progress">In Progress ({inProgressProjects.length})</TabsTrigger>
+          <TabsTrigger value="all">
+            All Articles ({filteredProjects.length})
+          </TabsTrigger>
+          <TabsTrigger value="completed">
+            Completed ({completedProjects.length})
+          </TabsTrigger>
+          <TabsTrigger value="in-progress">
+            In Progress ({inProgressProjects.length})
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="all">
           {viewMode === 'grid' ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               {filteredProjects.map(project => (
                 <ProjectCard key={project.id} project={project} />
               ))}
@@ -379,9 +425,11 @@ export default function KnowledgeBasePage() {
           {filteredProjects.length === 0 && (
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-12">
-                <FileText className="h-12 w-12 text-muted-foreground mb-4" />
-                <p className="text-lg font-medium mb-1">No articles found</p>
-                <p className="text-sm text-muted-foreground">Try adjusting your search or filters</p>
+                <FileText className="mb-4 h-12 w-12 text-muted-foreground" />
+                <p className="mb-1 text-lg font-medium">No articles found</p>
+                <p className="text-sm text-muted-foreground">
+                  Try adjusting your search or filters
+                </p>
               </CardContent>
             </Card>
           )}
@@ -389,7 +437,7 @@ export default function KnowledgeBasePage() {
 
         <TabsContent value="completed">
           {viewMode === 'grid' ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               {completedProjects.map(project => (
                 <ProjectCard key={project.id} project={project} />
               ))}
@@ -404,9 +452,13 @@ export default function KnowledgeBasePage() {
           {completedProjects.length === 0 && (
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-12">
-                <CheckCircle className="h-12 w-12 text-muted-foreground mb-4" />
-                <p className="text-lg font-medium mb-1">No completed articles</p>
-                <p className="text-sm text-muted-foreground">Complete some articles to see them here</p>
+                <CheckCircle className="mb-4 h-12 w-12 text-muted-foreground" />
+                <p className="mb-1 text-lg font-medium">
+                  No completed articles
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Complete some articles to see them here
+                </p>
               </CardContent>
             </Card>
           )}
@@ -414,7 +466,7 @@ export default function KnowledgeBasePage() {
 
         <TabsContent value="in-progress">
           {viewMode === 'grid' ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               {inProgressProjects.map(project => (
                 <ProjectCard key={project.id} project={project} />
               ))}
@@ -429,9 +481,13 @@ export default function KnowledgeBasePage() {
           {inProgressProjects.length === 0 && (
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-12">
-                <Clock className="h-12 w-12 text-muted-foreground mb-4" />
-                <p className="text-lg font-medium mb-1">No articles in progress</p>
-                <p className="text-sm text-muted-foreground">Start generating an article to see progress here</p>
+                <Clock className="mb-4 h-12 w-12 text-muted-foreground" />
+                <p className="mb-1 text-lg font-medium">
+                  No articles in progress
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Start generating an article to see progress here
+                </p>
               </CardContent>
             </Card>
           )}

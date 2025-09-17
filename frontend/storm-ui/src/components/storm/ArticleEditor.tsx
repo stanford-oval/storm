@@ -1,12 +1,12 @@
-import * as React from "react";
-import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Link from "@tiptap/extension-link";
-import Image from "@tiptap/extension-image";
-import Table from "@tiptap/extension-table";
-import TableRow from "@tiptap/extension-table-row";
-import TableCell from "@tiptap/extension-table-cell";
-import TableHeader from "@tiptap/extension-table-header";
+import * as React from 'react';
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Link from '@tiptap/extension-link';
+import Image from '@tiptap/extension-image';
+import { Table } from '@tiptap/extension-table';
+import { TableRow } from '@tiptap/extension-table-row';
+import { TableCell } from '@tiptap/extension-table-cell';
+import { TableHeader } from '@tiptap/extension-table-header';
 import {
   Bold,
   Italic,
@@ -27,19 +27,14 @@ import {
   FileText,
   Clock,
   BookOpen,
-} from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
-import { cn, formatDate, estimateReadingTime } from "@/lib/utils";
-import type { ArticleEditorProps, GeneratedArticle, Citation } from "@/types";
+} from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { cn, formatDate, estimateReadingTime } from '@/lib/utils';
+import type { ArticleEditorProps, GeneratedArticle, Citation } from '@/types';
 
 export const ArticleEditor: React.FC<ArticleEditorProps> = ({
   article,
@@ -49,7 +44,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
   showOutline = true,
   className,
 }) => {
-  const [activeTab, setActiveTab] = React.useState<string>("editor");
+  const [activeTab, setActiveTab] = React.useState<string>('editor');
   const [wordCount, setWordCount] = React.useState(0);
 
   const editor = useEditor({
@@ -113,7 +108,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
     title: string;
   }> = ({ onClick, isActive, children, title }) => (
     <Button
-      variant={isActive ? "default" : "ghost"}
+      variant={isActive ? 'default' : 'ghost'}
       size="sm"
       onClick={onClick}
       title={title}
@@ -124,10 +119,10 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
   );
 
   const toolbar = editor && (
-    <div className="flex items-center space-x-1 p-2 border-b">
+    <div className="flex items-center space-x-1 border-b p-2">
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleBold().run()}
-        isActive={editor.isActive("bold")}
+        isActive={editor.isActive('bold')}
         title="Bold"
       >
         <Bold className="h-4 w-4" />
@@ -135,7 +130,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
 
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleItalic().run()}
-        isActive={editor.isActive("italic")}
+        isActive={editor.isActive('italic')}
         title="Italic"
       >
         <Italic className="h-4 w-4" />
@@ -143,7 +138,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
 
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleStrike().run()}
-        isActive={editor.isActive("strike")}
+        isActive={editor.isActive('strike')}
         title="Strikethrough"
       >
         <Strikethrough className="h-4 w-4" />
@@ -151,7 +146,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
 
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleCode().run()}
-        isActive={editor.isActive("code")}
+        isActive={editor.isActive('code')}
         title="Code"
       >
         <Code className="h-4 w-4" />
@@ -161,7 +156,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
 
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-        isActive={editor.isActive("heading", { level: 1 })}
+        isActive={editor.isActive('heading', { level: 1 })}
         title="Heading 1"
       >
         <Heading1 className="h-4 w-4" />
@@ -169,7 +164,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
 
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-        isActive={editor.isActive("heading", { level: 2 })}
+        isActive={editor.isActive('heading', { level: 2 })}
         title="Heading 2"
       >
         <Heading2 className="h-4 w-4" />
@@ -177,7 +172,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
 
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-        isActive={editor.isActive("heading", { level: 3 })}
+        isActive={editor.isActive('heading', { level: 3 })}
         title="Heading 3"
       >
         <Heading3 className="h-4 w-4" />
@@ -187,7 +182,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
 
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleBulletList().run()}
-        isActive={editor.isActive("bulletList")}
+        isActive={editor.isActive('bulletList')}
         title="Bullet List"
       >
         <List className="h-4 w-4" />
@@ -195,7 +190,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
 
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
-        isActive={editor.isActive("orderedList")}
+        isActive={editor.isActive('orderedList')}
         title="Numbered List"
       >
         <ListOrdered className="h-4 w-4" />
@@ -203,7 +198,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
 
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleBlockquote().run()}
-        isActive={editor.isActive("blockquote")}
+        isActive={editor.isActive('blockquote')}
         title="Quote"
       >
         <Quote className="h-4 w-4" />
@@ -213,12 +208,12 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
 
       <ToolbarButton
         onClick={() => {
-          const url = window.prompt("Enter URL");
+          const url = window.prompt('Enter URL');
           if (url) {
             editor.chain().focus().setLink({ href: url }).run();
           }
         }}
-        isActive={editor.isActive("link")}
+        isActive={editor.isActive('link')}
         title="Add Link"
       >
         <LinkIcon className="h-4 w-4" />
@@ -226,7 +221,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
 
       <ToolbarButton
         onClick={() => {
-          const url = window.prompt("Enter image URL");
+          const url = window.prompt('Enter image URL');
           if (url) {
             editor.chain().focus().setImage({ src: url }).run();
           }
@@ -237,7 +232,13 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       </ToolbarButton>
 
       <ToolbarButton
-        onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
+        onClick={() =>
+          editor
+            .chain()
+            .focus()
+            .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+            .run()
+        }
         title="Insert Table"
       >
         <TableIcon className="h-4 w-4" />
@@ -260,9 +261,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
         <span>{article.sections?.length || 0} sections</span>
       </div>
       {article.lastModified && (
-        <div>
-          Modified {formatDate(article.lastModified)}
-        </div>
+        <div>Modified {formatDate(article.lastModified)}</div>
       )}
     </div>
   );
@@ -270,8 +269,8 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
   const CitationsList = ({ citations }: { citations: Citation[] }) => (
     <div className="space-y-2">
       {citations.map((citation, index) => (
-        <div key={citation.id} className="p-3 bg-muted/50 rounded-md text-sm">
-          <div className="flex items-start justify-between mb-1">
+        <div key={citation.id} className="rounded-md bg-muted/50 p-3 text-sm">
+          <div className="mb-1 flex items-start justify-between">
             <span className="font-medium">
               [{index + 1}] {citation.text}
             </span>
@@ -283,7 +282,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
             href={citation.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary hover:underline truncate block"
+            className="block truncate text-primary hover:underline"
           >
             {citation.url}
           </a>
@@ -298,21 +297,24 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
         <div
           key={section.id}
           className={cn(
-            "p-2 rounded-md border cursor-pointer hover:bg-accent",
+            'cursor-pointer rounded-md border p-2 hover:bg-accent',
             `pl-${Math.min(section.level * 4, 12)}`
           )}
           onClick={() => {
             // Find heading in editor and scroll to it
-            const heading = document.querySelector(`h${section.level}:nth-of-type(${section.order})`);
+            const heading = document.querySelector(
+              `h${section.level}:nth-of-type(${section.order})`
+            );
             if (heading) {
               heading.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
           }}
         >
-          <div className="font-medium text-sm">{section.title}</div>
+          <div className="text-sm font-medium">{section.title}</div>
           {section.citations.length > 0 && (
-            <div className="text-xs text-muted-foreground mt-1">
-              {section.citations.length} citation{section.citations.length > 1 ? 's' : ''}
+            <div className="mt-1 text-xs text-muted-foreground">
+              {section.citations.length} citation
+              {section.citations.length > 1 ? 's' : ''}
             </div>
           )}
         </div>
@@ -321,9 +323,9 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
   );
 
   return (
-    <div className={cn("flex h-full", className)}>
-      <div className="flex-1 flex flex-col min-h-0">
-        <Card className="flex-1 flex flex-col">
+    <div className={cn('flex h-full', className)}>
+      <div className="flex min-h-0 flex-1 flex-col">
+        <Card className="flex flex-1 flex-col">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-xl font-bold">
@@ -333,10 +335,12 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setActiveTab(activeTab === "editor" ? "preview" : "editor")}
+                  onClick={() =>
+                    setActiveTab(activeTab === 'editor' ? 'preview' : 'editor')
+                  }
                 >
                   <Eye className="mr-2 h-4 w-4" />
-                  {activeTab === "editor" ? "Preview" : "Edit"}
+                  {activeTab === 'editor' ? 'Preview' : 'Edit'}
                 </Button>
                 {!readOnly && (
                   <Button size="sm" onClick={onSave}>
@@ -349,28 +353,32 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
             <ArticleStats />
           </CardHeader>
 
-          <CardContent className="flex-1 flex flex-col min-h-0">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+          <CardContent className="flex min-h-0 flex-1 flex-col">
+            <Tabs
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="flex flex-1 flex-col"
+            >
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="editor">Editor</TabsTrigger>
                 <TabsTrigger value="preview">Preview</TabsTrigger>
                 <TabsTrigger value="citations">Citations</TabsTrigger>
               </TabsList>
 
-              <TabsContent value="editor" className="flex-1 flex flex-col mt-4">
-                <div className="border rounded-lg flex-1 flex flex-col">
+              <TabsContent value="editor" className="mt-4 flex flex-1 flex-col">
+                <div className="flex flex-1 flex-col rounded-lg border">
                   {!readOnly && toolbar}
-                  <div className="flex-1 p-4 overflow-auto storm-scrollbar">
-                    <EditorContent 
-                      editor={editor} 
+                  <div className="storm-scrollbar flex-1 overflow-auto p-4">
+                    <EditorContent
+                      editor={editor}
                       className="prose max-w-none focus:outline-none"
                     />
                   </div>
                 </div>
               </TabsContent>
 
-              <TabsContent value="preview" className="flex-1 mt-4">
-                <div className="border rounded-lg p-6 overflow-auto storm-scrollbar">
+              <TabsContent value="preview" className="mt-4 flex-1">
+                <div className="storm-scrollbar overflow-auto rounded-lg border p-6">
                   <div
                     className="prose max-w-none"
                     dangerouslySetInnerHTML={{ __html: article.content }}
@@ -378,15 +386,15 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
                 </div>
               </TabsContent>
 
-              <TabsContent value="citations" className="flex-1 mt-4">
-                <div className="border rounded-lg p-4 overflow-auto storm-scrollbar">
-                  <h3 className="font-semibold mb-4">
+              <TabsContent value="citations" className="mt-4 flex-1">
+                <div className="storm-scrollbar overflow-auto rounded-lg border p-4">
+                  <h3 className="mb-4 font-semibold">
                     Citations ({article.citations?.length || 0})
                   </h3>
                   {article.citations && article.citations.length > 0 ? (
                     <CitationsList citations={article.citations} />
                   ) : (
-                    <div className="text-center text-muted-foreground py-8">
+                    <div className="py-8 text-center text-muted-foreground">
                       No citations available
                     </div>
                   )}
@@ -404,7 +412,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
             <CardHeader>
               <CardTitle className="text-lg">Outline</CardTitle>
             </CardHeader>
-            <CardContent className="max-h-96 overflow-auto storm-scrollbar">
+            <CardContent className="storm-scrollbar max-h-96 overflow-auto">
               <OutlineView />
             </CardContent>
           </Card>
@@ -414,4 +422,4 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
   );
 };
 
-ArticleEditor.displayName = "ArticleEditor";
+ArticleEditor.displayName = 'ArticleEditor';

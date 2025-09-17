@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from 'react';
 import {
   DndContext,
   closestCenter,
@@ -7,15 +7,15 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-} from "@dnd-kit/core";
+} from '@dnd-kit/core';
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
   useSortable,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import {
   ChevronDown,
   ChevronRight,
@@ -27,24 +27,24 @@ import {
   X,
   FileText,
   Clock,
-} from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+} from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { cn, formatDate, generateId } from "@/lib/utils";
-import type { 
-  OutlineEditorProps, 
-  ArticleOutline, 
-  OutlineSection 
-} from "@/types";
+} from '@/components/ui/select';
+import { cn, formatDate, generateId } from '@/lib/utils';
+import type {
+  OutlineEditorProps,
+  ArticleOutline,
+  OutlineSection,
+} from '@/types';
 
 interface SortableSectionProps {
   section: OutlineSection;
@@ -67,7 +67,9 @@ const SortableSection: React.FC<SortableSectionProps> = ({
 }) => {
   const [isEditing, setIsEditing] = React.useState(false);
   const [editTitle, setEditTitle] = React.useState(section.title);
-  const [editDescription, setEditDescription] = React.useState(section.description || '');
+  const [editDescription, setEditDescription] = React.useState(
+    section.description || ''
+  );
 
   const {
     attributes,
@@ -76,7 +78,7 @@ const SortableSection: React.FC<SortableSectionProps> = ({
     transform,
     transition,
     isDragging,
-  } = useSortable({ 
+  } = useSortable({
     id: section.id,
     disabled: readOnly || isEditing,
   });
@@ -121,22 +123,22 @@ const SortableSection: React.FC<SortableSectionProps> = ({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "group relative",
-        isDragging && "z-10 opacity-50",
+        'group relative',
+        isDragging && 'z-10 opacity-50',
         indentClass
       )}
     >
       <div
         className={cn(
-          "flex items-center space-x-2 p-2 rounded-md border transition-colors",
-          isEditing ? "border-primary bg-primary/5" : "hover:bg-accent"
+          'flex items-center space-x-2 rounded-md border p-2 transition-colors',
+          isEditing ? 'border-primary bg-primary/5' : 'hover:bg-accent'
         )}
       >
         {!readOnly && (
           <div
             {...attributes}
             {...listeners}
-            className="flex-shrink-0 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity"
+            className="flex-shrink-0 cursor-grab opacity-0 transition-opacity active:cursor-grabbing group-hover:opacity-100"
           >
             <GripVertical className="h-4 w-4 text-muted-foreground" />
           </div>
@@ -146,7 +148,7 @@ const SortableSection: React.FC<SortableSectionProps> = ({
           <Button
             variant="ghost"
             size="sm"
-            className="h-6 w-6 p-0 flex-shrink-0"
+            className="h-6 w-6 flex-shrink-0 p-0"
             onClick={() => onToggleExpand(section.id)}
           >
             {section.isExpanded ? (
@@ -157,12 +159,12 @@ const SortableSection: React.FC<SortableSectionProps> = ({
           </Button>
         )}
 
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0 flex-1">
           {isEditing ? (
             <div className="space-y-2">
               <Input
                 value={editTitle}
-                onChange={(e) => setEditTitle(e.target.value)}
+                onChange={e => setEditTitle(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Section title"
                 className="h-8 text-sm"
@@ -170,7 +172,7 @@ const SortableSection: React.FC<SortableSectionProps> = ({
               />
               <Input
                 value={editDescription}
-                onChange={(e) => setEditDescription(e.target.value)}
+                onChange={e => setEditDescription(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Description (optional)"
                 className="h-7 text-xs"
@@ -179,15 +181,13 @@ const SortableSection: React.FC<SortableSectionProps> = ({
           ) : (
             <div className="min-w-0">
               <div className="flex items-center space-x-2">
-                <p className="font-medium text-sm truncate">
-                  {section.title}
-                </p>
+                <p className="truncate text-sm font-medium">{section.title}</p>
                 <Badge variant="outline" className="text-xs">
                   H{section.level}
                 </Badge>
               </div>
               {section.description && (
-                <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
                   {section.description}
                 </p>
               )}
@@ -196,7 +196,7 @@ const SortableSection: React.FC<SortableSectionProps> = ({
         </div>
 
         {!readOnly && (
-          <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex items-center space-x-1 opacity-0 transition-opacity group-hover:opacity-100">
             {isEditing ? (
               <>
                 <Button
@@ -251,7 +251,7 @@ const SortableSection: React.FC<SortableSectionProps> = ({
       {/* Render children */}
       {hasChildren && section.isExpanded && (
         <div className="mt-2">
-          <SortableContext 
+          <SortableContext
             items={childSections.map(s => s.id)}
             strategy={verticalListSortingStrategy}
           >
@@ -283,7 +283,8 @@ export const OutlineEditor: React.FC<OutlineEditorProps> = ({
   readOnly = false,
   className,
 }) => {
-  const [localOutline, setLocalOutline] = React.useState<ArticleOutline>(outline);
+  const [localOutline, setLocalOutline] =
+    React.useState<ArticleOutline>(outline);
   const [hasChanges, setHasChanges] = React.useState(false);
 
   const sensors = useSensors(
@@ -314,15 +315,15 @@ export const OutlineEditor: React.FC<OutlineEditorProps> = ({
     if (over && active.id !== over.id) {
       const oldIndex = localOutline.sections.findIndex(s => s.id === active.id);
       const newIndex = localOutline.sections.findIndex(s => s.id === over.id);
-      
+
       const newSections = arrayMove(localOutline.sections, oldIndex, newIndex);
-      
+
       // Update order numbers
       const updatedSections = newSections.map((section, index) => ({
         ...section,
         order: index + 1,
       }));
-      
+
       updateOutline(updatedSections);
     }
   };
@@ -336,14 +337,19 @@ export const OutlineEditor: React.FC<OutlineEditorProps> = ({
 
   const handleDeleteSection = (id: string) => {
     // Also delete all children
-    const deleteWithChildren = (sections: OutlineSection[], targetId: string): OutlineSection[] => {
-      const childIds = sections.filter(s => s.parentId === targetId).map(s => s.id);
+    const deleteWithChildren = (
+      sections: OutlineSection[],
+      targetId: string
+    ): OutlineSection[] => {
+      const childIds = sections
+        .filter(s => s.parentId === targetId)
+        .map(s => s.id);
       let filtered = sections.filter(s => s.id !== targetId);
-      
+
       childIds.forEach(childId => {
         filtered = deleteWithChildren(filtered, childId);
       });
-      
+
       return filtered;
     };
 
@@ -352,10 +358,10 @@ export const OutlineEditor: React.FC<OutlineEditorProps> = ({
   };
 
   const handleAddSection = (parentId?: string) => {
-    const parentSection = parentId 
+    const parentSection = parentId
       ? localOutline.sections.find(s => s.id === parentId)
       : null;
-    
+
     const newSection: OutlineSection = {
       id: generateId(),
       title: 'New Section',
@@ -376,7 +382,7 @@ export const OutlineEditor: React.FC<OutlineEditorProps> = ({
 
   const handleToggleExpand = (id: string) => {
     const updatedSections = localOutline.sections.map(section =>
-      section.id === id 
+      section.id === id
         ? { ...section, isExpanded: !section.isExpanded }
         : section
     );
@@ -396,7 +402,7 @@ export const OutlineEditor: React.FC<OutlineEditorProps> = ({
   const totalSections = localOutline.sections.length;
 
   return (
-    <Card className={cn("w-full", className)}>
+    <Card className={cn('w-full', className)}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
@@ -406,7 +412,9 @@ export const OutlineEditor: React.FC<OutlineEditorProps> = ({
             <div className="flex items-center space-x-4 text-sm text-muted-foreground">
               <div className="flex items-center">
                 <FileText className="mr-1 h-3 w-3" />
-                <span>{totalSections} section{totalSections !== 1 ? 's' : ''}</span>
+                <span>
+                  {totalSections} section{totalSections !== 1 ? 's' : ''}
+                </span>
               </div>
               <div className="flex items-center">
                 <Clock className="mr-1 h-3 w-3" />
@@ -414,7 +422,7 @@ export const OutlineEditor: React.FC<OutlineEditorProps> = ({
               </div>
             </div>
           </div>
-          
+
           {!readOnly && (
             <div className="flex items-center space-x-2">
               <Button
@@ -427,11 +435,7 @@ export const OutlineEditor: React.FC<OutlineEditorProps> = ({
               </Button>
               {hasChanges && (
                 <>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleReset}
-                  >
+                  <Button variant="ghost" size="sm" onClick={handleReset}>
                     Reset
                   </Button>
                   <Button size="sm" onClick={handleSave}>
@@ -447,10 +451,10 @@ export const OutlineEditor: React.FC<OutlineEditorProps> = ({
 
       <CardContent>
         {rootSections.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">
-            <FileText className="mx-auto h-12 w-12 mb-4 opacity-50" />
-            <p className="text-lg font-medium mb-2">No sections yet</p>
-            <p className="text-sm mb-4">
+          <div className="py-8 text-center text-muted-foreground">
+            <FileText className="mx-auto mb-4 h-12 w-12 opacity-50" />
+            <p className="mb-2 text-lg font-medium">No sections yet</p>
+            <p className="mb-4 text-sm">
               Start building your article outline by adding sections
             </p>
             {!readOnly && (
@@ -491,7 +495,7 @@ export const OutlineEditor: React.FC<OutlineEditorProps> = ({
         )}
 
         {hasChanges && (
-          <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-md">
+          <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-900/20">
             <p className="text-sm text-amber-800 dark:text-amber-200">
               You have unsaved changes. Don't forget to save your outline.
             </p>
@@ -502,4 +506,4 @@ export const OutlineEditor: React.FC<OutlineEditorProps> = ({
   );
 };
 
-OutlineEditor.displayName = "OutlineEditor";
+OutlineEditor.displayName = 'OutlineEditor';

@@ -1,4 +1,4 @@
-streamlit==1.31.1
+streamlit>=1.39.0  # Updated to fix path traversal vulnerability on Windows
 streamlit-card
 markdown
 unidecode

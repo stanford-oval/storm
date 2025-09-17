@@ -119,7 +119,9 @@ describe('ArticleEditor', () => {
 
       const titleElement = screen.getByText('Test Article');
       expect(titleElement).toBeInTheDocument();
-      expect(screen.queryByRole('textbox', { name: /title/i })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('textbox', { name: /title/i })
+      ).not.toBeInTheDocument();
     });
 
     it('shows outline when showOutline prop is true', () => {
@@ -199,7 +201,10 @@ describe('ArticleEditor', () => {
       );
 
       const citationLink = screen.getByText('Test citation 1').closest('a');
-      expect(citationLink).toHaveAttribute('href', 'https://example.com/source1');
+      expect(citationLink).toHaveAttribute(
+        'href',
+        'https://example.com/source1'
+      );
       expect(citationLink).toHaveAttribute('target', '_blank');
       expect(citationLink).toHaveAttribute('rel', 'noopener noreferrer');
     });
@@ -225,7 +230,7 @@ describe('ArticleEditor', () => {
   describe('Editor Integration', () => {
     it('initializes editor with article content', () => {
       const { useEditor } = require('@tiptap/react');
-      
+
       render(
         <ArticleEditor
           article={mockArticle}
@@ -244,7 +249,7 @@ describe('ArticleEditor', () => {
 
     it('disables editor in read-only mode', () => {
       const { useEditor } = require('@tiptap/react');
-      
+
       render(
         <ArticleEditor
           article={mockArticle}
@@ -388,8 +393,12 @@ describe('ArticleEditor', () => {
       );
 
       expect(screen.getByLabelText(/article title/i)).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /save article/i })).toBeInTheDocument();
-      expect(screen.getByRole('region', { name: /article content/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /save article/i })
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('region', { name: /article content/i })
+      ).toBeInTheDocument();
     });
 
     it('supports keyboard navigation', async () => {
@@ -416,7 +425,9 @@ describe('ArticleEditor', () => {
 
   describe('Visual States', () => {
     it('shows loading state during save', async () => {
-      const mockOnSaveAsync = jest.fn(() => new Promise(resolve => setTimeout(resolve, 100)));
+      const mockOnSaveAsync = jest.fn(
+        () => new Promise(resolve => setTimeout(resolve, 100))
+      );
 
       render(
         <ArticleEditor

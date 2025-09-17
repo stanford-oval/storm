@@ -1,5 +1,10 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
-import { WebSocketMessage, PipelineUpdateMessage, SessionUpdateMessage, NotificationMessage } from '../../types/api';
+import {
+  WebSocketMessage,
+  PipelineUpdateMessage,
+  SessionUpdateMessage,
+  NotificationMessage,
+} from '../../types/api';
 
 export interface UseWebSocketOptions {
   url: string;
@@ -33,7 +38,7 @@ export function useWebSocket<T = any>(
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const heartbeatIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const reconnectAttemptsRef = useRef(0);
@@ -72,31 +77,33 @@ export function useWebSocket<T = any>(
 
     try {
       const ws = new WebSocket(options.url, options.protocols);
-      
+
       ws.onopen = () => {
         setSocket(ws);
         setIsConnected(true);
         setIsConnecting(false);
         setError(null);
         reconnectAttemptsRef.current = 0;
-        
+
         startHeartbeat();
         options.onOpen?.();
       };
 
-      ws.onclose = (event) => {
+      ws.onclose = event => {
         setIsConnected(false);
         setIsConnecting(false);
         cleanup();
-        
+
         options.onClose?.(event);
 
         // Attempt to reconnect if enabled and not a clean close
         if (options.reconnect !== false && !event.wasClean) {
           if (reconnectAttemptsRef.current < maxReconnectAttempts) {
             reconnectAttemptsRef.current++;
-            setError(`Connection lost. Reconnecting... (${reconnectAttemptsRef.current}/${maxReconnectAttempts})`);
-            
+            setError(
+              `Connection lost. Reconnecting... (${reconnectAttemptsRef.current}/${maxReconnectAttempts})`
+            );
+
             reconnectTimeoutRef.current = setTimeout(() => {
               connect();
             }, reconnectInterval);
@@ -106,21 +113,21 @@ export function useWebSocket<T = any>(
         }
       };
 
-      ws.onerror = (error) => {
+      ws.onerror = error => {
         setError('WebSocket connection error');
         setIsConnecting(false);
         options.onError?.(error);
       };
 
-      ws.onmessage = (event) => {
+      ws.onmessage = event => {
         try {
           const message = JSON.parse(event.data) as WebSocketMessage<T>;
-          
+
           // Handle heartbeat responses
           if (message.type === 'pong') {
             return;
           }
-          
+
           onMessage?.(message);
         } catch (err) {
           console.error('Failed to parse WebSocket message:', err);
@@ -132,30 +139,45 @@ export function useWebSocket<T = any>(
       setError(err instanceof Error ? err.message : 'Failed to connect');
       setIsConnecting(false);
     }
-  }, [options, onMessage, isConnecting, socket, startHeartbeat, cleanup, maxReconnectAttempts, reconnectInterval]);
+  }, [
+    options,
+    onMessage,
+    isConnecting,
+    socket,
+    startHeartbeat,
+    cleanup,
+    maxReconnectAttempts,
+    reconnectInterval,
+  ]);
 
-  const send = useCallback((data: any): boolean => {
-    if (!socket || socket.readyState !== WebSocket.OPEN) {
-      return false;
-    }
+  const send = useCallback(
+    (data: any): boolean => {
+      if (!socket || socket.readyState !== WebSocket.OPEN) {
+        return false;
+      }
 
-    try {
-      const message = typeof data === 'string' ? data : JSON.stringify(data);
-      socket.send(message);
-      return true;
-    } catch (err) {
-      console.error('Failed to send WebSocket message:', err);
-      return false;
-    }
-  }, [socket]);
+      try {
+        const message = typeof data === 'string' ? data : JSON.stringify(data);
+        socket.send(message);
+        return true;
+      } catch (err) {
+        console.error('Failed to send WebSocket message:', err);
+        return false;
+      }
+    },
+    [socket]
+  );
 
-  const sendMessage = useCallback(<T>(type: string, data: T): boolean => {
-    return send({
-      type,
-      data,
-      timestamp: new Date(),
-    });
-  }, [send]);
+  const sendMessage = useCallback(
+    <T>(type: string, data: T): boolean => {
+      return send({
+        type,
+        data,
+        timestamp: new Date(),
+      });
+    },
+    [send]
+  );
 
   const close = useCallback(() => {
     cleanup();
@@ -206,8 +228,12 @@ export function useWebSocket<T = any>(
 }
 
 // Hook for pipeline updates
-export function usePipelineWebSocket(projectId: string, onUpdate?: (update: PipelineUpdateMessage) => void) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+export function usePipelineWebSocket(
+  projectId: string,
+  onUpdate?: (update: PipelineUpdateMessage) => void
+) {
+  const baseUrl =
+    process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
   const wsUrl = baseUrl.replace(/^http/, 'ws') + `/pipeline/${projectId}/ws`;
 
   return useWebSocket<PipelineUpdateMessage>(
@@ -216,7 +242,7 @@ export function usePipelineWebSocket(projectId: string, onUpdate?: (update: Pipe
       reconnect: true,
       heartbeat: true,
     },
-    (message) => {
+    message => {
       if (message.type === 'pipeline_update' && onUpdate) {
         onUpdate(message.data);
       }
@@ -225,8 +251,12 @@ export function usePipelineWebSocket(projectId: string, onUpdate?: (update: Pipe
 }
 
 // Hook for session updates
-export function useSessionWebSocket(sessionId: string, onUpdate?: (update: SessionUpdateMessage) => void) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+export function useSessionWebSocket(
+  sessionId: string,
+  onUpdate?: (update: SessionUpdateMessage) => void
+) {
+  const baseUrl =
+    process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
   const wsUrl = baseUrl.replace(/^http/, 'ws') + `/sessions/${sessionId}/ws`;
 
   return useWebSocket<SessionUpdateMessage>(
@@ -235,7 +265,7 @@ export function useSessionWebSocket(sessionId: string, onUpdate?: (update: Sessi
       reconnect: true,
       heartbeat: true,
     },
-    (message) => {
+    message => {
       if (message.type === 'session_update' && onUpdate) {
         onUpdate(message.data);
       }
@@ -244,8 +274,11 @@ export function useSessionWebSocket(sessionId: string, onUpdate?: (update: Sessi
 }
 
 // Hook for notifications
-export function useNotificationWebSocket(onNotification?: (notification: NotificationMessage) => void) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+export function useNotificationWebSocket(
+  onNotification?: (notification: NotificationMessage) => void
+) {
+  const baseUrl =
+    process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
   const wsUrl = baseUrl.replace(/^http/, 'ws') + '/notifications/ws';
 
   return useWebSocket<NotificationMessage>(
@@ -254,7 +287,7 @@ export function useNotificationWebSocket(onNotification?: (notification: Notific
       reconnect: true,
       heartbeat: true,
     },
-    (message) => {
+    message => {
       if (message.type === 'notification' && onNotification) {
         onNotification(message.data);
       }
@@ -264,7 +297,8 @@ export function useNotificationWebSocket(onNotification?: (notification: Notific
 
 // Hook for real-time analytics
 export function useAnalyticsWebSocket(onUpdate?: (data: any) => void) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+  const baseUrl =
+    process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
   const wsUrl = baseUrl.replace(/^http/, 'ws') + '/analytics/realtime/ws';
 
   return useWebSocket(
@@ -273,7 +307,7 @@ export function useAnalyticsWebSocket(onUpdate?: (data: any) => void) {
       reconnect: true,
       heartbeat: true,
     },
-    (message) => {
+    message => {
       if (message.type === 'analytics_update' && onUpdate) {
         onUpdate(message.data);
       }
@@ -298,7 +332,7 @@ export function useEventWebSocket(
       heartbeat: true,
       ...options,
     },
-    (message) => {
+    message => {
       const handler = eventHandlers[message.type];
       if (handler) {
         handler(message.data);
@@ -310,47 +344,56 @@ export function useEventWebSocket(
 // Hook for managing multiple WebSocket connections
 export function useMultiWebSocket() {
   const connections = useRef<Map<string, WebSocket>>(new Map());
-  const [connectionStates, setConnectionStates] = useState<Map<string, boolean>>(new Map());
+  const [connectionStates, setConnectionStates] = useState<
+    Map<string, boolean>
+  >(new Map());
 
-  const addConnection = useCallback((key: string, options: UseWebSocketOptions, onMessage?: (message: any) => void) => {
-    // Close existing connection if any
-    const existingConnection = connections.current.get(key);
-    if (existingConnection) {
-      existingConnection.close();
-    }
+  const addConnection = useCallback(
+    (
+      key: string,
+      options: UseWebSocketOptions,
+      onMessage?: (message: any) => void
+    ) => {
+      // Close existing connection if any
+      const existingConnection = connections.current.get(key);
+      if (existingConnection) {
+        existingConnection.close();
+      }
 
-    try {
-      const ws = new WebSocket(options.url, options.protocols);
-      
-      ws.onopen = () => {
-        setConnectionStates(prev => new Map(prev.set(key, true)));
-        options.onOpen?.();
-      };
+      try {
+        const ws = new WebSocket(options.url, options.protocols);
 
-      ws.onclose = () => {
-        setConnectionStates(prev => new Map(prev.set(key, false)));
-        connections.current.delete(key);
-        options.onClose?.();
-      };
+        ws.onopen = () => {
+          setConnectionStates(prev => new Map(prev.set(key, true)));
+          options.onOpen?.();
+        };
 
-      ws.onerror = options.onError;
-      
-      ws.onmessage = (event) => {
-        try {
-          const message = JSON.parse(event.data);
-          onMessage?.(message);
-        } catch (err) {
-          console.error('Failed to parse WebSocket message:', err);
-        }
-      };
+        ws.onclose = event => {
+          setConnectionStates(prev => new Map(prev.set(key, false)));
+          connections.current.delete(key);
+          options.onClose?.(event);
+        };
 
-      connections.current.set(key, ws);
-      return ws;
-    } catch (err) {
-      console.error('Failed to create WebSocket connection:', err);
-      return null;
-    }
-  }, []);
+        ws.onerror = options.onError || null;
+
+        ws.onmessage = event => {
+          try {
+            const message = JSON.parse(event.data);
+            onMessage?.(message);
+          } catch (err) {
+            console.error('Failed to parse WebSocket message:', err);
+          }
+        };
+
+        connections.current.set(key, ws);
+        return ws;
+      } catch (err) {
+        console.error('Failed to create WebSocket connection:', err);
+        return null;
+      }
+    },
+    []
+  );
 
   const removeConnection = useCallback((key: string) => {
     const connection = connections.current.get(key);
@@ -381,7 +424,7 @@ export function useMultiWebSocket() {
   }, []);
 
   const closeAll = useCallback(() => {
-    connections.current.forEach((connection) => {
+    connections.current.forEach(connection => {
       connection.close();
     });
     connections.current.clear();

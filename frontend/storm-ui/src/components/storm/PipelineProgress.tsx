@@ -1,17 +1,21 @@
-import * as React from "react";
-import { X, AlertTriangle, CheckCircle, Clock, Zap } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
+import * as React from 'react';
+import { X, AlertTriangle, CheckCircle, Clock, Zap } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
-import { cn, formatDuration, getPipelineStageLabel } from "@/lib/utils";
-import type { PipelineProgressProps, PipelineStage, PipelineError } from "@/types";
+} from '@/components/ui/accordion';
+import { cn, formatDuration, getPipelineStageLabel } from '@/lib/utils';
+import type {
+  PipelineProgressProps,
+  PipelineStage,
+  PipelineError,
+} from '@/types';
 
 export const PipelineProgress: React.FC<PipelineProgressProps> = ({
   progress,
@@ -25,7 +29,7 @@ export const PipelineProgress: React.FC<PipelineProgressProps> = ({
   // Update elapsed time every second
   React.useEffect(() => {
     if (!progress.startTime) return;
-    
+
     const interval = setInterval(() => {
       const elapsed = Date.now() - new Date(progress.startTime).getTime();
       setElapsedTime(elapsed);
@@ -40,7 +44,7 @@ export const PipelineProgress: React.FC<PipelineProgressProps> = ({
     'outline_generation',
     'article_generation',
     'polishing',
-    'completed'
+    'completed',
   ];
 
   const getStageIndex = (stage: PipelineStage): number => {
@@ -50,7 +54,10 @@ export const PipelineProgress: React.FC<PipelineProgressProps> = ({
   const isStageCompleted = (stage: PipelineStage): boolean => {
     const currentIndex = getStageIndex(progress.stage);
     const stageIndex = getStageIndex(stage);
-    return stageIndex < currentIndex || (stageIndex === currentIndex && progress.stage === 'completed');
+    return (
+      stageIndex < currentIndex ||
+      (stageIndex === currentIndex && progress.stage === 'completed')
+    );
   };
 
   const isStageActive = (stage: PipelineStage): boolean => {
@@ -62,17 +69,20 @@ export const PipelineProgress: React.FC<PipelineProgressProps> = ({
       return <CheckCircle className="h-4 w-4 text-green-500" />;
     }
     if (isStageActive(stage)) {
-      return <Zap className="h-4 w-4 text-primary animate-pulse" />;
+      return <Zap className="h-4 w-4 animate-pulse text-primary" />;
     }
     return <Clock className="h-4 w-4 text-muted-foreground" />;
   };
 
   const errorsByStage = React.useMemo(() => {
-    return (progress.errors || []).reduce((acc, error) => {
-      if (!acc[error.stage]) acc[error.stage] = [];
-      acc[error.stage].push(error);
-      return acc;
-    }, {} as Record<PipelineStage, PipelineError[]>);
+    return (progress.errors || []).reduce(
+      (acc, error) => {
+        if (!acc[error.stage]) acc[error.stage] = [];
+        acc[error.stage].push(error);
+        return acc;
+      },
+      {} as Record<PipelineStage, PipelineError[]>
+    );
   }, [progress.errors]);
 
   const estimatedTimeRemaining = progress.estimatedEndTime
@@ -80,7 +90,7 @@ export const PipelineProgress: React.FC<PipelineProgressProps> = ({
     : null;
 
   return (
-    <Card className={cn("w-full", className)}>
+    <Card className={cn('w-full', className)}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg font-semibold">
@@ -115,7 +125,7 @@ export const PipelineProgress: React.FC<PipelineProgressProps> = ({
           </div>
           <Progress value={progress.overallProgress || 0} className="h-2" />
           {estimatedTimeRemaining && (
-            <div className="text-xs text-muted-foreground text-right">
+            <div className="text-right text-xs text-muted-foreground">
               Est. {formatDuration(estimatedTimeRemaining)} remaining
             </div>
           )}
@@ -123,9 +133,11 @@ export const PipelineProgress: React.FC<PipelineProgressProps> = ({
 
         {/* Current Task */}
         {progress.currentTask && (
-          <div className="p-3 bg-muted/50 rounded-md">
-            <p className="text-sm font-medium mb-1">Current Task</p>
-            <p className="text-sm text-muted-foreground">{progress.currentTask}</p>
+          <div className="rounded-md bg-muted/50 p-3">
+            <p className="mb-1 text-sm font-medium">Current Task</p>
+            <p className="text-sm text-muted-foreground">
+              {progress.currentTask}
+            </p>
           </div>
         )}
 
@@ -145,7 +157,7 @@ export const PipelineProgress: React.FC<PipelineProgressProps> = ({
         {/* Pipeline Stages */}
         {showDetails && (
           <div className="space-y-3">
-            <h4 className="font-medium text-sm">Pipeline Stages</h4>
+            <h4 className="text-sm font-medium">Pipeline Stages</h4>
             <div className="space-y-2">
               {stageOrder.map((stage, index) => {
                 const stageErrors = errorsByStage[stage] || [];
@@ -157,31 +169,34 @@ export const PipelineProgress: React.FC<PipelineProgressProps> = ({
                   <div
                     key={stage}
                     className={cn(
-                      "flex items-center space-x-3 p-2 rounded-md transition-colors",
-                      isActive && "bg-primary/5",
-                      isCompleted && !hasErrors && "bg-green-50 dark:bg-green-950/20"
+                      'flex items-center space-x-3 rounded-md p-2 transition-colors',
+                      isActive && 'bg-primary/5',
+                      isCompleted &&
+                        !hasErrors &&
+                        'bg-green-50 dark:bg-green-950/20'
                     )}
                   >
-                    <div className="flex-shrink-0">
-                      {getStageIcon(stage)}
-                    </div>
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-shrink-0">{getStageIcon(stage)}</div>
+                    <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between">
-                        <p className={cn(
-                          "text-sm font-medium truncate",
-                          isCompleted && "text-muted-foreground",
-                          isActive && "text-primary"
-                        )}>
+                        <p
+                          className={cn(
+                            'truncate text-sm font-medium',
+                            isCompleted && 'text-muted-foreground',
+                            isActive && 'text-primary'
+                          )}
+                        >
                           {getPipelineStageLabel(stage)}
                         </p>
                         {hasErrors && (
                           <Badge variant="destructive" className="ml-2">
-                            {stageErrors.length} error{stageErrors.length > 1 ? 's' : ''}
+                            {stageErrors.length} error
+                            {stageErrors.length > 1 ? 's' : ''}
                           </Badge>
                         )}
                       </div>
                       {isActive && progress.currentTask && (
-                        <p className="text-xs text-muted-foreground mt-1 truncate">
+                        <p className="mt-1 truncate text-xs text-muted-foreground">
                           {progress.currentTask}
                         </p>
                       )}
@@ -200,7 +215,8 @@ export const PipelineProgress: React.FC<PipelineProgressProps> = ({
               <AccordionTrigger className="text-destructive">
                 <div className="flex items-center">
                   <AlertTriangle className="mr-2 h-4 w-4" />
-                  {progress.errors.length} Error{progress.errors.length > 1 ? 's' : ''}
+                  {progress.errors.length} Error
+                  {progress.errors.length > 1 ? 's' : ''}
                 </div>
               </AccordionTrigger>
               <AccordionContent>
@@ -208,9 +224,9 @@ export const PipelineProgress: React.FC<PipelineProgressProps> = ({
                   {progress.errors.map((error, index) => (
                     <div
                       key={index}
-                      className="p-3 bg-destructive/5 border border-destructive/20 rounded-md"
+                      className="rounded-md border border-destructive/20 bg-destructive/5 p-3"
                     >
-                      <div className="flex items-center justify-between mb-1">
+                      <div className="mb-1 flex items-center justify-between">
                         <Badge variant="destructive" className="text-xs">
                           {getPipelineStageLabel(error.stage)}
                         </Badge>
@@ -218,7 +234,9 @@ export const PipelineProgress: React.FC<PipelineProgressProps> = ({
                           {new Date(error.timestamp).toLocaleTimeString()}
                         </span>
                       </div>
-                      <p className="text-sm text-destructive">{error.message}</p>
+                      <p className="text-sm text-destructive">
+                        {error.message}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -231,4 +249,4 @@ export const PipelineProgress: React.FC<PipelineProgressProps> = ({
   );
 };
 
-PipelineProgress.displayName = "PipelineProgress";
+PipelineProgress.displayName = 'PipelineProgress';

@@ -11,7 +11,7 @@ from fastapi.responses import FileResponse
 import os
 from contextlib import asynccontextmanager
 
-from routers import projects, pipeline, docs
+from routers import projects, pipeline, docs, settings
 
 
 @asynccontextmanager
@@ -50,6 +50,8 @@ app.add_middleware(
         "http://127.0.0.1:3000",
         "http://localhost:3001",
         "http://127.0.0.1:3001",
+        "http://localhost:3002",
+        "http://127.0.0.1:3002",
     ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -59,6 +61,7 @@ app.add_middleware(
 # Include routers with API prefix
 app.include_router(projects.router, prefix="/api/projects", tags=["projects"])
 app.include_router(pipeline.router, prefix="/api/pipeline", tags=["pipeline"])
+app.include_router(settings.router, prefix="/api/settings", tags=["settings"])
 app.include_router(docs.router, tags=["documentation"])
 
 

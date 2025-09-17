@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { 
-  WebSocketManager, 
-  WebSocketConfig, 
-  WebSocketState, 
-  WebSocketMessage, 
+import {
+  WebSocketManager,
+  WebSocketConfig,
+  WebSocketState,
+  WebSocketMessage,
   createWebSocketConnection,
   createProjectWebSocket,
   createPipelineWebSocket,
-  createSessionWebSocket
+  createSessionWebSocket,
 } from '../lib/websocket';
 
 export interface UseWebSocketOptions extends Partial<WebSocketConfig> {
@@ -51,8 +51,10 @@ export function useWebSocket(
 
   const [state, setState] = useState<WebSocketState>('disconnected');
   const [isConnected, setIsConnected] = useState(false);
-  const [connectionInfo, setConnectionInfo] = useState<ReturnType<WebSocketManager['getConnectionInfo']> | null>(null);
-  
+  const [connectionInfo, setConnectionInfo] = useState<ReturnType<
+    WebSocketManager['getConnectionInfo']
+  > | null>(null);
+
   const wsRef = useRef<WebSocketManager | null>(null);
   const endpointRef = useRef<string | null>(endpoint);
 
@@ -73,31 +75,31 @@ export function useWebSocket(
 
     if (!wsRef.current) {
       wsRef.current = createWebSocketConnection(endpoint, wsConfig);
-      
+
       // Set up event handlers
       wsRef.current.setEventHandlers({
-        onOpen: (event) => {
+        onOpen: event => {
           setState('connected');
           setIsConnected(true);
           updateConnectionInfo();
           onOpen?.(event);
         },
-        onMessage: (message) => {
+        onMessage: message => {
           onMessage?.(message);
         },
-        onError: (event) => {
+        onError: event => {
           setState('error');
           setIsConnected(false);
           updateConnectionInfo();
           onError?.(event);
         },
-        onClose: (event) => {
+        onClose: event => {
           setState('disconnected');
           setIsConnected(false);
           updateConnectionInfo();
           onClose?.(event);
         },
-        onReconnect: (attempt) => {
+        onReconnect: attempt => {
           setState('reconnecting');
           setIsConnected(false);
           updateConnectionInfo();
@@ -136,7 +138,16 @@ export function useWebSocket(
         setConnectionInfo(null);
       }
     };
-  }, [endpoint, autoConnect, onOpen, onMessage, onError, onClose, onReconnect, onReconnectFailed]);
+  }, [
+    endpoint,
+    autoConnect,
+    onOpen,
+    onMessage,
+    onError,
+    onClose,
+    onReconnect,
+    onReconnectFailed,
+  ]);
 
   const connect = useCallback(async () => {
     if (wsRef.current) {
@@ -157,18 +168,24 @@ export function useWebSocket(
     }
   }, []);
 
-  const send = useCallback(<T>(type: string, data?: T, options?: { id?: string }) => {
-    if (wsRef.current) {
-      wsRef.current.send(type, data, options);
-    }
-  }, []);
+  const send = useCallback(
+    <T>(type: string, data?: T, options?: { id?: string }) => {
+      if (wsRef.current) {
+        wsRef.current.send(type, data, options);
+      }
+    },
+    []
+  );
 
-  const subscribe = useCallback(<T>(messageType: string, handler: (data: T) => void) => {
-    if (wsRef.current) {
-      return wsRef.current.on(messageType, handler);
-    }
-    return () => {};
-  }, []);
+  const subscribe = useCallback(
+    <T>(messageType: string, handler: (data: T) => void) => {
+      if (wsRef.current) {
+        return wsRef.current.on(messageType, handler);
+      }
+      return () => {};
+    },
+    []
+  );
 
   return {
     ws: wsRef.current,
@@ -191,8 +208,10 @@ export function useProjectWebSocket(
 ): UseWebSocketReturn {
   const [state, setState] = useState<WebSocketState>('disconnected');
   const [isConnected, setIsConnected] = useState(false);
-  const [connectionInfo, setConnectionInfo] = useState<ReturnType<WebSocketManager['getConnectionInfo']> | null>(null);
-  
+  const [connectionInfo, setConnectionInfo] = useState<ReturnType<
+    WebSocketManager['getConnectionInfo']
+  > | null>(null);
+
   const wsRef = useRef<WebSocketManager | null>(null);
 
   const {
@@ -215,7 +234,7 @@ export function useProjectWebSocket(
     }
 
     wsRef.current = createProjectWebSocket(projectId);
-    
+
     const updateConnectionInfo = () => {
       if (wsRef.current) {
         setConnectionInfo(wsRef.current.getConnectionInfo());
@@ -224,28 +243,28 @@ export function useProjectWebSocket(
 
     // Set up event handlers
     wsRef.current.setEventHandlers({
-      onOpen: (event) => {
+      onOpen: event => {
         setState('connected');
         setIsConnected(true);
         updateConnectionInfo();
         onOpen?.(event);
       },
-      onMessage: (message) => {
+      onMessage: message => {
         onMessage?.(message);
       },
-      onError: (event) => {
+      onError: event => {
         setState('error');
         setIsConnected(false);
         updateConnectionInfo();
         onError?.(event);
       },
-      onClose: (event) => {
+      onClose: event => {
         setState('disconnected');
         setIsConnected(false);
         updateConnectionInfo();
         onClose?.(event);
       },
-      onReconnect: (attempt) => {
+      onReconnect: attempt => {
         setState('reconnecting');
         setIsConnected(false);
         updateConnectionInfo();
@@ -276,7 +295,16 @@ export function useProjectWebSocket(
         setConnectionInfo(null);
       }
     };
-  }, [projectId, autoConnect, onOpen, onMessage, onError, onClose, onReconnect, onReconnectFailed]);
+  }, [
+    projectId,
+    autoConnect,
+    onOpen,
+    onMessage,
+    onError,
+    onClose,
+    onReconnect,
+    onReconnectFailed,
+  ]);
 
   const connect = useCallback(async () => {
     if (wsRef.current) {
@@ -297,18 +325,24 @@ export function useProjectWebSocket(
     }
   }, []);
 
-  const send = useCallback(<T>(type: string, data?: T, options?: { id?: string }) => {
-    if (wsRef.current) {
-      wsRef.current.send(type, data, options);
-    }
-  }, []);
+  const send = useCallback(
+    <T>(type: string, data?: T, options?: { id?: string }) => {
+      if (wsRef.current) {
+        wsRef.current.send(type, data, options);
+      }
+    },
+    []
+  );
 
-  const subscribe = useCallback(<T>(messageType: string, handler: (data: T) => void) => {
-    if (wsRef.current) {
-      return wsRef.current.on(messageType, handler);
-    }
-    return () => {};
-  }, []);
+  const subscribe = useCallback(
+    <T>(messageType: string, handler: (data: T) => void) => {
+      if (wsRef.current) {
+        return wsRef.current.on(messageType, handler);
+      }
+      return () => {};
+    },
+    []
+  );
 
   return {
     ws: wsRef.current,
@@ -335,17 +369,26 @@ export function usePipelineWebSocket(
 } {
   const webSocket = useProjectWebSocket(projectId, options);
 
-  const subscribeToProgress = useCallback((handler: (progress: any) => void) => {
-    return webSocket.subscribe('pipeline_progress', handler);
-  }, [webSocket]);
+  const subscribeToProgress = useCallback(
+    (handler: (progress: any) => void) => {
+      return webSocket.subscribe('pipeline_progress', handler);
+    },
+    [webSocket]
+  );
 
-  const subscribeToLogs = useCallback((handler: (log: any) => void) => {
-    return webSocket.subscribe('pipeline_log', handler);
-  }, [webSocket]);
+  const subscribeToLogs = useCallback(
+    (handler: (log: any) => void) => {
+      return webSocket.subscribe('pipeline_log', handler);
+    },
+    [webSocket]
+  );
 
-  const subscribeToErrors = useCallback((handler: (error: any) => void) => {
-    return webSocket.subscribe('pipeline_error', handler);
-  }, [webSocket]);
+  const subscribeToErrors = useCallback(
+    (handler: (error: any) => void) => {
+      return webSocket.subscribe('pipeline_error', handler);
+    },
+    [webSocket]
+  );
 
   return {
     ...webSocket,
@@ -368,8 +411,10 @@ export function useSessionWebSocket(
 } {
   const [state, setState] = useState<WebSocketState>('disconnected');
   const [isConnected, setIsConnected] = useState(false);
-  const [connectionInfo, setConnectionInfo] = useState<ReturnType<WebSocketManager['getConnectionInfo']> | null>(null);
-  
+  const [connectionInfo, setConnectionInfo] = useState<ReturnType<
+    WebSocketManager['getConnectionInfo']
+  > | null>(null);
+
   const wsRef = useRef<WebSocketManager | null>(null);
 
   const {
@@ -392,7 +437,7 @@ export function useSessionWebSocket(
     }
 
     wsRef.current = createSessionWebSocket(sessionId);
-    
+
     const updateConnectionInfo = () => {
       if (wsRef.current) {
         setConnectionInfo(wsRef.current.getConnectionInfo());
@@ -401,28 +446,28 @@ export function useSessionWebSocket(
 
     // Set up event handlers
     wsRef.current.setEventHandlers({
-      onOpen: (event) => {
+      onOpen: event => {
         setState('connected');
         setIsConnected(true);
         updateConnectionInfo();
         onOpen?.(event);
       },
-      onMessage: (message) => {
+      onMessage: message => {
         onMessage?.(message);
       },
-      onError: (event) => {
+      onError: event => {
         setState('error');
         setIsConnected(false);
         updateConnectionInfo();
         onError?.(event);
       },
-      onClose: (event) => {
+      onClose: event => {
         setState('disconnected');
         setIsConnected(false);
         updateConnectionInfo();
         onClose?.(event);
       },
-      onReconnect: (attempt) => {
+      onReconnect: attempt => {
         setState('reconnecting');
         setIsConnected(false);
         updateConnectionInfo();
@@ -453,7 +498,16 @@ export function useSessionWebSocket(
         setConnectionInfo(null);
       }
     };
-  }, [sessionId, autoConnect, onOpen, onMessage, onError, onClose, onReconnect, onReconnectFailed]);
+  }, [
+    sessionId,
+    autoConnect,
+    onOpen,
+    onMessage,
+    onError,
+    onClose,
+    onReconnect,
+    onReconnectFailed,
+  ]);
 
   const connect = useCallback(async () => {
     if (wsRef.current) {
@@ -474,30 +528,45 @@ export function useSessionWebSocket(
     }
   }, []);
 
-  const send = useCallback(<T>(type: string, data?: T, options?: { id?: string }) => {
-    if (wsRef.current) {
-      wsRef.current.send(type, data, options);
-    }
-  }, []);
+  const send = useCallback(
+    <T>(type: string, data?: T, options?: { id?: string }) => {
+      if (wsRef.current) {
+        wsRef.current.send(type, data, options);
+      }
+    },
+    []
+  );
 
-  const subscribe = useCallback(<T>(messageType: string, handler: (data: T) => void) => {
-    if (wsRef.current) {
-      return wsRef.current.on(messageType, handler);
-    }
-    return () => {};
-  }, []);
+  const subscribe = useCallback(
+    <T>(messageType: string, handler: (data: T) => void) => {
+      if (wsRef.current) {
+        return wsRef.current.on(messageType, handler);
+      }
+      return () => {};
+    },
+    []
+  );
 
-  const subscribeToDiscourse = useCallback((handler: (message: any) => void) => {
-    return subscribe('discourse_message', handler);
-  }, [subscribe]);
+  const subscribeToDiscourse = useCallback(
+    (handler: (message: any) => void) => {
+      return subscribe('discourse_message', handler);
+    },
+    [subscribe]
+  );
 
-  const subscribeToMindMapUpdate = useCallback((handler: (update: any) => void) => {
-    return subscribe('mindmap_update', handler);
-  }, [subscribe]);
+  const subscribeToMindMapUpdate = useCallback(
+    (handler: (update: any) => void) => {
+      return subscribe('mindmap_update', handler);
+    },
+    [subscribe]
+  );
 
-  const subscribeToParticipantUpdate = useCallback((handler: (update: any) => void) => {
-    return subscribe('participant_update', handler);
-  }, [subscribe]);
+  const subscribeToParticipantUpdate = useCallback(
+    (handler: (update: any) => void) => {
+      return subscribe('participant_update', handler);
+    },
+    [subscribe]
+  );
 
   return {
     ws: wsRef.current,

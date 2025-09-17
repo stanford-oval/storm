@@ -12,7 +12,7 @@ setup('authenticate', async ({ page }) => {
   await page.click('[data-testid="login-button"]');
 
   // Wait until the page receives the cookies.
-  // 
+  //
   // Sometimes login flow sets cookies in the process of several redirects.
   // Wait for the final URL to ensure that the cookies are actually set.
   await expect(page).toHaveURL('/dashboard');

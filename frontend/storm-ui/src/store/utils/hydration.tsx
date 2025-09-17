@@ -40,7 +40,7 @@ export class HydrationManager {
       error: null,
       retryCount: 0,
     });
-    
+
     this.notifySubscribers();
   }
 
@@ -64,7 +64,7 @@ export class HydrationManager {
       state.error = null;
       this.stores.set(storeName, state);
       this.notifySubscribers();
-      
+
       // Check if all stores are hydrated
       if (this.areAllStoresHydrated()) {
         this.config.onSuccess();
@@ -81,7 +81,7 @@ export class HydrationManager {
       state.retryCount++;
       this.stores.set(storeName, state);
       this.notifySubscribers();
-      
+
       // Retry if under retry limit
       if (state.retryCount < this.config.retryCount) {
         setTimeout(() => {
@@ -97,9 +97,11 @@ export class HydrationManager {
   private retryHydration(storeName: string): void {
     // This would trigger a re-hydration attempt
     // The actual retry logic would be handled by the individual stores
-    window.dispatchEvent(new CustomEvent('store:retry-hydration', {
-      detail: { storeName }
-    }));
+    window.dispatchEvent(
+      new CustomEvent('store:retry-hydration', {
+        detail: { storeName },
+      })
+    );
   }
 
   // Check if all registered stores are hydrated
@@ -132,10 +134,10 @@ export class HydrationManager {
   // Subscribe to hydration state changes
   subscribe(callback: (state: GlobalHydrationState) => void): () => void {
     this.subscribers.add(callback);
-    
+
     // Send initial state
     callback(this.getGlobalState());
-    
+
     return () => {
       this.subscribers.delete(callback);
     };
@@ -174,137 +176,150 @@ export interface GlobalHydrationState {
 export const globalHydrationManager = new HydrationManager();
 
 // Hydration middleware for Zustand stores
-export const hydrationMiddleware = <T>(
-  config: any,
-  options: {
-    storeName: string;
-    onHydrate?: (state: T) => void;
-    onError?: (error: Error) => void;
-    timeout?: number;
-  }
-) => (set: any, get: any, api: any) => {
-  const { storeName, onHydrate, onError, timeout = 5000 } = options;
-  
-  // Register with global hydration manager
-  globalHydrationManager.registerStore(storeName);
-  
-  const store = config(set, get, api);
-  
-  // Add hydration methods to store
-  (store as any).hydration = {
-    isHydrated: false,
-    isHydrating: false,
-    error: null,
-    
-    // Manual hydration trigger
-    hydrate: async () => {
-      if (store.hydration.isHydrated || store.hydration.isHydrating) {
-        return;
-      }
-      
-      store.hydration.isHydrating = true;
-      globalHydrationManager.startHydration(storeName);
-      
-      try {
-        // Hydration timeout
-        const timeoutPromise = new Promise<never>((_, reject) => {
-          setTimeout(() => reject(new Error(`Hydration timeout for ${storeName}`)), timeout);
-        });
-        
-        // Actual hydration logic (this would be implemented by each store)
-        const hydrationPromise = new Promise<void>((resolve) => {
-          // Check if persist middleware has rehydrated
-          if (api.persist?.hasHydrated?.()) {
-            resolve();
-          } else if (api.persist?.rehydrate) {
-            api.persist.rehydrate();
-            // Wait for rehydration to complete
-            const checkHydration = () => {
-              if (api.persist.hasHydrated()) {
-                resolve();
-              } else {
-                setTimeout(checkHydration, 50);
-              }
-            };
-            checkHydration();
-          } else {
-            // No persistence, consider immediately hydrated
-            resolve();
-          }
-        });
-        
-        await Promise.race([hydrationPromise, timeoutPromise]);
-        
-        store.hydration.isHydrated = true;
-        store.hydration.isHydrating = false;
-        store.hydration.error = null;
-        
-        globalHydrationManager.completeHydration(storeName);
-        
-        if (onHydrate) {
-          onHydrate(get());
-        }
-        
-      } catch (error) {
-        const hydrationError = error instanceof Error ? error : new Error(String(error));
-        
-        store.hydration.isHydrating = false;
-        store.hydration.error = hydrationError;
-        
-        globalHydrationManager.failHydration(storeName, hydrationError);
-        
-        if (onError) {
-          onError(hydrationError);
-        }
-        
-        throw hydrationError;
-      }
-    },
-    
-    // Check if store has been hydrated
-    hasHydrated: () => store.hydration.isHydrated,
-    
-    // Get hydration state
-    getHydrationState: () => ({
-      isHydrated: store.hydration.isHydrated,
-      isHydrating: store.hydration.isHydrating,
-      error: store.hydration.error,
-    }),
-  };
-  
-  // Listen for retry events
-  window.addEventListener('store:retry-hydration', (event: any) => {
-    if (event.detail.storeName === storeName) {
-      store.hydration.hydrate().catch(console.error);
+export const hydrationMiddleware =
+  <T,>(
+    config: any,
+    options: {
+      storeName: string;
+      onHydrate?: (state: T) => void;
+      onError?: (error: Error) => void;
+      timeout?: number;
     }
-  });
-  
-  // Auto-hydrate on store creation
-  setTimeout(() => {
-    store.hydration.hydrate().catch(console.error);
-  }, 0);
-  
-  return store;
-};
+  ) =>
+  (set: any, get: any, api: any) => {
+    const { storeName, onHydrate, onError, timeout = 5000 } = options;
+
+    // Register with global hydration manager
+    globalHydrationManager.registerStore(storeName);
+
+    const store = config(set, get, api);
+
+    // Add hydration methods to store
+    (store as any).hydration = {
+      isHydrated: false,
+      isHydrating: false,
+      error: null,
+
+      // Manual hydration trigger
+      hydrate: async () => {
+        if (store.hydration.isHydrated || store.hydration.isHydrating) {
+          return;
+        }
+
+        store.hydration.isHydrating = true;
+        globalHydrationManager.startHydration(storeName);
+
+        try {
+          // Hydration timeout
+          const timeoutPromise = new Promise<never>((_, reject) => {
+            setTimeout(
+              () => reject(new Error(`Hydration timeout for ${storeName}`)),
+              timeout
+            );
+          });
+
+          // Actual hydration logic (this would be implemented by each store)
+          const hydrationPromise = new Promise<void>(resolve => {
+            // Check if persist middleware has rehydrated
+            if (api.persist?.hasHydrated?.()) {
+              resolve();
+            } else if (api.persist?.rehydrate) {
+              api.persist.rehydrate();
+              // Wait for rehydration to complete
+              const checkHydration = () => {
+                if (api.persist.hasHydrated()) {
+                  resolve();
+                } else {
+                  setTimeout(checkHydration, 50);
+                }
+              };
+              checkHydration();
+            } else {
+              // No persistence, consider immediately hydrated
+              resolve();
+            }
+          });
+
+          await Promise.race([hydrationPromise, timeoutPromise]);
+
+          store.hydration.isHydrated = true;
+          store.hydration.isHydrating = false;
+          store.hydration.error = null;
+
+          globalHydrationManager.completeHydration(storeName);
+
+          if (onHydrate) {
+            onHydrate(get());
+          }
+        } catch (error) {
+          const hydrationError =
+            error instanceof Error ? error : new Error(String(error));
+
+          store.hydration.isHydrating = false;
+          store.hydration.error = hydrationError;
+
+          globalHydrationManager.failHydration(storeName, hydrationError);
+
+          if (onError) {
+            onError(hydrationError);
+          }
+
+          throw hydrationError;
+        }
+      },
+
+      // Check if store has been hydrated
+      hasHydrated: () => store.hydration.isHydrated,
+
+      // Get hydration state
+      getHydrationState: () => ({
+        isHydrated: store.hydration.isHydrated,
+        isHydrating: store.hydration.isHydrating,
+        error: store.hydration.error,
+      }),
+    };
+
+    // Listen for retry events
+    window.addEventListener('store:retry-hydration', (event: any) => {
+      if (event.detail.storeName === storeName) {
+        store.hydration.hydrate().catch(console.error);
+      }
+    });
+
+    // Auto-hydrate on store creation
+    setTimeout(() => {
+      store.hydration.hydrate().catch(console.error);
+    }, 0);
+
+    return store;
+  };
 
 // React hook for hydration state
 export const useHydration = (storeName?: string) => {
-  const [state, setState] = React.useState<GlobalHydrationState | HydrationState>(() => {
+  const [state, setState] = React.useState<
+    GlobalHydrationState | HydrationState
+  >(() => {
     if (storeName) {
-      return globalHydrationManager.getGlobalState().stores.find(s => s.storeName === storeName) || {
-        isHydrated: false,
-        isHydrating: false,
-        error: null,
-        retryCount: 0,
-      };
+      return (
+        globalHydrationManager
+          .getGlobalState()
+          .stores.find(s => s.storeName === storeName) || {
+          isHydrated: false,
+          isHydrating: false,
+          error: null,
+          retryCount: 0,
+        }
+      );
     }
     return globalHydrationManager.getGlobalState();
   });
-  
+
   React.useEffect(() => {
-    const unsubscribe = globalHydrationManager.subscribe((globalState) => {
+    const unsubscribe = globalHydrationManager.subscribe(globalState => {
       if (storeName) {
-        const storeState = globalState.stores.find(s => s.storeName === storeName);
+        const storeState = globalState.stores.find(
+          s => s.storeName === storeName
+        );
         if (storeState) {
           setState(storeState);
         }
@@ -312,10 +327,10 @@ export const useHydration = (storeName?: string) => {
         setState(globalState);
       }
     });
-    
+
     return unsubscribe;
   }, [storeName]);
-  
+
   return state;
 };
 
@@ -328,46 +343,66 @@ export function withHydration<P extends object>(
     storeNames?: string[];
   } = {}
 ) {
-  const { fallback: Fallback, errorFallback: ErrorFallback, storeNames } = options;
-  
+  const {
+    fallback: Fallback,
+    errorFallback: ErrorFallback,
+    storeNames,
+  } = options;
+
   return React.forwardRef<any, P>((props, ref) => {
     const hydrationState = useHydration();
-    
+
     // Filter to specific stores if specified
-    const relevantStores = storeNames 
-      ? hydrationState.stores.filter(s => storeNames.includes(s.storeName))
-      : hydrationState.stores;
-    
+    const relevantStores =
+      'stores' in hydrationState
+        ? storeNames
+          ? hydrationState.stores.filter(s => storeNames.includes(s.storeName))
+          : hydrationState.stores
+        : [hydrationState];
+
     const isHydrated = relevantStores.every(s => s.isHydrated);
     const isHydrating = relevantStores.some(s => s.isHydrating);
     const hasErrors = relevantStores.some(s => s.error !== null);
-    const errors = relevantStores.filter(s => s.error !== null).map(s => s.error!);
-    
+    const errors = relevantStores
+      .filter(s => s.error !== null)
+      .map(s => s.error!);
+
     // Show error fallback if there are errors
     if (hasErrors && ErrorFallback) {
       return (
         <ErrorFallback
           error={errors[0]}
           retry={() => {
-            relevantStores.forEach(store => {
-              if (store.error) {
-                window.dispatchEvent(new CustomEvent('store:retry-hydration', {
-                  detail: { storeName: store.storeName }
-                }));
-              }
-            });
+            if ('stores' in hydrationState) {
+              relevantStores.forEach(store => {
+                if (store.error && 'storeName' in store) {
+                  window.dispatchEvent(
+                    new CustomEvent('store:retry-hydration', {
+                      detail: { storeName: store.storeName },
+                    })
+                  );
+                }
+              });
+            } else {
+              // Single store mode - retry without storeName
+              window.dispatchEvent(
+                new CustomEvent('store:retry-hydration', {
+                  detail: {},
+                })
+              );
+            }
           }}
         />
       );
     }
-    
+
     // Show loading fallback while hydrating
     if (!isHydrated && (isHydrating || Fallback)) {
       return Fallback ? <Fallback /> : null;
     }
-    
+
     // Render component if hydrated
-    return <Component {...props} ref={ref} />;
+    return <Component {...(props as P)} ref={ref} />;
   });
 }
 
@@ -379,15 +414,15 @@ export const hydrationUtils = {
       const timeoutId = setTimeout(() => {
         reject(new Error('Hydration timeout'));
       }, timeout);
-      
-      const unsubscribe = globalHydrationManager.subscribe((state) => {
+
+      const unsubscribe = globalHydrationManager.subscribe(state => {
         if (state.allHydrated) {
           clearTimeout(timeoutId);
           unsubscribe();
           resolve();
         }
       });
-      
+
       // Check if already hydrated
       if (globalHydrationManager.areAllStoresHydrated()) {
         clearTimeout(timeoutId);
@@ -396,32 +431,43 @@ export const hydrationUtils = {
       }
     });
   },
-  
+
   // Wait for specific stores to be hydrated
-  waitForStores: (storeNames: string[], timeout: number = 10000): Promise<void> => {
+  waitForStores: (
+    storeNames: string[],
+    timeout: number = 10000
+  ): Promise<void> => {
     return new Promise((resolve, reject) => {
       const timeoutId = setTimeout(() => {
-        reject(new Error(`Hydration timeout for stores: ${storeNames.join(', ')}`));
+        reject(
+          new Error(`Hydration timeout for stores: ${storeNames.join(', ')}`)
+        );
       }, timeout);
-      
-      const unsubscribe = globalHydrationManager.subscribe((state) => {
-        const targetStores = state.stores.filter(s => storeNames.includes(s.storeName));
-        const allHydrated = targetStores.length === storeNames.length && 
-                           targetStores.every(s => s.isHydrated);
-        
+
+      const unsubscribe = globalHydrationManager.subscribe(state => {
+        const targetStores = state.stores.filter(s =>
+          storeNames.includes(s.storeName)
+        );
+        const allHydrated =
+          targetStores.length === storeNames.length &&
+          targetStores.every(s => s.isHydrated);
+
         if (allHydrated) {
           clearTimeout(timeoutId);
           unsubscribe();
           resolve();
         }
       });
-      
+
       // Check if already hydrated
       const currentState = globalHydrationManager.getGlobalState();
-      const targetStores = currentState.stores.filter(s => storeNames.includes(s.storeName));
-      const allHydrated = targetStores.length === storeNames.length && 
-                         targetStores.every(s => s.isHydrated);
-      
+      const targetStores = currentState.stores.filter(s =>
+        storeNames.includes(s.storeName)
+      );
+      const allHydrated =
+        targetStores.length === storeNames.length &&
+        targetStores.every(s => s.isHydrated);
+
       if (allHydrated) {
         clearTimeout(timeoutId);
         unsubscribe();
@@ -429,14 +475,17 @@ export const hydrationUtils = {
       }
     });
   },
-  
+
   // Get hydration progress
   getProgress: (): { completed: number; total: number; percentage: number } => {
     const state = globalHydrationManager.getGlobalState();
     return {
       completed: state.hydratedCount,
       total: state.totalStores,
-      percentage: state.totalStores > 0 ? (state.hydratedCount / state.totalStores) * 100 : 100,
+      percentage:
+        state.totalStores > 0
+          ? (state.hydratedCount / state.totalStores) * 100
+          : 100,
     };
   },
 };
@@ -448,51 +497,64 @@ export const HydrationProgress: React.FC<{
   showErrors?: boolean;
 }> = ({ onComplete, showProgress = true, showErrors = true }) => {
   const hydrationState = useHydration();
-  
+
   React.useEffect(() => {
-    if (hydrationState.allHydrated && onComplete) {
+    if (
+      'allHydrated' in hydrationState &&
+      hydrationState.allHydrated &&
+      onComplete
+    ) {
       onComplete();
     }
-  }, [hydrationState.allHydrated, onComplete]);
-  
-  if (hydrationState.allHydrated) {
+  }, [
+    'allHydrated' in hydrationState ? hydrationState.allHydrated : false,
+    onComplete,
+  ]);
+
+  if ('allHydrated' in hydrationState && hydrationState.allHydrated) {
     return null;
   }
-  
+
   return (
     <div className="hydration-progress">
       {showProgress && (
         <div className="progress-bar">
           <div className="progress-text">
-            Loading application... ({hydrationState.hydratedCount}/{hydrationState.totalStores})
+            Loading application... (
+            {'hydratedCount' in hydrationState
+              ? hydrationState.hydratedCount
+              : 0}
+            /{'totalStores' in hydrationState ? hydrationState.totalStores : 1})
           </div>
           <div className="progress-track">
-            <div 
+            <div
               className="progress-fill"
-              style={{ 
-                width: `${(hydrationState.hydratedCount / hydrationState.totalStores) * 100}%` 
+              style={{
+                width: `${('hydratedCount' in hydrationState && 'totalStores' in hydrationState ? hydrationState.hydratedCount / hydrationState.totalStores : 0) * 100}%`,
               }}
             />
           </div>
         </div>
       )}
-      
-      {showErrors && hydrationState.failedCount > 0 && (
-        <div className="hydration-errors">
-          <p>Some stores failed to load:</p>
-          <ul>
-            {hydrationState.stores
-              .filter(s => s.error)
-              .map(s => (
-                <li key={s.storeName}>
-                  {s.storeName}: {s.error!.message}
-                  {s.retryCount < 3 && <span> (retrying...)</span>}
-                </li>
-              ))
-            }
-          </ul>
-        </div>
-      )}
+
+      {showErrors &&
+        'failedCount' in hydrationState &&
+        hydrationState.failedCount > 0 && (
+          <div className="hydration-errors">
+            <p>Some stores failed to load:</p>
+            <ul>
+              {'stores' in hydrationState &&
+                hydrationState.stores
+                  .filter(s => s.error)
+                  .map(s => (
+                    <li key={s.storeName}>
+                      {s.storeName}: {s.error!.message}
+                      {s.retryCount < 3 && <span> (retrying...)</span>}
+                    </li>
+                  ))}
+            </ul>
+          </div>
+        )}
     </div>
   );
 };

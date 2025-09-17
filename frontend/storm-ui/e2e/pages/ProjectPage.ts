@@ -23,7 +23,9 @@ export class ProjectPage {
     this.createProjectButton = page.getByTestId('create-project-button');
     this.projectTitleInput = page.getByTestId('project-title-input');
     this.projectTopicInput = page.getByTestId('project-topic-input');
-    this.projectDescriptionInput = page.getByTestId('project-description-input');
+    this.projectDescriptionInput = page.getByTestId(
+      'project-description-input'
+    );
     this.modelSelect = page.getByTestId('model-select');
     this.providerSelect = page.getByTestId('provider-select');
     this.apiKeyInput = page.getByTestId('api-key-input');
@@ -60,7 +62,7 @@ export class ProjectPage {
     // Fill basic info
     await this.projectTitleInput.fill(projectData.title);
     await this.projectTopicInput.fill(projectData.topic);
-    
+
     if (projectData.description) {
       await this.projectDescriptionInput.fill(projectData.description);
     }
@@ -91,7 +93,9 @@ export class ProjectPage {
     await this.saveButton.click();
 
     // Wait for project to be created
-    await expect(this.page.getByText('Project created successfully')).toBeVisible();
+    await expect(
+      this.page.getByText('Project created successfully')
+    ).toBeVisible();
   }
 
   async searchProjects(query: string) {
@@ -123,18 +127,22 @@ export class ProjectPage {
     const projectCard = await this.getProjectCard(title);
     await projectCard.getByTestId('project-menu-button').click();
     await this.page.getByRole('menuitem', { name: 'Delete' }).click();
-    
+
     // Confirm deletion
     await this.page.getByTestId('confirm-delete-button').click();
-    await expect(this.page.getByText('Project deleted successfully')).toBeVisible();
+    await expect(
+      this.page.getByText('Project deleted successfully')
+    ).toBeVisible();
   }
 
   async duplicateProject(title: string) {
     const projectCard = await this.getProjectCard(title);
     await projectCard.getByTestId('project-menu-button').click();
     await this.page.getByRole('menuitem', { name: 'Duplicate' }).click();
-    
-    await expect(this.page.getByText('Project duplicated successfully')).toBeVisible();
+
+    await expect(
+      this.page.getByText('Project duplicated successfully')
+    ).toBeVisible();
   }
 
   async getProjectCount() {

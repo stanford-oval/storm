@@ -1,7 +1,6 @@
 # FastAPI and server dependencies
-fastapi==0.104.1
+fastapi==0.109.2
 uvicorn[standard]==0.24.0
-python-multipart==0.0.6
 
 # Data processing and validation
 pydantic==2.5.0
@@ -14,9 +13,11 @@ python-dateutil==2.8.2
 aiofiles==23.2.1
 pathlib2==2.3.7.post1
 
-# Background task processing
-python-jose[cryptography]==3.3.0
+# Authentication and security
+PyJWT==2.10.1  # Secure JWT implementation (Updated to fix CVE-2024-53861)
+cryptography==44.0.1  # For JWT signing (Updated to fix OpenSSL vulnerabilities)
 passlib[bcrypt]==1.7.4
+python-multipart==0.0.18  # Updated to fix DoS vulnerability (CVE-2024-53981)
 
 # STORM dependencies (assumed to be installed separately)
 # knowledge-storm should be installed from the parent directory
@@ -26,11 +27,16 @@ passlib[bcrypt]==1.7.4
 pytest==7.4.3
 pytest-asyncio==0.21.1
 httpx==0.25.2
-black==23.11.0
+black==24.3.0  # Updated to fix ReDoS vulnerability (CVE-2024-21503)
 isort==5.12.0
 mypy==1.7.1
 
+# Type stubs for mypy
+types-requests==2.31.0.10
+types-toml==0.10.8.7
+types-pytz==2024.1.0.20240203
+
 # Additional utilities
-typing-extensions==4.8.0
+typing-extensions>=4.11,<5
 # Export functionality
-markdown2>=2.4.0  # For HTML export
+markdown2>=2.5.4  # For HTML export (Updated to fix XSS and ReDoS vulnerabilities)

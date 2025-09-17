@@ -27,7 +27,9 @@ describe('ProjectCard', () => {
   it('calls onSelect when card is clicked', () => {
     render(<ProjectCard {...defaultProps} />);
 
-    fireEvent.click(screen.getByRole('article') || screen.getByText(mockProject.title));
+    fireEvent.click(
+      screen.getByRole('article') || screen.getByText(mockProject.title)
+    );
     expect(defaultProps.onSelect).toHaveBeenCalledWith(mockProject);
   });
 
@@ -100,7 +102,9 @@ describe('ProjectCard', () => {
       status: 'writing_article',
     });
 
-    const { container } = render(<ProjectCard {...defaultProps} project={runningProject} />);
+    const { container } = render(
+      <ProjectCard {...defaultProps} project={runningProject} />
+    );
 
     // Check for the animated dot indicator
     const indicator = container.querySelector('.animate-pulse');

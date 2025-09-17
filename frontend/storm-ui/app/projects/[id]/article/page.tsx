@@ -8,23 +8,22 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useProjectStore, useUIStore } from '@/store';
+import { useProjectStore, useNotificationStore } from '@/store';
 import { GeneratedArticle } from '@/types/storm';
 import { AnimatedPage } from '@/utils/animations/AnimatedPage';
 import { ResponsiveContainer } from '@/components/ux/ResponsiveContainer';
-import { 
-  ArrowLeft, 
-  FileText, 
+import {
+  ArrowLeft,
+  FileText,
   Download,
   Share2,
-  Copy,
   Edit3,
   Eye,
   MoreHorizontal,
@@ -32,12 +31,8 @@ import {
   Quote,
   Hash,
   Clock,
-  User,
   ExternalLink,
   Printer,
-  Save,
-  Undo,
-  Redo
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -45,16 +40,11 @@ export default function ArticlePage() {
   const params = useParams();
   const router = useRouter();
   const projectId = params.id as string;
-  
-  const { 
-    currentProject, 
-    projects, 
-    loading,
-    fetchProject,
-    updateProject 
-  } = useProjectStore();
-  
-  const { addNotification } = useUIStore();
+
+  const { currentProject, projects, loading, fetchProject, updateProject } =
+    useProjectStore();
+
+  const { addNotification } = useNotificationStore();
 
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState('article');
@@ -72,37 +62,44 @@ export default function ArticlePage() {
 
   const handleSaveArticle = async (updatedArticle: GeneratedArticle) => {
     if (!project) return;
-    
+
     try {
       await updateProject(project.id, { article: updatedArticle });
       addNotification({
         type: 'success',
         title: 'Article Saved',
         message: 'Your changes have been saved successfully',
+        read: false,
+        persistent: false,
       });
     } catch (error) {
       addNotification({
         type: 'error',
         title: 'Failed to Save',
-        message: error instanceof Error ? error.message : 'Unknown error occurred',
+        message:
+          error instanceof Error ? error.message : 'Unknown error occurred',
+        read: false,
+        persistent: false,
       });
     }
   };
 
   const handleExportArticle = (format: 'markdown' | 'html' | 'pdf') => {
     if (!article) return;
-    
+
     // This would typically call an export service
     addNotification({
       type: 'info',
       title: 'Export Started',
       message: `Exporting article as ${format.toUpperCase()}...`,
+      read: false,
+      persistent: false,
     });
   };
 
   const handleShareArticle = () => {
     if (!article) return;
-    
+
     // Copy article URL to clipboard
     const url = window.location.href;
     navigator.clipboard.writeText(url).then(() => {
@@ -110,6 +107,8 @@ export default function ArticlePage() {
         type: 'success',
         title: 'Link Copied',
         message: 'Article link copied to clipboard',
+        read: false,
+        persistent: false,
       });
     });
   };
@@ -138,10 +137,10 @@ export default function ArticlePage() {
         <ResponsiveContainer className="py-6">
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
-              <FileText className="h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Project Not Found</h3>
+              <FileText className="mb-4 h-12 w-12 text-muted-foreground" />
+              <h3 className="mb-2 text-lg font-semibold">Project Not Found</h3>
               <Button onClick={() => router.push('/')}>
-                <ArrowLeft className="h-4 w-4 mr-2" />
+                <ArrowLeft className="mr-2 h-4 w-4" />
                 Back to Projects
               </Button>
             </CardContent>
@@ -155,14 +154,14 @@ export default function ArticlePage() {
     return (
       <AnimatedPage>
         <ResponsiveContainer className="py-6">
-          <div className="flex items-center justify-between mb-6">
+          <div className="mb-6 flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => router.push(`/projects/${projectId}`)}
               >
-                <ArrowLeft className="h-4 w-4 mr-2" />
+                <ArrowLeft className="mr-2 h-4 w-4" />
                 Back to Project
               </Button>
               <Separator orientation="vertical" className="h-6" />
@@ -175,13 +174,16 @@ export default function ArticlePage() {
 
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
-              <FileText className="h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No Article Available</h3>
-              <p className="text-muted-foreground text-center mb-4">
-                The article hasn't been generated yet. Run the STORM pipeline to create the article.
+              <FileText className="mb-4 h-12 w-12 text-muted-foreground" />
+              <h3 className="mb-2 text-lg font-semibold">
+                No Article Available
+              </h3>
+              <p className="mb-4 text-center text-muted-foreground">
+                The article hasn't been generated yet. Run the STORM pipeline to
+                create the article.
               </p>
               <Button onClick={() => router.push(`/projects/${projectId}`)}>
-                <ArrowLeft className="h-4 w-4 mr-2" />
+                <ArrowLeft className="mr-2 h-4 w-4" />
                 Back to Project
               </Button>
             </CardContent>
@@ -193,21 +195,23 @@ export default function ArticlePage() {
 
   return (
     <AnimatedPage>
-      <ResponsiveContainer className="py-6 space-y-6">
+      <ResponsiveContainer className="space-y-6 py-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <Button 
-              variant="ghost" 
-              size="sm" 
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => router.push(`/projects/${projectId}`)}
             >
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Project
             </Button>
             <Separator orientation="vertical" className="h-6" />
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">{article.title}</h1>
+              <h1 className="text-3xl font-bold tracking-tight">
+                {article.title}
+              </h1>
               <p className="text-muted-foreground">{project.title}</p>
             </div>
           </div>
@@ -215,18 +219,18 @@ export default function ArticlePage() {
           <div className="flex items-center space-x-2">
             {/* View Mode Toggle */}
             <Button
-              variant={isEditing ? "outline" : "default"}
+              variant={isEditing ? 'outline' : 'default'}
               size="sm"
               onClick={() => setIsEditing(!isEditing)}
             >
               {isEditing ? (
                 <>
-                  <Eye className="h-4 w-4 mr-2" />
+                  <Eye className="mr-2 h-4 w-4" />
                   Preview
                 </>
               ) : (
                 <>
-                  <Edit3 className="h-4 w-4 mr-2" />
+                  <Edit3 className="mr-2 h-4 w-4" />
                   Edit
                 </>
               )}
@@ -241,24 +245,26 @@ export default function ArticlePage() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={handleShareArticle}>
-                  <Share2 className="h-4 w-4 mr-2" />
+                  <Share2 className="mr-2 h-4 w-4" />
                   Share Article
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={handlePrintArticle}>
-                  <Printer className="h-4 w-4 mr-2" />
+                  <Printer className="mr-2 h-4 w-4" />
                   Print
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => handleExportArticle('markdown')}>
-                  <Download className="h-4 w-4 mr-2" />
+                <DropdownMenuItem
+                  onClick={() => handleExportArticle('markdown')}
+                >
+                  <Download className="mr-2 h-4 w-4" />
                   Export as Markdown
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleExportArticle('html')}>
-                  <Download className="h-4 w-4 mr-2" />
+                  <Download className="mr-2 h-4 w-4" />
                   Export as HTML
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleExportArticle('pdf')}>
-                  <Download className="h-4 w-4 mr-2" />
+                  <Download className="mr-2 h-4 w-4" />
                   Export as PDF
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -273,33 +279,48 @@ export default function ArticlePage() {
               <div className="flex items-center space-x-6">
                 <div className="flex items-center space-x-2">
                   <Hash className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">{article.wordCount} words</span>
+                  <span className="text-sm font-medium">
+                    {article.wordCount} words
+                  </span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <BookOpen className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">{article.sections.length} sections</span>
+                  <span className="text-sm font-medium">
+                    {article.sections.length} sections
+                  </span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Quote className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">{article.citations.length} citations</span>
+                  <span className="text-sm font-medium">
+                    {article.citations.length} citations
+                  </span>
                 </div>
               </div>
               <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                 <Clock className="h-4 w-4" />
-                <span>Last modified {new Date(article.lastModified).toLocaleDateString()}</span>
+                <span>
+                  Last modified{' '}
+                  {new Date(article.lastModified).toLocaleDateString()}
+                </span>
               </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
           {/* Article Content */}
-          <div className={cn(
-            "space-y-4",
-            showOutline ? "lg:col-span-3" : "lg:col-span-4"
-          )}>
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+          <div
+            className={cn(
+              'space-y-4',
+              showOutline ? 'lg:col-span-3' : 'lg:col-span-4'
+            )}
+          >
+            <Tabs
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="space-y-4"
+            >
               <TabsList>
                 <TabsTrigger value="article">Article</TabsTrigger>
                 <TabsTrigger value="summary">Summary</TabsTrigger>
@@ -332,7 +353,7 @@ export default function ArticlePage() {
                         <p>{article.summary}</p>
                       </div>
                     ) : (
-                      <p className="text-muted-foreground italic">
+                      <p className="italic text-muted-foreground">
                         No summary available for this article.
                       </p>
                     )}
@@ -343,24 +364,32 @@ export default function ArticlePage() {
               <TabsContent value="citations" className="space-y-4">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Citations ({article.citations.length})</CardTitle>
+                    <CardTitle>
+                      Citations ({article.citations.length})
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     {article.citations.length > 0 ? (
                       <div className="space-y-3">
                         {article.citations.map((citation, index) => (
-                          <div key={citation.id} className="p-3 border rounded-lg">
+                          <div
+                            key={citation.id}
+                            className="rounded-lg border p-3"
+                          >
                             <div className="flex items-start justify-between">
                               <div className="flex-1">
-                                <p className="font-medium text-sm">
+                                <p className="text-sm font-medium">
                                   [{index + 1}] {citation.text}
                                 </p>
-                                <div className="flex items-center space-x-2 mt-2">
+                                <div className="mt-2 flex items-center space-x-2">
                                   <Badge variant="outline" className="text-xs">
                                     {citation.url}
                                   </Badge>
                                   {citation.page && (
-                                    <Badge variant="secondary" className="text-xs">
+                                    <Badge
+                                      variant="secondary"
+                                      className="text-xs"
+                                    >
                                       Page {citation.page}
                                     </Badge>
                                   )}
@@ -369,7 +398,9 @@ export default function ArticlePage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => window.open(citation.url, '_blank')}
+                                onClick={() =>
+                                  window.open(citation.url, '_blank')
+                                }
                               >
                                 <ExternalLink className="h-4 w-4" />
                               </Button>
@@ -378,7 +409,7 @@ export default function ArticlePage() {
                         ))}
                       </div>
                     ) : (
-                      <p className="text-muted-foreground italic">
+                      <p className="italic text-muted-foreground">
                         No citations found for this article.
                       </p>
                     )}
@@ -405,16 +436,18 @@ export default function ArticlePage() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  {article.sections.map((section) => (
+                  {article.sections.map(section => (
                     <div
                       key={section.id}
                       className={cn(
-                        "text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground rounded px-2 py-1 transition-colors",
+                        'cursor-pointer rounded px-2 py-1 text-sm transition-colors hover:bg-accent hover:text-accent-foreground',
                         `ml-${Math.min(section.level - 1, 4) * 2}`
                       )}
                       onClick={() => {
                         // Scroll to section
-                        const element = document.getElementById(`section-${section.id}`);
+                        const element = document.getElementById(
+                          `section-${section.id}`
+                        );
                         if (element) {
                           element.scrollIntoView({ behavior: 'smooth' });
                         }
@@ -438,7 +471,7 @@ export default function ArticlePage() {
             size="sm"
             onClick={() => setShowOutline(true)}
           >
-            <BookOpen className="h-4 w-4 mr-2" />
+            <BookOpen className="mr-2 h-4 w-4" />
             Outline
           </Button>
         )}

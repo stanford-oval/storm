@@ -22,7 +22,8 @@ const mockResearchData: ResearchData = {
         {
           id: 'turn-2',
           speaker: 'assistant',
-          content: 'Artificial intelligence encompasses machine learning, natural language processing, computer vision, and robotics.',
+          content:
+            'Artificial intelligence encompasses machine learning, natural language processing, computer vision, and robotics.',
           timestamp: new Date('2024-01-01T10:01:00'),
         },
         {
@@ -51,7 +52,8 @@ const mockResearchData: ResearchData = {
         {
           id: 'turn-5',
           speaker: 'assistant',
-          content: 'AI is widely used in automation, customer service, predictive analytics, and decision support systems.',
+          content:
+            'AI is widely used in automation, customer service, predictive analytics, and decision support systems.',
           timestamp: new Date('2024-01-01T10:11:00'),
         },
       ],
@@ -79,7 +81,8 @@ const mockResearchData: ResearchData = {
       id: 'source-1',
       title: 'Introduction to Machine Learning',
       url: 'https://example.com/ml-intro',
-      snippet: 'Machine learning is a subset of artificial intelligence that enables computers to learn and make decisions from data.',
+      snippet:
+        'Machine learning is a subset of artificial intelligence that enables computers to learn and make decisions from data.',
       retrievedAt: new Date('2024-01-01T09:30:00'),
       relevanceScore: 0.95,
       usedInSections: ['section-1'],
@@ -88,7 +91,8 @@ const mockResearchData: ResearchData = {
       id: 'source-2',
       title: 'AI Ethics and Society',
       url: 'https://example.com/ai-ethics',
-      snippet: 'The ethical implications of AI development include privacy, bias, and job displacement concerns.',
+      snippet:
+        'The ethical implications of AI development include privacy, bias, and job displacement concerns.',
       retrievedAt: new Date('2024-01-01T09:32:00'),
       relevanceScore: 0.87,
     },
@@ -96,7 +100,8 @@ const mockResearchData: ResearchData = {
       id: 'source-3',
       title: 'Deep Learning Techniques',
       url: 'https://example.com/deep-learning',
-      snippet: 'Neural networks and deep learning have revolutionized pattern recognition and data analysis.',
+      snippet:
+        'Neural networks and deep learning have revolutionized pattern recognition and data analysis.',
       retrievedAt: new Date('2024-01-01T09:35:00'),
       relevanceScore: 0.92,
       usedInSections: ['section-2'],
@@ -105,7 +110,8 @@ const mockResearchData: ResearchData = {
       id: 'source-4',
       title: 'AI in Business Applications',
       url: 'https://example.com/ai-business',
-      snippet: 'Companies are leveraging AI for automation, customer insights, and operational efficiency.',
+      snippet:
+        'Companies are leveraging AI for automation, customer insights, and operational efficiency.',
       retrievedAt: new Date('2024-01-01T09:40:00'),
       relevanceScore: 0.89,
     },
@@ -165,7 +171,9 @@ describe('ResearchView', () => {
         />
       );
 
-      expect(screen.getByLabelText(/filter by perspective/i)).toBeInTheDocument();
+      expect(
+        screen.getByLabelText(/filter by perspective/i)
+      ).toBeInTheDocument();
       expect(screen.getByLabelText(/filter by status/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/search sources/i)).toBeInTheDocument();
     });
@@ -180,8 +188,12 @@ describe('ResearchView', () => {
         />
       );
 
-      expect(screen.queryByLabelText(/filter by perspective/i)).not.toBeInTheDocument();
-      expect(screen.queryByLabelText(/filter by status/i)).not.toBeInTheDocument();
+      expect(
+        screen.queryByLabelText(/filter by perspective/i)
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByLabelText(/filter by status/i)
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -243,13 +255,21 @@ describe('ResearchView', () => {
         />
       );
 
-      const academicResearcherConv = screen.getByText('Academic Researcher').closest('[data-testid="conversation-card"]');
-      const expandButton = within(academicResearcherConv!).getByRole('button', { name: /expand/i });
-      
+      const academicResearcherConv = screen
+        .getByText('Academic Researcher')
+        .closest('[data-testid="conversation-card"]');
+      const expandButton = within(academicResearcherConv!).getByRole('button', {
+        name: /expand/i,
+      });
+
       await user.click(expandButton);
 
-      expect(screen.getByText('What are the key aspects of artificial intelligence?')).toBeInTheDocument();
-      expect(screen.getByText(/Artificial intelligence encompasses machine learning/)).toBeInTheDocument();
+      expect(
+        screen.getByText('What are the key aspects of artificial intelligence?')
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/Artificial intelligence encompasses machine learning/)
+      ).toBeInTheDocument();
     });
 
     it('calls onConversationSelect when conversation is clicked', async () => {
@@ -261,10 +281,14 @@ describe('ResearchView', () => {
         />
       );
 
-      const conversationCard = screen.getByText('Academic Researcher').closest('[data-testid="conversation-card"]');
+      const conversationCard = screen
+        .getByText('Academic Researcher')
+        .closest('[data-testid="conversation-card"]');
       await user.click(conversationCard!);
 
-      expect(mockOnConversationSelect).toHaveBeenCalledWith(mockResearchData.conversations[0]);
+      expect(mockOnConversationSelect).toHaveBeenCalledWith(
+        mockResearchData.conversations[0]
+      );
     });
   });
 
@@ -278,10 +302,14 @@ describe('ResearchView', () => {
         />
       );
 
-      expect(screen.getByText('Introduction to Machine Learning')).toBeInTheDocument();
+      expect(
+        screen.getByText('Introduction to Machine Learning')
+      ).toBeInTheDocument();
       expect(screen.getByText('AI Ethics and Society')).toBeInTheDocument();
       expect(screen.getByText('Deep Learning Techniques')).toBeInTheDocument();
-      expect(screen.getByText('AI in Business Applications')).toBeInTheDocument();
+      expect(
+        screen.getByText('AI in Business Applications')
+      ).toBeInTheDocument();
     });
 
     it('displays source metadata', () => {
@@ -308,8 +336,14 @@ describe('ResearchView', () => {
         />
       );
 
-      expect(screen.getByText(/Machine learning is a subset of artificial intelligence/)).toBeInTheDocument();
-      expect(screen.getByText(/The ethical implications of AI development/)).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          /Machine learning is a subset of artificial intelligence/
+        )
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/The ethical implications of AI development/)
+      ).toBeInTheDocument();
     });
 
     it('calls onSourceSelect when source is clicked', async () => {
@@ -321,10 +355,14 @@ describe('ResearchView', () => {
         />
       );
 
-      const sourceCard = screen.getByText('Introduction to Machine Learning').closest('[data-testid="source-card"]');
+      const sourceCard = screen
+        .getByText('Introduction to Machine Learning')
+        .closest('[data-testid="source-card"]');
       await user.click(sourceCard!);
 
-      expect(mockOnSourceSelect).toHaveBeenCalledWith(mockResearchData.sources[0]);
+      expect(mockOnSourceSelect).toHaveBeenCalledWith(
+        mockResearchData.sources[0]
+      );
     });
 
     it('opens source URLs in new tab', () => {
@@ -336,8 +374,13 @@ describe('ResearchView', () => {
         />
       );
 
-      const sourceLink = screen.getByText('Introduction to Machine Learning').closest('a');
-      expect(sourceLink).toHaveAttribute('href', 'https://example.com/ml-intro');
+      const sourceLink = screen
+        .getByText('Introduction to Machine Learning')
+        .closest('a');
+      expect(sourceLink).toHaveAttribute(
+        'href',
+        'https://example.com/ml-intro'
+      );
       expect(sourceLink).toHaveAttribute('target', '_blank');
       expect(sourceLink).toHaveAttribute('rel', 'noopener noreferrer');
     });
@@ -380,8 +423,12 @@ describe('ResearchView', () => {
       await user.type(searchInput, 'machine learning');
 
       // Should show only sources containing "machine learning"
-      expect(screen.getByText('Introduction to Machine Learning')).toBeInTheDocument();
-      expect(screen.queryByText('AI Ethics and Society')).not.toBeInTheDocument();
+      expect(
+        screen.getByText('Introduction to Machine Learning')
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByText('AI Ethics and Society')
+      ).not.toBeInTheDocument();
     });
 
     it('combines multiple filters', async () => {
@@ -401,7 +448,9 @@ describe('ResearchView', () => {
       const perspectiveFilter = screen.getByLabelText(/filter by perspective/i);
       await user.selectOptions(perspectiveFilter, 'Academic Researcher');
 
-      const clearFiltersButton = screen.getByRole('button', { name: /clear filters/i });
+      const clearFiltersButton = screen.getByRole('button', {
+        name: /clear filters/i,
+      });
       await user.click(clearFiltersButton);
 
       // Should show all conversations again
@@ -426,7 +475,9 @@ describe('ResearchView', () => {
       await user.selectOptions(sortSelect, 'relevance');
 
       const sourceTitles = screen.getAllByTestId('source-title');
-      expect(sourceTitles[0]).toHaveTextContent('Introduction to Machine Learning'); // 95%
+      expect(sourceTitles[0]).toHaveTextContent(
+        'Introduction to Machine Learning'
+      ); // 95%
       expect(sourceTitles[1]).toHaveTextContent('Deep Learning Techniques'); // 92%
       expect(sourceTitles[2]).toHaveTextContent('AI in Business Applications'); // 89%
       expect(sourceTitles[3]).toHaveTextContent('AI Ethics and Society'); // 87%
@@ -462,7 +513,9 @@ describe('ResearchView', () => {
       const sortSelect = screen.getByLabelText(/sort conversations/i);
       await user.selectOptions(sortSelect, 'time');
 
-      const conversationTitles = screen.getAllByTestId('conversation-perspective');
+      const conversationTitles = screen.getAllByTestId(
+        'conversation-perspective'
+      );
       expect(conversationTitles[0]).toHaveTextContent('Technology Critic'); // Latest
       expect(conversationTitles[1]).toHaveTextContent('Industry Expert');
       expect(conversationTitles[2]).toHaveTextContent('Academic Researcher'); // Earliest
@@ -483,7 +536,9 @@ describe('ResearchView', () => {
         />
       );
 
-      const exportButton = screen.getByRole('button', { name: /export research/i });
+      const exportButton = screen.getByRole('button', {
+        name: /export research/i,
+      });
       await user.click(exportButton);
 
       expect(global.URL.createObjectURL).toHaveBeenCalled();
@@ -498,10 +553,14 @@ describe('ResearchView', () => {
         />
       );
 
-      const exportDropdown = screen.getByRole('button', { name: /export options/i });
+      const exportDropdown = screen.getByRole('button', {
+        name: /export options/i,
+      });
       await user.click(exportDropdown);
 
-      const exportCsvButton = screen.getByRole('button', { name: /export sources as csv/i });
+      const exportCsvButton = screen.getByRole('button', {
+        name: /export sources as csv/i,
+      });
       await user.click(exportCsvButton);
 
       expect(global.URL.createObjectURL).toHaveBeenCalled();
@@ -533,7 +592,9 @@ describe('ResearchView', () => {
         />
       );
 
-      const timelineViewButton = screen.getByRole('button', { name: /timeline view/i });
+      const timelineViewButton = screen.getByRole('button', {
+        name: /timeline view/i,
+      });
       await user.click(timelineViewButton);
 
       expect(screen.getByTestId('research-timeline')).toBeInTheDocument();
@@ -565,7 +626,7 @@ describe('ResearchView', () => {
       const endTime = performance.now();
 
       expect(endTime - startTime).toBeLessThan(1000);
-      
+
       // Should not render all 1000 sources in DOM at once
       const sourceCards = screen.getAllByTestId('source-card');
       expect(sourceCards.length).toBeLessThan(50);
@@ -616,7 +677,9 @@ describe('ResearchView', () => {
         />
       );
 
-      expect(screen.getByText(/error loading conversation/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/error loading conversation/i)
+      ).toBeInTheDocument();
     });
   });
 
@@ -642,8 +705,12 @@ describe('ResearchView', () => {
         />
       );
 
-      expect(screen.getByRole('region', { name: /conversations/i })).toBeInTheDocument();
-      expect(screen.getByRole('region', { name: /sources/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('region', { name: /conversations/i })
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('region', { name: /sources/i })
+      ).toBeInTheDocument();
       expect(screen.getByRole('tablist')).toBeInTheDocument();
     });
 
@@ -674,11 +741,15 @@ describe('ResearchView', () => {
         />
       );
 
-      const firstConversation = screen.getByText('Academic Researcher').closest('[data-testid="conversation-card"]');
+      const firstConversation = screen
+        .getByText('Academic Researcher')
+        .closest('[data-testid="conversation-card"]');
       firstConversation?.focus();
 
       await user.keyboard('{ArrowDown}');
-      const secondConversation = screen.getByText('Industry Expert').closest('[data-testid="conversation-card"]');
+      const secondConversation = screen
+        .getByText('Industry Expert')
+        .closest('[data-testid="conversation-card"]');
       expect(secondConversation).toHaveFocus();
     });
 
@@ -691,11 +762,15 @@ describe('ResearchView', () => {
         />
       );
 
-      const firstConversation = screen.getByText('Academic Researcher').closest('[data-testid="conversation-card"]');
+      const firstConversation = screen
+        .getByText('Academic Researcher')
+        .closest('[data-testid="conversation-card"]');
       firstConversation?.focus();
 
       await user.keyboard('{Enter}');
-      expect(mockOnConversationSelect).toHaveBeenCalledWith(mockResearchData.conversations[0]);
+      expect(mockOnConversationSelect).toHaveBeenCalledWith(
+        mockResearchData.conversations[0]
+      );
     });
   });
 });

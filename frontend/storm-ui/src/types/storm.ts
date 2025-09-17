@@ -7,29 +7,34 @@ export interface StormProject {
   status: ProjectStatus;
   createdAt: Date;
   updatedAt: Date;
-  config?: StormConfig;  // Made optional since some projects may not have config
+  config?: StormConfig; // Made optional since some projects may not have config
   outputDir?: string;
   progress?: PipelineProgress;
-  content?: string;  // The raw article content from backend
-  word_count?: number;  // Word count from backend
+  content?: string; // The raw article content from backend
+  word_count?: number; // Word count from backend
   article?: GeneratedArticle;
   outline?: ArticleOutline;
   research?: ResearchData;
   current_stage?: string;
   pipeline_status?: string;
+  metadata?: {
+    duration?: number;
+    [key: string]: unknown;
+  };
+  error?: string; // Error message if pipeline failed
 }
 
-export type ProjectStatus = 
-  | 'draft' 
-  | 'researching' 
-  | 'generating_outline' 
-  | 'writing_article' 
-  | 'polishing' 
-  | 'completed' 
+export type ProjectStatus =
+  | 'draft'
+  | 'researching'
+  | 'generating_outline'
+  | 'writing_article'
+  | 'polishing'
+  | 'completed'
   | 'failed';
 
 export interface StormConfig {
-  llm: {
+  llm?: {
     model: string;
     provider: 'openai' | 'anthropic' | 'azure' | 'gemini' | 'ollama' | 'groq';
     apiKey?: string;
@@ -37,19 +42,41 @@ export interface StormConfig {
     temperature?: number;
     maxTokens?: number;
   };
-  retriever: {
-    type: 'google' | 'bing' | 'you' | 'duckduckgo' | 'tavily' | 'serper' | 'brave' | 'vector';
+  retriever?: {
+    type:
+      | 'google'
+      | 'bing'
+      | 'you'
+      | 'duckduckgo'
+      | 'tavily'
+      | 'serper'
+      | 'brave'
+      | 'vector';
     apiKey?: string;
     maxResults?: number;
+    topK?: number;
   };
-  pipeline: {
+  pipeline?: {
     doResearch: boolean;
     doGenerateOutline: boolean;
     doGenerateArticle: boolean;
     doPolishArticle: boolean;
     maxConvTurns?: number;
     maxPerspectives?: number;
+    maxSearchQueriesPerTurn?: number;
   };
+  // Legacy backend properties (for backward compatibility)
+  llm_provider?: string;
+  llm_model?: string;
+  retriever_type?: string;
+  max_perspective?: number;
+  max_conv_turn?: number;
+  max_search_queries_per_turn?: number;
+  temperature?: number;
+  max_tokens?: number;
+  max_search_results?: number;
+  search_top_k?: number;
+  [key: string]: any; // Allow other unknown properties from backend
 }
 
 export interface PipelineProgress {
@@ -62,7 +89,7 @@ export interface PipelineProgress {
   errors?: PipelineError[];
 }
 
-export type PipelineStage = 
+export type PipelineStage =
   | 'initializing'
   | 'research'
   | 'outline_generation'

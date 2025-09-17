@@ -18,7 +18,7 @@ interface DevtoolsConnection {
 // Check if devtools extension is available
 const getDevtoolsExtension = (): DevtoolsExtension | null => {
   if (typeof window === 'undefined') return null;
-  
+
   // Check for Redux DevTools Extension
   return (
     (window as any).__REDUX_DEVTOOLS_EXTENSION__ ||
@@ -39,7 +39,7 @@ export const devtools = <T>(
   options: Partial<DevtoolsOptions> = {}
 ) => {
   const opts = { ...defaultOptions, ...options };
-  
+
   // Skip if devtools disabled or not available
   if (!opts.enabled) {
     return config;
@@ -57,24 +57,25 @@ export const devtools = <T>(
     const store = config(
       (args: any, replace?: boolean, actionName?: string) => {
         const nextState = typeof args === 'function' ? args(get()) : args;
-        
+
         if (!isRecording) {
           set(nextState, replace);
           return;
         }
 
         // Determine action name
-        let action = { type: actionName || 'setState' };
-        
+        const action = { type: actionName || 'setState' };
+
         if (typeof args === 'function') {
           // Try to extract function name
           const functionName = args.name || 'anonymous';
-          action.type = functionName !== 'anonymous' ? functionName : 'updateState';
+          action.type =
+            functionName !== 'anonymous' ? functionName : 'updateState';
         }
 
         // Apply sanitizers
-        const sanitizedAction = opts.actionSanitizer 
-          ? opts.actionSanitizer(action) 
+        const sanitizedAction = opts.actionSanitizer
+          ? opts.actionSanitizer(action)
           : action;
 
         const currentState = get();
@@ -83,10 +84,10 @@ export const devtools = <T>(
 
         // Send to devtools
         if (connection) {
-          const sanitizedState = opts.stateSanitizer 
-            ? opts.stateSanitizer(newState) 
+          const sanitizedState = opts.stateSanitizer
+            ? opts.stateSanitizer(newState)
             : newState;
-          
+
           connection.send(sanitizedAction, sanitizedState);
         }
       },
@@ -104,10 +105,10 @@ export const devtools = <T>(
       });
 
       // Initialize devtools with current state
-      const initialState = opts.stateSanitizer 
-        ? opts.stateSanitizer(store) 
+      const initialState = opts.stateSanitizer
+        ? opts.stateSanitizer(store)
         : store;
-      
+
       connection.init(initialState);
 
       // Subscribe to devtools messages
@@ -120,19 +121,19 @@ export const devtools = <T>(
               set(store, true);
               isRecording = true;
               break;
-              
+
             case 'COMMIT':
               // Commit current state as new initial state
               connection.init(get());
               break;
-              
+
             case 'ROLLBACK':
               // Rollback to last committed state
               isRecording = false;
               set(store, true);
               isRecording = true;
               break;
-              
+
             case 'JUMP_TO_STATE':
             case 'JUMP_TO_ACTION':
               // Time travel to specific state
@@ -142,13 +143,14 @@ export const devtools = <T>(
                 isRecording = true;
               }
               break;
-              
+
             case 'IMPORT_STATE':
               // Import state from JSON
               if (message.payload.nextLiftedState) {
                 const { computedStates } = message.payload.nextLiftedState;
-                const lastComputedState = computedStates[computedStates.length - 1];
-                
+                const lastComputedState =
+                  computedStates[computedStates.length - 1];
+
                 isRecording = false;
                 set(lastComputedState.state, true);
                 isRecording = true;
@@ -177,9 +179,8 @@ export const devtools = <T>(
             connection = extension.connect({ name: opts.name });
             connection.init(get());
           }
-        }
+        },
       };
-
     } catch (error) {
       console.warn('Failed to connect to Redux DevTools:', error);
     }
@@ -189,8 +190,14 @@ export const devtools = <T>(
 };
 
 // Utility to create action creators with devtools integration
-export const createActions = <T, A extends Record<string, (...args: any[]) => void>>(
-  actions: (set: (fn: (state: T) => void, actionName?: string) => void, get: () => T) => A
+export const createActions = <
+  T,
+  A extends Record<string, (...args: any[]) => void>,
+>(
+  actions: (
+    set: (fn: (state: T) => void, actionName?: string) => void,
+    get: () => T
+  ) => A
 ) => {
   return (set: any, get: any) => {
     const wrappedSet = (fn: (state: T) => void, actionName?: string) => {
@@ -198,16 +205,16 @@ export const createActions = <T, A extends Record<string, (...args: any[]) => vo
       const namedFunction = function namedUpdate(state: T) {
         return fn(state);
       };
-      
+
       // Set the function name for better devtools display
       Object.defineProperty(namedFunction, 'name', {
         value: actionName || fn.name || 'update',
-        configurable: true
+        configurable: true,
       });
-      
+
       return set(namedFunction, false, actionName || fn.name);
     };
-    
+
     return actions(wrappedSet, get);
   };
 };
@@ -227,7 +234,10 @@ export const logActions = <T>(
         const nextState = get();
 
         // Log the action
-        console.group(`%c Action: ${actionName || 'setState'}`, 'color: #03A9F4; font-weight: bold');
+        console.group(
+          `%c Action: ${actionName || 'setState'}`,
+          'color: #03A9F4; font-weight: bold'
+        );
         console.log('%c Previous State:', 'color: #9E9E9E', prevState);
         console.log('%c Action:', 'color: #00BCD4', args);
         console.log('%c Next State:', 'color: #4CAF50', nextState);

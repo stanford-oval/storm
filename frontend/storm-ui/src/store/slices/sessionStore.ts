@@ -1,6 +1,18 @@
 // Co-STORM session store slice
 import { create } from 'zustand';
-import { SessionState, CoStormSession, Participant, DiscourseTurn, MindMapNode, TurnPolicy, SessionSettings, WebSocketConnection, ModeratorState, KnowledgeItem, Reaction } from '../types';
+import {
+  SessionState,
+  CoStormSession,
+  Participant,
+  DiscourseTurn,
+  MindMapNode,
+  TurnPolicy,
+  SessionSettings,
+  WebSocketConnection,
+  ModeratorState,
+  KnowledgeItem,
+  Reaction,
+} from '../types';
 import { persist, createPartialize } from '../middleware/persist';
 import { devtools } from '../middleware/devtools';
 import { immer } from '../middleware/immer';
@@ -34,79 +46,109 @@ const initialState: SessionState = {
 interface SessionActions {
   // Session lifecycle
   createSession: (sessionData: Partial<CoStormSession>) => Promise<string>;
-  joinSession: (sessionId: string, participant: Omit<Participant, 'id'>) => Promise<void>;
+  joinSession: (
+    sessionId: string,
+    participant: Omit<Participant, 'id'>
+  ) => Promise<void>;
   leaveSession: (sessionId: string, participantId?: string) => Promise<void>;
   endSession: (sessionId: string) => Promise<void>;
   pauseSession: (sessionId: string) => Promise<void>;
   resumeSession: (sessionId: string) => Promise<void>;
-  
+
   // Session management
   loadSession: (sessionId: string) => Promise<void>;
   loadSessions: () => Promise<void>;
-  updateSession: (sessionId: string, updates: Partial<CoStormSession>) => Promise<void>;
+  updateSession: (
+    sessionId: string,
+    updates: Partial<CoStormSession>
+  ) => Promise<void>;
   deleteSession: (sessionId: string) => Promise<void>;
   duplicateSession: (sessionId: string, newTitle: string) => Promise<string>;
   archiveSession: (sessionId: string) => Promise<void>;
-  
+
   // Participant management
   addParticipant: (participant: Omit<Participant, 'id'>) => Promise<void>;
-  updateParticipant: (participantId: string, updates: Partial<Participant>) => Promise<void>;
+  updateParticipant: (
+    participantId: string,
+    updates: Partial<Participant>
+  ) => Promise<void>;
   removeParticipant: (participantId: string) => Promise<void>;
   setParticipantStatus: (participantId: string, isActive: boolean) => void;
   assignExpertise: (participantId: string, expertise: string[]) => void;
-  
+
   // Discourse management
-  addDiscourseTurn: (turn: Omit<DiscourseTurn, 'id' | 'timestamp'>) => Promise<void>;
-  updateDiscourseTurn: (turnId: string, updates: Partial<DiscourseTurn>) => void;
+  addDiscourseTurn: (
+    turn: Omit<DiscourseTurn, 'id' | 'timestamp'>
+  ) => Promise<void>;
+  updateDiscourseTurn: (
+    turnId: string,
+    updates: Partial<DiscourseTurn>
+  ) => void;
   removeDiscourseTurn: (turnId: string) => void;
   addReaction: (turnId: string, reaction: Omit<Reaction, 'timestamp'>) => void;
-  removeReaction: (turnId: string, reactionType: Reaction['type'], participantId: string) => void;
-  
+  removeReaction: (
+    turnId: string,
+    reactionType: Reaction['type'],
+    participantId: string
+  ) => void;
+
   // Mind map management
   addMindMapNode: (node: Omit<MindMapNode, 'id'>) => void;
   updateMindMapNode: (nodeId: string, updates: Partial<MindMapNode>) => void;
   removeMindMapNode: (nodeId: string) => void;
   connectMindMapNodes: (nodeId1: string, nodeId2: string) => void;
   disconnectMindMapNodes: (nodeId1: string, nodeId2: string) => void;
-  repositionMindMapNode: (nodeId: string, position: { x: number; y: number }) => void;
-  
+  repositionMindMapNode: (
+    nodeId: string,
+    position: { x: number; y: number }
+  ) => void;
+
   // Knowledge base management
   addKnowledgeItem: (item: Omit<KnowledgeItem, 'id' | 'createdAt'>) => void;
-  updateKnowledgeItem: (itemId: string, updates: Partial<KnowledgeItem>) => void;
+  updateKnowledgeItem: (
+    itemId: string,
+    updates: Partial<KnowledgeItem>
+  ) => void;
   removeKnowledgeItem: (itemId: string) => void;
   validateKnowledgeItem: (itemId: string, validatorId: string) => void;
   searchKnowledgeBase: (query: string) => KnowledgeItem[];
-  
+
   // Turn policy and moderation
   updateTurnPolicy: (policy: Partial<TurnPolicy>) => void;
   updateModerator: (updates: Partial<ModeratorState>) => void;
   requestTurn: (participantId: string) => void;
   grantTurn: (participantId: string) => void;
   skipTurn: (participantId: string) => void;
-  moderateContent: (turnId: string, action: 'approve' | 'reject' | 'edit') => void;
-  
+  moderateContent: (
+    turnId: string,
+    action: 'approve' | 'reject' | 'edit'
+  ) => void;
+
   // Session settings
   updateSessionSettings: (settings: Partial<SessionSettings>) => void;
   enableAutoSave: (interval?: number) => void;
   disableAutoSave: () => void;
   saveSession: () => Promise<void>;
-  
+
   // WebSocket connection management
   connectWebSocket: (sessionId: string) => Promise<void>;
   disconnectWebSocket: () => void;
   handleWebSocketMessage: (message: any) => void;
   sendWebSocketMessage: (type: string, payload: any) => void;
-  
+
   // Analytics and insights
   getSessionAnalytics: (sessionId?: string) => SessionAnalytics;
   getParticipantAnalytics: (participantId: string) => ParticipantAnalytics;
   getDiscourseAnalytics: (sessionId?: string) => DiscourseAnalytics;
-  
+
   // Export functionality
-  exportSession: (sessionId: string, format: 'json' | 'txt' | 'pdf') => Promise<string>;
+  exportSession: (
+    sessionId: string,
+    format: 'json' | 'txt' | 'pdf'
+  ) => Promise<string>;
   exportMindMap: (format: 'json' | 'svg' | 'png') => string;
   exportKnowledgeBase: (format: 'json' | 'csv') => string;
-  
+
   // State management
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
@@ -140,7 +182,10 @@ interface DiscourseAnalytics {
   totalTurns: number;
   turnsByType: Record<DiscourseTurn['type'], number>;
   averageTurnLength: number;
-  mostActiveParticipants: Array<{ participant: Participant; turnCount: number }>;
+  mostActiveParticipants: Array<{
+    participant: Participant;
+    turnCount: number;
+  }>;
   topicEvolution: Array<{ topic: string; timestamp: Date }>;
   consensusLevel: number;
 }
@@ -162,11 +207,11 @@ export const useSessionStore = create<SessionStore>()(
           ...initialState,
 
           // Session lifecycle
-          createSession: async (sessionData) => {
-            set((draft) => {
+          createSession: async sessionData => {
+            set(draft => {
               draft.loading = true;
               draft.error = null;
-            }, 'createSession:start');
+            });
 
             try {
               const response = await fetch('/api/sessions', {
@@ -195,22 +240,25 @@ export const useSessionStore = create<SessionStore>()(
 
               const newSession: CoStormSession = await response.json();
 
-              set((draft) => {
+              set(draft => {
                 draft.sessions.unshift(newSession);
                 draft.currentSession = newSession;
                 draft.loading = false;
                 draft.lastUpdated = new Date();
-              }, 'createSession:success');
+              });
 
               // Connect to WebSocket for real-time updates
               await get().connectWebSocket(newSession.id);
 
               return newSession.id;
             } catch (error) {
-              set((draft) => {
-                draft.error = error instanceof Error ? error.message : 'Failed to create session';
+              set(draft => {
+                draft.error =
+                  error instanceof Error
+                    ? error.message
+                    : 'Failed to create session';
                 draft.loading = false;
-              }, 'createSession:error');
+              });
               throw error;
             }
           },
@@ -229,26 +277,33 @@ export const useSessionStore = create<SessionStore>()(
 
               const updatedSession: CoStormSession = await response.json();
 
-              set((draft) => {
-                const sessionIndex = draft.sessions.findIndex(s => s.id === sessionId);
+              set(draft => {
+                const sessionIndex = draft.sessions.findIndex(
+                  s => s.id === sessionId
+                );
                 if (sessionIndex !== -1) {
                   draft.sessions[sessionIndex] = updatedSession;
                 }
                 if (draft.currentSession?.id === sessionId) {
                   draft.currentSession = updatedSession;
                 }
-                draft.activeParticipants = updatedSession.participants.filter(p => p.isActive);
+                draft.activeParticipants = updatedSession.participants.filter(
+                  p => p.isActive
+                );
                 draft.lastUpdated = new Date();
-              }, 'joinSession:success');
+              });
 
               // Connect to WebSocket if not already connected
               if (!websocket || websocket.readyState !== WebSocket.OPEN) {
                 await get().connectWebSocket(sessionId);
               }
             } catch (error) {
-              set((draft) => {
-                draft.error = error instanceof Error ? error.message : 'Failed to join session';
-              }, 'joinSession:error');
+              set(draft => {
+                draft.error =
+                  error instanceof Error
+                    ? error.message
+                    : 'Failed to join session';
+              });
               throw error;
             }
           },
@@ -265,7 +320,7 @@ export const useSessionStore = create<SessionStore>()(
                 throw new Error('Failed to leave session');
               }
 
-              set((draft) => {
+              set(draft => {
                 if (draft.currentSession?.id === sessionId) {
                   if (!participantId) {
                     // User is leaving the session entirely
@@ -273,30 +328,34 @@ export const useSessionStore = create<SessionStore>()(
                     draft.activeParticipants = [];
                   } else {
                     // Remove specific participant
-                    draft.currentSession.participants = draft.currentSession.participants.filter(
-                      p => p.id !== participantId
-                    );
+                    draft.currentSession.participants =
+                      draft.currentSession.participants.filter(
+                        p => p.id !== participantId
+                      );
                     draft.activeParticipants = draft.activeParticipants.filter(
                       p => p.id !== participantId
                     );
                   }
                 }
                 draft.lastUpdated = new Date();
-              }, 'leaveSession:success');
+              });
 
               // Disconnect WebSocket if user is leaving entirely
               if (!participantId) {
                 get().disconnectWebSocket();
               }
             } catch (error) {
-              set((draft) => {
-                draft.error = error instanceof Error ? error.message : 'Failed to leave session';
-              }, 'leaveSession:error');
+              set(draft => {
+                draft.error =
+                  error instanceof Error
+                    ? error.message
+                    : 'Failed to leave session';
+              });
               throw error;
             }
           },
 
-          endSession: async (sessionId) => {
+          endSession: async sessionId => {
             try {
               const response = await fetch(`/api/sessions/${sessionId}/end`, {
                 method: 'POST',
@@ -306,8 +365,10 @@ export const useSessionStore = create<SessionStore>()(
                 throw new Error('Failed to end session');
               }
 
-              set((draft) => {
-                const sessionIndex = draft.sessions.findIndex(s => s.id === sessionId);
+              set(draft => {
+                const sessionIndex = draft.sessions.findIndex(
+                  s => s.id === sessionId
+                );
                 if (sessionIndex !== -1) {
                   draft.sessions[sessionIndex].status = 'completed';
                   draft.sessions[sessionIndex].updatedAt = new Date();
@@ -316,45 +377,50 @@ export const useSessionStore = create<SessionStore>()(
                   draft.currentSession.status = 'completed';
                 }
                 draft.lastUpdated = new Date();
-              }, 'endSession:success');
+              });
 
               get().disconnectWebSocket();
             } catch (error) {
-              set((draft) => {
-                draft.error = error instanceof Error ? error.message : 'Failed to end session';
-              }, 'endSession:error');
+              set(draft => {
+                draft.error =
+                  error instanceof Error
+                    ? error.message
+                    : 'Failed to end session';
+              });
               throw error;
             }
           },
 
-          pauseSession: async (sessionId) => {
+          pauseSession: async sessionId => {
             await get().updateSession(sessionId, { status: 'paused' });
           },
 
-          resumeSession: async (sessionId) => {
+          resumeSession: async sessionId => {
             await get().updateSession(sessionId, { status: 'active' });
           },
 
           // Session management
-          loadSession: async (sessionId) => {
-            set((draft) => {
+          loadSession: async sessionId => {
+            set(draft => {
               draft.loading = true;
               draft.error = null;
-            }, 'loadSession:start');
+            });
 
             try {
               const response = await fetch(`/api/sessions/${sessionId}`);
-              
+
               if (!response.ok) {
                 throw new Error('Session not found');
               }
 
               const session: CoStormSession = await response.json();
 
-              set((draft) => {
+              set(draft => {
                 draft.currentSession = session;
-                draft.activeParticipants = session.participants.filter(p => p.isActive);
-                
+                draft.activeParticipants = session.participants.filter(
+                  p => p.isActive
+                );
+
                 // Update mind map if available
                 if (session.knowledgeBase) {
                   // Convert knowledge items to mind map nodes (simplified)
@@ -367,54 +433,62 @@ export const useSessionStore = create<SessionStore>()(
                     metadata: item,
                   }));
                 }
-                
+
                 draft.loading = false;
                 draft.lastUpdated = new Date();
-              }, 'loadSession:success');
+              });
 
               // Update session in sessions list
-              set((draft) => {
-                const sessionIndex = draft.sessions.findIndex(s => s.id === sessionId);
+              set(draft => {
+                const sessionIndex = draft.sessions.findIndex(
+                  s => s.id === sessionId
+                );
                 if (sessionIndex !== -1) {
                   draft.sessions[sessionIndex] = session;
                 } else {
                   draft.sessions.unshift(session);
                 }
-              }, 'loadSession:updateList');
+              });
             } catch (error) {
-              set((draft) => {
-                draft.error = error instanceof Error ? error.message : 'Failed to load session';
+              set(draft => {
+                draft.error =
+                  error instanceof Error
+                    ? error.message
+                    : 'Failed to load session';
                 draft.loading = false;
-              }, 'loadSession:error');
+              });
               throw error;
             }
           },
 
           loadSessions: async () => {
-            set((draft) => {
+            set(draft => {
               draft.loading = true;
               draft.error = null;
-            }, 'loadSessions:start');
+            });
 
             try {
               const response = await fetch('/api/sessions');
-              
+
               if (!response.ok) {
                 throw new Error('Failed to load sessions');
               }
 
               const sessions: CoStormSession[] = await response.json();
 
-              set((draft) => {
+              set(draft => {
                 draft.sessions = sessions;
                 draft.loading = false;
                 draft.lastUpdated = new Date();
-              }, 'loadSessions:success');
+              });
             } catch (error) {
-              set((draft) => {
-                draft.error = error instanceof Error ? error.message : 'Failed to load sessions';
+              set(draft => {
+                draft.error =
+                  error instanceof Error
+                    ? error.message
+                    : 'Failed to load sessions';
                 draft.loading = false;
-              }, 'loadSessions:error');
+              });
               throw error;
             }
           },
@@ -433,8 +507,10 @@ export const useSessionStore = create<SessionStore>()(
 
               const updatedSession: CoStormSession = await response.json();
 
-              set((draft) => {
-                const sessionIndex = draft.sessions.findIndex(s => s.id === sessionId);
+              set(draft => {
+                const sessionIndex = draft.sessions.findIndex(
+                  s => s.id === sessionId
+                );
                 if (sessionIndex !== -1) {
                   draft.sessions[sessionIndex] = updatedSession;
                 }
@@ -442,16 +518,19 @@ export const useSessionStore = create<SessionStore>()(
                   draft.currentSession = updatedSession;
                 }
                 draft.lastUpdated = new Date();
-              }, 'updateSession:success');
+              });
             } catch (error) {
-              set((draft) => {
-                draft.error = error instanceof Error ? error.message : 'Failed to update session';
-              }, 'updateSession:error');
+              set(draft => {
+                draft.error =
+                  error instanceof Error
+                    ? error.message
+                    : 'Failed to update session';
+              });
               throw error;
             }
           },
 
-          deleteSession: async (sessionId) => {
+          deleteSession: async sessionId => {
             try {
               const response = await fetch(`/api/sessions/${sessionId}`, {
                 method: 'DELETE',
@@ -461,7 +540,7 @@ export const useSessionStore = create<SessionStore>()(
                 throw new Error('Failed to delete session');
               }
 
-              set((draft) => {
+              set(draft => {
                 draft.sessions = draft.sessions.filter(s => s.id !== sessionId);
                 if (draft.currentSession?.id === sessionId) {
                   draft.currentSession = null;
@@ -469,17 +548,22 @@ export const useSessionStore = create<SessionStore>()(
                   draft.mindMap = [];
                 }
                 draft.lastUpdated = new Date();
-              }, 'deleteSession:success');
+              });
             } catch (error) {
-              set((draft) => {
-                draft.error = error instanceof Error ? error.message : 'Failed to delete session';
-              }, 'deleteSession:error');
+              set(draft => {
+                draft.error =
+                  error instanceof Error
+                    ? error.message
+                    : 'Failed to delete session';
+              });
               throw error;
             }
           },
 
           duplicateSession: async (sessionId, newTitle) => {
-            const originalSession = get().sessions.find(s => s.id === sessionId);
+            const originalSession = get().sessions.find(
+              s => s.id === sessionId
+            );
             if (!originalSession) {
               throw new Error('Session not found');
             }
@@ -494,12 +578,12 @@ export const useSessionStore = create<SessionStore>()(
             });
           },
 
-          archiveSession: async (sessionId) => {
+          archiveSession: async sessionId => {
             await get().updateSession(sessionId, { status: 'completed' });
           },
 
           // Participant management
-          addParticipant: async (participant) => {
+          addParticipant: async participant => {
             if (!get().currentSession) {
               throw new Error('No active session');
             }
@@ -522,7 +606,7 @@ export const useSessionStore = create<SessionStore>()(
             });
           },
 
-          removeParticipant: async (participantId) => {
+          removeParticipant: async participantId => {
             const { currentSession } = get();
             if (!currentSession) {
               throw new Error('No active session');
@@ -532,17 +616,20 @@ export const useSessionStore = create<SessionStore>()(
           },
 
           setParticipantStatus: (participantId, isActive) => {
-            set((draft) => {
+            set(draft => {
               if (draft.currentSession) {
-                const participant = draft.currentSession.participants.find(p => p.id === participantId);
+                const participant = draft.currentSession.participants.find(
+                  p => p.id === participantId
+                );
                 if (participant) {
                   participant.isActive = isActive;
-                  
+
                   // Update active participants list
-                  draft.activeParticipants = draft.currentSession.participants.filter(p => p.isActive);
+                  draft.activeParticipants =
+                    draft.currentSession.participants.filter(p => p.isActive);
                 }
               }
-            }, 'setParticipantStatus');
+            });
           },
 
           assignExpertise: async (participantId, expertise) => {
@@ -550,7 +637,7 @@ export const useSessionStore = create<SessionStore>()(
           },
 
           // Discourse management
-          addDiscourseTurn: async (turn) => {
+          addDiscourseTurn: async turn => {
             const { currentSession } = get();
             if (!currentSession) {
               throw new Error('No active session');
@@ -562,151 +649,168 @@ export const useSessionStore = create<SessionStore>()(
               timestamp: new Date(),
             };
 
-            set((draft) => {
+            set(draft => {
               if (draft.currentSession) {
                 draft.currentSession.discourse.push(newTurn);
                 draft.currentSession.updatedAt = new Date();
               }
-            }, 'addDiscourseTurn');
+            });
 
             // Send via WebSocket for real-time updates
             get().sendWebSocketMessage('discourse_turn', newTurn);
           },
 
           updateDiscourseTurn: (turnId, updates) => {
-            set((draft) => {
+            set(draft => {
               if (draft.currentSession) {
-                const turn = draft.currentSession.discourse.find(t => t.id === turnId);
+                const turn = draft.currentSession.discourse.find(
+                  t => t.id === turnId
+                );
                 if (turn) {
                   Object.assign(turn, updates);
                   draft.currentSession.updatedAt = new Date();
                 }
               }
-            }, 'updateDiscourseTurn');
+            });
           },
 
-          removeDiscourseTurn: (turnId) => {
-            set((draft) => {
+          removeDiscourseTurn: turnId => {
+            set(draft => {
               if (draft.currentSession) {
-                draft.currentSession.discourse = draft.currentSession.discourse.filter(
-                  t => t.id !== turnId
-                );
+                draft.currentSession.discourse =
+                  draft.currentSession.discourse.filter(t => t.id !== turnId);
                 draft.currentSession.updatedAt = new Date();
               }
-            }, 'removeDiscourseTurn');
+            });
           },
 
           addReaction: (turnId, reaction) => {
-            set((draft) => {
+            set(draft => {
               if (draft.currentSession) {
-                const turn = draft.currentSession.discourse.find(t => t.id === turnId);
+                const turn = draft.currentSession.discourse.find(
+                  t => t.id === turnId
+                );
                 if (turn) {
                   if (!turn.reactions) {
                     turn.reactions = [];
                   }
-                  
+
                   // Remove existing reaction from same participant with same type
                   turn.reactions = turn.reactions.filter(
-                    r => !(r.participantId === reaction.participantId && r.type === reaction.type)
+                    r =>
+                      !(
+                        r.participantId === reaction.participantId &&
+                        r.type === reaction.type
+                      )
                   );
-                  
+
                   turn.reactions.push({
                     ...reaction,
                     timestamp: new Date(),
                   });
-                  
+
                   draft.currentSession.updatedAt = new Date();
                 }
               }
-            }, 'addReaction');
+            });
           },
 
           removeReaction: (turnId, reactionType, participantId) => {
-            set((draft) => {
+            set(draft => {
               if (draft.currentSession) {
-                const turn = draft.currentSession.discourse.find(t => t.id === turnId);
+                const turn = draft.currentSession.discourse.find(
+                  t => t.id === turnId
+                );
                 if (turn && turn.reactions) {
                   turn.reactions = turn.reactions.filter(
-                    r => !(r.type === reactionType && r.participantId === participantId)
+                    r =>
+                      !(
+                        r.type === reactionType &&
+                        r.participantId === participantId
+                      )
                   );
                   draft.currentSession.updatedAt = new Date();
                 }
               }
-            }, 'removeReaction');
+            });
           },
 
           // Mind map management
-          addMindMapNode: (node) => {
-            set((draft) => {
+          addMindMapNode: node => {
+            set(draft => {
               const newNode: MindMapNode = {
                 ...node,
                 id: `node_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
               };
               draft.mindMap.push(newNode);
-            }, 'addMindMapNode');
+            });
           },
 
           updateMindMapNode: (nodeId, updates) => {
-            set((draft) => {
+            set(draft => {
               const node = draft.mindMap.find(n => n.id === nodeId);
               if (node) {
                 Object.assign(node, updates);
               }
-            }, 'updateMindMapNode');
+            });
           },
 
-          removeMindMapNode: (nodeId) => {
-            set((draft) => {
+          removeMindMapNode: nodeId => {
+            set(draft => {
               // Remove node
               draft.mindMap = draft.mindMap.filter(n => n.id !== nodeId);
-              
+
               // Remove all connections to this node
               draft.mindMap.forEach(node => {
                 node.connections = node.connections.filter(id => id !== nodeId);
               });
-            }, 'removeMindMapNode');
+            });
           },
 
           connectMindMapNodes: (nodeId1, nodeId2) => {
-            set((draft) => {
+            set(draft => {
               const node1 = draft.mindMap.find(n => n.id === nodeId1);
               const node2 = draft.mindMap.find(n => n.id === nodeId2);
-              
+
               if (node1 && !node1.connections.includes(nodeId2)) {
                 node1.connections.push(nodeId2);
               }
               if (node2 && !node2.connections.includes(nodeId1)) {
                 node2.connections.push(nodeId1);
               }
-            }, 'connectMindMapNodes');
+            });
           },
 
           disconnectMindMapNodes: (nodeId1, nodeId2) => {
-            set((draft) => {
+            set(draft => {
               const node1 = draft.mindMap.find(n => n.id === nodeId1);
               const node2 = draft.mindMap.find(n => n.id === nodeId2);
-              
+
               if (node1) {
-                node1.connections = node1.connections.filter(id => id !== nodeId2);
+                node1.connections = node1.connections.filter(
+                  id => id !== nodeId2
+                );
               }
               if (node2) {
-                node2.connections = node2.connections.filter(id => id !== nodeId1);
+                node2.connections = node2.connections.filter(
+                  id => id !== nodeId1
+                );
               }
-            }, 'disconnectMindMapNodes');
+            });
           },
 
           repositionMindMapNode: (nodeId, position) => {
-            set((draft) => {
+            set(draft => {
               const node = draft.mindMap.find(n => n.id === nodeId);
               if (node) {
                 node.position = position;
               }
-            }, 'repositionMindMapNode');
+            });
           },
 
           // Knowledge base management
-          addKnowledgeItem: (item) => {
-            set((draft) => {
+          addKnowledgeItem: item => {
+            set(draft => {
               if (draft.currentSession) {
                 const newItem: KnowledgeItem = {
                   ...item,
@@ -716,45 +820,50 @@ export const useSessionStore = create<SessionStore>()(
                 draft.currentSession.knowledgeBase.push(newItem);
                 draft.currentSession.updatedAt = new Date();
               }
-            }, 'addKnowledgeItem');
+            });
           },
 
           updateKnowledgeItem: (itemId, updates) => {
-            set((draft) => {
+            set(draft => {
               if (draft.currentSession) {
-                const item = draft.currentSession.knowledgeBase.find(i => i.id === itemId);
+                const item = draft.currentSession.knowledgeBase.find(
+                  i => i.id === itemId
+                );
                 if (item) {
                   Object.assign(item, updates);
                   draft.currentSession.updatedAt = new Date();
                 }
               }
-            }, 'updateKnowledgeItem');
+            });
           },
 
-          removeKnowledgeItem: (itemId) => {
-            set((draft) => {
+          removeKnowledgeItem: itemId => {
+            set(draft => {
               if (draft.currentSession) {
-                draft.currentSession.knowledgeBase = draft.currentSession.knowledgeBase.filter(
-                  i => i.id !== itemId
-                );
+                draft.currentSession.knowledgeBase =
+                  draft.currentSession.knowledgeBase.filter(
+                    i => i.id !== itemId
+                  );
                 draft.currentSession.updatedAt = new Date();
               }
-            }, 'removeKnowledgeItem');
+            });
           },
 
           validateKnowledgeItem: (itemId, validatorId) => {
-            set((draft) => {
+            set(draft => {
               if (draft.currentSession) {
-                const item = draft.currentSession.knowledgeBase.find(i => i.id === itemId);
+                const item = draft.currentSession.knowledgeBase.find(
+                  i => i.id === itemId
+                );
                 if (item && !item.validatedBy.includes(validatorId)) {
                   item.validatedBy.push(validatorId);
                   draft.currentSession.updatedAt = new Date();
                 }
               }
-            }, 'validateKnowledgeItem');
+            });
           },
 
-          searchKnowledgeBase: (query) => {
+          searchKnowledgeBase: query => {
             const { currentSession } = get();
             if (!currentSession) return [];
 
@@ -768,32 +877,32 @@ export const useSessionStore = create<SessionStore>()(
           },
 
           // Turn policy and moderation
-          updateTurnPolicy: (policy) => {
-            set((draft) => {
+          updateTurnPolicy: policy => {
+            set(draft => {
               Object.assign(draft.turnPolicy, policy);
-            }, 'updateTurnPolicy');
+            });
           },
 
-          updateModerator: (updates) => {
-            set((draft) => {
+          updateModerator: updates => {
+            set(draft => {
               if (draft.currentSession) {
                 Object.assign(draft.currentSession.moderator, updates);
                 draft.currentSession.updatedAt = new Date();
               }
-            }, 'updateModerator');
+            });
           },
 
-          requestTurn: (participantId) => {
+          requestTurn: participantId => {
             // This would typically send a request to the moderator
             get().sendWebSocketMessage('turn_request', { participantId });
           },
 
-          grantTurn: (participantId) => {
+          grantTurn: participantId => {
             get().updateModerator({ nextParticipant: participantId });
             get().sendWebSocketMessage('turn_granted', { participantId });
           },
 
-          skipTurn: (participantId) => {
+          skipTurn: participantId => {
             get().updateModerator({ nextParticipant: null });
             get().sendWebSocketMessage('turn_skipped', { participantId });
           },
@@ -804,15 +913,15 @@ export const useSessionStore = create<SessionStore>()(
           },
 
           // Session settings
-          updateSessionSettings: (settings) => {
-            set((draft) => {
+          updateSessionSettings: settings => {
+            set(draft => {
               Object.assign(draft.sessionSettings, settings);
-            }, 'updateSessionSettings');
+            });
           },
 
           enableAutoSave: (interval = 30) => {
             get().disableAutoSave(); // Clear existing timer
-            
+
             autoSaveTimer = setInterval(() => {
               get().saveSession();
             }, interval * 1000);
@@ -842,7 +951,7 @@ export const useSessionStore = create<SessionStore>()(
           },
 
           // WebSocket connection management
-          connectWebSocket: async (sessionId) => {
+          connectWebSocket: async sessionId => {
             return new Promise((resolve, reject) => {
               try {
                 // Close existing connection
@@ -852,18 +961,18 @@ export const useSessionStore = create<SessionStore>()(
                 websocket = new WebSocket(wsUrl);
 
                 websocket.onopen = () => {
-                  set((draft) => {
+                  set(draft => {
                     draft.realtimeConnection = {
                       status: 'connected',
                       lastPing: new Date(),
                       reconnectAttempts: 0,
                       maxReconnectAttempts: 5,
                     };
-                  }, 'websocket:connected');
+                  });
                   resolve();
                 };
 
-                websocket.onmessage = (event) => {
+                websocket.onmessage = event => {
                   try {
                     const message = JSON.parse(event.data);
                     get().handleWebSocketMessage(message);
@@ -873,33 +982,39 @@ export const useSessionStore = create<SessionStore>()(
                 };
 
                 websocket.onclose = () => {
-                  set((draft) => {
+                  set(draft => {
                     if (draft.realtimeConnection) {
                       draft.realtimeConnection.status = 'disconnected';
                     }
-                  }, 'websocket:disconnected');
+                  });
 
                   // Attempt to reconnect
                   const connection = get().realtimeConnection;
-                  if (connection && connection.reconnectAttempts < connection.maxReconnectAttempts) {
-                    setTimeout(() => {
-                      set((draft) => {
-                        if (draft.realtimeConnection) {
-                          draft.realtimeConnection.status = 'reconnecting';
-                          draft.realtimeConnection.reconnectAttempts += 1;
-                        }
-                      }, 'websocket:reconnecting');
-                      
-                      get().connectWebSocket(sessionId);
-                    }, 1000 * Math.pow(2, connection.reconnectAttempts));
+                  if (
+                    connection &&
+                    connection.reconnectAttempts <
+                      connection.maxReconnectAttempts
+                  ) {
+                    setTimeout(
+                      () => {
+                        set(draft => {
+                          if (draft.realtimeConnection) {
+                            draft.realtimeConnection.status = 'reconnecting';
+                            draft.realtimeConnection.reconnectAttempts += 1;
+                          }
+                        });
+
+                        get().connectWebSocket(sessionId);
+                      },
+                      1000 * Math.pow(2, connection.reconnectAttempts)
+                    );
                   }
                 };
 
-                websocket.onerror = (error) => {
+                websocket.onerror = error => {
                   console.error('WebSocket error:', error);
                   reject(error);
                 };
-
               } catch (error) {
                 reject(error);
               }
@@ -911,63 +1026,66 @@ export const useSessionStore = create<SessionStore>()(
               websocket.close();
               websocket = null;
             }
-            
-            set((draft) => {
+
+            set(draft => {
               draft.realtimeConnection = null;
-            }, 'websocket:disconnect');
+            });
           },
 
-          handleWebSocketMessage: (message) => {
+          handleWebSocketMessage: message => {
             const { type, payload } = message;
 
             switch (type) {
               case 'discourse_turn':
-                set((draft) => {
+                set(draft => {
                   if (draft.currentSession) {
                     draft.currentSession.discourse.push(payload);
                     draft.currentSession.updatedAt = new Date();
                   }
-                }, 'websocket:discourse_turn');
+                });
                 break;
 
               case 'participant_joined':
-                set((draft) => {
+                set(draft => {
                   if (draft.currentSession) {
                     draft.currentSession.participants.push(payload);
-                    draft.activeParticipants = draft.currentSession.participants.filter(p => p.isActive);
+                    draft.activeParticipants =
+                      draft.currentSession.participants.filter(p => p.isActive);
                     draft.currentSession.updatedAt = new Date();
                   }
-                }, 'websocket:participant_joined');
+                });
                 break;
 
               case 'participant_left':
-                set((draft) => {
+                set(draft => {
                   if (draft.currentSession) {
-                    draft.currentSession.participants = draft.currentSession.participants.filter(
-                      p => p.id !== payload.participantId
-                    );
-                    draft.activeParticipants = draft.currentSession.participants.filter(p => p.isActive);
+                    draft.currentSession.participants =
+                      draft.currentSession.participants.filter(
+                        p => p.id !== payload.participantId
+                      );
+                    draft.activeParticipants =
+                      draft.currentSession.participants.filter(p => p.isActive);
                     draft.currentSession.updatedAt = new Date();
                   }
-                }, 'websocket:participant_left');
+                });
                 break;
 
               case 'knowledge_item_added':
-                set((draft) => {
+                set(draft => {
                   if (draft.currentSession) {
                     draft.currentSession.knowledgeBase.push(payload);
                     draft.currentSession.updatedAt = new Date();
                   }
-                }, 'websocket:knowledge_item_added');
+                });
                 break;
 
               case 'session_ended':
-                set((draft) => {
+                set(draft => {
                   if (draft.currentSession) {
                     draft.currentSession.status = 'completed';
                     draft.currentSession.updatedAt = new Date();
                   }
-                }, 'websocket:session_ended');
+                });
                 break;
 
               default:
@@ -982,28 +1100,39 @@ export const useSessionStore = create<SessionStore>()(
           },
 
           // Analytics and insights
-          getSessionAnalytics: (sessionId) => {
-            const sessions = sessionId 
+          getSessionAnalytics: sessionId => {
+            const sessions = sessionId
               ? get().sessions.filter(s => s.id === sessionId)
               : get().sessions;
 
             const totalSessions = sessions.length;
-            const averageSessionDuration = sessions.length > 0
-              ? sessions.reduce((sum, s) => {
-                  const duration = s.status === 'completed'
-                    ? s.updatedAt.getTime() - s.createdAt.getTime()
-                    : 0;
-                  return sum + duration;
-                }, 0) / sessions.length
-              : 0;
+            const averageSessionDuration =
+              sessions.length > 0
+                ? sessions.reduce((sum, s) => {
+                    const duration =
+                      s.status === 'completed'
+                        ? s.updatedAt.getTime() - s.createdAt.getTime()
+                        : 0;
+                    return sum + duration;
+                  }, 0) / sessions.length
+                : 0;
 
-            const averageParticipants = sessions.length > 0
-              ? sessions.reduce((sum, s) => sum + s.participants.length, 0) / sessions.length
-              : 0;
+            const averageParticipants =
+              sessions.length > 0
+                ? sessions.reduce((sum, s) => sum + s.participants.length, 0) /
+                  sessions.length
+                : 0;
 
-            const totalDiscourseTurns = sessions.reduce((sum, s) => sum + s.discourse.length, 0);
-            const activeSessionsCount = sessions.filter(s => s.status === 'active').length;
-            const completedSessionsCount = sessions.filter(s => s.status === 'completed').length;
+            const totalDiscourseTurns = sessions.reduce(
+              (sum, s) => sum + s.discourse.length,
+              0
+            );
+            const activeSessionsCount = sessions.filter(
+              s => s.status === 'active'
+            ).length;
+            const completedSessionsCount = sessions.filter(
+              s => s.status === 'completed'
+            ).length;
 
             // Extract topics from session titles and discourse
             const topicCounts = new Map<string, number>();
@@ -1023,9 +1152,13 @@ export const useSessionStore = create<SessionStore>()(
               .sort((a, b) => b.frequency - a.frequency)
               .slice(0, 10);
 
-            const participationRate = totalSessions > 0
-              ? (totalDiscourseTurns / totalSessions) / (averageParticipants || 1) * 100
-              : 0;
+            const participationRate =
+              totalSessions > 0
+                ? (totalDiscourseTurns /
+                    totalSessions /
+                    (averageParticipants || 1)) *
+                  100
+                : 0;
 
             return {
               totalSessions,
@@ -1039,52 +1172,68 @@ export const useSessionStore = create<SessionStore>()(
             };
           },
 
-          getParticipantAnalytics: (participantId) => {
-            const sessions = get().sessions.filter(s => 
+          getParticipantAnalytics: participantId => {
+            const sessions = get().sessions.filter(s =>
               s.participants.some(p => p.id === participantId)
             );
 
-            const participantTurns = sessions.flatMap(s => 
+            const participantTurns = sessions.flatMap(s =>
               s.discourse.filter(turn => turn.participantId === participantId)
             );
 
             const totalTurns = participantTurns.length;
-            const averageTurnLength = totalTurns > 0
-              ? participantTurns.reduce((sum, turn) => sum + turn.content.length, 0) / totalTurns
-              : 0;
+            const averageTurnLength =
+              totalTurns > 0
+                ? participantTurns.reduce(
+                    (sum, turn) => sum + turn.content.length,
+                    0
+                  ) / totalTurns
+                : 0;
 
-            const topicsContributed = Array.from(new Set(
-              sessions.map(s => s.topic)
-            ));
+            const topicsContributed = Array.from(
+              new Set(sessions.map(s => s.topic))
+            );
 
             const reactionsReceived = sessions.reduce((sum, s) => {
-              return sum + s.discourse.reduce((turnSum, turn) => {
-                if (turn.participantId === participantId) {
-                  return turnSum + (turn.reactions?.length || 0);
-                }
-                return turnSum;
-              }, 0);
+              return (
+                sum +
+                s.discourse.reduce((turnSum, turn) => {
+                  if (turn.participantId === participantId) {
+                    return turnSum + (turn.reactions?.length || 0);
+                  }
+                  return turnSum;
+                }, 0)
+              );
             }, 0);
 
             const reactionsGiven = sessions.reduce((sum, s) => {
-              return sum + s.discourse.reduce((turnSum, turn) => {
-                return turnSum + (turn.reactions?.filter(r => r.participantId === participantId).length || 0);
-              }, 0);
+              return (
+                sum +
+                s.discourse.reduce((turnSum, turn) => {
+                  return (
+                    turnSum +
+                    (turn.reactions?.filter(
+                      r => r.participantId === participantId
+                    ).length || 0)
+                  );
+                }, 0)
+              );
             }, 0);
 
             return {
               totalTurns,
               averageTurnLength,
               topicsContributed,
-              collaborationScore: (reactionsReceived + reactionsGiven) / Math.max(totalTurns, 1),
+              collaborationScore:
+                (reactionsReceived + reactionsGiven) / Math.max(totalTurns, 1),
               reactionsReceived,
               reactionsGiven,
               expertiseUtilization: 0.75, // This would be calculated based on expertise usage
             };
           },
 
-          getDiscourseAnalytics: (sessionId) => {
-            const session = sessionId 
+          getDiscourseAnalytics: sessionId => {
+            const session = sessionId
               ? get().sessions.find(s => s.id === sessionId)
               : get().currentSession;
 
@@ -1102,14 +1251,21 @@ export const useSessionStore = create<SessionStore>()(
             const discourse = session.discourse;
             const totalTurns = discourse.length;
 
-            const turnsByType = discourse.reduce((acc, turn) => {
-              acc[turn.type] = (acc[turn.type] || 0) + 1;
-              return acc;
-            }, {} as Record<DiscourseTurn['type'], number>);
+            const turnsByType = discourse.reduce(
+              (acc, turn) => {
+                acc[turn.type] = (acc[turn.type] || 0) + 1;
+                return acc;
+              },
+              {} as Record<DiscourseTurn['type'], number>
+            );
 
-            const averageTurnLength = totalTurns > 0
-              ? discourse.reduce((sum, turn) => sum + turn.content.length, 0) / totalTurns
-              : 0;
+            const averageTurnLength =
+              totalTurns > 0
+                ? discourse.reduce(
+                    (sum, turn) => sum + turn.content.length,
+                    0
+                  ) / totalTurns
+                : 0;
 
             const participantTurnCounts = new Map<string, number>();
             discourse.forEach(turn => {
@@ -1117,9 +1273,13 @@ export const useSessionStore = create<SessionStore>()(
               participantTurnCounts.set(turn.participantId, count + 1);
             });
 
-            const mostActiveParticipants = Array.from(participantTurnCounts.entries())
+            const mostActiveParticipants = Array.from(
+              participantTurnCounts.entries()
+            )
               .map(([participantId, turnCount]) => {
-                const participant = session.participants.find(p => p.id === participantId);
+                const participant = session.participants.find(
+                  p => p.id === participantId
+                );
                 return { participant: participant!, turnCount };
               })
               .filter(item => item.participant)
@@ -1133,11 +1293,20 @@ export const useSessionStore = create<SessionStore>()(
             }));
 
             // Simple consensus level calculation based on agreement reactions
-            const totalReactions = discourse.reduce((sum, turn) => sum + (turn.reactions?.length || 0), 0);
+            const totalReactions = discourse.reduce(
+              (sum, turn) => sum + (turn.reactions?.length || 0),
+              0
+            );
             const agreementReactions = discourse.reduce((sum, turn) => {
-              return sum + (turn.reactions?.filter(r => r.type === 'agree').length || 0);
+              return (
+                sum +
+                (turn.reactions?.filter(r => r.type === 'agree').length || 0)
+              );
             }, 0);
-            const consensusLevel = totalReactions > 0 ? (agreementReactions / totalReactions) * 100 : 0;
+            const consensusLevel =
+              totalReactions > 0
+                ? (agreementReactions / totalReactions) * 100
+                : 0;
 
             return {
               totalTurns,
@@ -1159,29 +1328,31 @@ export const useSessionStore = create<SessionStore>()(
             switch (format) {
               case 'json':
                 return JSON.stringify(session, null, 2);
-              
+
               case 'txt':
                 let txtOutput = `Co-STORM Session: ${session.title}\n${'='.repeat(50)}\n\n`;
                 txtOutput += `Topic: ${session.topic}\n`;
                 txtOutput += `Status: ${session.status}\n`;
                 txtOutput += `Created: ${session.createdAt.toISOString()}\n`;
                 txtOutput += `Updated: ${session.updatedAt.toISOString()}\n\n`;
-                
+
                 txtOutput += `Participants (${session.participants.length}):\n`;
                 session.participants.forEach((p, i) => {
                   txtOutput += `${i + 1}. ${p.name} (${p.role}) - ${p.expertise.join(', ')}\n`;
                 });
-                
+
                 txtOutput += `\nDiscourse (${session.discourse.length} turns):\n${'='.repeat(30)}\n`;
                 session.discourse.forEach((turn, i) => {
-                  const participant = session.participants.find(p => p.id === turn.participantId);
+                  const participant = session.participants.find(
+                    p => p.id === turn.participantId
+                  );
                   txtOutput += `\n${i + 1}. ${participant?.name || 'Unknown'} (${turn.type}):\n`;
                   txtOutput += `${turn.content}\n`;
                   if (turn.reactions && turn.reactions.length > 0) {
                     txtOutput += `   Reactions: ${turn.reactions.map(r => r.type).join(', ')}\n`;
                   }
                 });
-                
+
                 txtOutput += `\nKnowledge Base (${session.knowledgeBase.length} items):\n${'='.repeat(30)}\n`;
                 session.knowledgeBase.forEach((item, i) => {
                   txtOutput += `\n${i + 1}. ${item.content}\n`;
@@ -1189,36 +1360,38 @@ export const useSessionStore = create<SessionStore>()(
                   txtOutput += `   Confidence: ${item.confidence}\n`;
                   txtOutput += `   Tags: ${item.tags.join(', ')}\n`;
                 });
-                
+
                 return txtOutput;
-              
+
               case 'pdf':
                 // This would require a PDF generation library
                 throw new Error('PDF export not implemented');
-              
+
               default:
                 throw new Error('Unsupported format');
             }
           },
 
-          exportMindMap: (format) => {
+          exportMindMap: format => {
             const { mindMap } = get();
-            
+
             switch (format) {
               case 'json':
                 return JSON.stringify(mindMap, null, 2);
-              
+
               case 'svg':
               case 'png':
                 // This would require a graph visualization library
-                throw new Error(`${format.toUpperCase()} export not implemented`);
-              
+                throw new Error(
+                  `${format.toUpperCase()} export not implemented`
+                );
+
               default:
                 throw new Error('Unsupported format');
             }
           },
 
-          exportKnowledgeBase: (format) => {
+          exportKnowledgeBase: format => {
             const { currentSession } = get();
             if (!currentSession) return '';
 
@@ -1227,45 +1400,49 @@ export const useSessionStore = create<SessionStore>()(
             switch (format) {
               case 'json':
                 return JSON.stringify(knowledgeBase, null, 2);
-              
+
               case 'csv':
-                const csvHeaders = 'Content,Source,Confidence,Tags,Created At,Validated By\n';
+                const csvHeaders =
+                  'Content,Source,Confidence,Tags,Created At,Validated By\n';
                 const csvRows = knowledgeBase
-                  .map(item => `"${item.content}","${item.source}","${item.confidence}","${item.tags.join(';')}","${item.createdAt}","${item.validatedBy.join(';')}"`)
+                  .map(
+                    item =>
+                      `"${item.content}","${item.source}","${item.confidence}","${item.tags.join(';')}","${item.createdAt}","${item.validatedBy.join(';')}"`
+                  )
                   .join('\n');
                 return csvHeaders + csvRows;
-              
+
               default:
                 throw new Error('Unsupported format');
             }
           },
 
           // State management
-          setLoading: (loading) => {
-            set((draft) => {
+          setLoading: loading => {
+            set(draft => {
               draft.loading = loading;
-            }, 'setLoading');
+            });
           },
 
-          setError: (error) => {
-            set((draft) => {
+          setError: error => {
+            set(draft => {
               draft.error = error;
-            }, 'setError');
+            });
           },
 
           clearError: () => {
-            set((draft) => {
+            set(draft => {
               draft.error = null;
-            }, 'clearError');
+            });
           },
 
           reset: () => {
             get().disconnectWebSocket();
             get().disableAutoSave();
-            
-            set((draft) => {
+
+            set(draft => {
               Object.assign(draft, initialState);
-            }, 'reset');
+            });
           },
         }))
       ),
@@ -1294,11 +1471,16 @@ export const sessionSelectors = {
   realtimeConnection: (state: SessionStore) => state.realtimeConnection,
   isLoading: (state: SessionStore) => state.loading,
   error: (state: SessionStore) => state.error,
-  isConnected: (state: SessionStore) => state.realtimeConnection?.status === 'connected',
-  activeSessions: (state: SessionStore) => state.sessions.filter(s => s.status === 'active'),
-  completedSessions: (state: SessionStore) => state.sessions.filter(s => s.status === 'completed'),
-  currentDiscourse: (state: SessionStore) => state.currentSession?.discourse || [],
-  currentKnowledgeBase: (state: SessionStore) => state.currentSession?.knowledgeBase || [],
+  isConnected: (state: SessionStore) =>
+    state.realtimeConnection?.status === 'connected',
+  activeSessions: (state: SessionStore) =>
+    state.sessions.filter(s => s.status === 'active'),
+  completedSessions: (state: SessionStore) =>
+    state.sessions.filter(s => s.status === 'completed'),
+  currentDiscourse: (state: SessionStore) =>
+    state.currentSession?.discourse || [],
+  currentKnowledgeBase: (state: SessionStore) =>
+    state.currentSession?.knowledgeBase || [],
 };
 
 // Session hooks
@@ -1310,13 +1492,20 @@ export const useSession = () => {
   };
 };
 
-export const useCurrentSession = () => useSessionStore(sessionSelectors.currentSession);
+export const useCurrentSession = () =>
+  useSessionStore(sessionSelectors.currentSession);
 export const useSessionsList = () => useSessionStore(sessionSelectors.sessions);
-export const useActiveParticipants = () => useSessionStore(sessionSelectors.activeParticipants);
+export const useActiveParticipants = () =>
+  useSessionStore(sessionSelectors.activeParticipants);
 export const useMindMap = () => useSessionStore(sessionSelectors.mindMap);
-export const useRealtimeConnection = () => useSessionStore(sessionSelectors.realtimeConnection);
-export const useSessionLoading = () => useSessionStore(sessionSelectors.isLoading);
+export const useRealtimeConnection = () =>
+  useSessionStore(sessionSelectors.realtimeConnection);
+export const useSessionLoading = () =>
+  useSessionStore(sessionSelectors.isLoading);
 export const useSessionError = () => useSessionStore(sessionSelectors.error);
-export const useIsConnected = () => useSessionStore(sessionSelectors.isConnected);
-export const useCurrentDiscourse = () => useSessionStore(sessionSelectors.currentDiscourse);
-export const useCurrentKnowledgeBase = () => useSessionStore(sessionSelectors.currentKnowledgeBase);
+export const useIsConnected = () =>
+  useSessionStore(sessionSelectors.isConnected);
+export const useCurrentDiscourse = () =>
+  useSessionStore(sessionSelectors.currentDiscourse);
+export const useCurrentKnowledgeBase = () =>
+  useSessionStore(sessionSelectors.currentKnowledgeBase);

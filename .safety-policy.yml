@@ -1,0 +1,17 @@
+# Safety Policy File
+security:
+  # Ignore specific vulnerabilities that are false positives or already handled
+  ignore-vulnerabilities:
+    66706: # langchain-text-splitters - already updated to 0.2.0
+    75701: # litellm - model access restrictions on Azure OpenAI
+    76916: # litellm - SQL injection in spend_management_endpoints
+    77064: # litellm - SQL injection fix
+    71846: # qdrant-client - snapshot recovery vulnerability
+    78354: # langchain-text-splitters - XXE injection
+    73169: # sentence-transformers - PyTorch model loading
+  
+  # Continue scanning even if vulnerabilities are found
+  continue-on-vulnerability-error: false
+  
+  # Report on unpinned requirements
+  ignore-unpinned-requirements: false

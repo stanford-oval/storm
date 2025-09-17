@@ -1,24 +1,30 @@
 'use client';
 
 // WebSocket context provider for real-time connections
-import React, { createContext, useContext, useEffect, useRef, useState, ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  ReactNode,
+} from 'react';
 import { useConfig } from './ConfigContext';
 import { useAuthStore } from '../slices/authStore';
 import { useNotificationStore } from '../slices/notificationStore';
-import { getConnectionStatusColor, getConnectionStatusText } from '@/utils/status';
+import {
+  getConnectionStatusColor,
+  getConnectionStatusText,
+} from '@/utils/status';
+import type { WebSocketMessage } from '../types';
 
 // WebSocket connection states
-export type WebSocketState = 'connecting' | 'connected' | 'disconnected' | 'reconnecting' | 'error';
-
-// WebSocket message types
-export interface WebSocketMessage {
-  type: string;
-  payload: any;
-  id?: string;
-  timestamp: number;
-  from?: string;
-  to?: string;
-}
+export type WebSocketState =
+  | 'connecting'
+  | 'connected'
+  | 'disconnected'
+  | 'reconnecting'
+  | 'error';
 
 // WebSocket event handlers
 export interface WebSocketEventHandlers {
@@ -51,21 +57,21 @@ interface WebSocketContextType {
   lastError: string | null;
   reconnectAttempt: number;
   connectionId: string | null;
-  
+
   // Connection management
   connect: (config?: Partial<WebSocketConfig>) => void;
   disconnect: () => void;
   reconnect: () => void;
-  
+
   // Message handling
   send: (type: string, payload: any, options?: MessageOptions) => boolean;
   subscribe: (type: string, handler: (payload: any) => void) => () => void;
   unsubscribe: (type: string, handler?: (payload: any) => void) => void;
-  
+
   // Status
   getConnectionInfo: () => ConnectionInfo;
   getMessageStats: () => MessageStats;
-  
+
   // Event handlers
   setEventHandlers: (handlers: Partial<WebSocketEventHandlers>) => void;
 }
@@ -101,7 +107,9 @@ export interface MessageStats {
 }
 
 // WebSocket context
-const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
+const WebSocketContext = createContext<WebSocketContextType | undefined>(
+  undefined
+);
 
 // Default configuration
 const defaultConfig: WebSocketConfig = {
@@ -134,14 +142,21 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 }) => {
   // Refs for stable references
   const wsRef = useRef<WebSocket | null>(null);
-  const configRef = useRef<WebSocketConfig>({ ...defaultConfig, ...configOverride });
+  const configRef = useRef<WebSocketConfig>({
+    ...defaultConfig,
+    ...configOverride,
+  });
   const eventHandlersRef = useRef<WebSocketEventHandlers>({});
-  const subscribersRef = useRef<Map<string, Set<(payload: any) => void>>>(new Map());
-  const messageQueueRef = useRef<Array<{ type: string; payload: any; options?: MessageOptions }>>([]);
+  const subscribersRef = useRef<Map<string, Set<(payload: any) => void>>>(
+    new Map()
+  );
+  const messageQueueRef = useRef<
+    Array<{ type: string; payload: any; options?: MessageOptions }>
+  >([]);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const heartbeatIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const heartbeatTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   // State
   const [state, setState] = useState<WebSocketState>('disconnected');
   const [lastError, setLastError] = useState<string | null>(null);
@@ -175,17 +190,20 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     const apiUrl = baseUrl || appConfig.api.baseUrl;
     const wsUrl = apiUrl.replace(/^http/, 'ws');
     const url = new URL('/ws', wsUrl);
-    
+
     if (isAuthenticated && token) {
       url.searchParams.set('token', token);
     }
-    
+
     return url.toString();
   };
 
   // Connect to WebSocket
   const connect = (configOverrides?: Partial<WebSocketConfig>) => {
-    if (wsRef.current?.readyState === WebSocket.CONNECTING || wsRef.current?.readyState === WebSocket.OPEN) {
+    if (
+      wsRef.current?.readyState === WebSocket.CONNECTING ||
+      wsRef.current?.readyState === WebSocket.OPEN
+    ) {
       return;
     }
 
@@ -204,11 +222,13 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       wsRef.current = new WebSocket(url, config.protocols);
 
       // Connection opened
-      wsRef.current.onopen = (event) => {
+      wsRef.current.onopen = event => {
         setState('connected');
         setReconnectAttempt(0);
-        setConnectionId(`conn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
-        
+        setConnectionId(
+          `conn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+        );
+
         const now = new Date();
         setConnectionInfo(prev => ({
           ...prev,
@@ -217,32 +237,38 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
           connectedAt: now,
           reconnectAttempts: 0,
           protocol: wsRef.current?.protocol || null,
-          extensions: wsRef.current?.extensions ? wsRef.current.extensions.split(', ') : [],
+          extensions: wsRef.current?.extensions
+            ? wsRef.current.extensions.split(', ')
+            : [],
         }));
 
         // Process queued messages
         processMessageQueue();
-        
+
         // Start heartbeat
         startHeartbeat();
-        
+
         // Call event handler
         eventHandlersRef.current.onConnect?.();
-        
+
         // Global event
         if (enableGlobalEvents) {
-          window.dispatchEvent(new CustomEvent('websocket:connected', { detail: { url, connectionId } }));
+          window.dispatchEvent(
+            new CustomEvent('websocket:connected', {
+              detail: { url, connectionId },
+            })
+          );
         }
-        
+
         // Show notification
         showInfo('Connected', 'Real-time connection established');
       };
 
       // Message received
-      wsRef.current.onmessage = (event) => {
+      wsRef.current.onmessage = event => {
         try {
           const message: WebSocketMessage = JSON.parse(event.data);
-          
+
           // Update stats
           setMessageStats(prev => ({
             ...prev,
@@ -266,19 +292,23 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
               try {
                 handler(message.payload);
               } catch (error) {
-                console.error(`Error in WebSocket message handler for type ${message.type}:`, error);
+                console.error(
+                  `Error in WebSocket message handler for type ${message.type}:`,
+                  error
+                );
               }
             });
           }
 
           // Call global message handler
           eventHandlersRef.current.onMessage?.(message);
-          
+
           // Global event
           if (enableGlobalEvents) {
-            window.dispatchEvent(new CustomEvent('websocket:message', { detail: message }));
+            window.dispatchEvent(
+              new CustomEvent('websocket:message', { detail: message })
+            );
           }
-
         } catch (error) {
           console.error('Error parsing WebSocket message:', error);
           setMessageStats(prev => ({ ...prev, errors: prev.errors + 1 }));
@@ -286,56 +316,70 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       };
 
       // Connection error
-      wsRef.current.onerror = (event) => {
+      wsRef.current.onerror = event => {
         setState('error');
         setLastError('WebSocket connection error');
-        
+
         setConnectionInfo(prev => ({ ...prev, state: 'error' }));
-        
+
         // Call event handler
         eventHandlersRef.current.onError?.(event);
-        
+
         // Global event
         if (enableGlobalEvents) {
-          window.dispatchEvent(new CustomEvent('websocket:error', { detail: event }));
+          window.dispatchEvent(
+            new CustomEvent('websocket:error', { detail: event })
+          );
         }
       };
 
       // Connection closed
-      wsRef.current.onclose = (event) => {
+      wsRef.current.onclose = event => {
         setState('disconnected');
         setConnectionId(null);
-        
+
         setConnectionInfo(prev => ({
           ...prev,
           state: 'disconnected',
           connectedAt: null,
         }));
-        
+
         // Stop heartbeat
         stopHeartbeat();
-        
+
         // Call event handler
         eventHandlersRef.current.onDisconnect?.(event.code, event.reason);
-        
+
         // Global event
         if (enableGlobalEvents) {
-          window.dispatchEvent(new CustomEvent('websocket:disconnected', { 
-            detail: { code: event.code, reason: event.reason } 
-          }));
+          window.dispatchEvent(
+            new CustomEvent('websocket:disconnected', {
+              detail: { code: event.code, reason: event.reason },
+            })
+          );
         }
 
         // Handle reconnection
-        if (config.reconnect && reconnectAttempt < config.maxReconnectAttempts && !event.wasClean) {
+        if (
+          config.reconnect &&
+          reconnectAttempt < config.maxReconnectAttempts &&
+          !event.wasClean
+        ) {
           scheduleReconnect();
         } else if (reconnectAttempt >= config.maxReconnectAttempts) {
-          showError('Connection Failed', 'Maximum reconnection attempts reached');
+          showError(
+            'Connection Failed',
+            'Maximum reconnection attempts reached'
+          );
         }
       };
-
     } catch (error) {
       setState('error');
-      setLastError(error instanceof Error ? error.message : 'Failed to create WebSocket connection');
+      setLastError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to create WebSocket connection'
+      );
       console.error('WebSocket connection error:', error);
     }
   };
@@ -387,12 +431,16 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   };
 
   // Send message
-  const send = (type: string, payload: any, options: MessageOptions = {}): boolean => {
+  const send = (
+    type: string,
+    payload: any,
+    options: MessageOptions = {}
+  ): boolean => {
     const message: WebSocketMessage = {
       type,
       payload,
       id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      timestamp: Date.now(),
+      timestamp: new Date(),
     };
 
     // Queue message if not connected
@@ -405,7 +453,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 
     try {
       wsRef.current.send(JSON.stringify(message));
-      
+
       // Update stats
       setMessageStats(prev => ({
         ...prev,
@@ -420,12 +468,12 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     } catch (error) {
       console.error('Error sending WebSocket message:', error);
       setMessageStats(prev => ({ ...prev, errors: prev.errors + 1 }));
-      
+
       // Queue for retry if enabled
       if (options.retry !== false) {
         messageQueueRef.current.push({ type, payload, options });
       }
-      
+
       return false;
     }
   };
@@ -434,20 +482,23 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   const processMessageQueue = () => {
     const queue = messageQueueRef.current;
     messageQueueRef.current = [];
-    
+
     queue.forEach(({ type, payload, options }) => {
       send(type, payload, options);
     });
   };
 
   // Subscribe to message type
-  const subscribe = (type: string, handler: (payload: any) => void): (() => void) => {
+  const subscribe = (
+    type: string,
+    handler: (payload: any) => void
+  ): (() => void) => {
     if (!subscribersRef.current.has(type)) {
       subscribersRef.current.set(type, new Set());
     }
-    
+
     subscribersRef.current.get(type)!.add(handler);
-    
+
     return () => {
       const subscribers = subscribersRef.current.get(type);
       if (subscribers) {
@@ -468,7 +519,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       } else {
         subscribers.clear();
       }
-      
+
       if (subscribers.size === 0) {
         subscribersRef.current.delete(type);
       }
@@ -478,14 +529,17 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   // Start heartbeat
   const startHeartbeat = () => {
     const config = configRef.current;
-    
+
     heartbeatIntervalRef.current = setInterval(() => {
       if (wsRef.current?.readyState === WebSocket.OPEN) {
         const pingTime = Date.now();
         send('ping', { timestamp: pingTime });
-        
-        setConnectionInfo(prev => ({ ...prev, lastPingTime: new Date(pingTime) }));
-        
+
+        setConnectionInfo(prev => ({
+          ...prev,
+          lastPingTime: new Date(pingTime),
+        }));
+
         // Set timeout for pong response
         heartbeatTimeoutRef.current = setTimeout(() => {
           console.warn('WebSocket heartbeat timeout, reconnecting...');
@@ -501,7 +555,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       clearInterval(heartbeatIntervalRef.current);
       heartbeatIntervalRef.current = null;
     }
-    
+
     if (heartbeatTimeoutRef.current) {
       clearTimeout(heartbeatTimeoutRef.current);
       heartbeatTimeoutRef.current = null;
@@ -518,13 +572,14 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     if (message.payload?.timestamp) {
       const latency = Date.now() - message.payload.timestamp;
       setConnectionInfo(prev => ({ ...prev, latency }));
-      
+
       // Update average latency
       setMessageStats(prev => ({
         ...prev,
-        averageLatency: prev.averageLatency === 0 
-          ? latency 
-          : (prev.averageLatency + latency) / 2,
+        averageLatency:
+          prev.averageLatency === 0
+            ? latency
+            : (prev.averageLatency + latency) / 2,
       }));
     }
   };
@@ -539,7 +594,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     if (autoConnect && isAuthenticated) {
       connect();
     }
-    
+
     return () => {
       disconnect();
     };
@@ -572,21 +627,21 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     lastError,
     reconnectAttempt,
     connectionId,
-    
+
     // Connection management
     connect,
     disconnect,
     reconnect,
-    
+
     // Message handling
     send,
     subscribe,
     unsubscribe,
-    
+
     // Status
     getConnectionInfo: () => connectionInfo,
     getMessageStats: () => messageStats,
-    
+
     // Event handlers
     setEventHandlers,
   };
@@ -614,7 +669,7 @@ export const useWebSocketSubscription = (
   deps: React.DependencyList = []
 ) => {
   const { subscribe } = useWebSocket();
-  
+
   useEffect(() => {
     const unsubscribe = subscribe(messageType, handler);
     return unsubscribe;
@@ -624,13 +679,15 @@ export const useWebSocketSubscription = (
 // Hook for sending messages
 export const useWebSocketSender = () => {
   const { send, isConnected } = useWebSocket();
-  
+
   return {
     send,
     isConnected,
     sendMessage: (type: string, payload: any, options?: MessageOptions) => {
       if (!isConnected) {
-        console.warn(`Cannot send message of type ${type}: WebSocket not connected`);
+        console.warn(
+          `Cannot send message of type ${type}: WebSocket not connected`
+        );
         return false;
       }
       return send(type, payload, options);
@@ -644,7 +701,7 @@ export const withWebSocket = <P extends object>(
 ) => {
   return React.forwardRef<any, P>((props, ref) => {
     const websocket = useWebSocket();
-    return <Component {...props} websocket={websocket} ref={ref} />;
+    return <Component {...(props as P)} websocket={websocket} ref={ref} />;
   });
 };
 
@@ -654,10 +711,12 @@ export const WebSocketStatus: React.FC<{
   className?: string;
 }> = ({ showDetails = false, className }) => {
   const { state, isConnected, lastError, reconnectAttempt } = useWebSocket();
-  
 
   return (
-    <div className={className} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+    <div
+      className={className}
+      style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+    >
       <div
         style={{
           width: '8px',
@@ -667,7 +726,7 @@ export const WebSocketStatus: React.FC<{
         }}
         title={`WebSocket ${getConnectionStatusText(state as any, reconnectAttempt)}`}
       />
-      
+
       {showDetails && (
         <div style={{ fontSize: '12px', color: '#6b7280' }}>
           <span>{getConnectionStatusText(state as any, reconnectAttempt)}</span>

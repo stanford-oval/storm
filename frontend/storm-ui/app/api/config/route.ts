@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { logger } from '@/utils/logger';
 
 // API Configuration endpoint for frontend-backend connection
 // This provides configuration info and health checks for the STORM API
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const backendUrl = process.env.STORM_API_URL || 'http://localhost:8000';
-    
+
     // Test backend connectivity
     const healthCheck = await fetch(`${backendUrl}/health`, {
       method: 'GET',
@@ -16,7 +17,8 @@ export async function GET(request: NextRequest) {
     }).catch(() => null);
 
     const isBackendHealthy = healthCheck?.ok || false;
-    const backendVersion = healthCheck?.headers.get('X-STORM-Version') || 'unknown';
+    const backendVersion =
+      healthCheck?.headers.get('X-STORM-Version') || 'unknown';
 
     const config = {
       backend: {
@@ -50,10 +52,9 @@ export async function GET(request: NextRequest) {
       data: config,
       timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
-    console.error('Config API error:', error);
-    
+    logger.error('Config API error:', error);
+
     return NextResponse.json(
       {
         success: false,
@@ -73,8 +74,9 @@ export async function POST(request: NextRequest) {
     switch (action) {
       case 'test_connection': {
         const { url } = params;
-        const backendUrl = url || process.env.STORM_API_URL || 'http://localhost:8000';
-        
+        const backendUrl =
+          url || process.env.STORM_API_URL || 'http://localhost:8000';
+
         try {
           const response = await fetch(`${backendUrl}/health`, {
             method: 'GET',
@@ -90,7 +92,7 @@ export async function POST(request: NextRequest) {
           }
 
           const health = await response.json();
-          
+
           return NextResponse.json({
             success: true,
             data: {
@@ -114,22 +116,27 @@ export async function POST(request: NextRequest) {
 
       case 'validate_api_keys': {
         const { keys } = params;
-        const validationResults: Record<string, { valid: boolean; error?: string }> = {};
+        const validationResults: Record<
+          string,
+          { valid: boolean; error?: string }
+        > = {};
 
         // Validate OpenAI API Key
         if (keys.openai) {
           try {
             const response = await fetch('https://api.openai.com/v1/models', {
               headers: {
-                'Authorization': `Bearer ${keys.openai}`,
+                Authorization: `Bearer ${keys.openai}`,
                 'Content-Type': 'application/json',
               },
               signal: AbortSignal.timeout(10000),
             });
-            
+
             validationResults.openai = {
               valid: response.ok,
-              error: response.ok ? undefined : 'Invalid API key or network error',
+              error: response.ok
+                ? undefined
+                : 'Invalid API key or network error',
             };
           } catch (error) {
             validationResults.openai = {
@@ -142,21 +149,24 @@ export async function POST(request: NextRequest) {
         // Validate Anthropic API Key
         if (keys.anthropic) {
           try {
-            const response = await fetch('https://api.anthropic.com/v1/messages', {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${keys.anthropic}`,
-                'Content-Type': 'application/json',
-                'anthropic-version': '2023-06-01',
-              },
-              body: JSON.stringify({
-                model: 'claude-3-sonnet-20240229',
-                max_tokens: 1,
-                messages: [{ role: 'user', content: 'test' }],
-              }),
-              signal: AbortSignal.timeout(10000),
-            });
-            
+            const response = await fetch(
+              'https://api.anthropic.com/v1/messages',
+              {
+                method: 'POST',
+                headers: {
+                  Authorization: `Bearer ${keys.anthropic}`,
+                  'Content-Type': 'application/json',
+                  'anthropic-version': '2023-06-01',
+                },
+                body: JSON.stringify({
+                  model: 'claude-3-sonnet-20240229',
+                  max_tokens: 1,
+                  messages: [{ role: 'user', content: 'test' }],
+                }),
+                signal: AbortSignal.timeout(10000),
+              }
+            );
+
             // Anthropic returns 400 for invalid requests but 401 for auth issues
             validationResults.anthropic = {
               valid: response.status !== 401,
@@ -178,7 +188,7 @@ export async function POST(request: NextRequest) {
 
       case 'get_supported_models': {
         const { provider } = params;
-        
+
         // Return supported models for different providers
         const supportedModels: Record<string, string[]> = {
           openai: [
@@ -192,23 +202,9 @@ export async function POST(request: NextRequest) {
             'claude-3-sonnet-20240229',
             'claude-3-haiku-20240307',
           ],
-          azure: [
-            'gpt-4',
-            'gpt-4-32k',
-            'gpt-35-turbo',
-            'gpt-35-turbo-16k',
-          ],
-          ollama: [
-            'llama2',
-            'codellama',
-            'mistral',
-            'neural-chat',
-          ],
-          groq: [
-            'llama2-70b-4096',
-            'mixtral-8x7b-32768',
-            'gemma-7b-it',
-          ],
+          azure: ['gpt-4', 'gpt-4-32k', 'gpt-35-turbo', 'gpt-35-turbo-16k'],
+          ollama: ['llama2', 'codellama', 'mistral', 'neural-chat'],
+          groq: ['llama2-70b-4096', 'mixtral-8x7b-32768', 'gemma-7b-it'],
         };
 
         return NextResponse.json({
@@ -229,8 +225,8 @@ export async function POST(request: NextRequest) {
         );
     }
   } catch (error) {
-    console.error('Config API POST error:', error);
-    
+    logger.error('Config API POST error:', error);
+
     return NextResponse.json(
       {
         success: false,
@@ -245,13 +241,13 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
-    
+
     // This would typically save configuration to a database or file
     // For now, we just validate the configuration structure
-    
+
     const requiredFields = ['llm', 'retriever', 'pipeline'];
     const missingFields = requiredFields.filter(field => !(field in body));
-    
+
     if (missingFields.length > 0) {
       return NextResponse.json(
         {
@@ -286,17 +282,16 @@ export async function PUT(request: NextRequest) {
 
     // In a real implementation, you would save this configuration
     // For now, just return success
-    
+
     return NextResponse.json({
       success: true,
       message: 'Configuration saved successfully',
       data: body,
       timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
-    console.error('Config API PUT error:', error);
-    
+    logger.error('Config API PUT error:', error);
+
     return NextResponse.json(
       {
         success: false,

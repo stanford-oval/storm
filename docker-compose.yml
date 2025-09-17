@@ -1,46 +1,6 @@
 version: '3.8'
 
 services:
-  # PostgreSQL Database
-  postgres:
-    image: postgres:15-alpine
-    container_name: storm-postgres
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:-storm}
-      POSTGRES_USER: ${POSTGRES_USER:-storm}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-storm123}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./backend/sql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
-    ports:
-      - "${POSTGRES_PORT:-5432}:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-storm}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-    networks:
-      - storm-network
-
-  # Redis for caching and task queue
-  redis:
-    image: redis:7-alpine
-    container_name: storm-redis
-    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redis123}
-    volumes:
-      - redis_data:/data
-    ports:
-      - "${REDIS_PORT:-6379}:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-    networks:
-      - storm-network
-
   # Qdrant Vector Database (optional, for VectorRM)
   qdrant:
     image: qdrant/qdrant:latest
@@ -72,8 +32,6 @@ services:
     container_name: storm-backend
     environment:
       - NODE_ENV=${NODE_ENV:-production}
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-storm}:${POSTGRES_PASSWORD:-storm123}@postgres:5432/${POSTGRES_DB:-storm}
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-redis123}@redis:6379
       - QDRANT_URL=http://qdrant:6333
       - API_PORT=${BACKEND_PORT:-8000}
       - API_HOST=0.0.0.0
@@ -84,18 +42,13 @@ services:
       - MAX_WORKERS=${MAX_WORKERS:-4}
       - WORKER_TIMEOUT=${WORKER_TIMEOUT:-120}
     volumes:
-      - ./backend/data:/app/data
+      - ./storm-projects:/app/storm-projects
       - ./backend/logs:/app/logs
       - backend_uploads:/app/uploads
     ports:
       - "${BACKEND_PORT:-8000}:8000"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -111,51 +64,6 @@ services:
         reservations:
           memory: 512M
           cpus: '0.5'
-
-  # Celery Worker for background tasks
-  worker:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile.prod
-      args:
-        - BUILDKIT_INLINE_CACHE=1
-    container_name: storm-worker
-    command: celery -A main.celery_app worker --loglevel=info --concurrency=2
-    environment:
-      - NODE_ENV=${NODE_ENV:-production}
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-storm}:${POSTGRES_PASSWORD:-storm123}@postgres:5432/${POSTGRES_DB:-storm}
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-redis123}@redis:6379
-      - QDRANT_URL=http://qdrant:6333
-      - CELERY_BROKER_URL=redis://:${REDIS_PASSWORD:-redis123}@redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://:${REDIS_PASSWORD:-redis123}@redis:6379/0
-    volumes:
-      - ./backend/data:/app/data
-      - ./backend/logs:/app/logs
-      - backend_uploads:/app/uploads
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      backend:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "celery", "-A", "main.celery_app", "inspect", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    restart: unless-stopped
-    networks:
-      - storm-network
-    deploy:
-      resources:
-        limits:
-          memory: 4G
-          cpus: '2'
-        reservations:
-          memory: 1G
-          cpus: '1'
 
   # Frontend Next.js Application
   frontend:
@@ -221,32 +129,7 @@ services:
     profiles:
       - production
 
-  # Flower (Celery monitoring) - Development only
-  flower:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile.prod
-    container_name: storm-flower
-    command: celery -A main.celery_app flower --port=5555
-    environment:
-      - CELERY_BROKER_URL=redis://:${REDIS_PASSWORD:-redis123}@redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://:${REDIS_PASSWORD:-redis123}@redis:6379/0
-      - FLOWER_BASIC_AUTH=${FLOWER_USER:-admin}:${FLOWER_PASSWORD:-flower123}
-    ports:
-      - "${FLOWER_PORT:-5555}:5555"
-    depends_on:
-      - redis
-    restart: unless-stopped
-    networks:
-      - storm-network
-    profiles:
-      - development
-
 volumes:
-  postgres_data:
-    driver: local
-  redis_data:
-    driver: local
   qdrant_data:
     driver: local
   backend_uploads:

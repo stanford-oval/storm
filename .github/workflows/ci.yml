@@ -22,29 +22,7 @@ jobs:
       matrix:
         python-version: ['3.11']
     
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: storm_test
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-      
-      redis:
-        image: redis:7
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 6379:6379
+    # No database services needed - using file-based storage
 
     steps:
     - name: Checkout code
@@ -78,13 +56,11 @@ jobs:
 
     - name: Type check with mypy
       run: |
-        pip install mypy
-        mypy backend/ --ignore-missing-imports
+        pip install mypy types-requests types-toml types-pytz
+        mypy backend/ --ignore-missing-imports --exclude '.*transformers.*'
 
     - name: Test with pytest
       env:
-        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/storm_test
-        REDIS_URL: redis://localhost:6379
         SECRET_KEY: test-secret-key
       run: |
         cd backend
@@ -156,7 +132,7 @@ jobs:
         npm run test:e2e
 
     - name: Upload test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: failure()
       with:
         name: playwright-report
@@ -183,7 +159,7 @@ jobs:
         output: 'trivy-results.sarif'
 
     - name: Upload Trivy scan results
-      uses: github/codeql-action/upload-sarif@v2
+      uses: github/codeql-action/upload-sarif@v3
       if: always()
       with:
         sarif_file: 'trivy-results.sarif'
@@ -313,9 +289,6 @@ jobs:
     - name: Create environment file
       run: |
         cat > .env << EOF
-        POSTGRES_DB=storm
-        POSTGRES_USER=storm
-        POSTGRES_PASSWORD=storm123
         REDIS_PASSWORD=redis123
         SECRET_KEY=test-secret-key
         NODE_ENV=test
@@ -324,7 +297,7 @@ jobs:
 
     - name: Start services with Docker Compose
       run: |
-        docker-compose -f docker-compose.yml up -d postgres redis backend
+        docker-compose -f docker-compose.yml up -d backend
         
     - name: Wait for services to be ready
       run: |

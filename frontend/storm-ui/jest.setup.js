@@ -2,6 +2,43 @@ import '@testing-library/jest-dom';
 import 'jest-axe/extend-expect';
 import WS from 'jest-websocket-mock';
 
+// Add fetch polyfills for MSW in Node environment
+import 'whatwg-fetch';
+const nodeFetch = require('node-fetch');
+global.fetch = nodeFetch;
+global.Headers = nodeFetch.Headers;
+global.Request = nodeFetch.Request;
+global.Response = nodeFetch.Response;
+
+// Add TransformStream polyfill for MSW
+if (typeof global.TransformStream === 'undefined') {
+  const { TransformStream } = require('stream/web');
+  global.TransformStream = TransformStream;
+}
+
+// Add BroadcastChannel polyfill for MSW
+if (typeof global.BroadcastChannel === 'undefined') {
+  global.BroadcastChannel = class BroadcastChannel {
+    constructor(name) {
+      this.name = name;
+      this.onmessage = null;
+      this.onmessageerror = null;
+    }
+    postMessage() {}
+    close() {}
+    addEventListener() {}
+    removeEventListener() {}
+    dispatchEvent() {
+      return true;
+    }
+  };
+}
+
+// Add TextEncoder/TextDecoder polyfills for Node environment
+import { TextEncoder, TextDecoder } from 'util';
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;
+
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {
   constructor() {}
@@ -106,15 +143,16 @@ global.performance.measure = jest.fn();
 // Add custom matchers
 expect.extend({
   toHaveBeenCalledWithWebSocketMessage: (received, expectedMessage) => {
-    const pass = received.mock.calls.some(call => 
-      call[0] === JSON.stringify(expectedMessage)
+    const pass = received.mock.calls.some(
+      call => call[0] === JSON.stringify(expectedMessage)
     );
-    
+
     return {
       pass,
-      message: () => pass 
-        ? `Expected WebSocket not to have been called with ${JSON.stringify(expectedMessage)}`
-        : `Expected WebSocket to have been called with ${JSON.stringify(expectedMessage)}`
+      message: () =>
+        pass
+          ? `Expected WebSocket not to have been called with ${JSON.stringify(expectedMessage)}`
+          : `Expected WebSocket to have been called with ${JSON.stringify(expectedMessage)}`,
     };
   },
 });
@@ -127,8 +165,8 @@ console.error = (...args) => {
   if (
     typeof args[0] === 'string' &&
     (args[0].includes('Warning: ReactDOM.render is no longer supported') ||
-     args[0].includes('Warning: React.createFactory') ||
-     args[0].includes('act(...)'))
+      args[0].includes('Warning: React.createFactory') ||
+      args[0].includes('act(...)'))
   ) {
     return;
   }
@@ -139,8 +177,8 @@ console.warn = (...args) => {
   if (
     typeof args[0] === 'string' &&
     (args[0].includes('componentWillReceiveProps') ||
-     args[0].includes('componentWillMount') ||
-     args[0].includes('componentWillUpdate'))
+      args[0].includes('componentWillMount') ||
+      args[0].includes('componentWillUpdate'))
   ) {
     return;
   }

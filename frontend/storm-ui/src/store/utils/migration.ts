@@ -19,7 +19,10 @@ export interface MigrationResult<T> {
 }
 
 // Migration function type
-export type MigrationFunction<T = any> = (state: T, context: MigrationContext) => T;
+export type MigrationFunction<T = any> = (
+  state: T,
+  context: MigrationContext
+) => T;
 
 // Enhanced migration with validation and rollback
 export interface EnhancedMigration<T = any> {
@@ -50,8 +53,8 @@ export class MigrationManager<T> {
 
   // Apply migrations from one version to another
   migrate(
-    state: T, 
-    fromVersion: number, 
+    state: T,
+    fromVersion: number,
     toVersion: number
   ): MigrationResult<T> {
     const result: MigrationResult<T> = {
@@ -64,16 +67,21 @@ export class MigrationManager<T> {
 
     try {
       // Get sorted list of migrations to apply
-      const migrationsToApply = this.getMigrationsInRange(fromVersion, toVersion);
-      
+      const migrationsToApply = this.getMigrationsInRange(
+        fromVersion,
+        toVersion
+      );
+
       if (migrationsToApply.length === 0) {
         return result;
       }
 
-      console.log(`🔄 [${this.storeName}] Applying ${migrationsToApply.length} migrations from v${fromVersion} to v${toVersion}`);
+      console.log(
+        `🔄 [${this.storeName}] Applying ${migrationsToApply.length} migrations from v${fromVersion} to v${toVersion}`
+      );
 
       let currentState = this.deepClone(state);
-      
+
       // Apply each migration in order
       for (const migration of migrationsToApply) {
         try {
@@ -88,12 +96,14 @@ export class MigrationManager<T> {
           if (migration.validate && !migration.validate(currentState)) {
             const error = `State validation failed for migration v${migration.version}`;
             result.errors.push(error);
-            
+
             if (migration.critical) {
               result.success = false;
               break;
             } else {
-              result.warnings.push(`Skipping non-critical migration v${migration.version} due to validation failure`);
+              result.warnings.push(
+                `Skipping non-critical migration v${migration.version} due to validation failure`
+              );
               continue;
             }
           }
@@ -106,21 +116,24 @@ export class MigrationManager<T> {
 
           // Apply migration
           const migratedState = migration.up(currentState, context);
-          
-          console.log(`✅ [${this.storeName}] Applied migration v${migration.version}: ${migration.description}`);
-          
+
+          console.log(
+            `✅ [${this.storeName}] Applied migration v${migration.version}: ${migration.description}`
+          );
+
           currentState = migratedState;
           result.appliedMigrations.push(migration.version);
-
         } catch (error) {
           const errorMessage = `Migration v${migration.version} failed: ${error instanceof Error ? error.message : String(error)}`;
           result.errors.push(errorMessage);
-          
+
           if (migration.critical) {
             result.success = false;
             break;
           } else {
-            result.warnings.push(`Non-critical migration v${migration.version} failed but continuing`);
+            result.warnings.push(
+              `Non-critical migration v${migration.version} failed but continuing`
+            );
           }
         }
       }
@@ -128,39 +141,46 @@ export class MigrationManager<T> {
       result.migratedState = currentState;
 
       if (result.success) {
-        console.log(`🎉 [${this.storeName}] Successfully migrated from v${fromVersion} to v${toVersion}`);
+        console.log(
+          `🎉 [${this.storeName}] Successfully migrated from v${fromVersion} to v${toVersion}`
+        );
       } else {
         console.error(`❌ [${this.storeName}] Migration failed`, result.errors);
       }
 
       return result;
-
     } catch (error) {
       result.success = false;
-      result.errors.push(`Migration process failed: ${error instanceof Error ? error.message : String(error)}`);
+      result.errors.push(
+        `Migration process failed: ${error instanceof Error ? error.message : String(error)}`
+      );
       return result;
     }
   }
 
   // Rollback to a previous version
   rollback(targetVersion: number): T | null {
-    const rollbackPoint = this.rollbackStack.find(point => point.version <= targetVersion);
-    
+    const rollbackPoint = this.rollbackStack.find(
+      point => point.version <= targetVersion
+    );
+
     if (!rollbackPoint) {
-      console.error(`❌ [${this.storeName}] No rollback point found for version ${targetVersion}`);
+      console.error(
+        `❌ [${this.storeName}] No rollback point found for version ${targetVersion}`
+      );
       return null;
     }
 
     // Apply down migrations if available
-    const migrationsToRollback = this.rollbackStack.filter(
-      point => point.version > targetVersion
-    ).reverse();
+    const migrationsToRollback = this.rollbackStack
+      .filter(point => point.version > targetVersion)
+      .reverse();
 
     let currentState = rollbackPoint.state;
 
     for (const point of migrationsToRollback) {
       const migration = this.migrations.get(point.version);
-      
+
       if (migration?.down) {
         try {
           const context: MigrationContext = {
@@ -169,26 +189,38 @@ export class MigrationManager<T> {
             storeName: this.storeName,
             timestamp: Date.now(),
           };
-          
+
           currentState = migration.down(currentState, context);
-          console.log(`↩️ [${this.storeName}] Rolled back migration v${point.version}`);
+          console.log(
+            `↩️ [${this.storeName}] Rolled back migration v${point.version}`
+          );
         } catch (error) {
-          console.error(`❌ [${this.storeName}] Rollback failed for migration v${point.version}:`, error);
+          console.error(
+            `❌ [${this.storeName}] Rollback failed for migration v${point.version}:`,
+            error
+          );
         }
       }
     }
 
     // Clear rollback stack beyond target version
-    this.rollbackStack = this.rollbackStack.filter(point => point.version <= targetVersion);
+    this.rollbackStack = this.rollbackStack.filter(
+      point => point.version <= targetVersion
+    );
 
-    console.log(`🔄 [${this.storeName}] Rolled back to version ${targetVersion}`);
+    console.log(
+      `🔄 [${this.storeName}] Rolled back to version ${targetVersion}`
+    );
     return currentState;
   }
 
   // Get migrations in version range
-  private getMigrationsInRange(fromVersion: number, toVersion: number): EnhancedMigration<T>[] {
+  private getMigrationsInRange(
+    fromVersion: number,
+    toVersion: number
+  ): EnhancedMigration<T>[] {
     const migrations: EnhancedMigration<T>[] = [];
-    
+
     // Get all migration versions in range
     const versions = Array.from(this.migrations.keys())
       .filter(version => version > fromVersion && version <= toVersion)
@@ -245,7 +277,8 @@ export class MigrationManager<T> {
       storeName: this.storeName,
       totalMigrations: migrations.length,
       versions: migrations.map(m => m.version),
-      latestVersion: migrations.length > 0 ? Math.max(...migrations.map(m => m.version)) : 0,
+      latestVersion:
+        migrations.length > 0 ? Math.max(...migrations.map(m => m.version)) : 0,
       migrations: migrations.map(m => ({
         version: m.version,
         description: m.description,
@@ -282,25 +315,29 @@ export const createMigration = <T>(
 // Common migration utilities
 export const migrationUtils = {
   // Add a field with default value
-  addField: <T, K extends string, V>(
-    field: K,
-    defaultValue: V
-  ): MigrationFunction<T & Record<K, V>> =>
-    (state) => ({
-      ...state,
-      [field]: defaultValue,
-    } as T & Record<K, V>),
+  addField:
+    <T, K extends string, V>(
+      field: K,
+      defaultValue: V
+    ): MigrationFunction<T & Record<K, V>> =>
+    state =>
+      ({
+        ...state,
+        [field]: defaultValue,
+      }) as T & Record<K, V>,
 
   // Remove a field
-  removeField: <T>(field: string): MigrationFunction<T> =>
-    (state) => {
+  removeField:
+    <T>(field: string): MigrationFunction<T> =>
+    state => {
       const { [field]: removed, ...rest } = state as any;
       return rest;
     },
 
   // Rename a field
-  renameField: <T>(oldField: string, newField: string): MigrationFunction<T> =>
-    (state) => {
+  renameField:
+    <T>(oldField: string, newField: string): MigrationFunction<T> =>
+    state => {
       const newState = { ...state } as any;
       if (oldField in newState) {
         newState[newField] = newState[oldField];
@@ -310,21 +347,23 @@ export const migrationUtils = {
     },
 
   // Transform field value
-  transformField: <T, K extends keyof T>(
-    field: K,
-    transformer: (value: T[K]) => T[K]
-  ): MigrationFunction<T> =>
-    (state) => ({
+  transformField:
+    <T, K extends keyof T>(
+      field: K,
+      transformer: (value: T[K]) => T[K]
+    ): MigrationFunction<T> =>
+    state => ({
       ...state,
       [field]: transformer(state[field]),
     }),
 
   // Migrate array items
-  migrateArrayItems: <T, I>(
-    arrayField: keyof T,
-    itemMigration: (item: I) => I
-  ): MigrationFunction<T> =>
-    (state) => {
+  migrateArrayItems:
+    <T, I>(
+      arrayField: keyof T,
+      itemMigration: (item: I) => I
+    ): MigrationFunction<T> =>
+    state => {
       const array = (state as any)[arrayField];
       if (Array.isArray(array)) {
         return {
@@ -336,14 +375,17 @@ export const migrationUtils = {
     },
 
   // Change data structure
-  restructure: <T, R>(restructurer: (state: T) => R): MigrationFunction<R> =>
-    restructurer,
+  restructure:
+    <T, R>(restructurer: (state: T) => R): MigrationFunction<R> =>
+    (state: any) =>
+      restructurer(state as T),
 
   // Conditional migration
-  conditional: <T>(
-    condition: (state: T) => boolean,
-    migration: MigrationFunction<T>
-  ): MigrationFunction<T> =>
+  conditional:
+    <T>(
+      condition: (state: T) => boolean,
+      migration: MigrationFunction<T>
+    ): MigrationFunction<T> =>
     (state, context) => {
       if (condition(state)) {
         return migration(state, context);
@@ -352,10 +394,12 @@ export const migrationUtils = {
     },
 
   // Compose multiple migrations
-  compose: <T>(...migrations: MigrationFunction<T>[]): MigrationFunction<T> =>
+  compose:
+    <T>(...migrations: MigrationFunction<T>[]): MigrationFunction<T> =>
     (state, context) => {
-      return migrations.reduce((currentState, migration) => 
-        migration(currentState, context), state
+      return migrations.reduce(
+        (currentState, migration) => migration(currentState, context),
+        state
       );
     },
 };
@@ -366,15 +410,15 @@ export const versionUtils = {
   compareSemanticVersions: (v1: string, v2: string): number => {
     const parts1 = v1.split('.').map(Number);
     const parts2 = v2.split('.').map(Number);
-    
+
     for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
       const part1 = parts1[i] || 0;
       const part2 = parts2[i] || 0;
-      
+
       if (part1 > part2) return 1;
       if (part1 < part2) return -1;
     }
-    
+
     return 0;
   },
 
@@ -389,7 +433,7 @@ export const versionUtils = {
     const major = Math.floor(version / 10000);
     const minor = Math.floor((version % 10000) / 100);
     const patch = version % 100;
-    
+
     return `${major}.${minor}.${patch}`;
   },
 };
@@ -401,29 +445,32 @@ export const createStoreWithMigrations = <T>(
 ) => {
   const migrationManager = new MigrationManager<T>(storeName);
   migrationManager.addMigrations(migrations);
-  
+
   return {
     migrationManager,
-    createMigrator: (currentVersion: number) => (
-      persistedState: any,
-      version: number
-    ): T | null => {
-      if (version >= currentVersion) {
-        return persistedState;
-      }
-      
-      const result = migrationManager.migrate(persistedState, version, currentVersion);
-      
-      if (!result.success) {
-        console.error(`Failed to migrate ${storeName} store:`, result.errors);
-        return null;
-      }
-      
-      if (result.warnings.length > 0) {
-        console.warn(`Migration warnings for ${storeName}:`, result.warnings);
-      }
-      
-      return result.migratedState;
-    },
+    createMigrator:
+      (currentVersion: number) =>
+      (persistedState: any, version: number): T | null => {
+        if (version >= currentVersion) {
+          return persistedState;
+        }
+
+        const result = migrationManager.migrate(
+          persistedState,
+          version,
+          currentVersion
+        );
+
+        if (!result.success) {
+          console.error(`Failed to migrate ${storeName} store:`, result.errors);
+          return null;
+        }
+
+        if (result.warnings.length > 0) {
+          console.warn(`Migration warnings for ${storeName}:`, result.warnings);
+        }
+
+        return result.migratedState;
+      },
   };
 };

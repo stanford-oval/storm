@@ -9,6 +9,7 @@ Data visualization and analytics dashboard components built with Recharts.
 A comprehensive analytics dashboard for monitoring STORM pipeline performance, token usage, and system metrics.
 
 **Features:**
+
 - Real-time pipeline metrics visualization
 - Token usage and cost analysis
 - Research statistics tracking
@@ -31,8 +32,8 @@ const analyticsData = {
       duration: 120,
       tokensUsed: 15000,
       success: true,
-      timestamp: '2024-01-01T10:00:00Z'
-    }
+      timestamp: '2024-01-01T10:00:00Z',
+    },
   ],
   tokenUsage: [
     {
@@ -42,9 +43,9 @@ const analyticsData = {
       totalTokens: 20000,
       cost: 0.6,
       timestamp: '2024-01-01T10:00:00Z',
-      operation: 'research'
-    }
-  ]
+      operation: 'research',
+    },
+  ],
 };
 
 function MyAnalytics() {
@@ -61,15 +62,15 @@ function MyAnalytics() {
           researchStats: true,
           performance: true,
           userActivity: true,
-          costAnalysis: true
-        }
+          costAnalysis: true,
+        },
       }}
       theme={{
         primary: '#3b82f6',
         secondary: '#06b6d4',
         success: '#10b981',
         warning: '#f59e0b',
-        error: '#ef4444'
+        error: '#ef4444',
       }}
     />
   );
@@ -79,21 +80,25 @@ function MyAnalytics() {
 ## Chart Types
 
 ### Pipeline Metrics
+
 - **Bar Charts**: Stage duration comparison
 - **Composed Charts**: Duration vs token usage correlation
 - **Success Rate**: Pipeline success/failure tracking
 
 ### Token Usage
+
 - **Line Charts**: Token consumption over time
 - **Pie Charts**: Model usage distribution
 - **Cost Analysis**: Financial impact tracking
 
 ### Research Statistics
+
 - **Area Charts**: Source utilization trends
 - **Scatter Plots**: Confidence vs coverage analysis
 - **Heat Maps**: Topic coverage visualization
 
 ### Performance Monitoring
+
 - **Time Series**: Response time trends
 - **Gauge Charts**: System health indicators
 - **Progress Bars**: Availability metrics
@@ -101,6 +106,7 @@ function MyAnalytics() {
 ## Data Types
 
 ### PipelineMetrics
+
 ```typescript
 interface PipelineMetrics {
   stage: 'research' | 'outline' | 'generation' | 'polish';
@@ -113,6 +119,7 @@ interface PipelineMetrics {
 ```
 
 ### TokenUsage
+
 ```typescript
 interface TokenUsage {
   model: string;
@@ -126,6 +133,7 @@ interface TokenUsage {
 ```
 
 ### ResearchStats
+
 ```typescript
 interface ResearchStats {
   queriesExecuted: number;
@@ -140,6 +148,7 @@ interface ResearchStats {
 ## Configuration
 
 ### Dashboard Config
+
 ```typescript
 interface DashboardConfig {
   timeRange: '1h' | '24h' | '7d' | '30d' | 'custom';
@@ -161,6 +170,7 @@ interface DashboardConfig {
 ```
 
 ### Chart Themes
+
 ```typescript
 interface ChartTheme {
   primary: string;
@@ -177,18 +187,21 @@ interface ChartTheme {
 ## Features
 
 ### Interactive Elements
+
 - **Drill-down**: Click charts to view detailed data
 - **Filtering**: Filter by time range, model, or stage
 - **Zooming**: Zoom into specific time periods
 - **Tooltips**: Rich hover information
 
 ### Export Options
+
 - **JSON**: Raw data export
 - **CSV**: Spreadsheet-compatible format
 - **PNG/SVG**: Chart image export
 - **PDF**: Report generation
 
 ### Real-time Updates
+
 - **WebSocket**: Live data streaming
 - **Auto-refresh**: Configurable refresh intervals
 - **Push Notifications**: Alert on anomalies
@@ -232,9 +245,7 @@ function CustomWidget({ title, data, loading, error }: CustomWidgetProps) {
       <CardContent>
         {/* Your custom visualization */}
         <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={data}>
-            {/* Chart configuration */}
-          </BarChart>
+          <BarChart data={data}>{/* Chart configuration */}</BarChart>
         </ResponsiveContainer>
       </CardContent>
     </Card>

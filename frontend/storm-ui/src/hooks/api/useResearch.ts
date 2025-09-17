@@ -1,6 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { researchService } from '../../services/research';
-import { ResearchData, ConversationData, SourceData, SearchRequest } from '../../types/api';
+import {
+  ResearchData,
+  ConversationData,
+  SourceData,
+  SearchRequest,
+} from '../../types/api';
 import { useToast } from '../useToast';
 
 export interface UseResearchOptions {
@@ -20,7 +25,10 @@ export interface UseResearchResult {
     snippet: string;
     content?: string;
   }) => Promise<SourceData | null>;
-  updateSource: (sourceId: string, updates: Partial<SourceData>) => Promise<SourceData | null>;
+  updateSource: (
+    sourceId: string,
+    updates: Partial<SourceData>
+  ) => Promise<SourceData | null>;
   deleteSource: (sourceId: string) => Promise<boolean>;
   rateSource: (sourceId: string, rating: number) => Promise<SourceData | null>;
 }
@@ -36,7 +44,9 @@ export function useResearch(options: UseResearchOptions): UseResearchResult {
     setError(null);
 
     try {
-      const response = await researchService.getProjectResearch(options.projectId);
+      const response = await researchService.getProjectResearch(
+        options.projectId
+      );
 
       if (response.success && response.data) {
         setResearch(response.data);
@@ -44,7 +54,8 @@ export function useResearch(options: UseResearchOptions): UseResearchResult {
         throw new Error(response.error || 'Failed to fetch research data');
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch research data';
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to fetch research data';
       setError(errorMessage);
       toast({
         title: 'Error',
@@ -56,196 +67,245 @@ export function useResearch(options: UseResearchOptions): UseResearchResult {
     }
   }, [options.projectId, toast]);
 
-  const search = useCallback(async (request: SearchRequest) => {
-    setLoading(true);
-    setError(null);
+  const search = useCallback(
+    async (request: SearchRequest) => {
+      setLoading(true);
+      setError(null);
 
-    try {
-      const response = await researchService.search(request);
+      try {
+        const response = await researchService.search(request);
 
-      if (response.success && response.data) {
+        if (response.success && response.data) {
+          toast({
+            title: 'Success',
+            description: `Found ${response.data.length} search results`,
+            variant: 'success',
+          });
+          return response.data;
+        } else {
+          throw new Error(response.error || 'Search failed');
+        }
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Search failed';
+        setError(errorMessage);
         toast({
-          title: 'Success',
-          description: `Found ${response.data.length} search results`,
-          variant: 'success',
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
         });
-        return response.data;
-      } else {
-        throw new Error(response.error || 'Search failed');
+        return null;
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Search failed';
-      setError(errorMessage);
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, [toast]);
+    },
+    [toast]
+  );
 
-  const addCustomSource = useCallback(async (source: {
-    title: string;
-    url: string;
-    snippet: string;
-    content?: string;
-  }): Promise<SourceData | null> => {
-    setLoading(true);
-    setError(null);
+  const addCustomSource = useCallback(
+    async (source: {
+      title: string;
+      url: string;
+      snippet: string;
+      content?: string;
+    }): Promise<SourceData | null> => {
+      setLoading(true);
+      setError(null);
 
-    try {
-      const response = await researchService.addCustomSource(options.projectId, source);
+      try {
+        const response = await researchService.addCustomSource(
+          options.projectId,
+          source
+        );
 
-      if (response.success && response.data) {
-        // Update research data with new source
-        setResearch(prev => prev ? {
-          ...prev,
-          sources: [...prev.sources, response.data!],
-          lastUpdated: new Date()
-        } : null);
+        if (response.success && response.data) {
+          // Update research data with new source
+          setResearch(prev =>
+            prev
+              ? {
+                  ...prev,
+                  sources: [...prev.sources, response.data!],
+                  lastUpdated: new Date(),
+                }
+              : null
+          );
 
+          toast({
+            title: 'Success',
+            description: 'Source added successfully',
+            variant: 'success',
+          });
+
+          return response.data;
+        } else {
+          throw new Error(response.error || 'Failed to add source');
+        }
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Failed to add source';
+        setError(errorMessage);
         toast({
-          title: 'Success',
-          description: 'Source added successfully',
-          variant: 'success',
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
         });
-
-        return response.data;
-      } else {
-        throw new Error(response.error || 'Failed to add source');
+        return null;
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to add source';
-      setError(errorMessage);
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, [options.projectId, toast]);
+    },
+    [options.projectId, toast]
+  );
 
-  const updateSource = useCallback(async (
-    sourceId: string,
-    updates: Partial<SourceData>
-  ): Promise<SourceData | null> => {
-    setLoading(true);
-    setError(null);
+  const updateSource = useCallback(
+    async (
+      sourceId: string,
+      updates: Partial<SourceData>
+    ): Promise<SourceData | null> => {
+      setLoading(true);
+      setError(null);
 
-    try {
-      const response = await researchService.updateSource(options.projectId, sourceId, updates);
+      try {
+        const response = await researchService.updateSource(
+          options.projectId,
+          sourceId,
+          updates
+        );
 
-      if (response.success && response.data) {
-        // Update research data with updated source
-        setResearch(prev => prev ? {
-          ...prev,
-          sources: prev.sources.map(source =>
-            source.id === sourceId ? response.data! : source
-          ),
-          lastUpdated: new Date()
-        } : null);
+        if (response.success && response.data) {
+          // Update research data with updated source
+          setResearch(prev =>
+            prev
+              ? {
+                  ...prev,
+                  sources: prev.sources.map(source =>
+                    source.id === sourceId ? response.data! : source
+                  ),
+                  lastUpdated: new Date(),
+                }
+              : null
+          );
 
+          toast({
+            title: 'Success',
+            description: 'Source updated successfully',
+            variant: 'success',
+          });
+
+          return response.data;
+        } else {
+          throw new Error(response.error || 'Failed to update source');
+        }
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Failed to update source';
+        setError(errorMessage);
         toast({
-          title: 'Success',
-          description: 'Source updated successfully',
-          variant: 'success',
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
         });
-
-        return response.data;
-      } else {
-        throw new Error(response.error || 'Failed to update source');
+        return null;
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to update source';
-      setError(errorMessage);
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, [options.projectId, toast]);
+    },
+    [options.projectId, toast]
+  );
 
-  const deleteSource = useCallback(async (sourceId: string): Promise<boolean> => {
-    setLoading(true);
-    setError(null);
+  const deleteSource = useCallback(
+    async (sourceId: string): Promise<boolean> => {
+      setLoading(true);
+      setError(null);
 
-    try {
-      const response = await researchService.deleteSource(options.projectId, sourceId);
+      try {
+        const response = await researchService.deleteSource(
+          options.projectId,
+          sourceId
+        );
 
-      if (response.success) {
-        // Update research data by removing the source
-        setResearch(prev => prev ? {
-          ...prev,
-          sources: prev.sources.filter(source => source.id !== sourceId),
-          lastUpdated: new Date()
-        } : null);
+        if (response.success) {
+          // Update research data by removing the source
+          setResearch(prev =>
+            prev
+              ? {
+                  ...prev,
+                  sources: prev.sources.filter(
+                    source => source.id !== sourceId
+                  ),
+                  lastUpdated: new Date(),
+                }
+              : null
+          );
 
+          toast({
+            title: 'Success',
+            description: 'Source deleted successfully',
+            variant: 'success',
+          });
+
+          return true;
+        } else {
+          throw new Error(response.error || 'Failed to delete source');
+        }
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Failed to delete source';
+        setError(errorMessage);
         toast({
-          title: 'Success',
-          description: 'Source deleted successfully',
-          variant: 'success',
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
         });
-
-        return true;
-      } else {
-        throw new Error(response.error || 'Failed to delete source');
+        return false;
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to delete source';
-      setError(errorMessage);
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  }, [options.projectId, toast]);
+    },
+    [options.projectId, toast]
+  );
 
-  const rateSource = useCallback(async (
-    sourceId: string,
-    rating: number
-  ): Promise<SourceData | null> => {
-    try {
-      const response = await researchService.rateSource(options.projectId, sourceId, rating);
+  const rateSource = useCallback(
+    async (sourceId: string, rating: number): Promise<SourceData | null> => {
+      try {
+        const response = await researchService.rateSource(
+          options.projectId,
+          sourceId,
+          rating
+        );
 
-      if (response.success && response.data) {
-        // Update research data with rated source
-        setResearch(prev => prev ? {
-          ...prev,
-          sources: prev.sources.map(source =>
-            source.id === sourceId ? response.data! : source
-          ),
-          lastUpdated: new Date()
-        } : null);
+        if (response.success && response.data) {
+          // Update research data with rated source
+          setResearch(prev =>
+            prev
+              ? {
+                  ...prev,
+                  sources: prev.sources.map(source =>
+                    source.id === sourceId ? response.data! : source
+                  ),
+                  lastUpdated: new Date(),
+                }
+              : null
+          );
 
-        return response.data;
-      } else {
-        throw new Error(response.error || 'Failed to rate source');
+          return response.data;
+        } else {
+          throw new Error(response.error || 'Failed to rate source');
+        }
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Failed to rate source';
+        setError(errorMessage);
+        toast({
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+        return null;
       }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to rate source';
-      setError(errorMessage);
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      return null;
-    }
-  }, [options.projectId, toast]);
+    },
+    [options.projectId, toast]
+  );
 
   const refetch = useCallback(() => fetchResearch(), [fetchResearch]);
 
@@ -291,12 +351,15 @@ export function useConversations(options: UseConversationsOptions) {
     setError(null);
 
     try {
-      const response = await researchService.getConversations(options.projectId, {
-        page: options.page,
-        limit: options.limit,
-        perspective: options.perspective,
-        status: options.status,
-      });
+      const response = await researchService.getConversations(
+        options.projectId,
+        {
+          page: options.page,
+          limit: options.limit,
+          perspective: options.perspective,
+          status: options.status,
+        }
+      );
 
       if (response.success && response.data) {
         setConversations(response.data.items);
@@ -305,7 +368,8 @@ export function useConversations(options: UseConversationsOptions) {
         throw new Error(response.error || 'Failed to fetch conversations');
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch conversations';
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to fetch conversations';
       setError(errorMessage);
       toast({
         title: 'Error',
@@ -315,7 +379,14 @@ export function useConversations(options: UseConversationsOptions) {
     } finally {
       setLoading(false);
     }
-  }, [options.projectId, options.page, options.limit, options.perspective, options.status, toast]);
+  }, [
+    options.projectId,
+    options.page,
+    options.limit,
+    options.perspective,
+    options.status,
+    toast,
+  ]);
 
   const refetch = useCallback(() => fetchConversations(), [fetchConversations]);
 
@@ -372,7 +443,8 @@ export function useSources(options: UseSourcesOptions) {
         throw new Error(response.error || 'Failed to fetch sources');
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch sources';
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to fetch sources';
       setError(errorMessage);
       toast({
         title: 'Error',
@@ -421,7 +493,10 @@ export function useResearchAnalytics(projectId: string) {
         throw new Error(response.error || 'Failed to fetch research analytics');
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch research analytics';
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : 'Failed to fetch research analytics';
       setError(errorMessage);
       toast({
         title: 'Error',

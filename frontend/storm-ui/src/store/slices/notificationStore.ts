@@ -1,6 +1,11 @@
 // Notifications store slice
 import { create } from 'zustand';
-import { NotificationState, StormNotification, NotificationAction, NotificationSettings } from '../types';
+import {
+  NotificationState,
+  StormNotification,
+  NotificationAction,
+  NotificationSettings,
+} from '../types';
 import { persist, createPartialize } from '../middleware/persist';
 import { devtools } from '../middleware/devtools';
 import { immer } from '../middleware/immer';
@@ -27,36 +32,61 @@ const initialState: NotificationState = {
 // Notification store actions interface
 interface NotificationActions {
   // Notification management
-  addNotification: (notification: Omit<StormNotification, 'id' | 'timestamp'>) => string;
-  updateNotification: (notificationId: string, updates: Partial<StormNotification>) => void;
+  addNotification: (
+    notification: Omit<StormNotification, 'id' | 'timestamp'>
+  ) => string;
+  updateNotification: (
+    notificationId: string,
+    updates: Partial<StormNotification>
+  ) => void;
   removeNotification: (notificationId: string) => void;
   clearNotifications: () => void;
   clearAllNotifications: () => void;
-  
+
   // Quick notification methods
-  showSuccess: (title: string, message?: string, actions?: NotificationAction[]) => string;
-  showError: (title: string, message?: string, actions?: NotificationAction[]) => string;
-  showWarning: (title: string, message?: string, actions?: NotificationAction[]) => string;
-  showInfo: (title: string, message?: string, actions?: NotificationAction[]) => string;
-  
+  showSuccess: (
+    title: string,
+    message?: string,
+    actions?: NotificationAction[]
+  ) => string;
+  showError: (
+    title: string,
+    message?: string,
+    actions?: NotificationAction[]
+  ) => string;
+  showWarning: (
+    title: string,
+    message?: string,
+    actions?: NotificationAction[]
+  ) => string;
+  showInfo: (
+    title: string,
+    message?: string,
+    actions?: NotificationAction[]
+  ) => string;
+
   // Notification states
   markAsRead: (notificationId: string) => void;
   markAllAsRead: () => void;
   toggleRead: (notificationId: string) => void;
-  
+
   // Persistent notifications
-  addPersistentNotification: (notification: Omit<StormNotification, 'id' | 'timestamp' | 'persistent'>) => string;
+  addPersistentNotification: (
+    notification: Omit<StormNotification, 'id' | 'timestamp' | 'persistent'>
+  ) => string;
   removePersistentNotification: (notificationId: string) => void;
-  
+
   // Notification grouping
-  groupNotifications: (notifications: StormNotification[]) => GroupedNotification[];
+  groupNotifications: (
+    notifications: StormNotification[]
+  ) => GroupedNotification[];
   ungroupNotification: (groupId: string) => void;
-  
+
   // History management
   moveToHistory: (notificationId: string) => void;
   clearHistory: () => void;
   restoreFromHistory: (notificationId: string) => void;
-  
+
   // Settings management
   updateSettings: (settings: Partial<NotificationSettings>) => void;
   enableNotifications: () => void;
@@ -64,28 +94,36 @@ interface NotificationActions {
   toggleSounds: () => void;
   setPosition: (position: NotificationSettings['position']) => void;
   setAutoHideTimeout: (timeout: number) => void;
-  
+
   // Browser notifications
   requestBrowserPermission: () => Promise<boolean>;
-  showBrowserNotification: (title: string, options?: NotificationOptions) => void;
-  
+  showBrowserNotification: (
+    title: string,
+    options?: NotificationOptions
+  ) => void;
+
   // Action handling
   executeNotificationAction: (notificationId: string, actionId: string) => void;
-  
+
   // Batch operations
   removeMultipleNotifications: (notificationIds: string[]) => void;
   markMultipleAsRead: (notificationIds: string[]) => void;
-  
+
   // Filtering and search
-  getNotificationsByType: (type: StormNotification['type']) => StormNotification[];
+  getNotificationsByType: (
+    type: StormNotification['type']
+  ) => StormNotification[];
   getUnreadNotifications: () => StormNotification[];
   searchNotifications: (query: string) => StormNotification[];
-  
+
   // Auto-cleanup
   startAutoCleanup: (interval?: number) => void;
   stopAutoCleanup: () => void;
   cleanupOldNotifications: (maxAge?: number) => void;
-  
+
+  // Sound management (internal)
+  playNotificationSound: (type: StormNotification['type']) => void;
+
   // State management
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
@@ -127,7 +165,7 @@ export const useNotificationStore = create<NotificationStore>()(
           ...initialState,
 
           // Notification management
-          addNotification: (notification) => {
+          addNotification: notification => {
             const id = `notification_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
             const newNotification: StormNotification = {
               ...notification,
@@ -137,7 +175,7 @@ export const useNotificationStore = create<NotificationStore>()(
               persistent: notification.persistent || false,
             };
 
-            set((draft) => {
+            set(draft => {
               // Check if notifications are enabled
               if (!draft.settings.enabled) {
                 return;
@@ -146,11 +184,12 @@ export const useNotificationStore = create<NotificationStore>()(
               // Group similar notifications if enabled
               if (draft.settings.groupSimilar) {
                 const existing = draft.notifications.find(
-                  n => n.type === newNotification.type && 
-                       n.title === newNotification.title &&
-                       !n.read
+                  n =>
+                    n.type === newNotification.type &&
+                    n.title === newNotification.title &&
+                    !n.read
                 );
-                
+
                 if (existing) {
                   existing.message = `${existing.message}\n${newNotification.message}`;
                   existing.timestamp = newNotification.timestamp;
@@ -164,22 +203,27 @@ export const useNotificationStore = create<NotificationStore>()(
 
               // Add new notification
               draft.notifications.unshift(newNotification);
-              
+
               // Update unread count
               draft.unreadCount += 1;
-              
+
               // Limit visible notifications
               if (draft.notifications.length > draft.settings.maxVisible) {
-                const removed = draft.notifications.splice(draft.settings.maxVisible);
+                const removed = draft.notifications.splice(
+                  draft.settings.maxVisible
+                );
                 // Move excess notifications to history
                 draft.history.unshift(...removed);
               }
-              
+
               draft.lastUpdated = new Date();
-            }, 'addNotification');
+            });
 
             // Auto-hide non-persistent notifications
-            if (!newNotification.persistent && get().settings.autoHideTimeout > 0) {
+            if (
+              !newNotification.persistent &&
+              get().settings.autoHideTimeout > 0
+            ) {
               setTimeout(() => {
                 get().removeNotification(id);
               }, get().settings.autoHideTimeout);
@@ -203,60 +247,64 @@ export const useNotificationStore = create<NotificationStore>()(
           },
 
           updateNotification: (notificationId, updates) => {
-            set((draft) => {
-              const notification = draft.notifications.find(n => n.id === notificationId);
+            set(draft => {
+              const notification = draft.notifications.find(
+                n => n.id === notificationId
+              );
               if (notification) {
                 Object.assign(notification, updates);
                 draft.lastUpdated = new Date();
               }
-            }, 'updateNotification');
+            });
           },
 
-          removeNotification: (notificationId) => {
-            set((draft) => {
-              const notificationIndex = draft.notifications.findIndex(n => n.id === notificationId);
+          removeNotification: notificationId => {
+            set(draft => {
+              const notificationIndex = draft.notifications.findIndex(
+                n => n.id === notificationId
+              );
               if (notificationIndex !== -1) {
                 const notification = draft.notifications[notificationIndex];
-                
+
                 // Update unread count if notification was unread
                 if (!notification.read) {
                   draft.unreadCount = Math.max(0, draft.unreadCount - 1);
                 }
-                
+
                 // Move to history
                 draft.history.unshift(notification);
-                
+
                 // Remove from active notifications
                 draft.notifications.splice(notificationIndex, 1);
-                
+
                 draft.lastUpdated = new Date();
               }
-            }, 'removeNotification');
+            });
           },
 
           clearNotifications: () => {
-            set((draft) => {
+            set(draft => {
               // Move all notifications to history
               draft.history.unshift(...draft.notifications);
-              
+
               // Keep only last 100 items in history
               if (draft.history.length > 100) {
                 draft.history = draft.history.slice(0, 100);
               }
-              
+
               draft.notifications = [];
               draft.unreadCount = 0;
               draft.lastUpdated = new Date();
-            }, 'clearNotifications');
+            });
           },
 
           clearAllNotifications: () => {
-            set((draft) => {
+            set(draft => {
               draft.notifications = [];
               draft.history = [];
               draft.unreadCount = 0;
               draft.lastUpdated = new Date();
-            }, 'clearAllNotifications');
+            });
           },
 
           // Quick notification methods
@@ -266,6 +314,8 @@ export const useNotificationStore = create<NotificationStore>()(
               title,
               message,
               actions,
+              read: false,
+              persistent: false,
             });
           },
 
@@ -275,6 +325,7 @@ export const useNotificationStore = create<NotificationStore>()(
               title,
               message,
               actions,
+              read: false,
               persistent: true, // Errors are persistent by default
             });
           },
@@ -285,6 +336,8 @@ export const useNotificationStore = create<NotificationStore>()(
               title,
               message,
               actions,
+              read: false,
+              persistent: false,
             });
           },
 
@@ -294,42 +347,50 @@ export const useNotificationStore = create<NotificationStore>()(
               title,
               message,
               actions,
+              read: false,
+              persistent: false,
             });
           },
 
           // Notification states
-          markAsRead: (notificationId) => {
-            set((draft) => {
-              const notification = draft.notifications.find(n => n.id === notificationId);
+          markAsRead: notificationId => {
+            set(draft => {
+              const notification = draft.notifications.find(
+                n => n.id === notificationId
+              );
               if (notification && !notification.read) {
                 notification.read = true;
                 draft.unreadCount = Math.max(0, draft.unreadCount - 1);
                 draft.lastUpdated = new Date();
               }
-            }, 'markAsRead');
+            });
           },
 
           markAllAsRead: () => {
-            set((draft) => {
+            set(draft => {
               draft.notifications.forEach(notification => {
                 notification.read = true;
               });
               draft.unreadCount = 0;
               draft.lastUpdated = new Date();
-            }, 'markAllAsRead');
+            });
           },
 
-          toggleRead: (notificationId) => {
-            const notification = get().notifications.find(n => n.id === notificationId);
+          toggleRead: notificationId => {
+            const notification = get().notifications.find(
+              n => n.id === notificationId
+            );
             if (notification) {
               if (notification.read) {
-                set((draft) => {
-                  const n = draft.notifications.find(n => n.id === notificationId);
+                set(draft => {
+                  const n = draft.notifications.find(
+                    n => n.id === notificationId
+                  );
                   if (n) {
                     n.read = false;
                     draft.unreadCount += 1;
                   }
-                }, 'toggleRead:unread');
+                });
               } else {
                 get().markAsRead(notificationId);
               }
@@ -337,29 +398,30 @@ export const useNotificationStore = create<NotificationStore>()(
           },
 
           // Persistent notifications
-          addPersistentNotification: (notification) => {
+          addPersistentNotification: notification => {
             return get().addNotification({
               ...notification,
+              read: false,
               persistent: true,
             });
           },
 
-          removePersistentNotification: (notificationId) => {
+          removePersistentNotification: notificationId => {
             get().removeNotification(notificationId);
           },
 
           // Notification grouping
-          groupNotifications: (notifications) => {
+          groupNotifications: notifications => {
             const groups = new Map<string, GroupedNotification>();
 
             notifications.forEach(notification => {
               const groupKey = `${notification.type}_${notification.title}`;
-              
+
               if (groups.has(groupKey)) {
                 const group = groups.get(groupKey)!;
                 group.notifications.push(notification);
                 group.count += 1;
-                
+
                 if (notification.timestamp > group.latestTimestamp) {
                   group.latestTimestamp = notification.timestamp;
                 }
@@ -376,53 +438,56 @@ export const useNotificationStore = create<NotificationStore>()(
             });
 
             return Array.from(groups.values()).sort(
-              (a, b) => b.latestTimestamp.getTime() - a.latestTimestamp.getTime()
+              (a, b) =>
+                b.latestTimestamp.getTime() - a.latestTimestamp.getTime()
             );
           },
 
-          ungroupNotification: (groupId) => {
+          ungroupNotification: groupId => {
             // This would expand a grouped notification back into individual ones
             // Implementation depends on how grouping is stored and displayed
           },
 
           // History management
-          moveToHistory: (notificationId) => {
+          moveToHistory: notificationId => {
             get().removeNotification(notificationId);
           },
 
           clearHistory: () => {
-            set((draft) => {
+            set(draft => {
               draft.history = [];
               draft.lastUpdated = new Date();
-            }, 'clearHistory');
+            });
           },
 
-          restoreFromHistory: (notificationId) => {
-            set((draft) => {
-              const historyIndex = draft.history.findIndex(n => n.id === notificationId);
+          restoreFromHistory: notificationId => {
+            set(draft => {
+              const historyIndex = draft.history.findIndex(
+                n => n.id === notificationId
+              );
               if (historyIndex !== -1) {
                 const notification = draft.history[historyIndex];
-                
+
                 // Move back to active notifications
                 draft.notifications.unshift(notification);
                 draft.history.splice(historyIndex, 1);
-                
+
                 // Update unread count if notification is unread
                 if (!notification.read) {
                   draft.unreadCount += 1;
                 }
-                
+
                 draft.lastUpdated = new Date();
               }
-            }, 'restoreFromHistory');
+            });
           },
 
           // Settings management
-          updateSettings: (settings) => {
-            set((draft) => {
+          updateSettings: settings => {
+            set(draft => {
               Object.assign(draft.settings, settings);
               draft.lastUpdated = new Date();
-            }, 'updateSettings');
+            });
           },
 
           enableNotifications: () => {
@@ -438,11 +503,11 @@ export const useNotificationStore = create<NotificationStore>()(
             get().updateSettings({ soundEnabled: !currentSoundEnabled });
           },
 
-          setPosition: (position) => {
+          setPosition: position => {
             get().updateSettings({ position });
           },
 
-          setAutoHideTimeout: (timeout) => {
+          setAutoHideTimeout: timeout => {
             get().updateSettings({ autoHideTimeout: timeout });
           },
 
@@ -472,16 +537,22 @@ export const useNotificationStore = create<NotificationStore>()(
 
           // Action handling
           executeNotificationAction: (notificationId, actionId) => {
-            const notification = get().notifications.find(n => n.id === notificationId);
+            const notification = get().notifications.find(
+              n => n.id === notificationId
+            );
             if (!notification || !notification.actions) return;
 
-            const action = notification.actions.find(a => a.action === actionId);
+            const action = notification.actions.find(
+              a => a.action === actionId
+            );
             if (!action) return;
 
             // Execute the action (emit custom event)
-            window.dispatchEvent(new CustomEvent('notification:action', {
-              detail: { notificationId, action: action.action, notification }
-            }));
+            window.dispatchEvent(
+              new CustomEvent('notification:action', {
+                detail: { notificationId, action: action.action, notification },
+              })
+            );
 
             // Remove notification after action if it's not persistent
             if (!notification.persistent) {
@@ -490,16 +561,16 @@ export const useNotificationStore = create<NotificationStore>()(
           },
 
           // Batch operations
-          removeMultipleNotifications: (notificationIds) => {
+          removeMultipleNotifications: notificationIds => {
             notificationIds.forEach(id => get().removeNotification(id));
           },
 
-          markMultipleAsRead: (notificationIds) => {
+          markMultipleAsRead: notificationIds => {
             notificationIds.forEach(id => get().markAsRead(id));
           },
 
           // Filtering and search
-          getNotificationsByType: (type) => {
+          getNotificationsByType: type => {
             return get().notifications.filter(n => n.type === type);
           },
 
@@ -507,21 +578,22 @@ export const useNotificationStore = create<NotificationStore>()(
             return get().notifications.filter(n => !n.read);
           },
 
-          searchNotifications: (query) => {
+          searchNotifications: query => {
             const lowerQuery = query.toLowerCase();
             const allNotifications = [...get().notifications, ...get().history];
-            
+
             return allNotifications.filter(
-              n => 
+              n =>
                 n.title.toLowerCase().includes(lowerQuery) ||
                 n.message.toLowerCase().includes(lowerQuery)
             );
           },
 
           // Auto-cleanup
-          startAutoCleanup: (interval = 60000) => { // Default: 1 minute
+          startAutoCleanup: (interval = 60000) => {
+            // Default: 1 minute
             get().stopAutoCleanup();
-            
+
             autoCleanupTimer = setInterval(() => {
               get().cleanupOldNotifications();
             }, interval);
@@ -534,55 +606,60 @@ export const useNotificationStore = create<NotificationStore>()(
             }
           },
 
-          cleanupOldNotifications: (maxAge = 24 * 60 * 60 * 1000) => { // Default: 24 hours
+          cleanupOldNotifications: (maxAge = 24 * 60 * 60 * 1000) => {
+            // Default: 24 hours
             const cutoffTime = Date.now() - maxAge;
-            
-            set((draft) => {
+
+            set(draft => {
               // Clean up history
-              draft.history = draft.history.filter(
-                n => {
-                  const timestamp = n.timestamp instanceof Date ? n.timestamp : new Date(n.timestamp);
-                  return timestamp.getTime() > cutoffTime;
-                }
-              );
-              
+              draft.history = draft.history.filter(n => {
+                const timestamp =
+                  n.timestamp instanceof Date
+                    ? n.timestamp
+                    : new Date(n.timestamp);
+                return timestamp.getTime() > cutoffTime;
+              });
+
               // Clean up read notifications that are older than cutoff
-              draft.notifications = draft.notifications.filter(
-                n => {
-                  const timestamp = n.timestamp instanceof Date ? n.timestamp : new Date(n.timestamp);
-                  return !n.read || timestamp.getTime() > cutoffTime || n.persistent;
-                }
-              );
-              
+              draft.notifications = draft.notifications.filter(n => {
+                const timestamp =
+                  n.timestamp instanceof Date
+                    ? n.timestamp
+                    : new Date(n.timestamp);
+                return (
+                  !n.read || timestamp.getTime() > cutoffTime || n.persistent
+                );
+              });
+
               draft.lastUpdated = new Date();
-            }, 'cleanupOldNotifications');
+            });
           },
 
           // State management
-          setLoading: (loading) => {
-            set((draft) => {
+          setLoading: loading => {
+            set(draft => {
               draft.loading = loading;
-            }, 'setLoading');
+            });
           },
 
-          setError: (error) => {
-            set((draft) => {
+          setError: error => {
+            set(draft => {
               draft.error = error;
-            }, 'setError');
+            });
           },
 
           clearError: () => {
-            set((draft) => {
+            set(draft => {
               draft.error = null;
-            }, 'clearError');
+            });
           },
 
           reset: () => {
             get().stopAutoCleanup();
-            
-            set((draft) => {
+
+            set(draft => {
               Object.assign(draft, initialState);
-            }, 'reset');
+            });
           },
 
           // Private method for playing sounds
@@ -638,16 +715,21 @@ export const notificationSelectors = {
   history: (state: NotificationStore) => state.history,
   isLoading: (state: NotificationStore) => state.loading,
   error: (state: NotificationStore) => state.error,
-  unreadNotifications: (state: NotificationStore) => state.getUnreadNotifications(),
-  successNotifications: (state: NotificationStore) => state.getNotificationsByType('success'),
-  errorNotifications: (state: NotificationStore) => state.getNotificationsByType('error'),
-  warningNotifications: (state: NotificationStore) => state.getNotificationsByType('warning'),
-  infoNotifications: (state: NotificationStore) => state.getNotificationsByType('info'),
-  persistentNotifications: (state: NotificationStore) => 
+  unreadNotifications: (state: NotificationStore) =>
+    state.getUnreadNotifications(),
+  successNotifications: (state: NotificationStore) =>
+    state.getNotificationsByType('success'),
+  errorNotifications: (state: NotificationStore) =>
+    state.getNotificationsByType('error'),
+  warningNotifications: (state: NotificationStore) =>
+    state.getNotificationsByType('warning'),
+  infoNotifications: (state: NotificationStore) =>
+    state.getNotificationsByType('info'),
+  persistentNotifications: (state: NotificationStore) =>
     state.notifications.filter(n => n.persistent),
-  recentNotifications: (state: NotificationStore) => 
+  recentNotifications: (state: NotificationStore) =>
     state.notifications.slice(0, state.settings.maxVisible),
-  groupedNotifications: (state: NotificationStore) => 
+  groupedNotifications: (state: NotificationStore) =>
     state.groupNotifications(state.notifications),
 };
 
@@ -660,17 +742,29 @@ export const useNotifications = () => {
   };
 };
 
-export const useNotificationsList = () => useNotificationStore(notificationSelectors.notifications);
-export const useUnreadCount = () => useNotificationStore(notificationSelectors.unreadCount);
-export const useNotificationSettings = () => useNotificationStore(notificationSelectors.settings);
-export const useNotificationHistory = () => useNotificationStore(notificationSelectors.history);
-export const useNotificationLoading = () => useNotificationStore(notificationSelectors.isLoading);
-export const useNotificationError = () => useNotificationStore(notificationSelectors.error);
-export const useUnreadNotifications = () => useNotificationStore(notificationSelectors.unreadNotifications);
-export const usePersistentNotifications = () => useNotificationStore(notificationSelectors.persistentNotifications);
+export const useNotificationsList = () =>
+  useNotificationStore(notificationSelectors.notifications);
+export const useUnreadCount = () =>
+  useNotificationStore(notificationSelectors.unreadCount);
+export const useNotificationSettings = () =>
+  useNotificationStore(notificationSelectors.settings);
+export const useNotificationHistory = () =>
+  useNotificationStore(notificationSelectors.history);
+export const useNotificationLoading = () =>
+  useNotificationStore(notificationSelectors.isLoading);
+export const useNotificationError = () =>
+  useNotificationStore(notificationSelectors.error);
+export const useUnreadNotifications = () =>
+  useNotificationStore(notificationSelectors.unreadNotifications);
+export const usePersistentNotifications = () =>
+  useNotificationStore(notificationSelectors.persistentNotifications);
 
 // Convenience hooks for specific notification types
-export const useSuccessNotifications = () => useNotificationStore(notificationSelectors.successNotifications);
-export const useErrorNotifications = () => useNotificationStore(notificationSelectors.errorNotifications);
-export const useWarningNotifications = () => useNotificationStore(notificationSelectors.warningNotifications);
-export const useInfoNotifications = () => useNotificationStore(notificationSelectors.infoNotifications);
+export const useSuccessNotifications = () =>
+  useNotificationStore(notificationSelectors.successNotifications);
+export const useErrorNotifications = () =>
+  useNotificationStore(notificationSelectors.errorNotifications);
+export const useWarningNotifications = () =>
+  useNotificationStore(notificationSelectors.warningNotifications);
+export const useInfoNotifications = () =>
+  useNotificationStore(notificationSelectors.infoNotifications);

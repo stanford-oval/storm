@@ -48,20 +48,16 @@ describe('useWebSocket', () => {
     });
 
     it('auto-connects when autoConnect is true', async () => {
-      const { result } = renderHook(() => 
-        useWebSocket(TEST_WS_URL, { autoConnect: true })
-      );
-
+      const { result } = renderHook(() =>
+        useWebSocket(TEST_WS_URL, { autoConnect: true }));
       await server.connected;
 
       expect(result.current.isConnected).toBe(true);
     });
 
     it('does not auto-connect when autoConnect is false', async () => {
-      const { result } = renderHook(() => 
-        useWebSocket(TEST_WS_URL, { autoConnect: false })
-      );
-
+      const { result } = renderHook(() =>
+        useWebSocket(TEST_WS_URL, { autoConnect: false }));
       // Wait a bit to ensure no connection attempt
       await act(async () => {
         await new Promise(resolve => setTimeout(resolve, 100));
@@ -92,10 +88,8 @@ describe('useWebSocket', () => {
 
     it('receives messages successfully', async () => {
       const onMessage = jest.fn();
-      const { result } = renderHook(() => 
-        useWebSocket(TEST_WS_URL, { onMessage })
-      );
-
+      const { result } = renderHook(() =>
+        useWebSocket(TEST_WS_URL, { onMessage }));
       act(() => {
         result.current.connect();
       });
@@ -113,10 +107,8 @@ describe('useWebSocket', () => {
     });
 
     it('handles message history', async () => {
-      const { result } = renderHook(() => 
-        useWebSocket(TEST_WS_URL, { saveMessageHistory: true })
-      );
-
+      const { result } = renderHook(() =>
+        useWebSocket(TEST_WS_URL, { saveMessageHistory: true }));
       act(() => {
         result.current.connect();
       });
@@ -139,13 +131,10 @@ describe('useWebSocket', () => {
     });
 
     it('limits message history size', async () => {
-      const { result } = renderHook(() => 
-        useWebSocket(TEST_WS_URL, { 
-          saveMessageHistory: true,
+      const { result } = renderHook(() =>
+        useWebSocket(TEST_WS_URL, { saveMessageHistory: true,
           maxHistorySize: 2,
-        })
-      );
-
+         }));
       act(() => {
         result.current.connect();
       });
@@ -170,13 +159,10 @@ describe('useWebSocket', () => {
 
     it('filters messages by type', async () => {
       const onPipelineMessage = jest.fn();
-      const { result } = renderHook(() => 
-        useWebSocket(TEST_WS_URL, {
-          messageFilter: (msg: any) => msg.type === 'pipeline_update',
+      const { result } = renderHook(() =>
+        useWebSocket(TEST_WS_URL, { messageFilter: (msg: any) => msg.type === 'pipeline_update',
           onMessage: onPipelineMessage,
-        })
-      );
-
+         }));
       act(() => {
         result.current.connect();
       });
@@ -199,15 +185,12 @@ describe('useWebSocket', () => {
   describe('reconnection logic', () => {
     it('attempts reconnection on connection loss', async () => {
       const onReconnectAttempt = jest.fn();
-      const { result } = renderHook(() => 
-        useWebSocket(TEST_WS_URL, { 
-          shouldReconnect: true,
+      const { result } = renderHook(() =>
+        useWebSocket(TEST_WS_URL, { shouldReconnect: true,
           reconnectAttempts: 3,
           reconnectInterval: 100,
           onReconnectAttempt,
-        })
-      );
-
+         }));
       act(() => {
         result.current.connect();
       });
@@ -229,15 +212,12 @@ describe('useWebSocket', () => {
 
     it('stops reconnecting after max attempts', async () => {
       const onReconnectFailed = jest.fn();
-      const { result } = renderHook(() => 
-        useWebSocket(TEST_WS_URL, { 
-          shouldReconnect: true,
+      const { result } = renderHook(() =>
+        useWebSocket(TEST_WS_URL, { shouldReconnect: true,
           reconnectAttempts: 2,
           reconnectInterval: 50,
           onReconnectFailed,
-        })
-      );
-
+         }));
       act(() => {
         result.current.connect();
       });
@@ -258,16 +238,13 @@ describe('useWebSocket', () => {
 
     it('exponentially backs off reconnection attempts', async () => {
       const onReconnectAttempt = jest.fn();
-      const { result } = renderHook(() => 
-        useWebSocket(TEST_WS_URL, { 
-          shouldReconnect: true,
+      const { result } = renderHook(() =>
+        useWebSocket(TEST_WS_URL, { shouldReconnect: true,
           reconnectAttempts: 3,
           reconnectInterval: 100,
           exponentialBackoff: true,
           onReconnectAttempt,
-        })
-      );
-
+         }));
       act(() => {
         result.current.connect();
       });
@@ -275,16 +252,19 @@ describe('useWebSocket', () => {
       await server.connected;
 
       const startTime = Date.now();
-      
+
       // Simulate connection loss
       act(() => {
         server.close();
       });
 
       // Wait for multiple reconnection attempts
-      await waitFor(() => {
-        expect(onReconnectAttempt).toHaveBeenCalledTimes(3);
-      }, { timeout: 5000 });
+      await waitFor(
+        () => {
+          expect(onReconnectAttempt).toHaveBeenCalledTimes(3);
+        },
+        { timeout: 5000 }
+      );
 
       const endTime = Date.now();
       const elapsed = endTime - startTime;
@@ -298,7 +278,7 @@ describe('useWebSocket', () => {
     it('subscribes to specific message types', async () => {
       const pipelineHandler = jest.fn();
       const researchHandler = jest.fn();
-      
+
       const { result } = renderHook(() => useWebSocket(TEST_WS_URL));
 
       act(() => {
@@ -312,8 +292,14 @@ describe('useWebSocket', () => {
         result.current.subscribe('research_update', researchHandler);
       });
 
-      const pipelineMessage = { type: 'pipeline_update', data: { stage: 'research' } };
-      const researchMessage = { type: 'research_update', data: { progress: 50 } };
+      const pipelineMessage = {
+        type: 'pipeline_update',
+        data: { stage: 'research' },
+      };
+      const researchMessage = {
+        type: 'research_update',
+        data: { progress: 50 },
+      };
 
       act(() => {
         server.send(JSON.stringify(pipelineMessage));
@@ -361,7 +347,7 @@ describe('useWebSocket', () => {
     it('supports multiple handlers for same message type', async () => {
       const handler1 = jest.fn();
       const handler2 = jest.fn();
-      
+
       const { result } = renderHook(() => useWebSocket(TEST_WS_URL));
 
       act(() => {
@@ -389,10 +375,8 @@ describe('useWebSocket', () => {
   describe('error handling', () => {
     it('handles connection errors', async () => {
       const onError = jest.fn();
-      const { result } = renderHook(() => 
-        useWebSocket('ws://invalid-url:9999', { onError })
-      );
-
+      const { result } = renderHook(() =>
+        useWebSocket('ws://invalid-url:9999', { onError }));
       act(() => {
         result.current.connect();
       });
@@ -406,10 +390,8 @@ describe('useWebSocket', () => {
 
     it('handles malformed message errors', async () => {
       const onError = jest.fn();
-      const { result } = renderHook(() => 
-        useWebSocket(TEST_WS_URL, { onError })
-      );
-
+      const { result } = renderHook(() =>
+        useWebSocket(TEST_WS_URL, { onError }));
       act(() => {
         result.current.connect();
       });
@@ -428,13 +410,10 @@ describe('useWebSocket', () => {
     });
 
     it('retries failed send operations', async () => {
-      const { result } = renderHook(() => 
-        useWebSocket(TEST_WS_URL, { 
-          retryFailedSends: true,
+      const { result } = renderHook(() =>
+        useWebSocket(TEST_WS_URL, { retryFailedSends: true,
           maxSendRetries: 3,
-        })
-      );
-
+         }));
       act(() => {
         result.current.connect();
       });
@@ -466,13 +445,11 @@ describe('useWebSocket', () => {
 
   describe('heartbeat/ping-pong', () => {
     it('sends periodic ping messages', async () => {
-      const { result } = renderHook(() => 
-        useWebSocket(TEST_WS_URL, { 
+      const { result } = renderHook(() =>
+        useWebSocket(TEST_WS_URL, {
           heartbeatInterval: 100,
           pingMessage: { type: 'ping' },
-        })
-      );
-
+        }));
       act(() => {
         result.current.connect();
       });
@@ -485,15 +462,13 @@ describe('useWebSocket', () => {
 
     it('handles pong responses', async () => {
       const onPong = jest.fn();
-      const { result } = renderHook(() => 
-        useWebSocket(TEST_WS_URL, { 
+      const { result } = renderHook(() =>
+        useWebSocket(TEST_WS_URL, {
           heartbeatInterval: 100,
           pingMessage: { type: 'ping' },
           pongMessage: { type: 'pong' },
           onPong,
-        })
-      );
-
+        }));
       act(() => {
         result.current.connect();
       });
@@ -513,16 +488,14 @@ describe('useWebSocket', () => {
 
     it('detects connection timeout', async () => {
       const onConnectionTimeout = jest.fn();
-      const { result } = renderHook(() => 
-        useWebSocket(TEST_WS_URL, { 
+      const { result } = renderHook(() =>
+        useWebSocket(TEST_WS_URL, {
           heartbeatInterval: 50,
           heartbeatTimeout: 100,
           pingMessage: { type: 'ping' },
           pongMessage: { type: 'pong' },
           onConnectionTimeout,
-        })
-      );
-
+        }));
       act(() => {
         result.current.connect();
       });
@@ -533,9 +506,12 @@ describe('useWebSocket', () => {
       await expect(server).toReceiveMessage(JSON.stringify({ type: 'ping' }));
 
       // Don't send pong response to simulate timeout
-      await waitFor(() => {
-        expect(onConnectionTimeout).toHaveBeenCalled();
-      }, { timeout: 200 });
+      await waitFor(
+        () => {
+          expect(onConnectionTimeout).toHaveBeenCalled();
+        },
+        { timeout: 200 }
+      );
     });
   });
 
@@ -562,10 +538,8 @@ describe('useWebSocket', () => {
 
     it('receives binary data', async () => {
       const onBinaryMessage = jest.fn();
-      const { result } = renderHook(() => 
-        useWebSocket(TEST_WS_URL, { onBinaryMessage })
-      );
-
+      const { result } = renderHook(() =>
+        useWebSocket(TEST_WS_URL, { onBinaryMessage  }));
       act(() => {
         result.current.connect();
       });
@@ -584,7 +558,7 @@ describe('useWebSocket', () => {
 
   describe('cleanup', () => {
     it('cleans up on unmount', async () => {
-      const { result, unmount } = renderHook(() => useWebSocket(TEST_WS_URL));
+      const { result, unmount } = renderHook(() => useWebSocket(TEST_WS_URL, { status: 200 }));
 
       act(() => {
         result.current.connect();
@@ -593,14 +567,13 @@ describe('useWebSocket', () => {
       await server.connected;
 
       unmount();
-
       // Connection should be closed
       expect(server.server.clients().size).toBe(0);
     });
 
     it('clears subscriptions on unmount', async () => {
       const handler = jest.fn();
-      const { result, unmount } = renderHook(() => useWebSocket(TEST_WS_URL));
+      const { result, unmount } = renderHook(() => useWebSocket(TEST_WS_URL, { status: 200 }));
 
       act(() => {
         result.current.connect();
@@ -610,9 +583,8 @@ describe('useWebSocket', () => {
       await server.connected;
 
       unmount();
-
       // Create new connection
-      const { result: result2 } = renderHook(() => useWebSocket(TEST_WS_URL));
+      const { result: result2 } = renderHook(() => useWebSocket(TEST_WS_URL, { status: 200 }));
 
       act(() => {
         result2.current.connect();
@@ -631,12 +603,9 @@ describe('useWebSocket', () => {
 
   describe('advanced features', () => {
     it('supports custom protocols', async () => {
-      const { result } = renderHook(() => 
-        useWebSocket(TEST_WS_URL, { 
-          protocols: ['storm-protocol', 'v1'],
-        })
-      );
-
+      const { result } = renderHook(() =>
+        useWebSocket(TEST_WS_URL, { protocols: ['storm-protocol', 'v1'],
+         }));
       act(() => {
         result.current.connect();
       });
@@ -648,10 +617,8 @@ describe('useWebSocket', () => {
     });
 
     it('handles buffered sends when disconnected', async () => {
-      const { result } = renderHook(() => 
-        useWebSocket(TEST_WS_URL, { bufferWhenDisconnected: true })
-      );
-
+      const { result } = renderHook(() =>
+        useWebSocket(TEST_WS_URL, { bufferWhenDisconnected: true  }));
       const message1 = { type: 'test1', data: {} };
       const message2 = { type: 'test2', data: {} };
 
@@ -677,13 +644,10 @@ describe('useWebSocket', () => {
     });
 
     it('supports message compression', async () => {
-      const { result } = renderHook(() => 
-        useWebSocket(TEST_WS_URL, { 
-          compress: true,
+      const { result } = renderHook(() =>
+        useWebSocket(TEST_WS_URL, { compress: true,
           compressionThreshold: 100,
-        })
-      );
-
+         }));
       act(() => {
         result.current.connect();
       });

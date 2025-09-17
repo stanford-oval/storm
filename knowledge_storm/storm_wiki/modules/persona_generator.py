@@ -150,5 +150,7 @@ class StormPersonaGenerator:
         """
         personas = self.create_writer_with_persona(topic=topic)
         default_persona = "Basic fact writer: Basic fact writer focusing on broadly covering the basic facts about the topic."
-        considered_personas = [default_persona] + personas.personas[:max_num_persona]
+        considered_personas: List[str] = [default_persona] + personas.personas[
+            :max_num_persona
+        ]
         return considered_personas

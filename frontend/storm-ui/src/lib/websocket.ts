@@ -23,7 +23,12 @@ export interface WebSocketEventHandlers {
   onReconnectFailed?: () => void;
 }
 
-export type WebSocketState = 'connecting' | 'connected' | 'disconnected' | 'error' | 'reconnecting';
+export type WebSocketState =
+  | 'connecting'
+  | 'connected'
+  | 'disconnected'
+  | 'error'
+  | 'reconnecting';
 
 export class WebSocketManager {
   private ws: WebSocket | null = null;
@@ -39,8 +44,12 @@ export class WebSocketManager {
   constructor(config: WebSocketConfig) {
     this.config = {
       protocols: [],
-      reconnectDelay: parseInt(process.env.NEXT_PUBLIC_WS_RECONNECT_DELAY || '5000'),
-      maxRetryAttempts: parseInt(process.env.NEXT_PUBLIC_WS_MAX_RETRY_ATTEMPTS || '5'),
+      reconnectDelay: parseInt(
+        process.env.NEXT_PUBLIC_WS_RECONNECT_DELAY || '5000'
+      ),
+      maxRetryAttempts: parseInt(
+        process.env.NEXT_PUBLIC_WS_MAX_RETRY_ATTEMPTS || '5'
+      ),
       heartbeatInterval: 30000,
       debug: process.env.NEXT_PUBLIC_API_DEBUG === 'true',
       ...config,
@@ -58,40 +67,40 @@ export class WebSocketManager {
       }
 
       this.setState('connecting');
-      
+
       try {
         this.ws = new WebSocket(this.config.url, this.config.protocols);
-        
-        this.ws.onopen = (event) => {
+
+        this.ws.onopen = event => {
           this.setState('connected');
           this.reconnectAttempt = 0;
           this.startHeartbeat();
           this.flushMessageQueue();
-          
+
           if (this.config.debug) {
             console.log('🔌 WebSocket connected:', this.config.url);
           }
-          
+
           this.handlers.onOpen?.(event);
           resolve();
         };
 
-        this.ws.onmessage = (event) => {
+        this.ws.onmessage = event => {
           try {
             const message: WebSocketMessage = JSON.parse(event.data);
-            
+
             if (this.config.debug) {
               console.log('📨 WebSocket message:', message);
             }
-            
+
             // Handle heartbeat/pong messages
             if (message.type === 'pong') {
               return;
             }
-            
+
             // Call general message handler
             this.handlers.onMessage?.(message);
-            
+
             // Call specific message type handlers
             const typeHandlers = this.messageHandlers.get(message.type);
             if (typeHandlers) {
@@ -102,29 +111,32 @@ export class WebSocketManager {
           }
         };
 
-        this.ws.onerror = (event) => {
+        this.ws.onerror = event => {
           this.setState('error');
-          
+
           if (this.config.debug) {
             console.error('❌ WebSocket error:', event);
           }
-          
+
           this.handlers.onError?.(event);
           reject(new Error('WebSocket connection failed'));
         };
 
-        this.ws.onclose = (event) => {
+        this.ws.onclose = event => {
           this.setState('disconnected');
           this.stopHeartbeat();
-          
+
           if (this.config.debug) {
             console.log('🔌 WebSocket closed:', event.code, event.reason);
           }
-          
+
           this.handlers.onClose?.(event);
-          
+
           // Attempt reconnection if not closed intentionally
-          if (!event.wasClean && this.reconnectAttempt < this.config.maxRetryAttempts) {
+          if (
+            !event.wasClean &&
+            this.reconnectAttempt < this.config.maxRetryAttempts
+          ) {
             this.scheduleReconnect();
           } else if (this.reconnectAttempt >= this.config.maxRetryAttempts) {
             this.handlers.onReconnectFailed?.();
@@ -145,14 +157,14 @@ export class WebSocketManager {
       clearTimeout(this.reconnectTimer);
       this.reconnectTimer = null;
     }
-    
+
     this.stopHeartbeat();
-    
+
     if (this.ws) {
       this.ws.close(1000, 'Client disconnect');
       this.ws = null;
     }
-    
+
     this.setState('disconnected');
   }
 
@@ -169,14 +181,14 @@ export class WebSocketManager {
 
     if (this.ws?.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(message));
-      
+
       if (this.config.debug) {
         console.log('📤 WebSocket send:', message);
       }
     } else {
       // Queue message for when connection is re-established
       this.messageQueue.push(message);
-      
+
       if (this.config.debug) {
         console.log('📤 WebSocket queued:', message);
       }
@@ -190,9 +202,9 @@ export class WebSocketManager {
     if (!this.messageHandlers.has(messageType)) {
       this.messageHandlers.set(messageType, new Set());
     }
-    
+
     this.messageHandlers.get(messageType)!.add(handler);
-    
+
     // Return unsubscribe function
     return () => {
       const handlers = this.messageHandlers.get(messageType);
@@ -250,13 +262,16 @@ export class WebSocketManager {
 
     this.setState('reconnecting');
     this.reconnectAttempt++;
-    
-    const delay = this.config.reconnectDelay * Math.pow(2, this.reconnectAttempt - 1);
-    
+
+    const delay =
+      this.config.reconnectDelay * Math.pow(2, this.reconnectAttempt - 1);
+
     if (this.config.debug) {
-      console.log(`🔄 WebSocket reconnecting in ${delay}ms (attempt ${this.reconnectAttempt}/${this.config.maxRetryAttempts})`);
+      console.log(
+        `🔄 WebSocket reconnecting in ${delay}ms (attempt ${this.reconnectAttempt}/${this.config.maxRetryAttempts})`
+      );
     }
-    
+
     this.reconnectTimer = setTimeout(() => {
       this.reconnectTimer = null;
       this.handlers.onReconnect?.(this.reconnectAttempt);
@@ -272,7 +287,7 @@ export class WebSocketManager {
     }
 
     this.stopHeartbeat();
-    
+
     this.heartbeatTimer = setInterval(() => {
       if (this.isConnected()) {
         this.send('ping');
@@ -292,7 +307,7 @@ export class WebSocketManager {
       const message = this.messageQueue.shift();
       if (message) {
         this.ws!.send(JSON.stringify(message));
-        
+
         if (this.config.debug) {
           console.log('📤 WebSocket flushed:', message);
         }
@@ -356,7 +371,7 @@ export function createWebSocketConnection(
 ): WebSocketManager {
   const baseUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000/ws';
   const url = `${baseUrl}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
-  
+
   return new WebSocketManager({
     url,
     ...options,
@@ -364,28 +379,19 @@ export function createWebSocketConnection(
 }
 
 export function createProjectWebSocket(projectId: string): WebSocketManager {
-  return websocketManager.getConnection(
-    `project-${projectId}`,
-    {
-      url: `${process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000/ws'}/projects/${projectId}`,
-    }
-  );
+  return websocketManager.getConnection(`project-${projectId}`, {
+    url: `${process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000/ws'}/projects/${projectId}`,
+  });
 }
 
 export function createPipelineWebSocket(projectId: string): WebSocketManager {
-  return websocketManager.getConnection(
-    `pipeline-${projectId}`,
-    {
-      url: `${process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000/ws'}/pipeline/${projectId}`,
-    }
-  );
+  return websocketManager.getConnection(`pipeline-${projectId}`, {
+    url: `${process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000/ws'}/pipeline/${projectId}`,
+  });
 }
 
 export function createSessionWebSocket(sessionId: string): WebSocketManager {
-  return websocketManager.getConnection(
-    `session-${sessionId}`,
-    {
-      url: `${process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000/ws'}/sessions/${sessionId}`,
-    }
-  );
+  return websocketManager.getConnection(`session-${sessionId}`, {
+    url: `${process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000/ws'}/sessions/${sessionId}`,
+  });
 }

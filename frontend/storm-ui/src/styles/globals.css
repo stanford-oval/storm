@@ -62,7 +62,7 @@
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 94.0%;
+    --ring: 224.3 76.3% 94%;
   }
 }
 
@@ -78,30 +78,19 @@
 /* Custom styles for STORM UI */
 @layer components {
   .storm-card {
-    @apply bg-card text-card-foreground rounded-lg border shadow-sm;
+    @apply rounded-lg border bg-card text-card-foreground shadow-sm;
   }
-  
+
   .storm-button-primary {
-    @apply bg-primary text-primary-foreground hover:bg-primary/90 
-           px-4 py-2 rounded-md font-medium transition-colors 
-           focus-visible:outline-none focus-visible:ring-2 
-           focus-visible:ring-ring focus-visible:ring-offset-2;
+    @apply rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
   }
-  
+
   .storm-button-secondary {
-    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80
-           px-4 py-2 rounded-md font-medium transition-colors
-           focus-visible:outline-none focus-visible:ring-2 
-           focus-visible:ring-ring focus-visible:ring-offset-2;
+    @apply rounded-md bg-secondary px-4 py-2 font-medium text-secondary-foreground transition-colors hover:bg-secondary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
   }
 
   .storm-input {
-    @apply flex h-10 w-full rounded-md border border-input 
-           bg-background px-3 py-2 text-sm ring-offset-background 
-           file:border-0 file:bg-transparent file:text-sm file:font-medium 
-           placeholder:text-muted-foreground focus-visible:outline-none 
-           focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 
-           disabled:cursor-not-allowed disabled:opacity-50;
+    @apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .storm-progress-bar {
@@ -111,25 +100,23 @@
   .storm-progress-fill {
     @apply h-full bg-primary transition-all duration-500 ease-out;
   }
-  
+
   .storm-badge {
-    @apply inline-flex items-center rounded-full px-2.5 py-0.5 
-           text-xs font-semibold transition-colors 
-           focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
   }
-  
+
   .storm-badge-success {
     @apply storm-badge bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300;
   }
-  
+
   .storm-badge-warning {
     @apply storm-badge bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300;
   }
-  
+
   .storm-badge-error {
     @apply storm-badge bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300;
   }
-  
+
   .storm-badge-info {
     @apply storm-badge bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300;
   }
@@ -168,20 +155,37 @@
   margin: 1em 0;
 }
 
-.ProseMirror h1, .ProseMirror h2, .ProseMirror h3, 
-.ProseMirror h4, .ProseMirror h5, .ProseMirror h6 {
+.ProseMirror h1,
+.ProseMirror h2,
+.ProseMirror h3,
+.ProseMirror h4,
+.ProseMirror h5,
+.ProseMirror h6 {
   margin: 1.5em 0 0.5em 0;
   font-weight: 600;
 }
 
-.ProseMirror h1 { font-size: 2rem; }
-.ProseMirror h2 { font-size: 1.5rem; }
-.ProseMirror h3 { font-size: 1.25rem; }
-.ProseMirror h4 { font-size: 1.125rem; }
-.ProseMirror h5 { font-size: 1rem; }
-.ProseMirror h6 { font-size: 0.875rem; }
+.ProseMirror h1 {
+  font-size: 2rem;
+}
+.ProseMirror h2 {
+  font-size: 1.5rem;
+}
+.ProseMirror h3 {
+  font-size: 1.25rem;
+}
+.ProseMirror h4 {
+  font-size: 1.125rem;
+}
+.ProseMirror h5 {
+  font-size: 1rem;
+}
+.ProseMirror h6 {
+  font-size: 0.875rem;
+}
 
-.ProseMirror ul, .ProseMirror ol {
+.ProseMirror ul,
+.ProseMirror ol {
   padding-left: 1.5rem;
   margin: 1em 0;
 }
@@ -197,7 +201,9 @@
   background: hsl(var(--muted));
   padding: 0.125rem 0.25rem;
   border-radius: 0.25rem;
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-family:
+    ui-monospace, SFMono-Regular, 'SF Mono', Monaco, Consolas,
+    'Liberation Mono', 'Courier New', monospace;
 }
 
 .ProseMirror pre {
@@ -215,12 +221,21 @@
 
 /* Animation for loading states */
 @keyframes shimmer {
-  0% { background-position: -200px 0; }
-  100% { background-position: calc(200px + 100%) 0; }
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
 }
 
 .storm-shimmer {
-  background: linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted-foreground) / 0.1) 50%, hsl(var(--muted)) 75%);
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 25%,
+    hsl(var(--muted-foreground) / 0.1) 50%,
+    hsl(var(--muted)) 75%
+  );
   background-size: 200px 100%;
   animation: shimmer 1.5s infinite;
 }

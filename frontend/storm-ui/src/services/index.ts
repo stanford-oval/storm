@@ -1,5 +1,11 @@
 // Base API service and utilities
-export { BaseApiService, ApiError, DEFAULT_API_CONFIG, getApiService, resetApiService } from './base';
+export {
+  BaseApiService,
+  ApiError,
+  DEFAULT_API_CONFIG,
+  getApiService,
+  resetApiService,
+} from './base';
 
 // WebSocket and real-time utilities
 export * from '../lib/websocket';
@@ -20,6 +26,16 @@ export { SessionService, sessionService } from './session';
 export { ExportService, exportService } from './export';
 export { AnalyticsService, analyticsService } from './analytics';
 
+// Import service instances for re-export
+import { projectService } from './project';
+import { pipelineService } from './pipeline';
+import { configService } from './config';
+import { researchService } from './research';
+import { sessionService } from './session';
+import { exportService } from './export';
+import { analyticsService } from './analytics';
+import { getApiService } from './base';
+
 // Service type exports
 export type {
   // Project types
@@ -31,8 +47,10 @@ export type {
   ProjectShareInfo,
   ProjectCollaborator,
   ProjectImportValidation,
-  
-  // Pipeline types
+} from './project';
+
+// Export pipeline types from pipeline service
+export type {
   PipelineTemplate,
   CreatePipelineTemplateRequest,
   PipelineValidationResult,
@@ -46,8 +64,10 @@ export type {
   ExecutionTimeEstimate,
   SchedulePipelineRequest,
   ScheduledExecution,
-  
-  // Config types
+} from './pipeline';
+
+// Export config types from config service
+export type {
   LLMTestResult,
   RetrieverTestResult,
   LLMModel,
@@ -66,8 +86,10 @@ export type {
   ConfigSchema,
   ConfigRequirements,
   EnvironmentConfig,
-  
-  // Research types
+} from './config';
+
+// Export research types from research service
+export type {
   ResearchPerspective,
   ResearchQuestion,
   QueryResult,
@@ -80,8 +102,10 @@ export type {
   SourceValidationResult,
   ReportGenerationJob,
   ResearchBookmark,
-  
-  // Session types
+} from './research';
+
+// Export session types from session service
+export type {
   SessionJoinResult,
   MindMapConnection,
   SessionAnalytics,
@@ -91,8 +115,10 @@ export type {
   SessionInvitationResult,
   SessionInvitation,
   SessionRecording,
-  
-  // Export types
+} from './session';
+
+// Export export types from export service
+export type {
   ExportJobListResponse,
   ExportTemplate,
   CreateExportTemplateRequest,
@@ -110,8 +136,10 @@ export type {
   ConversionResult,
   ArchiveResult,
   ExportQuota,
-  
-  // Analytics types
+} from './export';
+
+// Export analytics types from analytics service
+export type {
   BatchTrackingResult,
   ProjectAnalytics,
   UserAnalytics,
@@ -135,7 +163,7 @@ export type {
   AnalyticsInsight,
   AnalyticsSettings,
   ComputationJob,
-} from './project';
+} from './analytics';
 
 // Re-export commonly used service instances
 export const services = {
@@ -157,11 +185,11 @@ export async function initializeServices(config?: {
   if (config?.baseURL) {
     // Update base URL for all services
     const baseApiService = getApiService({ baseURL: config.baseURL });
-    
+
     if (config.apiKey) {
       baseApiService.setApiKey(config.apiKey);
     }
-    
+
     if (config.authToken) {
       baseApiService.setAuthToken(config.authToken);
     }
@@ -174,7 +202,9 @@ export async function initializeServices(config?: {
       console.log('✅ API services initialized successfully');
       return true;
     } else {
-      console.warn('⚠️ API health check failed - services may not be available');
+      console.warn(
+        '⚠️ API health check failed - services may not be available'
+      );
       return false;
     }
   } catch (error) {
@@ -193,7 +223,7 @@ export async function checkServiceHealth() {
 
   try {
     results.api = await getApiService().healthCheck();
-    
+
     // You could add individual service health checks here
     // For now, we'll just check the main API
     results.services.main = results.api;
@@ -208,7 +238,7 @@ export async function checkServiceHealth() {
 export function setupGlobalErrorHandler() {
   // Set up a global error handler for uncaught service errors
   if (typeof window !== 'undefined') {
-    window.addEventListener('unhandledrejection', (event) => {
+    window.addEventListener('unhandledrejection', event => {
       if (event.reason?.name === 'ApiError') {
         console.error('Unhandled API Error:', event.reason);
         // You could integrate with error tracking services here

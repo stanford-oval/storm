@@ -2,10 +2,20 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { integrationTester, type IntegrationTestResult, type WebSocketTestResult } from '@/lib/integration-test';
+import {
+  integrationTester,
+  type IntegrationTestResult,
+  type WebSocketTestResult,
+} from '@/lib/integration-test';
 import { getTestResultColor, getTestResultText } from '@/utils/status';
 
 interface TestSummary {
@@ -42,9 +52,8 @@ export function IntegrationTestPanel() {
     }
   };
 
-
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Integration Test Panel</h2>
@@ -52,8 +61,8 @@ export function IntegrationTestPanel() {
             Test the connection between frontend and backend services
           </p>
         </div>
-        <Button 
-          onClick={runTests} 
+        <Button
+          onClick={runTests}
           disabled={isRunning}
           className="min-w-[120px]"
         >
@@ -65,9 +74,7 @@ export function IntegrationTestPanel() {
         <Card>
           <CardHeader>
             <CardTitle>Test Summary</CardTitle>
-            <CardDescription>
-              Overall test results
-            </CardDescription>
+            <CardDescription>Overall test results</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-4 gap-4">
@@ -76,16 +83,22 @@ export function IntegrationTestPanel() {
                 <div className="text-sm text-muted-foreground">Total Tests</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">{summary.passed}</div>
+                <div className="text-2xl font-bold text-green-600">
+                  {summary.passed}
+                </div>
                 <div className="text-sm text-muted-foreground">Passed</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-red-600">{summary.failed}</div>
+                <div className="text-2xl font-bold text-red-600">
+                  {summary.failed}
+                </div>
                 <div className="text-sm text-muted-foreground">Failed</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold">{summary.successRate}%</div>
-                <div className="text-sm text-muted-foreground">Success Rate</div>
+                <div className="text-sm text-muted-foreground">
+                  Success Rate
+                </div>
               </div>
             </div>
           </CardContent>
@@ -103,9 +116,9 @@ export function IntegrationTestPanel() {
           <CardContent>
             <div className="space-y-2">
               {apiResults.map((result, index) => (
-                <div 
+                <div
                   key={index}
-                  className="flex items-center justify-between p-3 border rounded-lg"
+                  className="flex items-center justify-between rounded-lg border p-3"
                 >
                   <div className="flex items-center space-x-3">
                     <Badge variant={getTestResultColor(result.success)}>
@@ -144,9 +157,9 @@ export function IntegrationTestPanel() {
           <CardContent>
             <div className="space-y-2">
               {wsResults.map((result, index) => (
-                <div 
+                <div
                   key={index}
-                  className="flex items-center justify-between p-3 border rounded-lg"
+                  className="flex items-center justify-between rounded-lg border p-3"
                 >
                   <div className="flex items-center space-x-3">
                     <Badge variant={getTestResultColor(result.success)}>
@@ -174,31 +187,30 @@ export function IntegrationTestPanel() {
         </Card>
       )}
 
-      {apiResults.some(r => !r.success) || wsResults.some(r => !r.success) && (
-        <Alert>
-          <AlertDescription>
-            Some tests failed. Check the backend server is running at{' '}
-            <code className="font-mono text-sm">
-              {process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}
-            </code>{' '}
-            and WebSocket server at{' '}
-            <code className="font-mono text-sm">
-              {process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000/ws'}
-            </code>
-          </AlertDescription>
-        </Alert>
-      )}
+      {apiResults.some(r => !r.success) ||
+        (wsResults.some(r => !r.success) && (
+          <Alert>
+            <AlertDescription>
+              Some tests failed. Check the backend server is running at{' '}
+              <code className="font-mono text-sm">
+                {process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}
+              </code>{' '}
+              and WebSocket server at{' '}
+              <code className="font-mono text-sm">
+                {process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000/ws'}
+              </code>
+            </AlertDescription>
+          </Alert>
+        ))}
 
       {report && (
         <Card>
           <CardHeader>
             <CardTitle>Detailed Report</CardTitle>
-            <CardDescription>
-              Full test report for debugging
-            </CardDescription>
+            <CardDescription>Full test report for debugging</CardDescription>
           </CardHeader>
           <CardContent>
-            <pre className="text-xs bg-muted p-4 rounded-lg overflow-auto">
+            <pre className="overflow-auto rounded-lg bg-muted p-4 text-xs">
               {report}
             </pre>
           </CardContent>

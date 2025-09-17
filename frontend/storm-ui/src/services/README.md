@@ -5,6 +5,7 @@ This directory contains a comprehensive API client service layer for the STORM s
 ## Architecture Overview
 
 ### Base Service Layer
+
 - **BaseApiService**: Core API client with axios wrapper, authentication, error handling, and retry logic
 - **ApiError**: Custom error class for API-specific errors
 - **Request/Response interceptors**: For authentication, rate limiting, and error handling
@@ -12,7 +13,9 @@ This directory contains a comprehensive API client service layer for the STORM s
 ### Service Modules
 
 #### 1. ProjectService (`project.ts`)
+
 Handles STORM project CRUD operations:
+
 - Create, read, update, delete projects
 - Project templates and duplication
 - Bulk operations and search
@@ -20,7 +23,9 @@ Handles STORM project CRUD operations:
 - Import/export functionality
 
 #### 2. PipelineService (`pipeline.ts`)
+
 Manages pipeline execution and monitoring:
+
 - Start, stop, pause, resume pipeline operations
 - Real-time progress tracking
 - Pipeline logs and metrics
@@ -28,21 +33,27 @@ Manages pipeline execution and monitoring:
 - Scheduling and history
 
 #### 3. ConfigService (`config.ts`)
+
 Handles model and retriever configuration:
+
 - Configuration templates and presets
 - LLM and retriever testing
 - Configuration validation and optimization
 - Model pricing and recommendations
 
 #### 4. ResearchService (`research.ts`)
+
 Manages research data and operations:
+
 - Search integration with multiple providers
 - Source management and validation
 - Conversation tracking
 - Research analytics and reporting
 
 #### 5. SessionService (`session.ts`)
+
 Handles Co-STORM collaborative sessions:
+
 - Session creation and management
 - Participant management
 - Mind map operations
@@ -50,7 +61,9 @@ Handles Co-STORM collaborative sessions:
 - Real-time collaboration features
 
 #### 6. ExportService (`export.ts`)
+
 Manages article export functionality:
+
 - Multiple export formats (PDF, DOCX, HTML, etc.)
 - Export job management
 - Template system
@@ -58,7 +71,9 @@ Manages article export functionality:
 - Scheduling and webhooks
 
 #### 7. AnalyticsService (`analytics.ts`)
+
 Provides usage tracking and analytics:
+
 - Event tracking
 - Dashboard creation
 - Real-time analytics
@@ -70,12 +85,13 @@ Provides usage tracking and analytics:
 ### API Integration Hooks
 
 #### Project Hooks
+
 ```typescript
 // Multiple projects with pagination and filtering
 const { projects, loading, createProject, deleteProject } = useProjects({
   page: 1,
   limit: 10,
-  filters: { status: ['draft', 'completed'] }
+  filters: { status: ['draft', 'completed'] },
 });
 
 // Single project management
@@ -86,36 +102,30 @@ const { templates, createFromTemplate } = useProjectTemplates();
 ```
 
 #### Pipeline Hooks
+
 ```typescript
 // Pipeline management with real-time updates
-const { 
-  status, 
-  progress, 
-  isRunning, 
-  startPipeline, 
-  stopPipeline 
-} = usePipeline({ 
-  projectId: '123',
-  pollingInterval: 2000 
-});
+const { status, progress, isRunning, startPipeline, stopPipeline } =
+  usePipeline({
+    projectId: '123',
+    pollingInterval: 2000,
+  });
 
 // Pipeline logs with streaming
 const { logs, clearLogs } = usePipelineLogs({
   projectId: '123',
   enableStreaming: true,
-  level: 'info'
+  level: 'info',
 });
 ```
 
 #### Research Hooks
+
 ```typescript
 // Research data management
-const { 
-  research, 
-  search, 
-  addCustomSource, 
-  deleteSource 
-} = useResearch({ projectId: '123' });
+const { research, search, addCustomSource, deleteSource } = useResearch({
+  projectId: '123',
+});
 
 // Conversations and sources
 const { conversations } = useConversations({ projectId: '123' });
@@ -125,14 +135,15 @@ const { sources, total } = useSources({ projectId: '123', usedOnly: true });
 ### WebSocket Hooks
 
 #### Real-time Updates
+
 ```typescript
 // Pipeline progress updates
-const pipeline = usePipelineWebSocket(projectId, (update) => {
+const pipeline = usePipelineWebSocket(projectId, update => {
   console.log('Pipeline update:', update);
 });
 
 // Session collaboration
-const session = useSessionWebSocket(sessionId, (update) => {
+const session = useSessionWebSocket(sessionId, update => {
   console.log('Session update:', update);
 });
 
@@ -140,7 +151,7 @@ const session = useSessionWebSocket(sessionId, (update) => {
 const { isConnected, send, sendMessage } = useWebSocket({
   url: 'ws://localhost:8000/ws',
   reconnect: true,
-  heartbeat: true
+  heartbeat: true,
 });
 ```
 
@@ -149,6 +160,7 @@ const { isConnected, send, sendMessage } = useWebSocket({
 For development and testing, the service layer includes a comprehensive mock server using MSW (Mock Service Worker).
 
 ### Setup
+
 ```typescript
 // In your app initialization
 import { enableMocking } from './mocks';
@@ -159,29 +171,31 @@ if (process.env.NODE_ENV === 'development') {
 ```
 
 ### Mock Scenarios
+
 ```typescript
 import { mockScenarios } from './mocks';
 
 // Test different scenarios
-mockScenarios.happyPath();        // Normal operation
-mockScenarios.errorScenario();    // API failures
+mockScenarios.happyPath(); // Normal operation
+mockScenarios.errorScenario(); // API failures
 mockScenarios.slowResponse(5000); // Network delays
-mockScenarios.emptyData();        // Empty responses
-mockScenarios.largeDataset();     // Large data sets
+mockScenarios.emptyData(); // Empty responses
+mockScenarios.largeDataset(); // Large data sets
 ```
 
 ## Usage Examples
 
 ### Basic Project Management
+
 ```typescript
 import { useProjects, useProject } from './hooks/api';
 
 function ProjectList() {
-  const { 
-    projects, 
-    loading, 
-    createProject, 
-    deleteProject 
+  const {
+    projects,
+    loading,
+    createProject,
+    deleteProject
   } = useProjects({
     autoFetch: true,
     limit: 20
@@ -194,7 +208,7 @@ function ProjectList() {
       description: 'An article about AI applications in education',
       config: defaultConfig
     });
-    
+
     if (project) {
       console.log('Project created:', project.id);
     }
@@ -204,8 +218,8 @@ function ProjectList() {
     <div>
       {loading && <div>Loading...</div>}
       {projects.map(project => (
-        <ProjectCard 
-          key={project.id} 
+        <ProjectCard
+          key={project.id}
           project={project}
           onDelete={() => deleteProject(project.id)}
         />
@@ -217,16 +231,17 @@ function ProjectList() {
 ```
 
 ### Pipeline Execution
+
 ```typescript
 function PipelineManager({ projectId }: { projectId: string }) {
-  const { 
-    progress, 
-    isRunning, 
-    startPipeline, 
-    stopPipeline 
-  } = usePipeline({ 
+  const {
+    progress,
+    isRunning,
+    startPipeline,
+    stopPipeline
+  } = usePipeline({
     projectId,
-    pollingInterval: 2000 
+    pollingInterval: 2000
   });
 
   const handleStart = async () => {
@@ -239,7 +254,7 @@ function PipelineManager({ projectId }: { projectId: string }) {
         { name: 'polish', enabled: true }
       ]
     });
-    
+
     if (success) {
       console.log('Pipeline started successfully');
     }
@@ -250,7 +265,7 @@ function PipelineManager({ projectId }: { projectId: string }) {
       <div>Progress: {progress?.overallProgress || 0}%</div>
       <div>Stage: {progress?.stage}</div>
       <div>Current Task: {progress?.currentTask}</div>
-      
+
       {!isRunning ? (
         <button onClick={handleStart}>Start Pipeline</button>
       ) : (
@@ -262,10 +277,11 @@ function PipelineManager({ projectId }: { projectId: string }) {
 ```
 
 ### Real-time Collaboration
+
 ```typescript
 function CollaborativeSession({ sessionId }: { sessionId: string }) {
   const [messages, setMessages] = useState<any[]>([]);
-  
+
   const session = useSessionWebSocket(sessionId, (update) => {
     if (update.updateType === 'message') {
       setMessages(prev => [...prev, update.data]);
@@ -285,7 +301,7 @@ function CollaborativeSession({ sessionId }: { sessionId: string }) {
       <div>
         Connection: {session.isConnected ? '🟢 Connected' : '🔴 Disconnected'}
       </div>
-      
+
       <div>
         {messages.map(message => (
           <div key={message.id}>
@@ -293,7 +309,7 @@ function CollaborativeSession({ sessionId }: { sessionId: string }) {
           </div>
         ))}
       </div>
-      
+
       <input
         onKeyPress={(e) => {
           if (e.key === 'Enter' && e.currentTarget.value) {
@@ -309,16 +325,17 @@ function CollaborativeSession({ sessionId }: { sessionId: string }) {
 ```
 
 ### Configuration Management
+
 ```typescript
 function ConfigurationPanel() {
-  const { 
-    templates, 
-    llmModels, 
-    retrievers, 
+  const {
+    templates,
+    llmModels,
+    retrievers,
     validateConfig,
-    testLlmConfig 
+    testLlmConfig
   } = useConfig();
-  
+
   const [config, setConfig] = useState<StormConfig>();
 
   const handleTest = async () => {
@@ -362,7 +379,7 @@ try {
       message: error.message,
       status: error.status,
       code: error.code,
-      details: error.details
+      details: error.details,
     });
   }
 }
@@ -396,7 +413,7 @@ const apiService = new BaseApiService({
   baseURL: 'http://localhost:8000/api',
   rateLimitPerSecond: 10, // Max 10 requests per second
   retryAttempts: 3,
-  retryDelay: 1000
+  retryDelay: 1000,
 });
 ```
 
@@ -424,9 +441,9 @@ describe('Project Service', () => {
     const project = await projectService.createProject({
       title: 'Test Project',
       topic: 'Test Topic',
-      config: mockConfig
+      config: mockConfig,
     });
-    
+
     expect(project.data).toBeDefined();
   });
 });

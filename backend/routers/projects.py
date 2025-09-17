@@ -6,6 +6,7 @@ Provides CRUD endpoints for managing STORM projects with file-based storage.
 
 from fastapi import APIRouter, HTTPException, Query, BackgroundTasks
 from typing import List, Optional, Dict, Any
+from uuid import UUID
 from pydantic import BaseModel, Field
 from uuid import UUID
 import logging

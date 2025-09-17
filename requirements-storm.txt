@@ -1,0 +1,96 @@
+# STORM Core Requirements (Pinned Versions)
+# Compatible with Python 3.11+
+# Tested on macOS (ARM64) and Windows (x64)
+
+# =========================
+# Core AI/ML Dependencies
+# =========================
+dspy_ai==2.4.9
+litellm>=1.61.15  # Updated to fix vulnerability 75075 (CWE-200: Exposure of Sensitive Information)
+sentence-transformers==2.6.0
+langchain-text-splitters==0.2.0
+langchain-huggingface==0.0.3
+
+# =========================
+# Vector Database
+# =========================
+qdrant-client==1.15.1
+langchain-qdrant==0.1.4
+
+# =========================
+# Data Processing
+# =========================
+numpy==1.26.4
+pandas==2.3.2
+scipy==1.16.1
+scikit-learn==1.7.2
+
+# =========================
+# Web Scraping & Parsing
+# =========================
+trafilatura==1.6.2
+wikipedia==1.4.0
+beautifulsoup4==4.13.5
+lxml==4.9.2
+
+# =========================
+# Deep Learning Framework
+# =========================
+torch==2.8.0
+transformers==4.56.1
+tokenizers==0.22.0
+safetensors==0.6.2
+
+# =========================
+# Utilities
+# =========================
+toml==0.10.2
+diskcache==5.6.3
+tqdm==4.67.1
+regex==2025.9.1
+ujson==5.11.0
+
+# =========================
+# Shared Dependencies (Pinned)
+# =========================
+pydantic==2.11.7
+pydantic-core==2.33.2
+typing-extensions==4.15.0
+python-dateutil==2.9.0.post0
+httpx==0.28.1
+requests==2.32.5
+urllib3==2.5.0
+certifi==2025.8.3
+charset-normalizer==3.4.3
+idna==3.10
+
+# =========================
+# Additional Requirements
+# =========================
+huggingface-hub==0.34.4
+filelock==3.19.1
+packaging==24.2
+pyyaml==6.0.2
+jinja2==3.1.6
+markupsafe==3.0.2
+click==8.2.1
+python-dotenv==1.1.1
+
+# =========================
+# Installation Notes
+# =========================
+# Install with: pip install -r requirements-storm.txt
+#
+# macOS (Apple Silicon):
+# - Some packages may download x86_64 versions and run via Rosetta 2
+# - For native ARM64 performance, use: pip install --no-binary :all: <package>
+#
+# Windows:
+# - Requires Microsoft Visual C++ 14.0 or greater
+# - Install from: https://visualstudio.microsoft.com/visual-cpp-build-tools/
+#
+# Common Issues:
+# - lxml: May need libxml2 and libxslt development packages
+#   macOS: brew install libxml2 libxslt
+#   Windows: Pre-built wheels usually work
+# - torch: Large download (~2GB), consider using --find-links https://download.pytorch.org/whl/torch_stable.html

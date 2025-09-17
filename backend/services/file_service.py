@@ -41,7 +41,7 @@ class ProjectConfig(BaseModel):
     max_tokens: int = 4000
 
     # Retriever Configuration
-    retriever_type: str = "bing"
+    retriever_type: str = "tavily"  # Default to tavily (bing is not implemented)
     max_search_results: int = 10
     search_top_k: int = 3
 
@@ -96,7 +96,8 @@ class FileProjectService:
         """Load projects index from JSON file."""
         try:
             with open(self.index_file, "r", encoding="utf-8") as f:
-                return json.load(f)
+                data: Dict[str, Any] = json.load(f)
+                return data
         except (FileNotFoundError, json.JSONDecodeError):
             return {"projects": []}
 
@@ -263,7 +264,13 @@ class FileProjectService:
         index["projects"].append(project_summary)
         self._save_index(index)
 
-        return self.get_project_summary(project_id)
+        # Get the full project summary and ensure it's not None
+        result = self.get_project_summary(project_id)
+        if result is None:
+            # This shouldn't happen since we just created the project
+            # but handle it to satisfy type checker
+            raise RuntimeError(f"Failed to retrieve newly created project {project_id}")
+        return result
 
     def list_projects(self) -> List[Dict[str, Any]]:
         """List all projects with summary information."""
@@ -552,7 +559,8 @@ class FileProjectService:
             if ref_path.exists():
                 try:
                     with open(ref_path, "r", encoding="utf-8") as f:
-                        return json.load(f)
+                        refs: Dict[str, Any] = json.load(f)
+                        return refs
                 except Exception as e:
                     print(f"Error loading references from {ref_path}: {e}")
 
@@ -621,7 +629,10 @@ class FileProjectService:
 
         if format.lower() == "markdown":
             # Return content with clickable links if available
-            return project.get("content_with_links", project["content"])
+            result: Optional[str] = project.get(
+                "content_with_links", project["content"]
+            )
+            return result
         elif format.lower() == "json":
             return json.dumps(project, indent=2, default=str)
         elif format.lower() == "html":

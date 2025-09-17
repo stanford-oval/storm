@@ -8,14 +8,14 @@ export const env = {
   // API URLs
   API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
   WS_URL: process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000/ws',
-  
+
   // LLM API Keys
   OPENAI_API_KEY: process.env.NEXT_PUBLIC_OPENAI_API_KEY || '',
   ANTHROPIC_API_KEY: process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY || '',
   AZURE_API_KEY: process.env.NEXT_PUBLIC_AZURE_API_KEY || '',
   GOOGLE_API_KEY: process.env.NEXT_PUBLIC_GOOGLE_API_KEY || '',
   GROQ_API_KEY: process.env.NEXT_PUBLIC_GROQ_API_KEY || '',
-  
+
   // Search/Retriever API Keys
   TAVILY_API_KEY: process.env.NEXT_PUBLIC_TAVILY_API_KEY || '',
   GOOGLE_SEARCH_API_KEY: process.env.NEXT_PUBLIC_GOOGLE_SEARCH_API_KEY || '',
@@ -24,18 +24,28 @@ export const env = {
   YDC_API_KEY: process.env.NEXT_PUBLIC_YDC_API_KEY || '',
   BING_SEARCH_API_KEY: process.env.NEXT_PUBLIC_BING_SEARCH_API_KEY || '',
   BRAVE_API_KEY: process.env.NEXT_PUBLIC_BRAVE_API_KEY || '',
-  
+
   // Feature flags
   USE_DUCKDUCKGO: process.env.NEXT_PUBLIC_USE_DUCKDUCKGO === 'true',
   ENABLE_DEBUG_MODE: process.env.NEXT_PUBLIC_ENABLE_DEBUG_MODE === 'true',
-  
+
   // Defaults
-  DEFAULT_LLM_PROVIDER: process.env.NEXT_PUBLIC_DEFAULT_LLM_PROVIDER || 'openai',
+  DEFAULT_LLM_PROVIDER:
+    process.env.NEXT_PUBLIC_DEFAULT_LLM_PROVIDER || 'openai',
   DEFAULT_LLM_MODEL: process.env.NEXT_PUBLIC_DEFAULT_LLM_MODEL || 'gpt-4o',
-  DEFAULT_RETRIEVER_TYPE: process.env.NEXT_PUBLIC_DEFAULT_RETRIEVER_TYPE || 'tavily',
-  DEFAULT_TEMPERATURE: parseFloat(process.env.NEXT_PUBLIC_DEFAULT_TEMPERATURE || '0.7'),
-  DEFAULT_MAX_TOKENS: parseInt(process.env.NEXT_PUBLIC_DEFAULT_MAX_TOKENS || '4000', 10),
-  DEFAULT_MAX_SEARCH_RESULTS: parseInt(process.env.NEXT_PUBLIC_DEFAULT_MAX_SEARCH_RESULTS || '10', 10),
+  DEFAULT_RETRIEVER_TYPE:
+    process.env.NEXT_PUBLIC_DEFAULT_RETRIEVER_TYPE || 'tavily',
+  DEFAULT_TEMPERATURE: parseFloat(
+    process.env.NEXT_PUBLIC_DEFAULT_TEMPERATURE || '0.7'
+  ),
+  DEFAULT_MAX_TOKENS: parseInt(
+    process.env.NEXT_PUBLIC_DEFAULT_MAX_TOKENS || '4000',
+    10
+  ),
+  DEFAULT_MAX_SEARCH_RESULTS: parseInt(
+    process.env.NEXT_PUBLIC_DEFAULT_MAX_SEARCH_RESULTS || '10',
+    10
+  ),
 } as const;
 
 // Debug function to log what's loaded

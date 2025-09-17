@@ -1,5 +1,4 @@
 import { useCallback, useEffect, RefObject } from 'react';
-import { useHotkeys } from 'react-hotkeys-hook';
 
 interface KeyboardNavigationOptions {
   enabled?: boolean;
@@ -45,7 +44,7 @@ export const useKeyboardNavigation = (
   // Get all navigable items
   const getItems = useCallback((): HTMLElement[] => {
     if (!containerRef.current) return [];
-    
+
     return Array.from(
       containerRef.current.querySelectorAll<HTMLElement>(itemSelector)
     ).filter(item => {
@@ -67,13 +66,16 @@ export const useKeyboardNavigation = (
   }, [getItems]);
 
   // Focus specific item
-  const focusItem = useCallback((index: number) => {
-    const items = getItems();
-    if (index >= 0 && index < items.length) {
-      items[index].focus();
-      onNavigate?.(index, items[index]);
-    }
-  }, [getItems, onNavigate]);
+  const focusItem = useCallback(
+    (index: number) => {
+      const items = getItems();
+      if (index >= 0 && index < items.length) {
+        items[index].focus();
+        onNavigate?.(index, items[index]);
+      }
+    },
+    [getItems, onNavigate]
+  );
 
   // Focus next item
   const focusNext = useCallback(() => {
@@ -113,155 +115,157 @@ export const useKeyboardNavigation = (
   }, [getItems, focusItem]);
 
   // Activate current item
-  const activateItem = useCallback((index: number) => {
-    const items = getItems();
-    if (index >= 0 && index < items.length) {
-      const item = items[index];
-      
-      // Trigger click event
-      if (item.tagName.toLowerCase() === 'button' || item.tagName.toLowerCase() === 'a') {
-        item.click();
-      } else {
-        // For other elements, dispatch a custom activate event
-        const event = new CustomEvent('activate', { bubbles: true });
-        item.dispatchEvent(event);
+  const activateItem = useCallback(
+    (index: number) => {
+      const items = getItems();
+      if (index >= 0 && index < items.length) {
+        const item = items[index];
+
+        // Trigger click event
+        if (
+          item.tagName.toLowerCase() === 'button' ||
+          item.tagName.toLowerCase() === 'a'
+        ) {
+          item.click();
+        } else {
+          // For other elements, dispatch a custom activate event
+          const event = new CustomEvent('activate', { bubbles: true });
+          item.dispatchEvent(event);
+        }
+
+        onActivate?.(index, item);
       }
-      
-      onActivate?.(index, item);
-    }
-  }, [getItems, onActivate]);
+    },
+    [getItems, onActivate]
+  );
 
   // Arrow key navigation
-  const handleArrowKeys = useCallback((direction: 'up' | 'down' | 'left' | 'right') => {
-    if (!enableArrowKeys || !enabled) return;
+  const handleArrowKeys = useCallback(
+    (direction: 'up' | 'down' | 'left' | 'right') => {
+      if (!enableArrowKeys || !enabled) return;
 
-    switch (orientation) {
-      case 'vertical':
-        if (direction === 'up') focusPrevious();
-        if (direction === 'down') focusNext();
-        break;
-      case 'horizontal':
-        if (direction === 'left') focusPrevious();
-        if (direction === 'right') focusNext();
-        break;
-      case 'both':
-        if (direction === 'up' || direction === 'left') focusPrevious();
-        if (direction === 'down' || direction === 'right') focusNext();
-        break;
-    }
-  }, [enableArrowKeys, enabled, orientation, focusNext, focusPrevious]);
+      switch (orientation) {
+        case 'vertical':
+          if (direction === 'up') focusPrevious();
+          if (direction === 'down') focusNext();
+          break;
+        case 'horizontal':
+          if (direction === 'left') focusPrevious();
+          if (direction === 'right') focusNext();
+          break;
+        case 'both':
+          if (direction === 'up' || direction === 'left') focusPrevious();
+          if (direction === 'down' || direction === 'right') focusNext();
+          break;
+      }
+    },
+    [enableArrowKeys, enabled, orientation, focusNext, focusPrevious]
+  );
 
   // Keyboard event handlers
-  useHotkeys('up', () => handleArrowKeys('up'), {
-    enabled: enabled && enableArrowKeys,
-    preventDefault: true,
-    enableOnFormTags: true,
-    scopes: ['navigation'],
-  });
+  useEffect(() => {
+    if (!enabled) return;
 
-  useHotkeys('down', () => handleArrowKeys('down'), {
-    enabled: enabled && enableArrowKeys,
-    preventDefault: true,
-    enableOnFormTags: true,
-    scopes: ['navigation'],
-  });
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      const isFormElement = ['INPUT', 'TEXTAREA', 'SELECT'].includes(
+        target.tagName
+      );
 
-  useHotkeys('left', () => handleArrowKeys('left'), {
-    enabled: enabled && enableArrowKeys,
-    preventDefault: true,
-    enableOnFormTags: true,
-    scopes: ['navigation'],
-  });
+      // Arrow keys
+      if (enableArrowKeys) {
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          handleArrowKeys('up');
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          handleArrowKeys('down');
+        } else if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          handleArrowKeys('left');
+        } else if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          handleArrowKeys('right');
+        }
+      }
 
-  useHotkeys('right', () => handleArrowKeys('right'), {
-    enabled: enabled && enableArrowKeys,
-    preventDefault: true,
-    enableOnFormTags: true,
-    scopes: ['navigation'],
-  });
+      // Home/End keys
+      if (enableHomeEnd) {
+        if (e.key === 'Home') {
+          e.preventDefault();
+          focusFirst();
+        } else if (e.key === 'End') {
+          e.preventDefault();
+          focusLast();
+        }
+      }
 
-  useHotkeys('home', focusFirst, {
-    enabled: enabled && enableHomeEnd,
-    preventDefault: true,
-    enableOnFormTags: true,
-    scopes: ['navigation'],
-  });
+      // PageUp/PageDown
+      if (enablePageUpDown) {
+        if (e.key === 'PageUp') {
+          e.preventDefault();
+          const items = getItems();
+          const currentIndex = getCurrentIndex();
+          const pageSize = Math.floor(items.length / 4) || 1;
+          const newIndex = Math.max(0, currentIndex - pageSize);
+          focusItem(newIndex);
+        } else if (e.key === 'PageDown') {
+          e.preventDefault();
+          const items = getItems();
+          const currentIndex = getCurrentIndex();
+          const pageSize = Math.floor(items.length / 4) || 1;
+          const newIndex = Math.min(items.length - 1, currentIndex + pageSize);
+          focusItem(newIndex);
+        }
+      }
 
-  useHotkeys('end', focusLast, {
-    enabled: enabled && enableHomeEnd,
-    preventDefault: true,
-    enableOnFormTags: true,
-    scopes: ['navigation'],
-  });
+      // Enter/Space for activation
+      if (enableEnterSpace && !isFormElement) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          const currentIndex = getCurrentIndex();
+          if (currentIndex >= 0) {
+            e.preventDefault();
+            activateItem(currentIndex);
+          }
+        }
+      }
+    };
 
-  useHotkeys('pageup', () => {
-    const items = getItems();
-    const currentIndex = getCurrentIndex();
-    const pageSize = Math.floor(items.length / 4) || 1;
-    const newIndex = Math.max(0, currentIndex - pageSize);
-    focusItem(newIndex);
-  }, {
-    enabled: enabled && enablePageUpDown,
-    preventDefault: true,
-    enableOnFormTags: true,
-    scopes: ['navigation'],
-  });
-
-  useHotkeys('pagedown', () => {
-    const items = getItems();
-    const currentIndex = getCurrentIndex();
-    const pageSize = Math.floor(items.length / 4) || 1;
-    const newIndex = Math.min(items.length - 1, currentIndex + pageSize);
-    focusItem(newIndex);
-  }, {
-    enabled: enabled && enablePageUpDown,
-    preventDefault: true,
-    enableOnFormTags: true,
-    scopes: ['navigation'],
-  });
-
-  useHotkeys('enter', () => {
-    const currentIndex = getCurrentIndex();
-    if (currentIndex >= 0) {
-      activateItem(currentIndex);
-    }
-  }, {
-    enabled: enabled && enableEnterSpace,
-    preventDefault: true,
-    enableOnFormTags: false,
-    scopes: ['navigation'],
-  });
-
-  useHotkeys('space', () => {
-    const currentIndex = getCurrentIndex();
-    if (currentIndex >= 0) {
-      activateItem(currentIndex);
-    }
-  }, {
-    enabled: enabled && enableEnterSpace,
-    preventDefault: true,
-    enableOnFormTags: false,
-    scopes: ['navigation'],
-  });
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [
+    enabled,
+    enableArrowKeys,
+    enableHomeEnd,
+    enablePageUpDown,
+    enableEnterSpace,
+    handleArrowKeys,
+    focusFirst,
+    focusLast,
+    focusItem,
+    activateItem,
+    getCurrentIndex,
+    getItems,
+  ]);
 
   // Auto-focus management
   useEffect(() => {
     if (!enabled || !containerRef.current) return;
 
     const container = containerRef.current;
-    
+
     const handleFocusIn = (event: FocusEvent) => {
       const target = event.target as HTMLElement;
       const items = getItems();
       const index = items.indexOf(target);
-      
+
       if (index >= 0) {
         onNavigate?.(index, target);
       }
     };
 
     container.addEventListener('focusin', handleFocusIn);
-    
+
     return () => {
       container.removeEventListener('focusin', handleFocusIn);
     };
@@ -292,7 +296,7 @@ export const useMenuNavigation = (containerRef: RefObject<HTMLElement>) => {
   });
 };
 
-// List navigation  
+// List navigation
 export const useListNavigation = (containerRef: RefObject<HTMLElement>) => {
   return useKeyboardNavigation(containerRef, {
     itemSelector: '[role="listitem"], [role="option"]',

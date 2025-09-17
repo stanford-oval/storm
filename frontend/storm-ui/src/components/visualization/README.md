@@ -9,6 +9,7 @@ This directory contains interactive data visualization components built with D3.
 An interactive D3.js-based mind map visualization for Co-STORM knowledge spaces.
 
 **Features:**
+
 - Force-directed graph layout
 - Interactive node expansion/collapse
 - Real-time updates during discourse
@@ -28,7 +29,7 @@ const nodes: MindMapNode[] = [
     label: 'Main Topic',
     type: 'topic',
     level: 0,
-    data: { content: 'This is the main topic' }
+    data: { content: 'This is the main topic' },
   },
   // ... more nodes
 ];
@@ -39,7 +40,7 @@ const links: MindMapLink[] = [
     source: '1',
     target: '2',
     type: 'hierarchy',
-    strength: 1
+    strength: 1,
   },
   // ... more links
 ];
@@ -66,7 +67,7 @@ function MyComponent() {
 **Props:**
 
 - `initialNodes`: Array of mind map nodes
-- `initialLinks`: Array of links between nodes  
+- `initialLinks`: Array of links between nodes
 - `width/height`: Dimensions of the visualization
 - `onNodeClick/onNodeDoubleClick`: Node interaction handlers
 - `onLinkClick`: Link interaction handler
@@ -75,6 +76,7 @@ function MyComponent() {
 - `showMinimap`: Show/hide minimap
 
 **Node Types:**
+
 - `topic`: Main topics (blue)
 - `subtopic`: Subtopics (cyan)
 - `research`: Research findings (green)
@@ -82,6 +84,7 @@ function MyComponent() {
 - `concept`: Abstract concepts (purple)
 
 **Link Types:**
+
 - `hierarchy`: Parent-child relationships
 - `reference`: Citations and references
 - `similarity`: Similar concepts
@@ -94,14 +97,17 @@ function MyComponent() {
 Manages mind map state and D3.js simulation.
 
 ```tsx
-const { state, actions, computed, refs } = useMindMap(initialNodes, initialLinks);
+const { state, actions, computed, refs } = useMindMap(
+  initialNodes,
+  initialLinks
+);
 
 // Add a new node
 actions.addNode({
   label: 'New Node',
   type: 'concept',
   level: 1,
-  data: { content: 'Node content' }
+  data: { content: 'Node content' },
 });
 
 // Update node
@@ -114,6 +120,7 @@ const visibleNodes = computed.visibleNodes;
 ## Types
 
 See `src/types/mindmap.ts` for comprehensive type definitions including:
+
 - `MindMapNode`: Node structure and properties
 - `MindMapLink`: Link structure and properties
 - `MindMapState`: Complete state interface
@@ -134,8 +141,8 @@ const customConfig = {
   linkDistance: 150,
   clustering: {
     enabled: true,
-    algorithm: 'kmeans'
-  }
+    algorithm: 'kmeans',
+  },
 };
 ```
 

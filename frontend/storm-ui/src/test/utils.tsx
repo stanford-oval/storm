@@ -1,42 +1,42 @@
 import React from 'react';
-import { render, RenderOptions } from '@testing-library/react';
-import { renderHook, RenderHookOptions } from '@testing-library/react-hooks';
-import { ThemeProvider } from 'next-themes';
-import { axe, toHaveNoViolations } from 'jest-axe';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { render, RenderOptions, renderHook } from '@testing-library/react';
+// import { ThemeProvider } from 'next-themes'; // TODO: Install next-themes
+import { ThemeProvider } from '@/store/contexts/ThemeContext';
+// import { axe, toHaveNoViolations } from 'jest-axe'; // TODO: Install jest-axe
+// import { QueryClient, QueryClientProvider } from '@tanstack/react-query'; // TODO: Install react-query
 import { StoreProvider } from '@/store/contexts/StoreProvider';
 import { WebSocketContext } from '@/store/contexts/WebSocketContext';
 import { ConfigContext } from '@/store/contexts/ConfigContext';
-import WS from 'jest-websocket-mock';
+// import WS from 'jest-websocket-mock'; // TODO: Install jest-websocket-mock
 
 // Extend jest matchers
-expect.extend(toHaveNoViolations);
+// expect.extend(toHaveNoViolations); // TODO: Uncomment when jest-axe is installed
 
 // Mock WebSocket server
-const mockWebSocketServer = new WS('ws://localhost:8080');
+// const mockWebSocketServer = new WS('ws://localhost:8080'); // TODO: Uncomment when jest-websocket-mock is installed
 
 // Create a custom render function that includes providers
 interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
   initialStoreState?: any;
-  queryClient?: QueryClient;
+  // queryClient?: QueryClient;
   webSocketUrl?: string;
   theme?: string;
 }
 
-const AllTheProviders: React.FC<{ 
+const AllTheProviders: React.FC<{
   children: React.ReactNode;
   options?: CustomRenderOptions;
 }> = ({ children, options = {} }) => {
-  const { 
-    initialStoreState, 
-    queryClient = new QueryClient({
-      defaultOptions: {
-        queries: { retry: false },
-        mutations: { retry: false },
-      },
-    }),
+  const {
+    initialStoreState,
+    // queryClient = new QueryClient({
+    //   defaultOptions: {
+    //     queries: { retry: false },
+    //     mutations: { retry: false },
+    //   },
+    // }),
     webSocketUrl = 'ws://localhost:8080',
-    theme = 'light'
+    theme = 'light',
   } = options;
 
   const mockWebSocket = {
@@ -56,24 +56,26 @@ const AllTheProviders: React.FC<{
   };
 
   return (
-    <ThemeProvider attribute="class" defaultTheme={theme} enableSystem={false}>
+    <ThemeProvider defaultTheme={theme as 'light' | 'dark' | 'system'}>
       <ConfigContext.Provider value={mockConfig}>
-        <QueryClientProvider client={queryClient}>
-          <WebSocketContext.Provider value={mockWebSocket}>
-            <StoreProvider initialState={initialStoreState}>
-              {children}
-            </StoreProvider>
-          </WebSocketContext.Provider>
-        </QueryClientProvider>
+        {/* <QueryClientProvider client={queryClient}> */}
+        <WebSocketContext.Provider value={mockWebSocket}>
+          <StoreProvider initialState={initialStoreState}>
+            {children}
+          </StoreProvider>
+        </WebSocketContext.Provider>
+        {/* </QueryClientProvider> */}
       </ConfigContext.Provider>
     </ThemeProvider>
   );
 };
 
 const customRender = (ui: React.ReactElement, options?: CustomRenderOptions) =>
-  render(ui, { 
-    wrapper: ({ children }) => <AllTheProviders options={options}>{children}</AllTheProviders>, 
-    ...options 
+  render(ui, {
+    wrapper: ({ children }) => (
+      <AllTheProviders options={options}>{children}</AllTheProviders>
+    ),
+    ...options,
   });
 
 // Custom hook render function
@@ -81,11 +83,19 @@ const customRenderHook = <TProps, TResult>(
   callback: (props: TProps) => TResult,
   options?: RenderHookOptions<TProps> & CustomRenderOptions
 ) => {
-  const { initialStoreState, queryClient, webSocketUrl, theme, ...hookOptions } = options || {};
-  
+  const {
+    initialStoreState,
+    queryClient,
+    webSocketUrl,
+    theme,
+    ...hookOptions
+  } = options || {};
+
   return renderHook(callback, {
     wrapper: ({ children }) => (
-      <AllTheProviders options={{ initialStoreState, queryClient, webSocketUrl, theme }}>
+      <AllTheProviders
+        options={{ initialStoreState, queryClient, webSocketUrl, theme }}
+      >
         {children}
       </AllTheProviders>
     ),
@@ -110,7 +120,7 @@ export const measureRenderTime = (renderFn: () => void): number => {
 };
 
 // Wait for async operations
-export const waitForNextTick = (): Promise<void> => 
+export const waitForNextTick = (): Promise<void> =>
   new Promise(resolve => setTimeout(resolve, 0));
 
 export const waitForWebSocket = (): Promise<void> =>

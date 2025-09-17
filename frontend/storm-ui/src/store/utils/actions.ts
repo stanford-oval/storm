@@ -7,7 +7,10 @@ export type ActionCreator<TPayload = void> = TPayload extends void
   : (payload: TPayload) => void;
 
 // Async action creator type
-export type AsyncActionCreator<TPayload = void, TReturn = void> = TPayload extends void
+export type AsyncActionCreator<
+  TPayload = void,
+  TReturn = void,
+> = TPayload extends void
   ? () => Promise<TReturn>
   : (payload: TPayload) => Promise<TReturn>;
 
@@ -28,10 +31,10 @@ export const createAction = <TPayload = void>(
       payload,
     };
   };
-  
+
   actionCreator.type = type;
   actionCreator.toString = () => type;
-  
+
   return actionCreator as any;
 };
 
@@ -43,30 +46,30 @@ export const createAsyncAction = <TPayload = void, TReturn = void>(
   const actionCreator = async (payload?: TPayload) => {
     return asyncFn(payload as TPayload);
   };
-  
+
   actionCreator.type = type;
   actionCreator.toString = () => type;
-  
+
   return actionCreator as any;
 };
 
 // Create action with metadata
-export const createActionWithMeta = <TPayload = void, TMeta = any>(
-  type: string
-) => (payload: TPayload, meta?: TMeta): ActionWithMeta<TPayload, TMeta> => ({
-  payload,
-  meta,
-  error: false,
-});
+export const createActionWithMeta =
+  <TPayload = void, TMeta = any>(type: string) =>
+  (payload: TPayload, meta?: TMeta): ActionWithMeta<TPayload, TMeta> => ({
+    payload,
+    meta,
+    error: false,
+  });
 
 // Create error action
-export const createErrorAction = <TPayload = Error>(
-  type: string
-) => (payload: TPayload, meta?: any): ActionWithMeta<TPayload> => ({
-  payload,
-  meta,
-  error: true,
-});
+export const createErrorAction =
+  <TPayload = Error>(type: string) =>
+  (payload: TPayload, meta?: any): ActionWithMeta<TPayload> => ({
+    payload,
+    meta,
+    error: true,
+  });
 
 // Optimistic update utilities
 export interface OptimisticUpdate<T, P> {
@@ -88,7 +91,7 @@ export const createOptimisticAction = <T, P>(
     try {
       // Perform async operation
       const result = await asyncFn(payload);
-      
+
       // Update with real data if needed
       set((draft: Draft<T>) => {
         // Implementation depends on the specific use case
@@ -108,26 +111,29 @@ export const createOptimisticAction = <T, P>(
 };
 
 // Batch action creator
-export const createBatchAction = <T>(
-  actions: Array<(draft: Draft<T>) => void>
-) => (set: any) => {
-  set((draft: Draft<T>) => {
-    actions.forEach(action => action(draft));
-  }, 'batch');
-};
+export const createBatchAction =
+  <T>(actions: Array<(draft: Draft<T>) => void>) =>
+  (set: any) => {
+    set((draft: Draft<T>) => {
+      actions.forEach(action => action(draft));
+    }, 'batch');
+  };
 
 // Conditional action creator
-export const createConditionalAction = <T, P>(
-  condition: (state: T, payload: P) => boolean,
-  action: (draft: Draft<T>, payload: P) => void
-) => (set: any, get: any) => (payload: P) => {
-  const state = get();
-  if (condition(state, payload)) {
-    set((draft: Draft<T>) => {
-      action(draft, payload);
-    }, 'conditional');
-  }
-};
+export const createConditionalAction =
+  <T, P>(
+    condition: (state: T, payload: P) => boolean,
+    action: (draft: Draft<T>, payload: P) => void
+  ) =>
+  (set: any, get: any) =>
+  (payload: P) => {
+    const state = get();
+    if (condition(state, payload)) {
+      set((draft: Draft<T>) => {
+        action(draft, payload);
+      }, 'conditional');
+    }
+  };
 
 // Throttled action creator
 export const createThrottledAction = <P>(
@@ -135,13 +141,13 @@ export const createThrottledAction = <P>(
   delay: number = 100
 ) => {
   let isThrottled = false;
-  
+
   return (payload: P) => {
     if (isThrottled) return;
-    
+
     isThrottled = true;
     action(payload);
-    
+
     setTimeout(() => {
       isThrottled = false;
     }, delay);
@@ -154,12 +160,12 @@ export const createDebouncedAction = <P>(
   delay: number = 300
 ) => {
   let timeoutId: NodeJS.Timeout | null = null;
-  
+
   return (payload: P) => {
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
-    
+
     timeoutId = setTimeout(() => {
       action(payload);
       timeoutId = null;
@@ -178,10 +184,10 @@ export const createUndoableActions = <T>() => ({
   undo: (set: any, get: any) => () => {
     set((draft: UndoableState<T>) => {
       if (draft.past.length === 0) return;
-      
+
       const previous = draft.past[draft.past.length - 1];
       const newPast = draft.past.slice(0, -1);
-      
+
       draft.future = [draft.present, ...draft.future];
       draft.present = previous;
       draft.past = newPast;
@@ -191,10 +197,10 @@ export const createUndoableActions = <T>() => ({
   redo: (set: any, get: any) => () => {
     set((draft: UndoableState<T>) => {
       if (draft.future.length === 0) return;
-      
+
       const next = draft.future[0];
       const newFuture = draft.future.slice(1);
-      
+
       draft.past = [...draft.past, draft.present];
       draft.present = next;
       draft.future = newFuture;
@@ -213,7 +219,7 @@ export const createUndoableActions = <T>() => ({
       draft.past.push(draft.present);
       draft.present = state;
       draft.future = [];
-      
+
       // Limit history size
       if (draft.past.length > 50) {
         draft.past = draft.past.slice(-50);
@@ -225,48 +231,62 @@ export const createUndoableActions = <T>() => ({
 // Validation utilities
 export type Validator<T> = (value: T) => string | null;
 
-export const createValidatedAction = <T, P>(
-  validator: Validator<P>,
-  action: (draft: Draft<T>, payload: P) => void
-) => (set: any, get: any) => (payload: P) => {
-  const error = validator(payload);
-  if (error) {
-    throw new Error(error);
-  }
-  
-  set((draft: Draft<T>) => {
-    action(draft, payload);
-  }, 'validated');
-};
+export const createValidatedAction =
+  <T, P>(
+    validator: Validator<P>,
+    action: (draft: Draft<T>, payload: P) => void
+  ) =>
+  (set: any, get: any) =>
+  (payload: P) => {
+    const error = validator(payload);
+    if (error) {
+      throw new Error(error);
+    }
+
+    set((draft: Draft<T>) => {
+      action(draft, payload);
+    }, 'validated');
+  };
 
 // Common validators
 export const validators = {
-  required: <T>(value: T): string | null => 
+  required: <T>(value: T): string | null =>
     value == null || value === '' ? 'This field is required' : null,
 
-  minLength: (min: number) => (value: string): string | null =>
-    value.length < min ? `Minimum length is ${min}` : null,
+  minLength:
+    (min: number) =>
+    (value: string): string | null =>
+      value.length < min ? `Minimum length is ${min}` : null,
 
-  maxLength: (max: number) => (value: string): string | null =>
-    value.length > max ? `Maximum length is ${max}` : null,
+  maxLength:
+    (max: number) =>
+    (value: string): string | null =>
+      value.length > max ? `Maximum length is ${max}` : null,
 
   email: (value: string): string | null => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(value) ? null : 'Invalid email format';
   },
 
-  min: (min: number) => (value: number): string | null =>
-    value < min ? `Minimum value is ${min}` : null,
+  min:
+    (min: number) =>
+    (value: number): string | null =>
+      value < min ? `Minimum value is ${min}` : null,
 
-  max: (max: number) => (value: number): string | null =>
-    value > max ? `Maximum value is ${max}` : null,
+  max:
+    (max: number) =>
+    (value: number): string | null =>
+      value > max ? `Maximum value is ${max}` : null,
 
-  pattern: (regex: RegExp, message: string) => (value: string): string | null =>
-    regex.test(value) ? null : message,
+  pattern:
+    (regex: RegExp, message: string) =>
+    (value: string): string | null =>
+      regex.test(value) ? null : message,
 };
 
 // Combine validators
-export const combineValidators = <T>(...validators: Validator<T>[]): Validator<T> =>
+export const combineValidators =
+  <T>(...validators: Validator<T>[]): Validator<T> =>
   (value: T) => {
     for (const validator of validators) {
       const error = validator(value);
@@ -319,7 +339,9 @@ export interface PaginationState {
   total: number;
 }
 
-export const createPaginationActions = <T extends { pagination: PaginationState }>() => ({
+export const createPaginationActions = <
+  T extends { pagination: PaginationState },
+>() => ({
   setPage: (set: any) => (page: number) => {
     set((draft: Draft<T>) => {
       draft.pagination.page = Math.max(1, page);
@@ -342,7 +364,7 @@ export const createPaginationActions = <T extends { pagination: PaginationState 
   nextPage: (set: any, get: any) => () => {
     const { pagination } = get();
     const maxPage = Math.ceil(pagination.total / pagination.limit);
-    
+
     set((draft: Draft<T>) => {
       draft.pagination.page = Math.min(maxPage, pagination.page + 1);
     }, 'nextPage');
@@ -350,7 +372,7 @@ export const createPaginationActions = <T extends { pagination: PaginationState 
 
   previousPage: (set: any, get: any) => () => {
     const { pagination } = get();
-    
+
     set((draft: Draft<T>) => {
       draft.pagination.page = Math.max(1, pagination.page - 1);
     }, 'previousPage');
@@ -365,7 +387,7 @@ export const createPaginationActions = <T extends { pagination: PaginationState 
   lastPage: (set: any, get: any) => () => {
     const { pagination } = get();
     const maxPage = Math.ceil(pagination.total / pagination.limit);
-    
+
     set((draft: Draft<T>) => {
       draft.pagination.page = maxPage;
     }, 'lastPage');
@@ -399,7 +421,7 @@ export const arrayActions = {
     }
   },
 
-  updateBy: <T>(
+  updateBy: <T extends object>(
     array: T[],
     predicate: (item: T) => boolean,
     updater: (item: T) => Partial<T>

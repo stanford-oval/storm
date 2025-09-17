@@ -3,7 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { 
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -14,12 +14,17 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { CommandPalette } from '@/components/ux/CommandPalette';
-import { useUIStore, useNotificationStore, usePipelineStore, useAuthStore } from '@/store';
-import { 
-  Bell, 
-  Settings, 
-  HelpCircle, 
-  User, 
+import {
+  useUIStore,
+  useNotificationStore,
+  usePipelineStore,
+  useAuthStore,
+} from '@/store';
+import {
+  Bell,
+  Settings,
+  HelpCircle,
+  User,
   LogOut,
   Moon,
   Sun,
@@ -27,27 +32,18 @@ import {
   Search,
   Zap,
   Activity,
-  AlertCircle
+  AlertCircle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function TopBar() {
   const router = useRouter();
-  const { 
-    theme, 
-    setTheme, 
-    commandPaletteOpen, 
-    openCommandPalette,
-    getEffectiveTheme 
-  } = useUIStore();
-  
-  const { 
-    notifications, 
-    unreadCount, 
-    markAsRead, 
-    markAllAsRead 
-  } = useNotificationStore();
-  
+  const { theme, setTheme, openCommandPalette, getEffectiveTheme } =
+    useUIStore();
+
+  const { notifications, unreadCount, markAsRead, markAllAsRead } =
+    useNotificationStore();
+
   const { runningPipelines } = usePipelineStore();
   const { user, logout } = useAuthStore();
 
@@ -78,7 +74,7 @@ export function TopBar() {
 
   return (
     <>
-      <header className="flex items-center justify-between h-16 px-6 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="flex h-16 items-center justify-between border-b bg-background/95 px-6 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         {/* Left side - Search */}
         <div className="flex items-center space-x-4">
           <Button
@@ -86,7 +82,7 @@ export function TopBar() {
             className="relative w-64 justify-start text-sm text-muted-foreground"
             onClick={openCommandPalette}
           >
-            <Search className="h-4 w-4 mr-2" />
+            <Search className="mr-2 h-4 w-4" />
             <span>Search projects, articles...</span>
             <kbd className="pointer-events-none absolute right-1.5 top-1.5 h-5 select-none rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100">
               ⌘K
@@ -98,8 +94,8 @@ export function TopBar() {
         <div className="flex items-center space-x-2">
           {/* Pipeline Status */}
           {runningPipelinesCount > 0 && (
-            <div className="flex items-center space-x-2 px-3 py-2 rounded-lg bg-primary/10 border">
-              <Activity className="h-4 w-4 text-primary animate-pulse" />
+            <div className="flex items-center space-x-2 rounded-lg border bg-primary/10 px-3 py-2">
+              <Activity className="h-4 w-4 animate-pulse text-primary" />
               <span className="text-sm font-medium text-primary">
                 {runningPipelinesCount} Running
               </span>
@@ -110,14 +106,13 @@ export function TopBar() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="relative">
-                <Bell className={cn(
-                  "h-4 w-4",
-                  hasErrors && "text-destructive"
-                )} />
+                <Bell
+                  className={cn('h-4 w-4', hasErrors && 'text-destructive')}
+                />
                 {unreadCount > 0 && (
-                  <Badge 
-                    variant={hasErrors ? "destructive" : "default"}
-                    className="absolute -top-1 -right-1 h-5 w-5 text-xs p-0 flex items-center justify-center"
+                  <Badge
+                    variant={hasErrors ? 'destructive' : 'default'}
+                    className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center p-0 text-xs"
                   >
                     {unreadCount > 99 ? '99+' : unreadCount}
                   </Badge>
@@ -139,48 +134,50 @@ export function TopBar() {
                 )}
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              
+
               {recentNotifications.length === 0 ? (
                 <DropdownMenuItem disabled>
-                  <span className="text-muted-foreground">No notifications</span>
+                  <span className="text-muted-foreground">
+                    No notifications
+                  </span>
                 </DropdownMenuItem>
               ) : (
-                recentNotifications.map((notification) => (
+                recentNotifications.map(notification => (
                   <DropdownMenuItem
                     key={notification.id}
                     className="flex-col items-start p-3"
                     onClick={() => markAsRead(notification.id)}
                   >
-                    <div className="flex items-center w-full">
+                    <div className="flex w-full items-center">
                       {notification.type === 'error' && (
-                        <AlertCircle className="h-4 w-4 text-destructive mr-2" />
+                        <AlertCircle className="mr-2 h-4 w-4 text-destructive" />
                       )}
                       {notification.type === 'success' && (
-                        <Zap className="h-4 w-4 text-green-500 mr-2" />
+                        <Zap className="mr-2 h-4 w-4 text-green-500" />
                       )}
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium">
                           {notification.title}
                         </p>
-                        <p className="text-xs text-muted-foreground truncate">
+                        <p className="truncate text-xs text-muted-foreground">
                           {notification.message}
                         </p>
                       </div>
                       {!notification.read && (
-                        <div className="h-2 w-2 bg-primary rounded-full ml-2" />
+                        <div className="ml-2 h-2 w-2 rounded-full bg-primary" />
                       )}
                     </div>
-                    <time className="text-xs text-muted-foreground mt-1">
+                    <time className="mt-1 text-xs text-muted-foreground">
                       {notification.timestamp.toLocaleTimeString()}
                     </time>
                   </DropdownMenuItem>
                 ))
               )}
-              
+
               {notifications.length > 5 && (
                 <>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem 
+                  <DropdownMenuItem
                     className="text-center"
                     onClick={() => router.push('/notifications')}
                   >
@@ -200,15 +197,15 @@ export function TopBar() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => handleThemeChange('light')}>
-                <Sun className="h-4 w-4 mr-2" />
+                <Sun className="mr-2 h-4 w-4" />
                 Light
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleThemeChange('dark')}>
-                <Moon className="h-4 w-4 mr-2" />
+                <Moon className="mr-2 h-4 w-4" />
                 Dark
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleThemeChange('system')}>
-                <Monitor className="h-4 w-4 mr-2" />
+                <Monitor className="mr-2 h-4 w-4" />
                 System
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -235,17 +232,17 @@ export function TopBar() {
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
                 <DropdownMenuItem onClick={() => router.push('/settings')}>
-                  <Settings className="h-4 w-4 mr-2" />
+                  <Settings className="mr-2 h-4 w-4" />
                   Settings
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => router.push('/help')}>
-                  <HelpCircle className="h-4 w-4 mr-2" />
+                  <HelpCircle className="mr-2 h-4 w-4" />
                   Help & Support
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>
-                <LogOut className="h-4 w-4 mr-2" />
+                <LogOut className="mr-2 h-4 w-4" />
                 Sign out
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -254,7 +251,12 @@ export function TopBar() {
       </header>
 
       {/* Command Palette */}
-      <CommandPalette />
+      <CommandPalette
+        isOpen={useUIStore(state =>
+          state.openDialogs.includes('commandPalette')
+        )}
+        onClose={() => useUIStore.getState().closeDialog('commandPalette')}
+      />
     </>
   );
 }

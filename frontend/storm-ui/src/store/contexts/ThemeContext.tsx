@@ -97,7 +97,8 @@ export const lightTheme: ThemeConfig = {
     info: '#3b82f6',
   },
   typography: {
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    fontFamily:
+      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     fontSize: {
       xs: '0.75rem',
       sm: '0.875rem',
@@ -200,17 +201,22 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   customLightTheme,
   customDarkTheme,
 }) => {
-  const { theme: themeMode, setTheme, toggleTheme, getEffectiveTheme } = useUIStore();
-  
+  const {
+    theme: themeMode,
+    setTheme,
+    toggleTheme,
+    getEffectiveTheme,
+  } = useUIStore();
+
   // Get the effective theme (resolving 'system' to actual theme)
   const effectiveTheme = getEffectiveTheme();
   const isDark = effectiveTheme === 'dark';
 
   // Merge custom themes with defaults
-  const mergedLightTheme = customLightTheme 
+  const mergedLightTheme = customLightTheme
     ? mergeTheme(lightTheme, customLightTheme)
     : lightTheme;
-  
+
   const mergedDarkTheme = customDarkTheme
     ? mergeTheme(darkTheme, customDarkTheme)
     : darkTheme;
@@ -221,7 +227,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   // Apply theme to CSS custom properties
   useEffect(() => {
     const root = document.documentElement;
-    
+
     // Apply color variables
     Object.entries(currentTheme.colors).forEach(([key, value]) => {
       root.style.setProperty(`--color-${key}`, value);
@@ -232,13 +238,17 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
       root.style.setProperty(`--font-size-${key}`, value);
     });
 
-    Object.entries(currentTheme.typography.fontWeight).forEach(([key, value]) => {
-      root.style.setProperty(`--font-weight-${key}`, value.toString());
-    });
+    Object.entries(currentTheme.typography.fontWeight).forEach(
+      ([key, value]) => {
+        root.style.setProperty(`--font-weight-${key}`, value.toString());
+      }
+    );
 
-    Object.entries(currentTheme.typography.lineHeight).forEach(([key, value]) => {
-      root.style.setProperty(`--line-height-${key}`, value.toString());
-    });
+    Object.entries(currentTheme.typography.lineHeight).forEach(
+      ([key, value]) => {
+        root.style.setProperty(`--line-height-${key}`, value.toString());
+      }
+    );
 
     // Apply spacing variables
     Object.entries(currentTheme.spacing).forEach(([key, value]) => {
@@ -266,14 +276,13 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
 
     // Apply font family
     root.style.setProperty('--font-family', currentTheme.typography.fontFamily);
-
   }, [currentTheme]);
 
   // Listen for system theme changes
   useEffect(() => {
     if (themeMode === 'system') {
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      
+
       const handleChange = () => {
         // Force a re-render by updating the store
         // This will trigger the effect above to update CSS variables
@@ -311,13 +320,19 @@ export const useTheme = (): ThemeContextType => {
 };
 
 // Utility function to merge theme objects deeply
-function mergeTheme(baseTheme: ThemeConfig, customTheme: Partial<ThemeConfig>): ThemeConfig {
+function mergeTheme(
+  baseTheme: ThemeConfig,
+  customTheme: Partial<ThemeConfig>
+): ThemeConfig {
   const merged = { ...baseTheme };
 
   // Deep merge each section
   Object.keys(customTheme).forEach(key => {
     const section = key as keyof ThemeConfig;
-    if (typeof customTheme[section] === 'object' && customTheme[section] !== null) {
+    if (
+      typeof customTheme[section] === 'object' &&
+      customTheme[section] !== null
+    ) {
       merged[section] = {
         ...merged[section],
         ...customTheme[section],
@@ -331,50 +346,54 @@ function mergeTheme(baseTheme: ThemeConfig, customTheme: Partial<ThemeConfig>): 
 // Hook for theme-aware styling
 export const useThemeStyles = () => {
   const { theme, isDark } = useTheme();
-  
+
   return {
     theme,
     isDark,
-    
+
     // Helper functions for common styling patterns
     bg: (variant: keyof ThemeConfig['colors'] = 'background') => ({
       backgroundColor: theme.colors[variant],
     }),
-    
+
     text: (variant: keyof ThemeConfig['colors'] = 'text') => ({
       color: theme.colors[variant],
     }),
-    
+
     border: (variant: keyof ThemeConfig['colors'] = 'border') => ({
       borderColor: theme.colors[variant],
     }),
-    
+
     shadow: (size: keyof ThemeConfig['shadows'] = 'md') => ({
       boxShadow: theme.shadows[size],
     }),
-    
+
     rounded: (size: keyof ThemeConfig['borderRadius'] = 'md') => ({
       borderRadius: theme.borderRadius[size],
     }),
-    
+
     p: (size: keyof ThemeConfig['spacing'] = 'md') => ({
       padding: theme.spacing[size],
     }),
-    
+
     m: (size: keyof ThemeConfig['spacing'] = 'md') => ({
       margin: theme.spacing[size],
     }),
-    
+
     fontSize: (size: keyof ThemeConfig['typography']['fontSize'] = 'base') => ({
       fontSize: theme.typography.fontSize[size],
     }),
-    
-    fontWeight: (weight: keyof ThemeConfig['typography']['fontWeight'] = 'normal') => ({
+
+    fontWeight: (
+      weight: keyof ThemeConfig['typography']['fontWeight'] = 'normal'
+    ) => ({
       fontWeight: theme.typography.fontWeight[weight],
     }),
-    
+
     // Transition helper
-    transition: (duration: keyof ThemeConfig['animation']['duration'] = 'normal') => ({
+    transition: (
+      duration: keyof ThemeConfig['animation']['duration'] = 'normal'
+    ) => ({
       transitionDuration: theme.animation.duration[duration],
       transitionTimingFunction: theme.animation.easing.easeInOut,
     }),
@@ -388,11 +407,11 @@ export const ThemeConditional: React.FC<{
   children?: (theme: ThemeContextType) => ReactNode;
 }> = ({ light, dark, children }) => {
   const themeContext = useTheme();
-  
+
   if (children) {
     return <>{children(themeContext)}</>;
   }
-  
+
   return <>{themeContext.isDark ? dark : light}</>;
 };
 
@@ -402,7 +421,7 @@ export const withTheme = <P extends object>(
 ) => {
   return React.forwardRef<any, P>((props, ref) => {
     const theme = useTheme();
-    return <Component {...props} theme={theme} ref={ref} />;
+    return <Component {...(props as P)} theme={theme} ref={ref} />;
   });
 };
 
@@ -412,7 +431,7 @@ export const ThemeToggle: React.FC<{
   showLabel?: boolean;
 }> = ({ className, showLabel = false }) => {
   const { isDark, toggleTheme } = useTheme();
-  
+
   return (
     <button
       onClick={toggleTheme}
@@ -421,12 +440,24 @@ export const ThemeToggle: React.FC<{
       title={`Switch to ${isDark ? 'light' : 'dark'} theme`}
     >
       {isDark ? (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+        >
           <circle cx="12" cy="12" r="5" />
           <path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
         </svg>
       ) : (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+        >
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
         </svg>
       )}

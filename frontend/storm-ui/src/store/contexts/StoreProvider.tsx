@@ -11,14 +11,14 @@ import { storeDebugUtils } from '../utils/debug';
 // Store provider props
 export interface StoreProviderProps {
   children: ReactNode;
-  
+
   // Theme configuration
   themeConfig?: {
     defaultTheme?: 'light' | 'dark' | 'system';
     customLightTheme?: any;
     customDarkTheme?: any;
   };
-  
+
   // Configuration
   configConfig?: {
     configUrl?: string;
@@ -26,21 +26,21 @@ export interface StoreProviderProps {
     enableRemoteConfig?: boolean;
     enableConfigValidation?: boolean;
   };
-  
+
   // WebSocket configuration
   websocketConfig?: {
     config?: any;
     autoConnect?: boolean;
     enableGlobalEvents?: boolean;
   };
-  
+
   // Development options
   development?: {
     enableDebugMode?: boolean;
     showHydrationProgress?: boolean;
     enablePerformanceMonitoring?: boolean;
   };
-  
+
   // Loading and error fallbacks
   fallbacks?: {
     loading?: React.ComponentType;
@@ -51,24 +51,28 @@ export interface StoreProviderProps {
 
 // Default loading component
 const DefaultLoadingFallback: React.FC = () => (
-  <div style={{
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '100vh',
-    backgroundColor: '#f9fafb',
-    fontFamily: 'system-ui, sans-serif',
-  }}>
-    <div style={{
-      width: '40px',
-      height: '40px',
-      border: '3px solid #e5e7eb',
-      borderTop: '3px solid #3b82f6',
-      borderRadius: '50%',
-      animation: 'spin 1s linear infinite',
-      marginBottom: '16px',
-    }} />
+  <div
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: '100vh',
+      backgroundColor: '#f9fafb',
+      fontFamily: 'system-ui, sans-serif',
+    }}
+  >
+    <div
+      style={{
+        width: '40px',
+        height: '40px',
+        border: '3px solid #e5e7eb',
+        borderTop: '3px solid #3b82f6',
+        borderRadius: '50%',
+        animation: 'spin 1s linear infinite',
+        marginBottom: '16px',
+      }}
+    />
     <div style={{ color: '#6b7280', fontSize: '14px' }}>
       Loading STORM UI...
     </div>
@@ -82,24 +86,30 @@ const DefaultLoadingFallback: React.FC = () => (
 );
 
 // Default error fallback
-const DefaultErrorFallback: React.FC<{ error: Error; retry: () => void }> = ({ error, retry }) => (
-  <div style={{
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '100vh',
-    backgroundColor: '#fef2f2',
-    fontFamily: 'system-ui, sans-serif',
-    padding: '32px',
-    textAlign: 'center',
-  }}>
+const DefaultErrorFallback: React.FC<{ error: Error; retry: () => void }> = ({
+  error,
+  retry,
+}) => (
+  <div
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: '100vh',
+      backgroundColor: '#fef2f2',
+      fontFamily: 'system-ui, sans-serif',
+      padding: '32px',
+      textAlign: 'center',
+    }}
+  >
     <div style={{ fontSize: '48px', marginBottom: '16px' }}>⚠️</div>
     <h2 style={{ color: '#dc2626', margin: '0 0 8px 0' }}>
       Something went wrong
     </h2>
     <p style={{ color: '#991b1b', marginBottom: '24px', maxWidth: '400px' }}>
-      {error.message || 'An unexpected error occurred while loading the application.'}
+      {error.message ||
+        'An unexpected error occurred while loading the application.'}
     </p>
     <button
       onClick={retry}
@@ -121,7 +131,7 @@ const DefaultErrorFallback: React.FC<{ error: Error; retry: () => void }> = ({ e
 
 // Error boundary component
 class StoreErrorBoundary extends React.Component<
-  { 
+  {
     fallback: React.ComponentType<{ error: Error; retry: () => void }>;
     children: ReactNode;
   },
@@ -180,16 +190,18 @@ export const StoreProvider: React.FC<StoreProviderProps> = ({
       console.log('🎉 All stores hydrated successfully');
     }
   }, []);
-  
-  const HydrationFallback = fallbacks.hydration || (() => (
-    <div style={{ padding: '20px' }}>
-      <HydrationProgress 
-        showProgress={showHydrationProgress}
-        showErrors={enableDebugMode}
-        onComplete={handleHydrationComplete}
-      />
-    </div>
-  ));
+
+  const HydrationFallback =
+    fallbacks.hydration ||
+    (() => (
+      <div style={{ padding: '20px' }}>
+        <HydrationProgress
+          showProgress={showHydrationProgress}
+          showErrors={enableDebugMode}
+          onComplete={handleHydrationComplete}
+        />
+      </div>
+    ));
 
   // Performance monitoring setup
   useEffect(() => {
@@ -199,7 +211,7 @@ export const StoreProvider: React.FC<StoreProviderProps> = ({
         return;
       }
       (window as any).__PERF_MONITORING__ = true;
-      
+
       // Log performance metrics periodically
       const interval = setInterval(() => {
         if (enableDebugMode) {
@@ -219,7 +231,7 @@ export const StoreProvider: React.FC<StoreProviderProps> = ({
   useEffect(() => {
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
       console.error('Unhandled promise rejection in store:', event.reason);
-      
+
       if (enableDebugMode) {
         // Show detailed error information
         console.group('🚨 Unhandled Promise Rejection Details');
@@ -232,7 +244,7 @@ export const StoreProvider: React.FC<StoreProviderProps> = ({
 
     const handleError = (event: ErrorEvent) => {
       console.error('Global error in store context:', event.error);
-      
+
       if (enableDebugMode) {
         console.group('🚨 Global Error Details');
         console.error('Message:', event.message);
@@ -247,7 +259,10 @@ export const StoreProvider: React.FC<StoreProviderProps> = ({
     window.addEventListener('error', handleError);
 
     return () => {
-      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+      window.removeEventListener(
+        'unhandledrejection',
+        handleUnhandledRejection
+      );
       window.removeEventListener('error', handleError);
     };
   }, [enableDebugMode]);
@@ -259,12 +274,12 @@ export const StoreProvider: React.FC<StoreProviderProps> = ({
       if ((window as any).__STORM_DEBUG__) {
         return; // Already initialized
       }
-      
+
       // Expose debug utilities to window for console access
       (window as any).__STORM_DEBUG__ = {
         stores: storeDebugUtils,
         hydration: globalHydrationManager,
-        
+
         // Helper functions
         logAllStoresState: () => {
           console.group('🏪 All Stores State');
@@ -273,26 +288,32 @@ export const StoreProvider: React.FC<StoreProviderProps> = ({
           console.log('Store state logging not fully implemented yet');
           console.groupEnd();
         },
-        
+
         clearAllStores: () => {
-          if (confirm('Are you sure you want to reset all stores? This will clear all data.')) {
+          if (
+            confirm(
+              'Are you sure you want to reset all stores? This will clear all data.'
+            )
+          ) {
             // This would call reset on all stores
             console.log('Store reset not fully implemented yet');
           }
         },
-        
+
         simulateNetworkError: () => {
           window.dispatchEvent(new CustomEvent('simulate:network-error'));
         },
-        
+
         simulateSlowNetwork: (delay = 2000) => {
-          window.dispatchEvent(new CustomEvent('simulate:slow-network', { detail: { delay } }));
+          window.dispatchEvent(
+            new CustomEvent('simulate:slow-network', { detail: { delay } })
+          );
         },
       };
 
       console.log(
         '%c🌪️ STORM UI Debug Mode Enabled\n' +
-        '%cType __STORM_DEBUG__ in console for debugging utilities',
+          '%cType __STORM_DEBUG__ in console for debugging utilities',
         'color: #3b82f6; font-size: 16px; font-weight: bold;',
         'color: #6b7280; font-size: 12px;'
       );
@@ -322,11 +343,13 @@ const HydrationWrapper: React.FC<{
   fallback: React.ComponentType;
 }> = ({ children, fallback: Fallback }) => {
   const [isHydrated, setIsHydrated] = React.useState(false);
-  const [hydrationError, setHydrationError] = React.useState<Error | null>(null);
+  const [hydrationError, setHydrationError] = React.useState<Error | null>(
+    null
+  );
 
   useEffect(() => {
     // Subscribe to global hydration state
-    const unsubscribe = globalHydrationManager.subscribe((state) => {
+    const unsubscribe = globalHydrationManager.subscribe(state => {
       if (state.allHydrated) {
         setIsHydrated(true);
       }
@@ -368,12 +391,15 @@ const HydrationWrapper: React.FC<{
 export const useStoreProvider = () => {
   return {
     // Debug utilities (only in development)
-    debug: process.env.NODE_ENV === 'development' ? {
-      logPerformance: storeDebugUtils.logPerformanceSummary,
-      logMemory: storeDebugUtils.logMemoryUsage,
-      getDebugData: storeDebugUtils.getDebugPanelData,
-    } : undefined,
-    
+    debug:
+      process.env.NODE_ENV === 'development'
+        ? {
+            logPerformance: storeDebugUtils.logPerformanceSummary,
+            logMemory: storeDebugUtils.logMemoryUsage,
+            getDebugData: storeDebugUtils.getDebugPanelData,
+          }
+        : undefined,
+
     // Hydration utilities
     hydration: {
       isHydrated: globalHydrationManager.areAllStoresHydrated(),
@@ -390,11 +416,6 @@ export const StoreDebugPanel: React.FC<{
   const [isOpen, setIsOpen] = React.useState(false);
   const [debugData, setDebugData] = React.useState<any>(null);
 
-  // Only render in development
-  if (process.env.NODE_ENV !== 'development') {
-    return null;
-  }
-
   useEffect(() => {
     if (isOpen) {
       const interval = setInterval(() => {
@@ -404,6 +425,11 @@ export const StoreDebugPanel: React.FC<{
       return () => clearInterval(interval);
     }
   }, [isOpen]);
+
+  // Only render in development
+  if (process.env.NODE_ENV !== 'development') {
+    return null;
+  }
 
   const positionStyles = {
     'top-left': { top: '10px', left: '10px' },
@@ -449,15 +475,19 @@ export const StoreDebugPanel: React.FC<{
           <div style={{ marginBottom: '8px' }}>
             <strong>Hydration Status:</strong> {debugData.stores.length} stores
           </div>
-          
+
           {debugData.stores.map((store: any, index: number) => (
             <div
               key={store.name}
               style={{
                 marginBottom: '4px',
                 padding: '4px 8px',
-                backgroundColor: store.healthStatus === 'healthy' ? '#065f46' : 
-                               store.healthStatus === 'warning' ? '#92400e' : '#991b1b',
+                backgroundColor:
+                  store.healthStatus === 'healthy'
+                    ? '#065f46'
+                    : store.healthStatus === 'warning'
+                      ? '#92400e'
+                      : '#991b1b',
                 borderRadius: '4px',
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -469,10 +499,28 @@ export const StoreDebugPanel: React.FC<{
           ))}
 
           {debugData.memoryInfo && (
-            <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #374151' }}>
-              <div><strong>Memory:</strong></div>
-              <div>Used: {(debugData.memoryInfo.usedJSHeapSize / 1024 / 1024).toFixed(1)}MB</div>
-              <div>Total: {(debugData.memoryInfo.totalJSHeapSize / 1024 / 1024).toFixed(1)}MB</div>
+            <div
+              style={{
+                marginTop: '8px',
+                paddingTop: '8px',
+                borderTop: '1px solid #374151',
+              }}
+            >
+              <div>
+                <strong>Memory:</strong>
+              </div>
+              <div>
+                Used:{' '}
+                {(debugData.memoryInfo.usedJSHeapSize / 1024 / 1024).toFixed(1)}
+                MB
+              </div>
+              <div>
+                Total:{' '}
+                {(debugData.memoryInfo.totalJSHeapSize / 1024 / 1024).toFixed(
+                  1
+                )}
+                MB
+              </div>
             </div>
           )}
         </div>

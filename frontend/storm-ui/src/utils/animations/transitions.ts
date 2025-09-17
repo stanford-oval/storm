@@ -128,11 +128,11 @@ export const buttonAnimations = {
 export const cardTransitions: Record<string, Variants> = {
   hover: {
     rest: { scale: 1, y: 0, boxShadow: '0 4px 6px rgba(0,0,0,0.1)' },
-    hover: { 
-      scale: 1.02, 
-      y: -2, 
+    hover: {
+      scale: 1.02,
+      y: -2,
       boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
-      transition: { duration: 0.2 }
+      transition: { duration: 0.2 },
     },
   },
   lift: {
@@ -171,11 +171,11 @@ export const loadingAnimations: Record<string, Variants> = {
   wave: {
     animate: {
       scale: [1, 1.2, 1],
-      transition: { 
-        duration: 1, 
-        repeat: Infinity, 
+      transition: {
+        duration: 1,
+        repeat: Infinity,
         repeatDelay: 0.5,
-        ease: 'easeInOut' 
+        ease: 'easeInOut',
       },
     },
   },
@@ -218,10 +218,10 @@ export const notificationTransitions: Record<string, Variants> = {
   },
   bounce: {
     initial: { scale: 0.3, opacity: 0 },
-    animate: { 
-      scale: 1, 
+    animate: {
+      scale: 1,
       opacity: 1,
-      transition: { type: 'spring', stiffness: 300, damping: 20 }
+      transition: { type: 'spring', stiffness: 300, damping: 20 },
     },
     exit: { scale: 0.3, opacity: 0 },
   },

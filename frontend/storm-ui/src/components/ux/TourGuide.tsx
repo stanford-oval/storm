@@ -1,10 +1,18 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ChevronRight, ChevronLeft, X, CheckCircle, Circle, 
-  Play, BookOpen, Sparkles, ArrowRight, SkipForward
+import {
+  ChevronRight,
+  ChevronLeft,
+  X,
+  CheckCircle,
+  Circle,
+  Play,
+  BookOpen,
+  Sparkles,
+  ArrowRight,
+  SkipForward,
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
@@ -36,20 +44,23 @@ const defaultSteps: TourStep[] = [
   {
     id: 'welcome',
     title: 'Welcome to STORM UI',
-    content: 'Let\'s take a quick tour to get you familiar with the interface and key features.',
+    content:
+      "Let's take a quick tour to get you familiar with the interface and key features.",
     placement: 'bottom',
   },
   {
     id: 'dashboard',
     title: 'Dashboard Overview',
-    content: 'This is your main dashboard where you can see all your projects, recent activity, and quick actions.',
+    content:
+      'This is your main dashboard where you can see all your projects, recent activity, and quick actions.',
     target: '[data-tour="dashboard"]',
     placement: 'bottom',
   },
   {
     id: 'new-project',
     title: 'Create New Project',
-    content: 'Click here to start a new STORM project. You can choose from different templates or start from scratch.',
+    content:
+      'Click here to start a new STORM project. You can choose from different templates or start from scratch.',
     target: '[data-tour="new-project"]',
     placement: 'left',
     action: 'hover',
@@ -57,27 +68,31 @@ const defaultSteps: TourStep[] = [
   {
     id: 'pipeline',
     title: 'Pipeline Management',
-    content: 'This section shows your active pipelines and their current status. You can monitor progress in real-time.',
+    content:
+      'This section shows your active pipelines and their current status. You can monitor progress in real-time.',
     target: '[data-tour="pipeline"]',
     placement: 'right',
   },
   {
     id: 'command-palette',
     title: 'Command Palette',
-    content: 'Press Cmd+K (or Ctrl+K) anytime to open the command palette for quick access to any feature.',
+    content:
+      'Press Cmd+K (or Ctrl+K) anytime to open the command palette for quick access to any feature.',
     placement: 'top',
   },
   {
     id: 'analytics',
     title: 'Analytics Dashboard',
-    content: 'View detailed analytics about your projects, token usage, and performance metrics.',
+    content:
+      'View detailed analytics about your projects, token usage, and performance metrics.',
     target: '[data-tour="analytics"]',
     placement: 'top',
   },
   {
     id: 'settings',
     title: 'Settings & Configuration',
-    content: 'Configure your API keys, preferences, and application settings from here.',
+    content:
+      'Configure your API keys, preferences, and application settings from here.',
     target: '[data-tour="settings"]',
     placement: 'left',
   },
@@ -97,20 +112,19 @@ export const TourGuide: React.FC<TourGuideProps> = ({
   const [isVisible, setIsVisible] = useState(false);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
-  
-  // Early return if not open
-  if (!isOpen) {
-    return null;
-  }
 
   // Calculate tooltip position based on target element
-  const updateTooltipPosition = (target: string, placement: string = 'bottom') => {
+  const updateTooltipPosition = (
+    target: string,
+    placement: string = 'bottom'
+  ) => {
     const element = document.querySelector(target);
     if (!element) return;
 
     const rect = element.getBoundingClientRect();
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+    const scrollLeft =
+      window.pageXOffset || document.documentElement.scrollLeft;
 
     let x = 0;
     let y = 0;
@@ -165,7 +179,51 @@ export const TourGuide: React.FC<TourGuideProps> = ({
     }
   }, [isOpen, autoStart]);
 
-  // Keyboard navigation
+  const handleComplete = useCallback(() => {
+    setIsVisible(false);
+    onComplete?.();
+    onClose();
+  }, [onComplete, onClose]);
+
+  const handleNext = useCallback(() => {
+    const step = steps[currentStep];
+    setCompletedSteps(prev => new Set([...Array.from(prev), step.id]));
+
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      handleComplete();
+    }
+  }, [currentStep, steps, handleComplete]);
+
+  const handlePrevious = useCallback(() => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  }, [currentStep]);
+
+  const handleClose = useCallback(() => {
+    setIsVisible(false);
+    onClose();
+  }, [onClose]);
+
+  const handleStart = useCallback(() => {
+    setIsVisible(true);
+    setCurrentStep(0);
+  }, []);
+
+  const handleSkip = useCallback(() => {
+    const step = steps[currentStep];
+    if (step.skippable !== false) {
+      handleNext();
+    }
+  }, [currentStep, steps, handleNext]);
+
+  const handleStepClick = (stepIndex: number) => {
+    setCurrentStep(stepIndex);
+  };
+
+  // Keyboard navigation - moved after handler definitions
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!isOpen) return;
@@ -188,51 +246,7 @@ export const TourGuide: React.FC<TourGuideProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, currentStep]);
-
-  const handleStart = () => {
-    setIsVisible(true);
-    setCurrentStep(0);
-  };
-
-  const handleNext = () => {
-    const step = steps[currentStep];
-    setCompletedSteps(prev => new Set([...prev, step.id]));
-
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      handleComplete();
-    }
-  };
-
-  const handlePrevious = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  const handleSkip = () => {
-    const step = steps[currentStep];
-    if (step.skippable !== false) {
-      handleNext();
-    }
-  };
-
-  const handleComplete = () => {
-    setIsVisible(false);
-    onComplete?.();
-    onClose();
-  };
-
-  const handleClose = () => {
-    setIsVisible(false);
-    onClose();
-  };
-
-  const handleStepClick = (stepIndex: number) => {
-    setCurrentStep(stepIndex);
-  };
+  }, [isOpen, currentStep, handleNext, handlePrevious, handleClose]);
 
   const currentStepData = steps[currentStep];
   const progress = ((currentStep + 1) / steps.length) * 100;
@@ -240,17 +254,18 @@ export const TourGuide: React.FC<TourGuideProps> = ({
   // Create spotlight overlay for targeted elements
   const createSpotlight = () => {
     if (!currentStepData?.target) return null;
-    
+
     const element = document.querySelector(currentStepData.target);
     if (!element) return null;
 
     const rect = element.getBoundingClientRect();
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+    const scrollLeft =
+      window.pageXOffset || document.documentElement.scrollLeft;
 
     return (
       <div
-        className="fixed inset-0 pointer-events-none z-40"
+        className="pointer-events-none fixed inset-0 z-40"
         style={{
           background: `radial-gradient(circle at ${rect.left + scrollLeft + rect.width / 2}px ${
             rect.top + scrollTop + rect.height / 2
@@ -262,6 +277,11 @@ export const TourGuide: React.FC<TourGuideProps> = ({
     );
   };
 
+  // Early return after all hooks
+  if (!isOpen) {
+    return null;
+  }
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -271,7 +291,7 @@ export const TourGuide: React.FC<TourGuideProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/30 z-30"
+            className="fixed inset-0 z-30 bg-black/30"
           />
 
           {/* Spotlight overlay */}
@@ -283,25 +303,31 @@ export const TourGuide: React.FC<TourGuideProps> = ({
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50"
+              className="fixed left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2 transform"
             >
-              <Card className="p-8 max-w-md text-center shadow-2xl">
+              <Card className="max-w-md p-8 text-center shadow-2xl">
                 <div className="mb-6">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
-                    <BookOpen className="w-8 h-8 text-blue-600" />
+                  <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
+                    <BookOpen className="h-8 w-8 text-blue-600" />
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">{title}</h2>
+                  <h2 className="mb-2 text-2xl font-bold text-gray-900">
+                    {title}
+                  </h2>
                   <p className="text-gray-600">
-                    Take a guided tour to learn about the key features and how to get started.
+                    Take a guided tour to learn about the key features and how
+                    to get started.
                   </p>
                 </div>
 
-                <div className="flex gap-3 justify-center">
+                <div className="flex justify-center gap-3">
                   <Button variant="outline" onClick={handleClose}>
                     Skip Tour
                   </Button>
-                  <Button onClick={handleStart} className="bg-blue-600 hover:bg-blue-700">
-                    <Play className="w-4 h-4 mr-2" />
+                  <Button
+                    onClick={handleStart}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    <Play className="mr-2 h-4 w-4" />
                     Start Tour
                   </Button>
                 </div>
@@ -320,23 +346,23 @@ export const TourGuide: React.FC<TourGuideProps> = ({
               style={{
                 left: currentStepData?.target ? tooltipPosition.x : '50%',
                 top: currentStepData?.target ? tooltipPosition.y : '50%',
-                transform: currentStepData?.target 
-                  ? `translate(-50%, ${currentStepData.placement === 'top' ? '100%' : currentStepData.placement === 'bottom' ? '-100%' : '-50%'})` 
+                transform: currentStepData?.target
+                  ? `translate(-50%, ${currentStepData.placement === 'top' ? '100%' : currentStepData.placement === 'bottom' ? '-100%' : '-50%'})`
                   : 'translate(-50%, -50%)',
               }}
             >
-              <Card className="shadow-2xl border-2 border-blue-200">
+              <Card className="border-2 border-blue-200 shadow-2xl">
                 {/* Header */}
-                <div className="p-4 border-b bg-gradient-to-r from-blue-50 to-purple-50">
-                  <div className="flex items-center justify-between mb-2">
+                <div className="border-b bg-gradient-to-r from-blue-50 to-purple-50 p-4">
+                  <div className="mb-2 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Sparkles className="w-5 h-5 text-blue-500" />
+                      <Sparkles className="h-5 w-5 text-blue-500" />
                       <span className="text-sm font-medium text-blue-600">
                         Step {currentStep + 1} of {steps.length}
                       </span>
                     </div>
                     <Button variant="ghost" size="sm" onClick={handleClose}>
-                      <X className="w-4 h-4" />
+                      <X className="h-4 w-4" />
                     </Button>
                   </div>
                   <Progress value={progress} className="h-2" />
@@ -344,36 +370,38 @@ export const TourGuide: React.FC<TourGuideProps> = ({
 
                 {/* Content */}
                 <div className="p-4">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  <h3 className="mb-2 text-lg font-semibold text-gray-900">
                     {currentStepData.title}
                   </h3>
-                  <p className="text-gray-600 mb-4">{currentStepData.content}</p>
+                  <p className="mb-4 text-gray-600">
+                    {currentStepData.content}
+                  </p>
 
                   {/* Media */}
                   {currentStepData.image && (
-                    <img 
-                      src={currentStepData.image} 
+                    <img
+                      src={currentStepData.image}
                       alt={currentStepData.title}
-                      className="w-full rounded-lg mb-4"
+                      className="mb-4 w-full rounded-lg"
                     />
                   )}
                 </div>
 
                 {/* Footer */}
-                <div className="flex items-center justify-between p-4 border-t bg-gray-50">
+                <div className="flex items-center justify-between border-t bg-gray-50 p-4">
                   <div className="flex items-center gap-1">
                     {steps.map((_, index) => (
                       <button
                         key={index}
                         onClick={() => handleStepClick(index)}
-                        className="p-1 rounded-full hover:bg-gray-200 transition-colors"
+                        className="rounded-full p-1 transition-colors hover:bg-gray-200"
                       >
                         {completedSteps.has(steps[index].id) ? (
-                          <CheckCircle className="w-3 h-3 text-green-500" />
+                          <CheckCircle className="h-3 w-3 text-green-500" />
                         ) : index === currentStep ? (
-                          <Circle className="w-3 h-3 text-blue-500 fill-current" />
+                          <Circle className="h-3 w-3 fill-current text-blue-500" />
                         ) : (
-                          <Circle className="w-3 h-3 text-gray-300" />
+                          <Circle className="h-3 w-3 text-gray-300" />
                         )}
                       </button>
                     ))}
@@ -381,29 +409,34 @@ export const TourGuide: React.FC<TourGuideProps> = ({
 
                   <div className="flex items-center gap-2">
                     {currentStep > 0 && (
-                      <Button variant="outline" size="sm" onClick={handlePrevious}>
-                        <ChevronLeft className="w-4 h-4" />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handlePrevious}
+                      >
+                        <ChevronLeft className="h-4 w-4" />
                         Previous
                       </Button>
                     )}
-                    
-                    {currentStepData.skippable !== false && currentStep < steps.length - 1 && (
-                      <Button variant="ghost" size="sm" onClick={handleSkip}>
-                        <SkipForward className="w-4 h-4 mr-2" />
-                        Skip
-                      </Button>
-                    )}
-                    
+
+                    {currentStepData.skippable !== false &&
+                      currentStep < steps.length - 1 && (
+                        <Button variant="ghost" size="sm" onClick={handleSkip}>
+                          <SkipForward className="mr-2 h-4 w-4" />
+                          Skip
+                        </Button>
+                      )}
+
                     <Button size="sm" onClick={handleNext}>
                       {currentStep === steps.length - 1 ? (
                         <>
-                          <CheckCircle className="w-4 h-4 mr-2" />
+                          <CheckCircle className="mr-2 h-4 w-4" />
                           Complete
                         </>
                       ) : (
                         <>
                           Next
-                          <ChevronRight className="w-4 h-4 ml-2" />
+                          <ChevronRight className="ml-2 h-4 w-4" />
                         </>
                       )}
                     </Button>
@@ -414,7 +447,7 @@ export const TourGuide: React.FC<TourGuideProps> = ({
               {/* Arrow pointer */}
               {currentStepData?.target && (
                 <div
-                  className="absolute w-0 h-0 border-8"
+                  className="absolute h-0 w-0 border-8"
                   style={{
                     left: '50%',
                     transform: 'translateX(-50%)',

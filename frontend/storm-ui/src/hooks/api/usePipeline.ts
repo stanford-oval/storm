@@ -1,6 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { pipelineService } from '../../services/pipeline';
-import { PipelineProgress, PipelineStatusResponse, StartPipelineRequest } from '../../types/api';
+import {
+  PipelineProgress,
+  PipelineStatusResponse,
+  StartPipelineRequest,
+} from '../../types/api';
 import { useToast } from '../useToast';
 
 export interface UsePipelineOptions {
@@ -33,7 +37,9 @@ export function usePipeline(options: UsePipelineOptions): UsePipelineResult {
     setError(null);
 
     try {
-      const response = await pipelineService.getPipelineStatus(options.projectId);
+      const response = await pipelineService.getPipelineStatus(
+        options.projectId
+      );
 
       if (response.success && response.data) {
         setStatus(response.data);
@@ -41,7 +47,8 @@ export function usePipeline(options: UsePipelineOptions): UsePipelineResult {
         throw new Error(response.error || 'Failed to fetch pipeline status');
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch pipeline status';
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to fetch pipeline status';
       setError(errorMessage);
       console.error('Pipeline status fetch error:', errorMessage);
     }
@@ -63,88 +70,96 @@ export function usePipeline(options: UsePipelineOptions): UsePipelineResult {
     }
   }, []);
 
-  const startPipeline = useCallback(async (config?: StartPipelineRequest): Promise<boolean> => {
-    setLoading(true);
-    setError(null);
+  const startPipeline = useCallback(
+    async (config?: StartPipelineRequest): Promise<boolean> => {
+      setLoading(true);
+      setError(null);
 
-    try {
-      const request: StartPipelineRequest = config || {
-        projectId: options.projectId,
-        stages: [
-          { name: 'research', enabled: true },
-          { name: 'outline', enabled: true },
-          { name: 'article', enabled: true },
-          { name: 'polish', enabled: true },
-        ],
-      };
+      try {
+        const request: StartPipelineRequest = config || {
+          projectId: options.projectId,
+          stages: [
+            { name: 'research', enabled: true },
+            { name: 'outline', enabled: true },
+            { name: 'article', enabled: true },
+            { name: 'polish', enabled: true },
+          ],
+        };
 
-      const response = await pipelineService.startPipeline(request);
+        const response = await pipelineService.startPipeline(request);
 
-      if (response.success && response.data) {
-        setStatus(response.data);
-        startPolling(); // Start polling when pipeline starts
+        if (response.success && response.data) {
+          setStatus(response.data);
+          startPolling(); // Start polling when pipeline starts
 
+          toast({
+            title: 'Success',
+            description: 'Pipeline started successfully',
+            variant: 'success',
+          });
+
+          return true;
+        } else {
+          throw new Error(response.error || 'Failed to start pipeline');
+        }
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Failed to start pipeline';
+        setError(errorMessage);
         toast({
-          title: 'Success',
-          description: 'Pipeline started successfully',
-          variant: 'success',
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+        return false;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [options.projectId, startPolling, toast]
+  );
+
+  const stopPipeline = useCallback(
+    async (reason?: string): Promise<boolean> => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await pipelineService.stopPipeline({
+          projectId: options.projectId,
+          reason,
         });
 
-        return true;
-      } else {
-        throw new Error(response.error || 'Failed to start pipeline');
-      }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to start pipeline';
-      setError(errorMessage);
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  }, [options.projectId, startPolling, toast]);
+        if (response.success) {
+          await fetchStatus(); // Refresh status
+          stopPolling(); // Stop polling when pipeline stops
 
-  const stopPipeline = useCallback(async (reason?: string): Promise<boolean> => {
-    setLoading(true);
-    setError(null);
+          toast({
+            title: 'Success',
+            description: 'Pipeline stopped successfully',
+            variant: 'success',
+          });
 
-    try {
-      const response = await pipelineService.stopPipeline({
-        projectId: options.projectId,
-        reason,
-      });
-
-      if (response.success) {
-        await fetchStatus(); // Refresh status
-        stopPolling(); // Stop polling when pipeline stops
-
+          return true;
+        } else {
+          throw new Error(response.error || 'Failed to stop pipeline');
+        }
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Failed to stop pipeline';
+        setError(errorMessage);
         toast({
-          title: 'Success',
-          description: 'Pipeline stopped successfully',
-          variant: 'success',
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
         });
-
-        return true;
-      } else {
-        throw new Error(response.error || 'Failed to stop pipeline');
+        return false;
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to stop pipeline';
-      setError(errorMessage);
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  }, [options.projectId, fetchStatus, stopPolling, toast]);
+    },
+    [options.projectId, fetchStatus, stopPolling, toast]
+  );
 
   const pausePipeline = useCallback(async (): Promise<boolean> => {
     setLoading(true);
@@ -167,7 +182,8 @@ export function usePipeline(options: UsePipelineOptions): UsePipelineResult {
         throw new Error(response.error || 'Failed to pause pipeline');
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to pause pipeline';
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to pause pipeline';
       setError(errorMessage);
       toast({
         title: 'Error',
@@ -202,7 +218,8 @@ export function usePipeline(options: UsePipelineOptions): UsePipelineResult {
         throw new Error(response.error || 'Failed to resume pipeline');
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to resume pipeline';
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to resume pipeline';
       setError(errorMessage);
       toast({
         title: 'Error',
@@ -277,11 +294,14 @@ export function usePipelineLogs(options: UsePipelineLogsOptions) {
     setError(null);
 
     try {
-      const response = await pipelineService.getPipelineLogs(options.projectId, {
-        stage: options.stage,
-        level: options.level,
-        limit: options.limit || 100,
-      });
+      const response = await pipelineService.getPipelineLogs(
+        options.projectId,
+        {
+          stage: options.stage,
+          level: options.level,
+          limit: options.limit || 100,
+        }
+      );
 
       if (response.success && response.data) {
         setLogs(response.data);
@@ -289,7 +309,8 @@ export function usePipelineLogs(options: UsePipelineLogsOptions) {
         throw new Error(response.error || 'Failed to fetch pipeline logs');
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch pipeline logs';
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to fetch pipeline logs';
       setError(errorMessage);
       console.error('Pipeline logs fetch error:', errorMessage);
     } finally {
@@ -302,18 +323,20 @@ export function usePipelineLogs(options: UsePipelineLogsOptions) {
       streamCleanupRef.current();
     }
 
-    pipelineService.streamPipelineLogs(
-      options.projectId,
-      (newLog) => {
-        setLogs(prev => [...prev, newLog]);
-      },
-      (error) => {
-        console.error('Pipeline log streaming error:', error);
-        setError(error.message);
-      }
-    ).then(cleanup => {
-      streamCleanupRef.current = cleanup;
-    });
+    pipelineService
+      .streamPipelineLogs(
+        options.projectId,
+        newLog => {
+          setLogs(prev => [...prev, newLog]);
+        },
+        error => {
+          console.error('Pipeline log streaming error:', error);
+          setError(error.message);
+        }
+      )
+      .then(cleanup => {
+        streamCleanupRef.current = cleanup;
+      });
   }, [options.projectId]);
 
   const stopStreaming = useCallback(() => {
@@ -376,7 +399,10 @@ export function usePipelineTemplates() {
         throw new Error(response.error || 'Failed to fetch pipeline templates');
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch pipeline templates';
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : 'Failed to fetch pipeline templates';
       setError(errorMessage);
       toast({
         title: 'Error',
@@ -420,7 +446,8 @@ export function usePipelineMetrics(projectId: string) {
         throw new Error(response.error || 'Failed to fetch pipeline metrics');
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch pipeline metrics';
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to fetch pipeline metrics';
       setError(errorMessage);
       toast({
         title: 'Error',

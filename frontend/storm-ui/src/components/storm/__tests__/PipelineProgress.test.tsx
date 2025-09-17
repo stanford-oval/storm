@@ -17,7 +17,9 @@ describe('PipelineProgress', () => {
     render(<PipelineProgress {...defaultProps} />);
 
     expect(screen.getByText('Pipeline Progress')).toBeInTheDocument();
-    expect(screen.getByText('Current stage: Research Phase')).toBeInTheDocument();
+    expect(
+      screen.getByText('Current stage: Research Phase')
+    ).toBeInTheDocument();
     expect(screen.getByText('25%')).toBeInTheDocument();
   });
 
@@ -25,7 +27,9 @@ describe('PipelineProgress', () => {
     render(<PipelineProgress {...defaultProps} />);
 
     expect(screen.getByText('Current Task')).toBeInTheDocument();
-    expect(screen.getByText('Conducting perspective research...')).toBeInTheDocument();
+    expect(
+      screen.getByText('Conducting perspective research...')
+    ).toBeInTheDocument();
   });
 
   it('shows elapsed time', () => {
@@ -46,7 +50,9 @@ describe('PipelineProgress', () => {
     const onCancel = jest.fn();
     render(<PipelineProgress {...defaultProps} onCancel={onCancel} />);
 
-    const cancelButton = screen.getByRole('button', { name: /cancel pipeline/i });
+    const cancelButton = screen.getByRole('button', {
+      name: /cancel pipeline/i,
+    });
     expect(cancelButton).toBeInTheDocument();
 
     fireEvent.click(cancelButton);
@@ -59,9 +65,13 @@ describe('PipelineProgress', () => {
     });
 
     const onCancel = jest.fn();
-    render(<PipelineProgress progress={completedProgress} onCancel={onCancel} />);
+    render(
+      <PipelineProgress progress={completedProgress} onCancel={onCancel} />
+    );
 
-    expect(screen.queryByRole('button', { name: /cancel pipeline/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /cancel pipeline/i })
+    ).not.toBeInTheDocument();
   });
 
   it('displays errors when present', () => {
@@ -134,7 +144,7 @@ describe('PipelineProgress', () => {
 
   it('updates elapsed time over time', () => {
     jest.useFakeTimers();
-    
+
     render(<PipelineProgress {...defaultProps} />);
 
     // Fast-forward time
@@ -146,4 +156,6 @@ describe('PipelineProgress', () => {
 
     jest.useRealTimers();
   });
-});
+
+}
+)

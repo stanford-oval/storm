@@ -25,7 +25,7 @@ export class ApiErrorHandler {
     const message = error?.message || 'Unknown error occurred';
     const status = error?.status || error?.response?.status;
     const code = error?.code || error?.response?.data?.code;
-    
+
     const enhancedError: EnhancedError = new Error(message) as EnhancedError;
     enhancedError.originalError = error;
     enhancedError.operation = operation;
@@ -35,7 +35,7 @@ export class ApiErrorHandler {
     enhancedError.timestamp = new Date();
     enhancedError.retryable = this.isRetryable(error);
     enhancedError.userMessage = this.getUserMessage(status, operation, code);
-    
+
     return enhancedError;
   }
 
@@ -45,27 +45,27 @@ export class ApiErrorHandler {
   static isRetryable(error: any): boolean {
     const status = error?.status || error?.response?.status;
     const code = error?.code;
-    
+
     // Network errors are generally retryable
     if (!status && (code === 'NETWORK_ERROR' || code === 'ECONNABORTED')) {
       return true;
     }
-    
+
     // 5xx server errors are retryable
     if (status >= 500 && status < 600) {
       return true;
     }
-    
+
     // Rate limit errors are retryable
     if (status === 429) {
       return true;
     }
-    
+
     // Timeout errors are retryable
     if (code === 'ECONNABORTED') {
       return true;
     }
-    
+
     return false;
   }
 
@@ -127,7 +127,7 @@ export class ApiErrorHandler {
       context: error.context,
       timestamp: error.timestamp,
       retryable: error.retryable,
-      originalError: error.originalError
+      originalError: error.originalError,
     };
 
     if (error.status && error.status >= 500) {
@@ -162,7 +162,7 @@ export class ApiErrorHandler {
         const enhancedError = this.enhance(error, operationName, {
           ...context,
           attempt: attempt + 1,
-          maxRetries: maxRetries + 1
+          maxRetries: maxRetries + 1,
         });
 
         lastError = enhancedError;
@@ -200,7 +200,7 @@ export class ErrorRecoveryStrategies {
         localStorage.removeItem('storm_auth_token');
         sessionStorage.removeItem('storm_auth_token');
       }
-      
+
       // Could trigger auth flow here
       console.log('Authentication required - redirecting to login');
       return true;
@@ -214,11 +214,12 @@ export class ErrorRecoveryStrategies {
   static async handleRateLimit(error: EnhancedError): Promise<number> {
     if (error.status === 429) {
       // Extract retry-after header if available
-      const retryAfter = error.originalError?.response?.headers?.['retry-after'];
+      const retryAfter =
+        error.originalError?.response?.headers?.['retry-after'];
       if (retryAfter) {
         return parseInt(retryAfter) * 1000; // Convert to milliseconds
       }
-      
+
       // Default backoff
       return 60000; // 1 minute
     }
@@ -237,7 +238,7 @@ export class ErrorRecoveryStrategies {
     return {
       shouldReconnect: true,
       delay: 5000,
-      maxRetries: 5
+      maxRetries: 5,
     };
   }
 }
@@ -256,9 +257,9 @@ export class ErrorNotifications {
       message: error.userMessage,
       operation: error.operation,
       retryable: error.retryable,
-      timestamp: error.timestamp
+      timestamp: error.timestamp,
     });
-    
+
     // Example integration with a notification library:
     // toast.error(error.userMessage, {
     //   id: `error-${error.operation}-${error.timestamp.getTime()}`,
@@ -276,9 +277,9 @@ export class ErrorNotifications {
   static notifyRecovery(operation: string): void {
     console.log('Recovery Notification:', {
       message: `${operation} completed successfully after retry`,
-      timestamp: new Date()
+      timestamp: new Date(),
     });
-    
+
     // toast.success(`${operation} completed successfully`);
   }
 }
@@ -291,11 +292,12 @@ export const ErrorUtils = {
    * Check if error is a network error
    */
   isNetworkError(error: any): boolean {
-    return !error.status && (
-      error.code === 'NETWORK_ERROR' ||
-      error.code === 'ECONNABORTED' ||
-      error.message?.includes('Network Error') ||
-      error.message?.includes('fetch')
+    return (
+      !error.status &&
+      (error.code === 'NETWORK_ERROR' ||
+        error.code === 'ECONNABORTED' ||
+        error.message?.includes('Network Error') ||
+        error.message?.includes('fetch'))
     );
   },
 
@@ -334,17 +336,17 @@ export const ErrorUtils = {
    */
   formatForDisplay(error: EnhancedError): string {
     let message = error.userMessage;
-    
+
     if (error.context?.field) {
       message = `${error.context.field}: ${message}`;
     }
-    
+
     if (error.retryable) {
       message += ' (This operation can be retried)';
     }
-    
+
     return message;
-  }
+  },
 };
 
 export default ApiErrorHandler;
