@@ -7,6 +7,8 @@ Provides endpoints for managing global and project-specific configurations.
 from fastapi import APIRouter, HTTPException, Query
 from typing import Dict, Any, Optional
 from pydantic import BaseModel
+import re
+from pathlib import Path
 
 from services.config_service import (
     ConfigurationService,
@@ -17,6 +19,35 @@ from services.config_service import (
 from services.llm_config_builder import LLMConfigBuilder
 
 router = APIRouter(prefix="/api/config", tags=["configuration"])
+
+# Project ID validation pattern - alphanumeric, hyphens, and underscores only
+PROJECT_ID_PATTERN = re.compile(r"^[a-zA-Z0-9_-]+$")
+MAX_PROJECT_ID_LENGTH = 100
+
+
+def validate_project_id(project_id: str) -> str:
+    """Validate and sanitize project ID to prevent path traversal attacks."""
+    # Check length
+    if len(project_id) > MAX_PROJECT_ID_LENGTH:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Project ID too long (max {MAX_PROJECT_ID_LENGTH} characters)",
+        )
+
+    # Check for path traversal attempts
+    if ".." in project_id or "/" in project_id or "\\" in project_id:
+        raise HTTPException(
+            status_code=400, detail="Invalid project ID: contains illegal characters"
+        )
+
+    # Validate against pattern
+    if not PROJECT_ID_PATTERN.match(project_id):
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid project ID: must contain only letters, numbers, hyphens, and underscores",
+        )
+
+    return project_id
 
 
 class ConfigUpdateRequest(BaseModel):
@@ -72,13 +103,26 @@ async def update_global_config(request: ConfigUpdateRequest):
 @router.get("/project/{project_id}")
 async def get_project_config(project_id: str):
     """Get configuration for a specific project (with inheritance applied)."""
+    # Validate project ID to prevent path traversal
+    project_id = validate_project_id(project_id)
+
     config_service = get_config_service()
 
     # Load project overrides from file if exists
-    from pathlib import Path
     import json
 
-    project_config_file = Path(f"./storm-projects/projects/{project_id}/config.json")
+    # Use resolve() to ensure the path is within the expected directory
+    base_dir = Path("./storm-projects/projects").resolve()
+    project_config_file = base_dir / project_id / "config.json"
+
+    # Double-check the resolved path is within the base directory
+    try:
+        project_config_file = project_config_file.resolve()
+        if not str(project_config_file).startswith(str(base_dir)):
+            raise HTTPException(status_code=400, detail="Invalid project path")
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid project path")
+
     project_overrides = {}
     if project_config_file.exists():
         with open(project_config_file, "r") as f:
@@ -92,7 +136,9 @@ async def get_project_config(project_id: str):
 @router.post("/project/{project_id}")
 async def update_project_config(project_id: str, request: ConfigUpdateRequest):
     """Update project-specific configuration overrides."""
-    from pathlib import Path
+    # Validate project ID to prevent path traversal
+    project_id = validate_project_id(project_id)
+
     import json
 
     # Validate configuration
@@ -104,9 +150,21 @@ async def update_project_config(project_id: str, request: ConfigUpdateRequest):
             detail={"message": "Invalid configuration", "errors": errors},
         )
 
-    # Save project overrides
-    project_config_file = Path(f"./storm-projects/projects/{project_id}/config.json")
-    project_config_file.parent.mkdir(parents=True, exist_ok=True)
+    # Use resolve() to ensure the path is within the expected directory
+    base_dir = Path("./storm-projects/projects").resolve()
+    project_dir = base_dir / project_id
+    project_config_file = project_dir / "config.json"
+
+    # Double-check the resolved path is within the base directory
+    try:
+        project_config_file = project_config_file.resolve()
+        if not str(project_config_file).startswith(str(base_dir)):
+            raise HTTPException(status_code=400, detail="Invalid project path")
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid project path")
+
+    # Create directory if it doesn't exist
+    project_dir.mkdir(parents=True, exist_ok=True)
 
     with open(project_config_file, "w") as f:
         json.dump(request.config, f, indent=2)
@@ -307,13 +365,26 @@ async def export_project_config(
     ),
 ):
     """Export project configuration (optionally without sensitive data)."""
+    # Validate project ID to prevent path traversal
+    project_id = validate_project_id(project_id)
+
     config_service = get_config_service()
 
     # Get project config
-    from pathlib import Path
     import json
 
-    project_config_file = Path(f"./storm-projects/projects/{project_id}/config.json")
+    # Use resolve() to ensure the path is within the expected directory
+    base_dir = Path("./storm-projects/projects").resolve()
+    project_config_file = base_dir / project_id / "config.json"
+
+    # Double-check the resolved path is within the base directory
+    try:
+        project_config_file = project_config_file.resolve()
+        if not str(project_config_file).startswith(str(base_dir)):
+            raise HTTPException(status_code=400, detail="Invalid project path")
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid project path")
+
     project_overrides = {}
     if project_config_file.exists():
         with open(project_config_file, "r") as f:
