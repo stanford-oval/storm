@@ -466,7 +466,7 @@ class AzureOpenAIModel(dspy.LM):
 
     def __init__(
         self,
-        azure_endpoint: str,
+        api_base: str,
         api_version: str,
         model: str,
         api_key: str,
@@ -482,7 +482,7 @@ class AzureOpenAIModel(dspy.LM):
         self.model_type = model_type
 
         self.client = AzureOpenAI(
-            azure_endpoint=azure_endpoint,
+            azure_endpoint=api_base,
             api_key=api_key,
             api_version=api_version,
         )

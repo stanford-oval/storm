@@ -69,6 +69,7 @@ def main(args):
     if os.getenv("OPENAI_API_TYPE") == "azure":
         openai_kwargs["api_base"] = os.getenv("AZURE_API_BASE")
         openai_kwargs["api_version"] = os.getenv("AZURE_API_VERSION")
+        gpt_4o_model_name = os.getenv("AZURE_API_MODEL")
 
     # STORM is a LM system so different components can be powered by different models.
     # For a good balance between cost and quality, you can choose a cheaper/faster model for conv_simulator_lm
@@ -199,7 +200,7 @@ def main(args):
     os.makedirs(args.output_dir, exist_ok=True)
 
     # Save article
-    with open(os.path.join(args.output_dir, "report.md"), "w") as f:
+    with open(os.path.join(args.output_dir, "report.md"), "w", encoding="utf-8") as f:
         f.write(article)
 
     # Save instance dump
@@ -210,7 +211,17 @@ def main(args):
     # Save logging
     log_dump = costorm_runner.dump_logging_and_reset()
     with open(os.path.join(args.output_dir, "log.json"), "w") as f:
-        json.dump(log_dump, f, indent=2)
+        for stage in log_dump:
+            stage_obj = log_dump[stage]
+            for metric in stage_obj:
+                metric_obj=stage_obj[metric]
+                if metric == "lm_history":
+                    # values = []
+                    for history in metric_obj:
+                        history["response"] = history["response"]["choices"][0].message.content
+                        # values.append(text)
+                    # metric_obj[history] = ".".join(values)
+            json.dump(stage_obj, f, indent=2)
 
 
 if __name__ == "__main__":
@@ -225,6 +236,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--retriever",
         type=str,
+        default="duckduckgo",
         choices=["bing", "you", "brave", "serper", "duckduckgo", "tavily", "searxng"],
         help="The search engine API to use for retrieving information.",
     )
@@ -280,7 +292,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--max_thread_num",
         type=int,
-        default=10,
+        default=1,
         help=(
             "Maximum number of threads to use. "
             "Consider reducing it if you keep getting 'Exceed rate limit' errors when calling the LM API."
