@@ -209,6 +209,13 @@ class TopicExpert(dspy.Module):
                 q.replace("-", "").strip().strip('"').strip('"').strip()
                 for q in queries.split("\n")
             ]
+            queries = [q for q in queries if q and len(q.strip()) > 3]  # 长度>3字符
+            if not queries:
+                return dspy.Prediction(
+                    queries=[],
+                    searched_results=[],
+                    answer="No valid queries generated for this question"
+                )
             queries = queries[: self.max_search_queries]
             # Search
             searched_results: List[Information] = self.retriever.retrieve(

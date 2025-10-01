@@ -932,6 +932,10 @@ class TavilySearchRM(dspy.Retrieve):
             if isinstance(query_or_queries, str)
             else query_or_queries
         )
+        valid_queries = [q for q in queries if q and len(q.strip()) >= 3]
+        if not valid_queries:
+            logging.warning(f"All queries are empty: {queries}")
+            return []
         self.usage += len(queries)
 
         collected_results = []

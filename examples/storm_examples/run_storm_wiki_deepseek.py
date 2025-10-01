@@ -49,13 +49,13 @@ def sanitize_topic(topic):
     topic = topic.replace(" ", "_")
 
     # Remove any character that isn't alphanumeric, underscore, or hyphen
-    topic = re.sub(r"[^a-zA-Z0-9_-]", "", topic)
+    topic = re.sub(r'[^a-zA-Z0-9_\-\s]', '', topic)
 
     # Ensure the topic isn't empty after sanitization
     if not topic:
         topic = "unnamed_topic"
 
-    return topic
+    return topic[:100] if topic else "unnamed_topic" 
 
 
 def main(args):
@@ -152,8 +152,8 @@ def main(args):
     try:
         runner.run(
             topic=sanitized_topic,
-            do_research=args.do_research,
-            do_generate_outline=args.do_generate_outline,
+            do_research=args.do_research and bool(sanitized_topic.strip()),
+            do_generate_outline=args.do_generate_outline and bool(sanitized_topic.strip()),
             do_generate_article=args.do_generate_article,
             do_polish_article=args.do_polish_article,
             remove_duplicate=args.remove_duplicate,
