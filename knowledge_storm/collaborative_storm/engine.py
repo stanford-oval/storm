@@ -176,14 +176,112 @@ class CollaborativeStormLMConfigs(LMConfigs):
     def to_dict(self):
         """
         Converts the CollaborativeStormLMConfigs instance to a dictionary representation.
-
-        Returns:
-            dict: The dictionary representation of the CollaborativeStormLMConfigs.
         """
         config_dict = {}
-        for attr_name in self.__dict__:
-            config_dict[attr_name] = getattr(self, attr_name).kwargs
+
+        # For each LM attribute
+        for attr_name, attr_value in self.__dict__.items():
+            if attr_name.endswith("_lm") and attr_value is not None:
+                # Store the model information directly
+                model_info = {
+                    "type": attr_value.__class__.__name__,
+                    "module": attr_value.__class__.__module__,
+                    "model": getattr(attr_value, "model", None),
+                    "max_tokens": getattr(attr_value, "max_tokens", None),
+                }
+
+                # Check for additional important attributes
+                for param in ["temperature", "top_p"]:
+                    if hasattr(attr_value, param):
+                        model_info[param] = getattr(attr_value, param)
+
+                # Check if the model has a kwargs dictionary
+                if hasattr(attr_value, "kwargs"):
+                    # Make a copy to avoid reference issues
+                    model_info["kwargs"] = {**attr_value.kwargs}
+
+                    # Don't include sensitive info or large objects in serialization
+                    if "extra_headers" in model_info["kwargs"]:
+                        model_info["kwargs"]["extra_headers"] = "AUTH_HEADERS_PRESENT"
+
+                config_dict[attr_name] = model_info
+
         return config_dict
+
+    @classmethod
+    def from_dict(cls, data):
+        """
+        Constructs a CollaborativeStormLMConfigs instance from a dictionary representation.
+        Fails if no data is provided.
+        """
+        # If there's no data, raise an exception
+        if not data:
+            raise ValueError(
+                "No data provided to construct CollaborativeStormLMConfigs"
+            )
+
+        # Create a new instance
+        config = cls()
+
+        # Import LM class
+        try:
+            from knowledge_storm.lm import LM
+        except ImportError:
+            # Fallback if import path is different
+            from ..lm import LM
+
+        # Process each LM configuration from the data - don't use get() with lm_config again
+        for attr_name, model_info in data.items():
+            if attr_name.endswith("_lm") and model_info:
+                # Extract model class if specified
+                LMClass = LM
+                if "module" in model_info and "type" in model_info:
+                    try:
+                        module_name = model_info["module"]
+                        class_name = model_info["type"]
+                        module = __import__(module_name, fromlist=[class_name])
+                        LMClass = getattr(module, class_name)
+                    except (ImportError, AttributeError):
+                        pass
+
+                # Extract parameters from model_info
+                model = model_info.get("model")
+                kwargs = model_info.get("kwargs", {}).copy()
+
+                # Handle max_tokens
+                max_tokens = kwargs.pop("max_tokens", model_info.get("max_tokens"))
+
+                # Handle model_type
+                model_type = kwargs.pop("model_type", "chat")
+
+                # Only replace auth headers placeholder if it was explicitly present
+                if kwargs.get("extra_headers") == "AUTH_HEADERS_PRESENT":
+                    # The presence of this placeholder indicates auth headers were previously used
+                    if model and model.startswith("azure/"):
+                        auth_headers = get_auth_headers()
+                        if auth_headers:
+                            kwargs["extra_headers"] = auth_headers
+                            kwargs["api_key"] = None
+                    else:
+                        # For non-Azure models, remove the placeholder
+                        kwargs.pop("extra_headers", None)
+
+                # Create the LM instance
+                try:
+                    lm = LMClass(
+                        model=model,
+                        max_tokens=max_tokens,
+                        model_type=model_type,
+                        **kwargs,
+                    )
+                    setattr(config, attr_name, lm)
+                except Exception as e:
+                    print(
+                        f"Warning: Could not create {attr_name} with model {model}: {e}"
+                    )
+                    # Don't attempt to create a fallback here
+
+        return config
 
 
 @dataclass
@@ -509,6 +607,7 @@ class CoStormRunner:
         runner_argument: RunnerArgument,
         logging_wrapper: LoggingWrapper,
         rm: Optional[dspy.Retrieve] = None,
+        encoder: Optional[Encoder] = None,
         callback_handler: BaseCallbackHandler = None,
     ):
         self.runner_argument = runner_argument
@@ -519,7 +618,10 @@ class CoStormRunner:
             self.rm = BingSearch(k=runner_argument.retrieve_top_k)
         else:
             self.rm = rm
-        self.encoder = Encoder()
+        if encoder is None:
+            self.encoder = Encoder()
+        else:
+            self.encoder = encoder
         self.conversation_history = []
         self.warmstart_conv_archive = []
         self.knowledge_base = KnowledgeBase(
@@ -536,9 +638,10 @@ class CoStormRunner:
             encoder=self.encoder,
             callback_handler=callback_handler,
         )
+        self.report = None  # Initialize the report attribute
 
     def to_dict(self):
-        return {
+        result = {
             "runner_argument": self.runner_argument.to_dict(),
             "lm_config": self.lm_config.to_dict(),
             "conversation_history": [
@@ -551,32 +654,99 @@ class CoStormRunner:
             "knowledge_base": self.knowledge_base.to_dict(),
         }
 
+        # Include the report if it exists
+        if hasattr(self, "report") and self.report is not None:
+            result["report"] = self.report
+
+        return result
+
     @classmethod
     def from_dict(cls, data, callback_handler: BaseCallbackHandler = None):
-        # FIXME: does not use the lm_config data but naively use default setting
-        lm_config = CollaborativeStormLMConfigs()
-        lm_config.init(lm_type=os.getenv("OPENAI_API_TYPE"))
+        # Fail if no data is provided
+        if not data:
+            raise ValueError("No data provided to construct CoStormRunner")
+
+        # Create a new LM config from lm_config data - pass the actual lm_config data, not nested
+        lm_config = CollaborativeStormLMConfigs.from_dict(data.get("lm_config", {}))
+
+        # Create logging wrapper
+        logging_wrapper = LoggingWrapper(lm_config)
+
+        # Create a basic encoder - don't add auth headers by default
+        encoder = Encoder()
+
+        # Only create an encoder with auth headers if there's evidence they were used before
+        uses_azure_auth = False
+        for attr_name in dir(lm_config):
+            if attr_name.endswith("_lm"):
+                lm = getattr(lm_config, attr_name, None)
+                if (
+                    lm
+                    and hasattr(lm, "kwargs")
+                    and isinstance(getattr(lm, "kwargs", {}), dict)
+                    and "extra_headers" in getattr(lm, "kwargs", {})
+                ):
+                    uses_azure_auth = True
+                    break
+
+        # Only use auth headers if they were previously used
+        if uses_azure_auth:
+            auth_headers = get_auth_headers()
+            if auth_headers:
+                encoder = Encoder(
+                    api_key=None,
+                    api_base=os.getenv("AZURE_OPENAI_ENDPOINT")
+                    or os.getenv("AZURE_API_BASE"),
+                    extra_headers=auth_headers,
+                )
+
+        # Create runner args from the data
+        runner_args = RunnerArgument.from_dict(data["runner_argument"])
+
+        # Create retriever
+        retriever = BingSearch(
+            bing_search_api_key=os.getenv("BING_SEARCH_API_KEY"),
+            k=runner_args.retrieve_top_k,
+        )
+
+        # Initialize CoStormRunner
         costorm_runner = cls(
             lm_config=lm_config,
-            runner_argument=RunnerArgument.from_dict(data["runner_argument"]),
-            logging_wrapper=LoggingWrapper(lm_config),
+            runner_argument=runner_args,
+            logging_wrapper=logging_wrapper,
+            rm=retriever,
             callback_handler=callback_handler,
+            encoder=encoder,
         )
-        costorm_runner.encoder = Encoder()
-        costorm_runner.conversation_history = [
-            ConversationTurn.from_dict(turn) for turn in data["conversation_history"]
-        ]
-        costorm_runner.warmstart_conv_archive = [
-            ConversationTurn.from_dict(turn)
-            for turn in data.get("warmstart_conv_archive", [])
-        ]
-        costorm_runner.discourse_manager.deserialize_experts(data["experts"])
-        costorm_runner.knowledge_base = KnowledgeBase.from_dict(
-            data=data["knowledge_base"],
-            knowledge_base_lm=costorm_runner.lm_config.knowledge_base_lm,
-            node_expansion_trigger_count=costorm_runner.runner_argument.node_expansion_trigger_count,
-            encoder=costorm_runner.encoder,
-        )
+
+        # Load data from the dictionary
+        if "conversation_history" in data:
+            costorm_runner.conversation_history = [
+                ConversationTurn.from_dict(turn)
+                for turn in data["conversation_history"]
+            ]
+
+        if "warmstart_conv_archive" in data:
+            costorm_runner.warmstart_conv_archive = [
+                ConversationTurn.from_dict(turn)
+                for turn in data["warmstart_conv_archive"]
+            ]
+
+        if "experts" in data:
+            costorm_runner.discourse_manager.deserialize_experts(data["experts"])
+
+        if "knowledge_base" in data:
+            costorm_runner.knowledge_base = KnowledgeBase.from_dict(
+                data=data["knowledge_base"],
+                knowledge_base_lm=costorm_runner.lm_config.knowledge_base_lm,
+                node_expansion_trigger_count=costorm_runner.runner_argument.node_expansion_trigger_count,
+                encoder=costorm_runner.encoder,
+            )
+
+        # Load report if it exists
+        if "report" in data:
+            costorm_runner.report = data["report"]
+
         return costorm_runner
 
     def warm_start(self):
@@ -653,7 +823,8 @@ class CoStormRunner:
             with self.logging_wrapper.log_event(
                 "report generation stage: generate report"
             ):
-                return self.knowledge_base.to_report()
+                self.report = self.knowledge_base.to_report()
+                return self.report
 
     def dump_logging_and_reset(self):
         return self.logging_wrapper.dump_logging_and_reset()
@@ -759,3 +930,53 @@ class CoStormRunner:
                             self.callback_handler.on_mindmap_reorg_start()
                         self.knowledge_base.reorganize()
         return conv_turn
+
+
+def get_auth_headers():
+    """
+    Helper function to get authentication headers based on available credentials.
+    Avoids direct dependency on Azure libraries unless necessary.
+
+    Returns:
+        dict: A dictionary containing authentication headers if available
+    """
+    auth_headers = {}
+
+    # Try to get Azure API key if available
+    api_key = os.getenv("AZURE_OPENAI_API_KEY") or os.getenv("AZURE_API_KEY")
+    if api_key:
+        auth_headers["api-key"] = api_key
+
+    # Try to get Azure Bearer token only if needed
+    client_id = os.getenv("AZURE_OPENAI_CLIENT_ID") or os.getenv("AZURE_CLIENT_ID")
+    client_secret = os.getenv("AZURE_OPENAI_CLIENT_SECRET") or os.getenv(
+        "AZURE_CLIENT_SECRET"
+    )
+    tenant_id = os.getenv("AZURE_OPENAI_TENANT_ID") or os.getenv("AZURE_TENANT_ID")
+
+    if all([client_id, client_secret, tenant_id]):
+        try:
+            # Only import azure.identity if we need to get a token
+            import importlib.util
+
+            if importlib.util.find_spec("azure.identity"):
+                from azure.identity import ClientSecretCredential
+
+                token = (
+                    ClientSecretCredential(
+                        client_id=client_id,
+                        client_secret=client_secret,
+                        tenant_id=tenant_id,
+                    )
+                    .get_token("https://cognitiveservices.azure.com/.default")
+                    .token
+                )
+                auth_headers["Authorization"] = f"Bearer {token}"
+        except ImportError:
+            # If azure.identity isn't available, continue without token
+            pass
+        except Exception as e:
+            # Handle other exceptions
+            print(f"Warning: Could not get Azure authentication token: {e}")
+
+    return auth_headers
