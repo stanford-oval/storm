@@ -673,7 +673,7 @@ class WebPageHelper:
 
     def download_webpage(self, url: str):
         try:
-            res = self.httpx_client.get(url, timeout=4)
+            res = self.httpx_client.get(url, timeout=12)
             if res.status_code >= 400:
                 res.raise_for_status()
             return res.content
