@@ -268,7 +268,6 @@ class StormKnowledgeCurationModule(KnowledgeCurationModule):
         self.conv_simulator_lm = conv_simulator_lm
         self.search_top_k = search_top_k
         self.max_thread_num = max_thread_num
-        self.retriever = retriever
         self.conv_simulator = ConvSimulator(
             topic_expert_engine=conv_simulator_lm,
             question_asker_engine=question_asker_lm,
