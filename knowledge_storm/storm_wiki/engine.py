@@ -38,8 +38,8 @@ class STORMWikiLMConfigs(LMConfigs):
     def init_openai_model(
         self,
         openai_api_key: str,
-        azure_api_key: str,
         openai_type: Literal["openai", "azure"],
+        azure_api_key: Optional[str] = None,
         api_base: Optional[str] = None,
         api_version: Optional[str] = None,
         temperature: Optional[float] = 1.0,
