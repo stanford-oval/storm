@@ -33,7 +33,7 @@ class GenExpertActionPlanning(dspy.Signature):
     last_utterance = dspy.InputField(
         prefix="Last utterance in the conversation: \n", format=str
     )
-    resposne = dspy.OutputField(
+    response = dspy.OutputField(
         prefix="Now give your note. Start with one of [Original Question, Further Details, Information Request, Potential Answer] with one sentence description\n",
         format=str,
     )
@@ -126,7 +126,7 @@ class CoStormExpertUtteranceGenerationModule(dspy.Module):
                         expert=current_expert,
                         summary=conversation_summary,
                         last_utterance=last_utterance,
-                    ).resposne
+                    ).response
                 action_type, action_content = self.parse_action(action)
 
         if self.callback_handler is not None:

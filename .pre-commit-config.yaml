@@ -8,3 +8,8 @@ repos:
         args: ["knowledge_storm/"]
         language: python
         pass_filenames: true
+  - repo: https://github.com/codespell-project/codespell
+    # Configuration for codespell is in .codespellrc
+    rev: v2.3.0
+    hooks:
+    - id: codespell

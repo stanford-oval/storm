@@ -80,7 +80,7 @@ class InsertInformationModule(dspy.Module):
         if child_names:
             structure += f"Child Nodes: {child_names}"
         navigated_path = " -> ".join(knowledge_node.get_path_from_root())
-        structure += f"Path you have nagivated: {navigated_path}"
+        structure += f"Path you have navigated: {navigated_path}"
 
         # get predicted action
         with dspy.settings.context(lm=self.engine):
