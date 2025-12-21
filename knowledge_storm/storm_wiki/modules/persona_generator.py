@@ -9,8 +9,10 @@ from bs4 import BeautifulSoup
 
 def get_wiki_page_title_and_toc(url):
     """Get the main title and table of contents from an url of a Wikipedia page."""
-
-    response = requests.get(url)
+    headers = {
+        'User-Agent': 'MyScraperBot/1.0 (contact@example.com)'
+    }
+    response = requests.get(url, headers=headers)
     soup = BeautifulSoup(response.content, "html.parser")
 
     # Get the main title from the first h1 tag
