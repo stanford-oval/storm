@@ -204,11 +204,26 @@ class TopicExpert(dspy.Module):
     def forward(self, topic: str, question: str, ground_truth_url: str):
         with dspy.settings.context(lm=self.engine, show_guidelines=False):
             # Identify: Break down question into queries.
-            queries = self.generate_queries(topic=topic, question=question).queries
-            queries = [
-                q.replace("-", "").strip().strip('"').strip('"').strip()
-                for q in queries.split("\n")
-            ]
+            # queries = self.generate_queries(topic=topic, question=question).queries
+            # queries = [
+            #     q.replace("-", "").strip().strip('"').strip('"').strip()
+            #     for q in queries.split("\n")
+            # ]
+            # 신뢰도 낮은 사이트 제거를 위해 검색 필터 추가
+            raw_queries = self.generate_queries(topic=topic, question=question).queries
+            queries = []
+            for q in raw_queries.split("\n"):
+                q = q.replace("-", "").strip().strip('"').strip()
+                if q:
+                    # 1. 개인 블로그 및 티스토리 제외 연산자 강제 추가
+                    filtered_q = f"{q} -site:blog.naver.com -site:tistory.com"
+
+                    # 2. 특정 섹션(예: 공시, 재무) 질문일 경우 신뢰 사이트 가중치 (선택 사항)
+                    if "공시" in question or "실적" in question:
+                        filtered_q += " site:fss.or.kr"
+
+                    queries.append(filtered_q)
+
             queries = queries[: self.max_search_queries]
             # Search
             searched_results: List[Information] = self.retriever.retrieve(

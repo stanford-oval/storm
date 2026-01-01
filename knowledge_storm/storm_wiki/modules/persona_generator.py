@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 
 
 def get_wiki_page_title_and_toc(url):
-    """Get the main title and table of contents from an url of a Wikipedia page."""
+    """Get the main title and table of contents from a url of a Wikipedia page."""
 
     response = requests.get(url)
     soup = BeautifulSoup(response.content, "html.parser")
@@ -131,7 +131,7 @@ class StormPersonaGenerator:
     def __init__(self, engine: Union[dspy.dsp.LM, dspy.dsp.HFModel]):
         self.create_writer_with_persona = CreateWriterWithPersona(engine=engine)
 
-    def generate_persona(self, topic: str, max_num_persona: int = 3) -> List[str]:
+    def generate_persona(self, topic: str, max_num_persona: int = 1) -> List[str]:
         """
         Generates a list of personas based on the provided topic, up to a maximum number specified.
 
@@ -150,5 +150,11 @@ class StormPersonaGenerator:
         """
         personas = self.create_writer_with_persona(topic=topic)
         default_persona = "Basic fact writer: Basic fact writer focusing on broadly covering the basic facts about the topic."
-        considered_personas = [default_persona] + personas.personas[:max_num_persona]
+        # "기업 분석 전문가" 페르소나 3가지 강제 주입. 경영 전략 컨설턴트, 인사 및 조직문화 전문가, 재무 분석가.
+        corporate_personas = [
+            "Management Strategy Consultant: Specialize in analyzing enterprise SWOT, 3C/4P strategies and business models.",
+            "Personnel and organizational culture experts: delve into talent awards, recruitment screening, organizational culture and average pay.",
+            "Financial Analyst: Expert Analyzing Recent Disclosure, Financial Statements, and Market Share Changes of Companies."
+        ]
+        considered_personas = [default_persona] + corporate_personas + personas.personas[:max_num_persona]
         return considered_personas

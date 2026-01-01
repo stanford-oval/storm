@@ -166,8 +166,8 @@ class QdrantVectorStoreManager:
         embedding_model: str = "BAAI/bge-m3",
         device: str = "mps",
     ):
-        from qdrant_client import Document
-
+        # from qdrant_client import Document
+        from langchain_core.documents import Document
         """
         Takes a CSV file and adds each row in the CSV file to the Qdrant collection.
 
@@ -610,13 +610,13 @@ class FileIOHelper:
             return json.load(fr)
 
     @staticmethod
-    def write_str(s, path):
-        with open(path, "w") as f:
+    def write_str(s, path, encoding="utf-8"):
+        with open(path, "w" , encoding=encoding) as f:
             f.write(s)
 
     @staticmethod
-    def load_str(path):
-        with open(path, "r") as f:
+    def load_str(path, encoding="utf-8"):
+        with open(path, "r", encoding=encoding) as f:
             return "\n".join(f.readlines())
 
     @staticmethod

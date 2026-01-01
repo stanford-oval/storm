@@ -20,12 +20,12 @@ class StormOutlineGenerationModule(OutlineGenerationModule):
         self.write_outline = WriteOutline(engine=self.outline_gen_lm)
 
     def generate_outline(
-        self,
-        topic: str,
-        information_table: StormInformationTable,
-        old_outline: Optional[StormArticle] = None,
-        callback_handler: BaseCallbackHandler = None,
-        return_draft_outline=False,
+            self,
+            topic: str,
+            information_table: StormInformationTable,
+            old_outline: Optional[StormArticle] = None,
+            callback_handler: BaseCallbackHandler = None,
+            return_draft_outline=False,
     ) -> Union[StormArticle, Tuple[StormArticle, StormArticle]]:
         """
         Generates an outline for an article based on the specified topic and the information
@@ -82,17 +82,17 @@ class WriteOutline(dspy.Module):
         self.engine = engine
 
     def forward(
-        self,
-        topic: str,
-        dlg_history,
-        old_outline: Optional[str] = None,
-        callback_handler: BaseCallbackHandler = None,
+            self,
+            topic: str,
+            dlg_history,
+            old_outline: Optional[str] = None,
+            callback_handler: BaseCallbackHandler = None,
     ):
         trimmed_dlg_history = []
         for turn in dlg_history:
             if (
-                "topic you" in turn.agent_utterance.lower()
-                or "topic you" in turn.user_utterance.lower()
+                    "topic you" in turn.agent_utterance.lower()
+                    or "topic you" in turn.user_utterance.lower()
             ):
                 continue
             trimmed_dlg_history.append(turn)
@@ -126,11 +126,21 @@ class WriteOutline(dspy.Module):
 
 
 class WritePageOutline(dspy.Signature):
-    """Write an outline for a Wikipedia page.
+    """You are a professional corporate analyst. Write an outline for your corporate analysis report.
+
+    The following items must be included in the outline:
+    - a man of talent
+    - Recruitment screening
+    - Organizational culture
+    - Average salary
+    - 3C Analysis & 4P Strategy
+    - SWOT Analysis
+
     Here is the format of your writing:
     1. Use "#" Title" to indicate section title, "##" Title" to indicate subsection title, "###" Title" to indicate subsubsection title, and so on.
-    2. Do not include other information.
-    3. Do not include topic name itself in the outline.
+    2. In addition to the above items, you can add your company's business model, latest news, and more.
+    3. Do not include other information.
+    4. Do not include topic name itself in the outline.
     """
 
     topic = dspy.InputField(prefix="The topic you want to write: ", format=str)
@@ -151,11 +161,21 @@ class NaiveOutlineGen(dspy.Module):
 
 
 class WritePageOutlineFromConv(dspy.Signature):
-    """Improve an outline for a Wikipedia page. You already have a draft outline that covers the general information. Now you want to improve it based on the information learned from an information-seeking conversation to make it more informative.
+    """Improve an outline for a corporate analysis report. You already have a draft outline that covers the general information. Now you want to improve it based on the information learned from an information-seeking conversation to make it more informative.
+
+    The following items must be included in the outline:
+    - a man of talent
+    - Recruitment screening
+    - Organizational culture
+    - Average salary
+    - 3C Analysis & 4P Strategy
+    - SWOT Analysis
+
     Here is the format of your writing:
     1. Use "#" Title" to indicate section title, "##" Title" to indicate subsection title, "###" Title" to indicate subsubsection title, and so on.
-    2. Do not include other information.
-    3. Do not include topic name itself in the outline.
+    2. In addition to the above items, you can add your company's business model, latest news, and more.
+    3. Do not include other information.
+    4. Do not include topic name itself in the outline.
     """
 
     topic = dspy.InputField(prefix="The topic you want to write: ", format=str)
