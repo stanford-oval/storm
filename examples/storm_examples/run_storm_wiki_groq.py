@@ -3,7 +3,6 @@ STORM Wiki pipeline powered by llama3-70b-8192 hosted by Groq server and You.com
 You need to set up the following environment variables to run this script:
     - GROQ_API_KEY: You can get your Groq API Key at https://console.groq.com/keys
     - YDC_API_KEY: You.com API key; BING_SEARCH_API_KEY: Bing Search API key, SERPER_API_KEY: Serper API key, BRAVE_API_KEY: Brave API key, or TAVILY_API_KEY: Tavily API key
-You also need to have a VLLM server running with the Mistral-7B-Instruct-v0.2 model. Specify `--url` and `--port` accordingly.
 
 Output will be structured as below
 args.output_dir/
@@ -17,6 +16,7 @@ args.output_dir/
         storm_gen_article_polished.txt  # Polished final article (if args.do_polish_article is True)
 """
 
+import logging
 import os
 import re
 from argparse import ArgumentParser
@@ -27,9 +27,7 @@ from knowledge_storm import (
     STORMWikiLMConfigs,
 )
 
-# Now import lm directly
-import lm
-from lm import GroqModel
+from knowledge_storm.lm import GroqModel
 from knowledge_storm.rm import (
     YouRM,
     BingSearch,
@@ -61,6 +59,7 @@ def sanitize_topic(topic):
 
 
 def main(args):
+    logger = logging.getLogger(__name__)
     load_api_key(toml_file_path="secrets.toml")
     lm_configs = STORMWikiLMConfigs()
 
