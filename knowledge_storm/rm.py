@@ -1236,3 +1236,80 @@ class AzureAISearch(dspy.Retrieve):
                 logging.error(f"Error occurs when searching query {query}: {e}")
 
         return collected_results
+
+
+class TavilySearchRM(dspy.Retrieve):
+    def __init__(
+        self, tavily_search_api_key=None, k=3, is_valid_source: Callable = None
+    ):
+        super().__init__(k=k)
+        if not tavily_search_api_key and not os.environ.get("TAVILY_API_KEY"):
+            raise RuntimeError(
+                "You must supply tavily_search_api_key or set environment variable TAVILY_API_KEY"
+            )
+        elif tavily_search_api_key:
+            self.tavily_search_api_key = tavily_search_api_key
+        else:
+            self.tavily_search_api_key = os.environ["TAVILY_API_KEY"]
+        self.usage = 0
+
+        # If not None, is_valid_source shall be a function that takes a URL and returns a boolean.
+        if is_valid_source:
+            self.is_valid_source = is_valid_source
+        else:
+            self.is_valid_source = lambda x: True
+
+    def get_usage_and_reset(self):
+        usage = self.usage
+        self.usage = 0
+
+        return {"TavilySearchRM": usage}
+
+    def forward(
+        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
+    ):
+        """Search with Tavily for self.k top passages for query or queries
+
+        Args:
+            query_or_queries (Union[str, List[str]]): The query or queries to search for.
+            exclude_urls (List[str]): A list of urls to exclude from the search results.
+
+        Returns:
+            a list of Dicts, each dict has keys of 'description', 'snippets' (list of strings), 'title', 'url'
+        """
+        queries = (
+            [query_or_queries]
+            if isinstance(query_or_queries, str)
+            else query_or_queries
+        )
+        self.usage += len(queries)
+        collected_results = []
+        for query in queries:
+            try:
+                response = requests.post(
+                    "https://api.tavily.com/search",
+                    json={
+                        "api_key": self.tavily_search_api_key,
+                        "query": query,
+                        "max_results": self.k,
+                        "include_raw_content": True,
+                    },
+                ).json()
+
+                if "results" not in response:
+                    continue
+
+                for r in response["results"]:
+                    if self.is_valid_source(r["url"]) and r["url"] not in exclude_urls:
+                        collected_results.append(
+                            {
+                                "description": r.get("content", ""),
+                                "snippets": [r.get("content", "")],
+                                "title": r.get("title", ""),
+                                "url": r.get("url", ""),
+                            }
+                        )
+            except Exception as e:
+                logging.error(f"Error occurs when searching query {query}: {e}")
+
+        return collected_results
