@@ -355,7 +355,7 @@ class ArticleTextProcessing:
         Extracts citation indexes from the provided content string and returns them as a list of integers.
 
         Args:
-            content (str): The content string containing citations in the format [number].
+            s (str): The content string containing citations in the format [number].
 
         Returns:
             List[int]: A list of unique citation indexes extracted from the content, in the order they appear.
