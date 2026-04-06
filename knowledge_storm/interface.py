@@ -41,8 +41,8 @@ class InformationTable(ABC):
 class Information:
     """Class to represent detailed information.
 
-    Inherits from Information to include a unique identifier (URL), and extends
-    it with a description, snippets, and title of the storm information.
+    Includes a unique identifier (URL), along with a description, snippets,
+    and title of the storm information.
 
     Attributes:
         description (str): Brief description.
@@ -66,14 +66,6 @@ class Information:
         self.url = url
         self.meta = meta if meta is not None else {}
         self.citation_uuid = -1
-
-    def __hash__(self):
-        return hash(
-            (
-                self.url,
-                tuple(sorted(self.snippets)),
-            )
-        )
 
     def __eq__(self, other):
         if not isinstance(other, Information):
@@ -394,8 +386,8 @@ class ArticleGenerationModule(ABC):
 
 class ArticlePolishingModule(ABC):
     """
-    The interface for article generation stage. Given topic, collected information from
-    knowledge curation stage, generated outline from outline generation stage,
+    The interface for article polishing stage. Given topic and draft article,
+    polish the article into its final form.
     """
 
     @abstractmethod
