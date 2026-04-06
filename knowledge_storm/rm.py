@@ -36,7 +36,7 @@ class YouRM(dspy.Retrieve):
         return {"YouRM": usage}
 
     def forward(
-        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
+        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = None
     ):
         """Search with You.com for self.k top passages for query or queries
 
@@ -47,6 +47,8 @@ class YouRM(dspy.Retrieve):
         Returns:
             a list of Dicts, each dict has keys of 'description', 'snippets' (list of strings), 'title', 'url'
         """
+        if exclude_urls is None:
+            exclude_urls = []
         queries = (
             [query_or_queries]
             if isinstance(query_or_queries, str)
@@ -126,7 +128,7 @@ class BingSearch(dspy.Retrieve):
         return {"BingSearch": usage}
 
     def forward(
-        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
+        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = None
     ):
         """Search with Bing for self.k top passages for query or queries
 
@@ -137,6 +139,8 @@ class BingSearch(dspy.Retrieve):
         Returns:
             a list of Dicts, each dict has keys of 'description', 'snippets' (list of strings), 'title', 'url'
         """
+        if exclude_urls is None:
+            exclude_urls = []
         queries = (
             [query_or_queries]
             if isinstance(query_or_queries, str)
@@ -385,8 +389,10 @@ class StanfordOvalArxivRM(dspy.Retrieve):
             )
 
     def forward(
-        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
+        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = None
     ):
+        if exclude_urls is None:
+            exclude_urls = []
         collected_results = []
         queries = (
             [query_or_queries]
@@ -475,7 +481,7 @@ class SerperRM(dspy.Retrieve):
             "POST", self.search_url, headers=headers, json=query_params
         )
 
-        if response == None:
+        if response is None:
             raise RuntimeError(
                 f"Error had occurred while running the search process.\n Error is {response.reason}, had failed with status code {response.status_code}"
             )
@@ -561,7 +567,7 @@ class SerperRM(dspy.Retrieve):
                             ),
                         }
                     )
-            except:
+            except Exception:
                 continue
 
         return collected_results
@@ -595,7 +601,7 @@ class BraveRM(dspy.Retrieve):
         return {"BraveRM": usage}
 
     def forward(
-        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
+        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = None
     ):
         """Search with api.search.brave.com for self.k top passages for query or queries
 
@@ -606,6 +612,8 @@ class BraveRM(dspy.Retrieve):
         Returns:
             a list of Dicts, each dict has keys of 'description', 'snippets' (list of strings), 'title', 'url'
         """
+        if exclude_urls is None:
+            exclude_urls = []
         queries = (
             [query_or_queries]
             if isinstance(query_or_queries, str)
@@ -677,7 +685,7 @@ class SearXNG(dspy.Retrieve):
         return {"SearXNG": usage}
 
     def forward(
-        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
+        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = None
     ):
         """Search with SearxNG for self.k top passages for query or queries
 
@@ -688,6 +696,8 @@ class SearXNG(dspy.Retrieve):
         Returns:
             a list of Dicts, each dict has keys of 'description', 'snippets' (list of strings), 'title', 'url'
         """
+        if exclude_urls is None:
+            exclude_urls = []
         queries = (
             [query_or_queries]
             if isinstance(query_or_queries, str)
@@ -800,7 +810,7 @@ class DuckDuckGoSearchRM(dspy.Retrieve):
         return results
 
     def forward(
-        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
+        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = None
     ):
         """Search with DuckDuckGoSearch for self.k top passages for query or queries
         Args:
@@ -809,6 +819,8 @@ class DuckDuckGoSearchRM(dspy.Retrieve):
         Returns:
             a list of Dicts, each dict has keys of 'description', 'snippets' (list of strings), 'title', 'url'
         """
+        if exclude_urls is None:
+            exclude_urls = []
         queries = (
             [query_or_queries]
             if isinstance(query_or_queries, str)
@@ -918,7 +930,7 @@ class TavilySearchRM(dspy.Retrieve):
         return {"TavilySearchRM": usage}
 
     def forward(
-        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
+        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = None
     ):
         """Search with TavilySearch for self.k top passages for query or queries
         Args:
@@ -927,6 +939,8 @@ class TavilySearchRM(dspy.Retrieve):
         Returns:
             a list of Dicts, each dict has keys of 'description', 'snippets' (list of strings), 'title', 'url'
         """
+        if exclude_urls is None:
+            exclude_urls = []
         queries = (
             [query_or_queries]
             if isinstance(query_or_queries, str)
@@ -1046,7 +1060,7 @@ class GoogleSearch(dspy.Retrieve):
         return {"GoogleSearch": usage}
 
     def forward(
-        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
+        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = None
     ):
         """Search using Google Custom Search API for self.k top results for query or queries.
 
@@ -1057,6 +1071,8 @@ class GoogleSearch(dspy.Retrieve):
         Returns:
             A list of dicts, each dict has keys: 'title', 'url', 'snippet', 'description'.
         """
+        if exclude_urls is None:
+            exclude_urls = []
         queries = (
             [query_or_queries]
             if isinstance(query_or_queries, str)
@@ -1188,7 +1204,7 @@ class AzureAISearch(dspy.Retrieve):
         return {"AzureAISearch": usage}
 
     def forward(
-        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
+        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = None
     ):
         """Search with Azure Open AI for self.k top passages for query or queries
 
@@ -1199,6 +1215,8 @@ class AzureAISearch(dspy.Retrieve):
         Returns:
             a list of Dicts, each dict has keys of 'description', 'snippets' (list of strings), 'title', 'url'
         """
+        if exclude_urls is None:
+            exclude_urls = []
         try:
             from azure.core.credentials import AzureKeyCredential
             from azure.search.documents import SearchClient

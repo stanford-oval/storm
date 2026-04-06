@@ -286,8 +286,10 @@ class Retriever:
         return name_to_usage
 
     def retrieve(
-        self, query: Union[str, List[str]], exclude_urls: List[str] = []
+        self, query: Union[str, List[str]], exclude_urls: List[str] = None
     ) -> List[Information]:
+        if exclude_urls is None:
+            exclude_urls = []
         queries = query if isinstance(query, list) else [query]
         to_return = []
 
