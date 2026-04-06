@@ -924,7 +924,7 @@ class VLLMClient(dspy.dsp.LM):
 
         history = {
             "prompt": prompt,
-            "response": response,
+            "response": response.model_dump(),
             "kwargs": kwargs,
         }
         self.history.append(history)
