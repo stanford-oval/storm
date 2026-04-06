@@ -29,7 +29,7 @@ Besides VLLM server, STORM is also compatible with [TGI](https://huggingface.co/
 
 ## Run STORM with your own corpus
 
-By default, STORM is grounded on the Internet using the search engine, but it can also be grounded on your own corpus using `VectorRM`. [run_storm_wiki_with_gpt_with_VectorRM.py](run_storm_wiki_gpt_with_VectorRM.py) provides an example of running STORM grounding on your provided data.
+By default, STORM is grounded on the Internet using the search engine, but it can also be grounded on your own corpus using `VectorRM`. [run_storm_wiki_gpt_with_VectorRM.py](run_storm_wiki_gpt_with_VectorRM.py) provides an example of running STORM grounding on your provided data.
 
 1. Set up API keys.
    - Make sure you have set up the OpenAI API key.
