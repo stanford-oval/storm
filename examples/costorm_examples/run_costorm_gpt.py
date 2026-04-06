@@ -210,7 +210,7 @@ def main(args):
     # Save logging
     log_dump = costorm_runner.dump_logging_and_reset()
     with open(os.path.join(args.output_dir, "log.json"), "w") as f:
-        json.dump(log_dump, f, indent=2)
+        json.dump(log_dump, f, indent=2, default=str)
 
 
 if __name__ == "__main__":
