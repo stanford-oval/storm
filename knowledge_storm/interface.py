@@ -57,7 +57,7 @@ class Information:
         Args:
             url (str): The unique URL serving as the identifier for the information.
             description (str): Detailed description.
-            snippets (list): List of brief excerpts or snippet.
+            snippets (list): List of brief excerpts or snippets.
             title (str): The title or headline of the information.
         """
         self.description = description
@@ -66,14 +66,6 @@ class Information:
         self.url = url
         self.meta = meta if meta is not None else {}
         self.citation_uuid = -1
-
-    def __hash__(self):
-        return hash(
-            (
-                self.url,
-                tuple(sorted(self.snippets)),
-            )
-        )
 
     def __eq__(self, other):
         if not isinstance(other, Information):
