@@ -324,7 +324,7 @@ class StormArticle(Article):
             section_node = self.root
         else:
             section_node = self.find_section(self.root, root_section_name)
-            include_root = include_root or section_node != self.root.section_name
+            include_root = include_root or section_node != self.root
         if section_node is None:
             return []
         result = []
