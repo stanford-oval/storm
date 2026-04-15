@@ -1222,7 +1222,7 @@ class AzureAISearch(dspy.Retrieve):
         for query in queries:
             try:
                 # https://learn.microsoft.com/en-us/python/api/azure-search-documents/azure.search.documents.searchclient?view=azure-python#azure-search-documents-searchclient-search
-                results = client.search(search_text=query, top=1)
+                results = client.search(search_text=query, top=self.k)
 
                 for result in results:
                     document = {
