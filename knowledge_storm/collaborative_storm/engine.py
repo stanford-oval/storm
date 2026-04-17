@@ -173,17 +173,80 @@ class CollaborativeStormLMConfigs(LMConfigs):
                     lm_usage[attr_name] = usage
         return lm_usage
 
+    # Keys that must never be serialized to avoid leaking credentials.
+    _SENSITIVE_KEYS = frozenset({
+        "api_key", "api_base", "api_version",
+        "azure_api_key", "azure_api_base", "azure_api_version",
+    })
+
     def to_dict(self):
         """
         Converts the CollaborativeStormLMConfigs instance to a dictionary representation.
+
+        Each LM slot is serialized as ``{"model": ..., "model_type": ..., **non_sensitive_kwargs}``
+        so that :meth:`from_dict` can reconstruct the exact same :class:`LitellmModel`
+        instances.  Sensitive keys (API keys, base URLs, API versions) are
+        intentionally **excluded** to prevent credential leakage when the dict
+        is written to disk.
 
         Returns:
             dict: The dictionary representation of the CollaborativeStormLMConfigs.
         """
         config_dict = {}
         for attr_name in self.__dict__:
-            config_dict[attr_name] = getattr(self, attr_name).kwargs
+            lm = getattr(self, attr_name)
+            if not hasattr(lm, "kwargs"):
+                continue
+            entry = {
+                "model": getattr(lm, "model", None),
+                "model_type": getattr(lm, "model_type", "chat"),
+            }
+            for k, v in lm.kwargs.items():
+                if k not in self._SENSITIVE_KEYS:
+                    entry[k] = v
+            config_dict[attr_name] = entry
         return config_dict
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "CollaborativeStormLMConfigs":
+        """Reconstruct a :class:`CollaborativeStormLMConfigs` from a dictionary
+        previously produced by :meth:`to_dict`.
+
+        Each LM slot is recreated as a :class:`LitellmModel` using the saved
+        ``model``, ``model_type`` and generation parameters (temperature,
+        max_tokens, etc.).  API credentials are **not** stored in the dict;
+        they are picked up from the environment at construction time by
+        LiteLLM's standard resolution logic.
+
+        Args:
+            data: Dictionary produced by :meth:`to_dict`.
+
+        Returns:
+            CollaborativeStormLMConfigs: A fully reconstructed config object.
+        """
+        cfg = cls()
+        lm_slot_names = [
+            "question_answering_lm",
+            "discourse_manage_lm",
+            "utterance_polishing_lm",
+            "warmstart_outline_gen_lm",
+            "question_asking_lm",
+            "knowledge_base_lm",
+        ]
+        for attr_name in lm_slot_names:
+            if attr_name not in data:
+                continue
+            entry = dict(data[attr_name])  # shallow copy
+            model = entry.pop("model", None)
+            model_type = entry.pop("model_type", "chat")
+            if model is None:
+                continue
+            setattr(
+                cfg,
+                attr_name,
+                LitellmModel(model=model, model_type=model_type, **entry),
+            )
+        return cfg
 
 
 @dataclass
@@ -552,10 +615,31 @@ class CoStormRunner:
         }
 
     @classmethod
-    def from_dict(cls, data, callback_handler: BaseCallbackHandler = None):
-        # FIXME: does not use the lm_config data but naively use default setting
-        lm_config = CollaborativeStormLMConfigs()
-        lm_config.init(lm_type=os.getenv("OPENAI_API_TYPE"))
+    def from_dict(
+        cls,
+        data,
+        callback_handler: BaseCallbackHandler = None,
+        lm_config: CollaborativeStormLMConfigs = None,
+    ):
+        """Reconstruct a :class:`CoStormRunner` from a previously serialized dict.
+
+        When *lm_config* is ``None`` (the default), the method restores LM
+        configurations from the serialized ``lm_config`` entry using
+        :meth:`CollaborativeStormLMConfigs.from_dict`.  If the serialized
+        data does not contain ``lm_config`` (e.g. files produced by older
+        versions), the method falls back to the previous behaviour of
+        creating default configs via ``OPENAI_API_TYPE``.
+
+        Callers that need to override specific models (e.g. to use a
+        different deployment) can pass a pre-built *lm_config* directly.
+        """
+        if lm_config is None:
+            if "lm_config" in data and data["lm_config"]:
+                lm_config = CollaborativeStormLMConfigs.from_dict(data["lm_config"])
+            else:
+                # Legacy fallback: dict was produced before this fix.
+                lm_config = CollaborativeStormLMConfigs()
+                lm_config.init(lm_type=os.getenv("OPENAI_API_TYPE"))
         costorm_runner = cls(
             lm_config=lm_config,
             runner_argument=RunnerArgument.from_dict(data["runner_argument"]),
