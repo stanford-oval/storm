@@ -63,10 +63,10 @@ class YouRM(dspy.Retrieve):
                 ).json()
 
                 authoritative_results = []
-                for r in results["hits"]:
-                    if self.is_valid_source(r["url"]) and r["url"] not in exclude_urls:
-                        authoritative_results.append(r)
                 if "hits" in results:
+                    for r in results["hits"]:
+                        if self.is_valid_source(r["url"]) and r["url"] not in exclude_urls:
+                            authoritative_results.append(r)
                     collected_results.extend(authoritative_results[: self.k])
             except Exception as e:
                 logging.error(f"Error occurs when searching query {query}: {e}")
