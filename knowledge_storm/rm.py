@@ -621,7 +621,7 @@ class BraveRM(dspy.Retrieve):
                     "X-Subscription-Token": self.brave_search_api_key,
                 }
                 response = requests.get(
-                    f"https://api.search.brave.com/res/v1/web/search?result_filter=web&q={query}",
+                    f"https://api.search.brave.com/res/v1/web/search?result_filter=web&q={query}&count={self.k}",
                     headers=headers,
                 ).json()
                 results = response.get("web", {}).get("results", [])
