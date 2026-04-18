@@ -300,7 +300,7 @@ class STORMWikiRunner(Engine):
 
         llm_call_history = self.lm_configs.collect_and_reset_lm_history()
         with open(
-            os.path.join(self.article_output_dir, "llm_call_history.jsonl"), "w"
+            os.path.join(self.article_output_dir, "llm_call_history.jsonl"), "w", encoding="utf-8"
         ) as f:
             for call in llm_call_history:
                 if "kwargs" in call:

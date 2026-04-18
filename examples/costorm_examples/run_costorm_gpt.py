@@ -199,17 +199,17 @@ def main(args):
     os.makedirs(args.output_dir, exist_ok=True)
 
     # Save article
-    with open(os.path.join(args.output_dir, "report.md"), "w") as f:
+    with open(os.path.join(args.output_dir, "report.md"), "w", encoding="utf-8") as f:
         f.write(article)
 
     # Save instance dump
     instance_copy = costorm_runner.to_dict()
-    with open(os.path.join(args.output_dir, "instance_dump.json"), "w") as f:
+    with open(os.path.join(args.output_dir, "instance_dump.json"), "w", encoding="utf-8") as f:
         json.dump(instance_copy, f, indent=2)
 
     # Save logging
     log_dump = costorm_runner.dump_logging_and_reset()
-    with open(os.path.join(args.output_dir, "log.json"), "w") as f:
+    with open(os.path.join(args.output_dir, "log.json"), "w", encoding="utf-8") as f:
         json.dump(log_dump, f, indent=2)
 
 
