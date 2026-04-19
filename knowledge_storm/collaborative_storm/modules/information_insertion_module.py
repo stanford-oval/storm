@@ -363,7 +363,7 @@ class ExpandNodeModule(dspy.Module):
             # remove any integer followed by a dot and a space, a leading dashline,
             # or a specific hint at the start of the string
             subsections = [
-                re.sub(r"^\d+\.\s|-|" + re.escape(node.name), "", text)
+                re.sub(r"^(\d+\.\s|-|" + re.escape(node.name) + ")", "", text)
                 .replace("*", "")
                 .strip()
                 for text in subsections
