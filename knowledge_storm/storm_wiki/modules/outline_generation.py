@@ -160,7 +160,7 @@ class WritePageOutlineFromConv(dspy.Signature):
 
     topic = dspy.InputField(prefix="The topic you want to write: ", format=str)
     conv = dspy.InputField(prefix="Conversation history:\n", format=str)
-    old_outline = dspy.OutputField(prefix="Current outline:\n", format=str)
+    old_outline = dspy.InputField(prefix="Current outline:\n", format=str)
     outline = dspy.OutputField(
         prefix='Write the Wikipedia page outline (Use "#" Title" to indicate section title, "##" Title" to indicate subsection title, ...):\n',
         format=str,
