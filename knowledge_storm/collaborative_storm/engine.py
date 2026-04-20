@@ -470,7 +470,7 @@ class DiscourseManager:
             self.simulated_user.intent = simulate_user_intent
             next_turn_policy.agent = self.simulated_user
         elif self.runner_argument.rag_only_baseline_mode:
-            assert self.conversation_history[-1].role == "Guest"
+            assert conversation_history[-1].role == "Guest"
             next_turn_policy.agent = self.pure_rag_agent
         elif self.next_turn_moderator_override:
             next_turn_policy.agent = self.moderator
