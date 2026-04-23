@@ -722,7 +722,7 @@ def user_input_appropriateness_check(user_input):
     if len(user_input.split()) > 20:
         return "The input is too long. Please make your input topic more concise!"
 
-    if not re.match(r'^[a-zA-Z0-9\s\-"\,\.?\']*$', user_input):
+    if not re.match(r'^[a-zA-Z0-9\s\-"/\,\.?\']*$', user_input):
         return "The input contains invalid characters. The input should only contain a-z, A-Z, 0-9, space, -/\"/,./?/'."
 
     prompt = f"""Here is a topic input into a knowledge curation engine that can write a Wikipedia-like article for the topic. Please judge whether it is appropriate or not for the engine to curate information for this topic based on English search engine. The following types of inputs are inappropriate:
