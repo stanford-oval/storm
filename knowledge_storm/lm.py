@@ -524,7 +524,7 @@ class AzureOpenAIModel(dspy.LM):
 
             history_entry = {
                 "prompt": prompt,
-                "response": dict(response),
+                "response": response.model_dump(),
                 "kwargs": kwargs,
             }
             self.history.append(history_entry)
