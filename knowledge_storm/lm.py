@@ -509,6 +509,9 @@ class AzureOpenAIModel(dspy.LM):
     )
     def basic_request(self, prompt: str, **kwargs) -> Any:
         kwargs = {**self.kwargs, **kwargs}
+        # Azure o-series models (o1, o3-mini) reject max_tokens; use max_completion_tokens instead
+        if any(tag in self.model for tag in ("o1", "o3")) and "max_tokens" in kwargs:
+            kwargs["max_completion_tokens"] = kwargs.pop("max_tokens")
 
         try:
             if self.model_type == "chat":
