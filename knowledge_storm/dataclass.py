@@ -815,11 +815,11 @@ class KnowledgeBase:
             conv_turn.utterance = conv_turn.utterance.replace(
                 f"[_{new_idx}_]", f"[{new_idx}]"
             )
-            conv_turn.utterance.replace("[-1]", "")
+            conv_turn.utterance = conv_turn.utterance.replace("[-1]", "")
             conv_turn.raw_utterance = conv_turn.raw_utterance.replace(
                 f"[_{new_idx}_]", f"[{new_idx}]"
             )
-            conv_turn.raw_utterance.replace("[-1]", "")
+            conv_turn.raw_utterance = conv_turn.raw_utterance.replace("[-1]", "")
         conv_turn.cited_info = None
 
     def get_knowledge_base_summary(self):
