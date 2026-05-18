@@ -137,8 +137,8 @@ def litellm_text_completion(request, cache={"no-cache": True, "no-store": True})
     provider, model = model[0] if len(model) > 1 else "openai", model[-1]
 
     # Use the API key and base from the kwargs, or from the environment.
-    api_key = kwargs.pop("api_key", None) or os.getenv(f"{provider}_API_KEY")
-    api_base = kwargs.pop("api_base", None) or os.getenv(f"{provider}_API_BASE")
+    api_key = kwargs.pop("api_key", None) or os.getenv(f"{provider.upper()}_API_KEY")
+    api_base = kwargs.pop("api_base", None) or os.getenv(f"{provider.upper()}_API_BASE")
 
     # Build the prompt from the messages.
     prompt = "\n\n".join(
