@@ -182,8 +182,42 @@ class CollaborativeStormLMConfigs(LMConfigs):
         """
         config_dict = {}
         for attr_name in self.__dict__:
-            config_dict[attr_name] = getattr(self, attr_name).kwargs
+            lm = getattr(self, attr_name)
+            if lm is not None and hasattr(lm, "kwargs"):
+                kwargs = lm.kwargs.copy()
+                if "api_key" in kwargs:
+                    del kwargs["api_key"]
+                config_dict[attr_name] = {
+                    "class": lm.__class__.__name__,
+                    "kwargs": kwargs
+                }
+            else:
+                config_dict[attr_name] = None
         return config_dict
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        config = cls()
+        import dspy
+        import knowledge_storm.lm as storm_lm
+        for attr_name, lm_data in data.items():
+            if lm_data is not None:
+                if "class" in lm_data and "kwargs" in lm_data:
+                    class_name = lm_data["class"]
+                    kwargs = lm_data["kwargs"]
+                else:
+                    class_name = "LitellmModel"
+                    kwargs = lm_data
+                
+                if hasattr(storm_lm, class_name):
+                    lm_class = getattr(storm_lm, class_name)
+                elif hasattr(dspy, class_name):
+                    lm_class = getattr(dspy, class_name)
+                else:
+                    lm_class = storm_lm.LitellmModel
+                
+                setattr(config, attr_name, lm_class(**kwargs))
+        return config
 
 
 @dataclass
@@ -553,9 +587,11 @@ class CoStormRunner:
 
     @classmethod
     def from_dict(cls, data, callback_handler: BaseCallbackHandler = None):
-        # FIXME: does not use the lm_config data but naively use default setting
-        lm_config = CollaborativeStormLMConfigs()
-        lm_config.init(lm_type=os.getenv("OPENAI_API_TYPE"))
+        if "lm_config" in data:
+            lm_config = CollaborativeStormLMConfigs.from_dict(data["lm_config"])
+        else:
+            lm_config = CollaborativeStormLMConfigs()
+            lm_config.init(lm_type=os.getenv("OPENAI_API_TYPE"))
         costorm_runner = cls(
             lm_config=lm_config,
             runner_argument=RunnerArgument.from_dict(data["runner_argument"]),
