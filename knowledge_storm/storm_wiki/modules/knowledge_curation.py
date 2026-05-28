@@ -209,6 +209,7 @@ class TopicExpert(dspy.Module):
                 q.replace("-", "").strip().strip('"').strip('"').strip()
                 for q in queries.split("\n")
             ]
+            queries = [q for q in queries if q]
             queries = queries[: self.max_search_queries]
             # Search
             searched_results: List[Information] = self.retriever.retrieve(
