@@ -763,7 +763,7 @@ class DuckDuckGoSearchRM(dspy.Retrieve):
         #   https://duckduckgo.com/duckduckgo-help-pages/settings/params/
 
         # Sets the backend to be api
-        self.duck_duck_go_backend = "api"
+        self.duck_duck_go_backend = "auto"
 
         # Only gets safe search results
         self.duck_duck_go_safe_search = safe_search
@@ -795,7 +795,7 @@ class DuckDuckGoSearchRM(dspy.Retrieve):
     )
     def request(self, query: str):
         results = self.ddgs.text(
-            query, max_results=self.k, backend=self.duck_duck_go_backend
+            keywords=query, max_results=self.k, backend=self.duck_duck_go_backend
         )
         return results
 
