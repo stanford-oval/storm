@@ -611,12 +611,12 @@ class FileIOHelper:
 
     @staticmethod
     def write_str(s, path):
-        with open(path, "w") as f:
+        with open(path, "w", encoding="utf-8") as f:
             f.write(s)
 
     @staticmethod
     def load_str(path):
-        with open(path, "r") as f:
+        with open(path, "r", encoding="utf-8") as f:
             return "\n".join(f.readlines())
 
     @staticmethod
