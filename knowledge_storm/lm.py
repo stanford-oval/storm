@@ -458,6 +458,112 @@ class DeepSeekModel(dspy.OpenAI):
         return completions
 
 
+class MiniMaxModel(dspy.OpenAI):
+    """A wrapper class for MiniMax API (https://www.minimaxi.com/), compatible with dspy.OpenAI.
+
+    MiniMax provides OpenAI-compatible chat completion endpoints.
+    Available models include 'MiniMax-M3' (default, 512K context window,
+    up to 128K output, supports image input), 'MiniMax-M2.7' and
+    'MiniMax-M2.7-highspeed'.
+    """
+
+    def __init__(
+        self,
+        model: str = "MiniMax-M3",
+        api_key: Optional[str] = None,
+        api_base: str = "https://api.minimax.io/v1",
+        **kwargs,
+    ):
+        super().__init__(model=model, api_key=api_key, api_base=api_base, **kwargs)
+        self._token_usage_lock = threading.Lock()
+        self.prompt_tokens = 0
+        self.completion_tokens = 0
+        self.model = model
+        self.api_key = api_key or os.getenv("MINIMAX_API_KEY")
+        self.api_base = api_base
+        if not self.api_key:
+            raise ValueError(
+                "MiniMax API key must be provided either as an argument or as an environment variable MINIMAX_API_KEY"
+            )
+
+    def log_usage(self, response):
+        """Log the total tokens from the MiniMax API response."""
+        usage_data = response.get("usage")
+        if usage_data:
+            with self._token_usage_lock:
+                self.prompt_tokens += usage_data.get("prompt_tokens", 0)
+                self.completion_tokens += usage_data.get("completion_tokens", 0)
+
+    def get_usage_and_reset(self):
+        """Get the total tokens used and reset the token usage."""
+        usage = {
+            self.model: {
+                "prompt_tokens": self.prompt_tokens,
+                "completion_tokens": self.completion_tokens,
+            }
+        }
+        self.prompt_tokens = 0
+        self.completion_tokens = 0
+        return usage
+
+    @backoff.on_exception(
+        backoff.expo,
+        ERRORS,
+        max_time=1000,
+        on_backoff=backoff_hdlr,
+        giveup=giveup_hdlr,
+    )
+    def _create_completion(self, prompt: str, **kwargs):
+        """Create a completion using the MiniMax API."""
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self.api_key}",
+        }
+
+        # MiniMax requires temperature to be in (0.0, 1.0]; adjust if zero
+        if kwargs.get("temperature", 1) == 0:
+            kwargs["temperature"] = 0.01
+
+        data = {
+            "model": self.model,
+            "messages": [{"role": "user", "content": prompt}],
+            **kwargs,
+        }
+        response = requests.post(
+            f"{self.api_base}/chat/completions", headers=headers, json=data
+        )
+        response.raise_for_status()
+        return response.json()
+
+    def __call__(
+        self,
+        prompt: str,
+        only_completed: bool = True,
+        return_sorted: bool = False,
+        **kwargs,
+    ) -> list[dict[str, Any]]:
+        """Call the MiniMax API to generate completions."""
+        assert only_completed, "for now"
+        assert return_sorted is False, "for now"
+
+        response = self._create_completion(prompt, **kwargs)
+
+        # Log the token usage from the MiniMax API response.
+        self.log_usage(response)
+
+        choices = response["choices"]
+        completions = [choice["message"]["content"] for choice in choices]
+
+        history = {
+            "prompt": prompt,
+            "response": response,
+            "kwargs": kwargs,
+        }
+        self.history.append(history)
+
+        return completions
+
+
 class AzureOpenAIModel(dspy.LM):
     """A wrapper class of Azure OpenAI endpoint.
 

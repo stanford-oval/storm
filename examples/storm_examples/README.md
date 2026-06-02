@@ -3,7 +3,7 @@
 We host a number of example scripts for various customization of STORM (e.g., use your favorite language models, use your own corpus, etc.). These examples can be starting points for your own customizations and you are welcome to contribute your own examples by submitting a pull request to this directory.
 
 ## Run STORM with your own language model
-[run_storm_wiki_gpt.py](run_storm_wiki_gpt.py) provides an example of running STORM with GPT models, and [run_storm_wiki_claude.py](run_storm_wiki_claude.py) provides an example of running STORM with Claude models. Besides using close-source models, you can also run STORM with models with open weights.
+[run_storm_wiki_gpt.py](run_storm_wiki_gpt.py) provides an example of running STORM with GPT models, [run_storm_wiki_claude.py](run_storm_wiki_claude.py) provides an example of running STORM with Claude models, and [run_storm_wiki_minimax.py](run_storm_wiki_minimax.py) provides an example of running STORM with [MiniMax](https://www.minimaxi.com/) models (MiniMax-M3, MiniMax-M2.7, MiniMax-M2.7-highspeed). Besides using close-source models, you can also run STORM with models with open weights.
 
 `run_storm_wiki_mistral.py` provides an example of running STORM with `Mistral-7B-Instruct-v0.2` using [VLLM](https://docs.vllm.ai/en/stable/) server:
 

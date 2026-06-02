@@ -233,9 +233,11 @@ OPENAI_API_TYPE="openai"
 OPENAI_API_TYPE="azure"
 AZURE_API_BASE="your_azure_api_base_url"
 AZURE_API_VERSION="your_azure_api_version"
-# ============ retriever configurations ============ 
+# Set up MiniMax API key (https://www.minimaxi.com/).
+MINIMAX_API_KEY="your_minimax_api_key"
+# ============ retriever configurations ============
 BING_SEARCH_API_KEY="your_bing_search_api_key" # if using bing search
-# ============ encoder configurations ============ 
+# ============ encoder configurations ============
 ENCODER_API_TYPE="openai" # if using openai encoder
 ```
 
@@ -253,6 +255,20 @@ python examples/storm_examples/run_storm_wiki_gpt.py \
     --do-generate-article \
     --do-polish-article
 ```
+
+**To run STORM with [MiniMax](https://www.minimaxi.com/) models:**
+
+```bash
+python examples/storm_examples/run_storm_wiki_minimax.py \
+    --output-dir $OUTPUT_DIR \
+    --retriever you \
+    --do-research \
+    --do-generate-outline \
+    --do-generate-article \
+    --do-polish-article
+```
+
+MiniMax offers `MiniMax-M3` (latest flagship, default), `MiniMax-M2.7`, and `MiniMax-M2.7-highspeed` models. `MiniMax-M3` provides a 512K context window, up to 128K max output, and image input support. The default model is `MiniMax-M3`. Use `--model MiniMax-M2.7-highspeed` for faster inference.
 
 **To run STORM using your favorite language models or grounding on your own corpus:** Check out [examples/storm_examples/README.md](examples/storm_examples/README.md).
 
