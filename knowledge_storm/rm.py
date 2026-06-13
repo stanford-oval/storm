@@ -981,6 +981,139 @@ class TavilySearchRM(dspy.Retrieve):
         return collected_results
 
 
+class CRWSearchRM(dspy.Retrieve):
+    """Retrieve information from custom queries using fastCRW.
+
+    fastCRW is a Firecrawl-compatible web data engine that ships as a single Rust
+    binary. It can run self-hosted or via the managed cloud at https://fastcrw.com.
+    This module uses the `/v1/search` endpoint. Documentation can be found at
+    https://fastcrw.com/docs/rest-api
+    """
+
+    def __init__(
+        self,
+        crw_api_key=None,
+        crw_api_url: str = "https://fastcrw.com/api",
+        k: int = 3,
+        is_valid_source: Callable = None,
+        min_char_count: int = 150,
+        snippet_chunk_size: int = 1000,
+        webpage_helper_max_threads=10,
+        include_raw_content=False,
+    ):
+        """
+        Params:
+            crw_api_key str: API key for fastCRW cloud that can be retrieved from https://fastcrw.com/ (optional for self-hosted instances without auth).
+            crw_api_url str: Base URL of the fastCRW API. Defaults to the managed cloud; set this to a self-hosted endpoint (e.g. http://localhost:3000) to override.
+            min_char_count: Minimum character count for the article to be considered valid.
+            snippet_chunk_size: Maximum character count for each snippet.
+            webpage_helper_max_threads: Maximum number of threads to use for webpage helper.
+            include_raw_content bool: Boolean that is used to determine if the full text (markdown) should be returned.
+        """
+        super().__init__(k=k)
+
+        if not crw_api_key and os.environ.get("CRW_API_KEY"):
+            crw_api_key = os.environ["CRW_API_KEY"]
+
+        self.crw_api_key = crw_api_key
+        self.crw_api_url = crw_api_url.rstrip("/")
+        self.k = k
+        self.webpage_helper = WebPageHelper(
+            min_char_count=min_char_count,
+            snippet_chunk_size=snippet_chunk_size,
+            max_thread_num=webpage_helper_max_threads,
+        )
+        self.usage = 0
+        self.include_raw_content = include_raw_content
+
+        # If not None, is_valid_source shall be a function that takes a URL and returns a boolean.
+        if is_valid_source:
+            self.is_valid_source = is_valid_source
+        else:
+            self.is_valid_source = lambda x: True
+
+    def get_usage_and_reset(self):
+        usage = self.usage
+        self.usage = 0
+        return {"CRWSearchRM": usage}
+
+    def forward(
+        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
+    ):
+        """Search with fastCRW for self.k top passages for query or queries
+        Args:
+            query_or_queries (Union[str, List[str]]): The query or queries to search for.
+            exclude_urls (List[str]): A list of urls to exclude from the search results.
+        Returns:
+            a list of Dicts, each dict has keys of 'description', 'snippets' (list of strings), 'title', 'url'
+        """
+        queries = (
+            [query_or_queries]
+            if isinstance(query_or_queries, str)
+            else query_or_queries
+        )
+        self.usage += len(queries)
+
+        collected_results = []
+
+        headers = {"Content-Type": "application/json"}
+        if self.crw_api_key:
+            headers["Authorization"] = f"Bearer {self.crw_api_key}"
+
+        for query in queries:
+            try:
+                response = requests.post(
+                    f"{self.crw_api_url}/v1/search",
+                    headers=headers,
+                    json={"query": query, "limit": self.k},
+                )
+                payload = response.json()
+
+                # fastCRW responses are wrapped in a {success, data, ...} envelope.
+                if not payload.get("success", False):
+                    raise RuntimeError(
+                        payload.get("error", f"fastCRW search failed: {payload}")
+                    )
+
+                results = payload.get("data", [])
+                for d in results:
+                    # assert d is dict
+                    if not isinstance(d, dict):
+                        print(f"Invalid result: {d}\n")
+                        continue
+
+                    try:
+                        # ensure keys are present
+                        url = d.get("url", None)
+                        title = d.get("title", None)
+                        description = d.get("description", None)
+                        snippets = []
+                        if self.include_raw_content and d.get("markdown"):
+                            snippets.append(d.get("markdown"))
+                        else:
+                            snippets.append(description)
+
+                        # raise exception of missing key(s)
+                        if not all([url, title, description, snippets]):
+                            raise ValueError(f"Missing key(s) in result: {d}")
+                        if self.is_valid_source(url) and url not in exclude_urls:
+                            result = {
+                                "url": url,
+                                "title": title,
+                                "description": description,
+                                "snippets": snippets,
+                            }
+                            collected_results.append(result)
+                        else:
+                            print(f"invalid source {url} or url in exclude_urls")
+                    except Exception as e:
+                        print(f"Error occurs when processing {d=}: {e}\n")
+            except Exception as e:
+                logging.error(f"Error occurs when searching query {query}: {e}")
+
+        return collected_results
+
+
 class GoogleSearch(dspy.Retrieve):
     def __init__(
         self,

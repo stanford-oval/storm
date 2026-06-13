@@ -5,7 +5,7 @@ You need to set up the following environment variables to run this script:
     - OPENAI_API_TYPE: OpenAI API type (e.g., 'openai' or 'azure')
     - AZURE_API_BASE: Azure API base URL if using Azure API
     - AZURE_API_VERSION: Azure API version if using Azure API
-    - BING_SEARCH_API_KEY: Biang search API key; BING_SEARCH_API_KEY: Bing Search API key, SERPER_API_KEY: Serper API key, BRAVE_API_KEY: Brave API key, or TAVILY_API_KEY: Tavily API key
+    - BING_SEARCH_API_KEY: Biang search API key; BING_SEARCH_API_KEY: Bing Search API key, SERPER_API_KEY: Serper API key, BRAVE_API_KEY: Brave API key, TAVILY_API_KEY: Tavily API key, or CRW_API_KEY: fastCRW API key
 
 Output will be structured as below
 args.output_dir/
@@ -33,6 +33,7 @@ from knowledge_storm.rm import (
     SerperRM,
     DuckDuckGoSearchRM,
     TavilySearchRM,
+    CRWSearchRM,
     SearXNG,
 )
 from knowledge_storm.utils import load_api_key
@@ -154,6 +155,12 @@ def main(args):
                 k=runner_argument.retrieve_top_k,
                 include_raw_content=True,
             )
+        case "crw":
+            rm = CRWSearchRM(
+                crw_api_key=os.getenv("CRW_API_KEY"),
+                k=runner_argument.retrieve_top_k,
+                include_raw_content=True,
+            )
         case "searxng":
             rm = SearXNG(
                 searxng_api_key=os.getenv("SEARXNG_API_KEY"),
@@ -161,7 +168,7 @@ def main(args):
             )
         case _:
             raise ValueError(
-                f'Invalid retriever: {args.retriever}. Choose either "bing", "you", "brave", "duckduckgo", "serper", "tavily", or "searxng"'
+                f'Invalid retriever: {args.retriever}. Choose either "bing", "you", "brave", "duckduckgo", "serper", "tavily", "searxng", or "crw"'
             )
 
     costorm_runner = CoStormRunner(
@@ -225,7 +232,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--retriever",
         type=str,
-        choices=["bing", "you", "brave", "serper", "duckduckgo", "tavily", "searxng"],
+        choices=["bing", "you", "brave", "serper", "duckduckgo", "tavily", "searxng", "crw"],
         help="The search engine API to use for retrieving information.",
     )
     # hyperparameters for co-storm

@@ -5,7 +5,7 @@ You need to set up the following environment variables to run this script:
     - OPENAI_API_TYPE: OpenAI API type (e.g., 'openai' or 'azure')
     - AZURE_API_BASE: Azure API base URL if using Azure API
     - AZURE_API_VERSION: Azure API version if using Azure API
-    - YDC_API_KEY: You.com API key; BING_SEARCH_API_KEY: Bing Search API key, SERPER_API_KEY: Serper API key, BRAVE_API_KEY: Brave API key, or TAVILY_API_KEY: Tavily API key
+    - YDC_API_KEY: You.com API key; BING_SEARCH_API_KEY: Bing Search API key, SERPER_API_KEY: Serper API key, BRAVE_API_KEY: Brave API key, TAVILY_API_KEY: Tavily API key, or CRW_API_KEY: fastCRW API key
 
 Output will be structured as below
 args.output_dir/
@@ -35,6 +35,7 @@ from knowledge_storm.rm import (
     SerperRM,
     DuckDuckGoSearchRM,
     TavilySearchRM,
+    CRWSearchRM,
     SearXNG,
     AzureAISearch,
 )
@@ -125,6 +126,12 @@ def main(args):
                 k=engine_args.search_top_k,
                 include_raw_content=True,
             )
+        case "crw":
+            rm = CRWSearchRM(
+                crw_api_key=os.getenv("CRW_API_KEY"),
+                k=engine_args.search_top_k,
+                include_raw_content=True,
+            )
         case "searxng":
             rm = SearXNG(
                 searxng_api_key=os.getenv("SEARXNG_API_KEY"), k=engine_args.search_top_k
@@ -136,7 +143,7 @@ def main(args):
             )
         case _:
             raise ValueError(
-                f'Invalid retriever: {args.retriever}. Choose either "bing", "you", "brave", "duckduckgo", "serper", "tavily", "searxng", or "azure_ai_search"'
+                f'Invalid retriever: {args.retriever}. Choose either "bing", "you", "brave", "duckduckgo", "serper", "tavily", "searxng", "azure_ai_search", or "crw"'
             )
 
     runner = STORMWikiRunner(engine_args, lm_configs, rm)
@@ -182,6 +189,7 @@ if __name__ == "__main__":
             "tavily",
             "searxng",
             "azure_ai_search",
+            "crw",
         ],
         help="The search engine API to use for retrieving information.",
     )
