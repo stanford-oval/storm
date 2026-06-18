@@ -67,7 +67,8 @@ class StormArticleGenerationModule(ArticleGenerationModule):
             callback_handler (BaseCallbackHandler): An optional callback handler that can be used to trigger
                 custom callbacks at various stages of the article generation process. Defaults to None.
         """
-        information_table.prepare_table_for_retrieval()
+        if information_table is not None:
+            information_table.prepare_table_for_retrieval()
 
         if article_with_outline is None:
             article_with_outline = StormArticle(topic_name=topic)
