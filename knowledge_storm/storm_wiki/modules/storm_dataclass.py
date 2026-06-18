@@ -40,7 +40,9 @@ class DialogueTurn:
                 "agent_utterance": self.agent_utterance,
                 "user_utterance": self.user_utterance,
                 "search_queries": self.search_queries,
-                "search_results": [data.to_dict() for data in self.search_results],
+                "search_results": [
+                    data.to_dict() for data in (self.search_results or [])
+                ],
             }
         )
 
@@ -64,7 +66,7 @@ class StormInformationTable(InformationTable):
 
     @staticmethod
     def construct_url_to_info(
-        conversations: List[Tuple[str, List[DialogueTurn]]]
+        conversations: List[Tuple[str, List[DialogueTurn]]],
     ) -> Dict[str, Information]:
         url_to_info = {}
 
@@ -81,7 +83,7 @@ class StormInformationTable(InformationTable):
 
     @staticmethod
     def construct_log_dict(
-        conversations: List[Tuple[str, List[DialogueTurn]]]
+        conversations: List[Tuple[str, List[DialogueTurn]]],
     ) -> List[Dict[str, Union[str, Any]]]:
         conversation_log = []
         for persona, conv in conversations:
@@ -107,22 +109,33 @@ class StormInformationTable(InformationTable):
         return cls(conversations)
 
     def prepare_table_for_retrieval(self):
-        self.encoder = SentenceTransformer("paraphrase-MiniLM-L6-v2")
         self.collected_urls = []
         self.collected_snippets = []
         for url, information in self.url_to_info.items():
             for snippet in information.snippets:
                 self.collected_urls.append(url)
                 self.collected_snippets.append(snippet)
+        if not self.collected_snippets:
+            self.encoder = None
+            self.encoded_snippets = np.array([])
+            return
+        self.encoder = SentenceTransformer("paraphrase-MiniLM-L6-v2")
         self.encoded_snippets = self.encoder.encode(self.collected_snippets)
 
     def retrieve_information(
         self, queries: Union[List[str], str], search_top_k
     ) -> List[Information]:
+        if (
+            not getattr(self, "collected_snippets", None)
+            or getattr(self, "encoder", None) is None
+        ):
+            return []
         selected_urls = []
         selected_snippets = []
         if type(queries) is str:
             queries = [queries]
+        if not queries:
+            return []
         for query in queries:
             encoded_query = self.encoder.encode(query)
             sim = cosine_similarity([encoded_query], self.encoded_snippets)[0]

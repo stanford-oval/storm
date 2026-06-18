@@ -427,9 +427,14 @@ class DiscourseManager:
             expert_descriptions = [expert_descriptions]
         agents: CoStormExpert = []
         for expert_name in expert_descriptions:
-            role_name, role_description = expert_name.split(":")
+            if ":" in expert_name:
+                role_name, role_description = expert_name.split(":", 1)
+            else:
+                role_name, role_description = expert_name, ""
             role_name = role_name.strip()
             role_description = role_description.strip()
+            if not role_name:
+                continue
             new_costorm_expert = CoStormExpert(
                 topic=self.runner_argument.topic,
                 role_name=role_name,
@@ -470,7 +475,7 @@ class DiscourseManager:
             self.simulated_user.intent = simulate_user_intent
             next_turn_policy.agent = self.simulated_user
         elif self.runner_argument.rag_only_baseline_mode:
-            assert self.conversation_history[-1].role == "Guest"
+            assert conversation_history and conversation_history[-1].role == "Guest"
             next_turn_policy.agent = self.pure_rag_agent
         elif self.next_turn_moderator_override:
             next_turn_policy.agent = self.moderator
@@ -488,6 +493,7 @@ class DiscourseManager:
             if (
                 not self._is_last_turn_questioning(conversation_history)
                 and not self.runner_argument.disable_multi_experts
+                and self.experts
             ):
                 if dry_run:
                     next_turn_policy.agent = self.experts[0]
@@ -693,7 +699,6 @@ class CoStormRunner:
                 - Inserts the new turn into the `knowledge_base`, optionally allowing the creation of new nodes or inserting under the root based on the `rag_only_baseline_mode` flag.
                 - If the turn policy specifies, it reorganizes the `knowledge_base` to maintain optimal structure and relevance.
         """
-        last_conv_turn = self.conversation_history[-1]
         cur_turn_name = f"conv turn: {len(self.conversation_history) + 1}"
         with self.logging_wrapper.log_pipeline_stage(
             pipeline_stage=f"{cur_turn_name} stage"
@@ -708,6 +713,12 @@ class CoStormRunner:
                 )
                 self.conversation_history.append(conv_turn)
             else:
+                if not self.conversation_history:
+                    raise ValueError(
+                        "CoStormRunner.step() requires existing conversation history. "
+                        "Call warm_start() first or pass user_utterance."
+                    )
+                last_conv_turn = self.conversation_history[-1]
                 with self.logging_wrapper.log_event(
                     f"{cur_turn_name}: get turn policy"
                 ):
