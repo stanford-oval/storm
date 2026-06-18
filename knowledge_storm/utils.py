@@ -278,7 +278,7 @@ class QdrantVectorStoreManager:
                 "\uff0c",  # Fullwidth comma
                 "\u3001",  # Ideographic comma
                 " ",
-                "\u200B",  # Zero-width space
+                "\u200b",  # Zero-width space
                 "",
             ],
         )
@@ -610,13 +610,13 @@ class FileIOHelper:
             return json.load(fr)
 
     @staticmethod
-    def write_str(s, path):
-        with open(path, "w") as f:
+    def write_str(s, path, encoding="utf-8"):
+        with open(path, "w", encoding=encoding) as f:
             f.write(s)
 
     @staticmethod
-    def load_str(path):
-        with open(path, "r") as f:
+    def load_str(path, encoding="utf-8"):
+        with open(path, "r", encoding=encoding) as f:
             return "\n".join(f.readlines())
 
     @staticmethod
@@ -641,16 +641,21 @@ class WebPageHelper:
         min_char_count: int = 150,
         snippet_chunk_size: int = 1000,
         max_thread_num: int = 10,
+        request_timeout: float = 4.0,
+        verify_ssl: bool = True,
     ):
         """
         Args:
             min_char_count: Minimum character count for the article to be considered valid.
             snippet_chunk_size: Maximum character count for each snippet.
             max_thread_num: Maximum number of threads to use for concurrent requests (e.g., downloading webpages).
+            request_timeout: HTTP request timeout in seconds.
+            verify_ssl: Whether to verify TLS certificates when downloading pages.
         """
-        self.httpx_client = httpx.Client(verify=False)
+        self.httpx_client = httpx.Client(verify=verify_ssl)
         self.min_char_count = min_char_count
         self.max_thread_num = max_thread_num
+        self.request_timeout = request_timeout
         self.text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=snippet_chunk_size,
             chunk_overlap=0,
@@ -666,14 +671,14 @@ class WebPageHelper:
                 "\uff0c",  # Fullwidth comma
                 "\u3001",  # Ideographic comma
                 " ",
-                "\u200B",  # Zero-width space
+                "\u200b",  # Zero-width space
                 "",
             ],
         )
 
     def download_webpage(self, url: str):
         try:
-            res = self.httpx_client.get(url, timeout=4)
+            res = self.httpx_client.get(url, timeout=self.request_timeout)
             if res.status_code >= 400:
                 res.raise_for_status()
             return res.content
