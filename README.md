@@ -309,6 +309,10 @@ For STORM paper experiments, please switch to the branch `NAACL-2024-code-backup
 
 For Co-STORM paper experiments, please switch to the branch `EMNLP-2024-code-backup` (placeholder for now, will be updated soon).
 
+## Troubleshooting curated knowledge
+
+If you are debugging long-term memory or knowledge curation behavior, see [Knowledge curation and memory failure modes](docs/knowledge_curation_and_memory_failure_modes.md) for common symptoms, likely causes, and a reporting checklist.
+
 ## Roadmap & Contributions
 Our team is actively working on:
 1. Human-in-the-Loop Functionalities: Supporting user participation in the knowledge curation process.
