@@ -1182,7 +1182,7 @@ class GoogleModel(dspy.dsp.modules.lm.LM):
             "temperature": (
                 0.0 if "temperature" not in kwargs else kwargs["temperature"]
             ),
-            "max_output_tokens": kwargs["max_tokens"],
+            "max_output_tokens": kwargs.get("max_tokens", 1000),
             "top_p": 1,
             "top_k": 1,
             **kwargs,
