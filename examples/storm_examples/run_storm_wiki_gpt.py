@@ -5,7 +5,7 @@ You need to set up the following environment variables to run this script:
     - OPENAI_API_TYPE: OpenAI API type (e.g., 'openai' or 'azure')
     - AZURE_API_BASE: Azure API base URL if using Azure API
     - AZURE_API_VERSION: Azure API version if using Azure API
-    - YDC_API_KEY: You.com API key; BING_SEARCH_API_KEY: Bing Search API key, SERPER_API_KEY: Serper API key, BRAVE_API_KEY: Brave API key, or TAVILY_API_KEY: Tavily API key
+    - YDC_API_KEY: You.com API key; BING_SEARCH_API_KEY: Bing Search API key, SERPER_API_KEY: Serper API key, BRAVE_API_KEY: Brave API key, TAVILY_API_KEY: Tavily API key, EXA_API_KEY: Exa API key, FIRECRAWL_API_KEY: Firecrawl API key, or JINA_API_KEY: Jina API key
 
 Output will be structured as below
 args.output_dir/
@@ -37,6 +37,9 @@ from knowledge_storm.rm import (
     TavilySearchRM,
     SearXNG,
     AzureAISearch,
+    ExaRM,
+    FirecrawlRM,
+    JinaRM,
 )
 from knowledge_storm.utils import load_api_key
 
@@ -134,9 +137,25 @@ def main(args):
                 azure_ai_search_api_key=os.getenv("AZURE_AI_SEARCH_API_KEY"),
                 k=engine_args.search_top_k,
             )
+        case "exa":
+            rm = ExaRM(
+                exa_search_api_key=os.getenv("EXA_API_KEY"),
+                k=engine_args.search_top_k,
+            )
+        case "firecrawl":
+            rm = FirecrawlRM(
+                firecrawl_api_key=os.getenv("FIRECRAWL_API_KEY"),
+                k=engine_args.search_top_k,
+                include_content=True,
+            )
+        case "jina":
+            rm = JinaRM(
+                jina_api_key=os.getenv("JINA_API_KEY"),
+                k=engine_args.search_top_k,
+            )
         case _:
             raise ValueError(
-                f'Invalid retriever: {args.retriever}. Choose either "bing", "you", "brave", "duckduckgo", "serper", "tavily", "searxng", or "azure_ai_search"'
+                f'Invalid retriever: {args.retriever}. Choose either "bing", "you", "brave", "duckduckgo", "serper", "tavily", "searxng", "azure_ai_search", "exa", "firecrawl", or "jina"'
             )
 
     runner = STORMWikiRunner(engine_args, lm_configs, rm)
@@ -182,6 +201,9 @@ if __name__ == "__main__":
             "tavily",
             "searxng",
             "azure_ai_search",
+            "exa",
+            "firecrawl",
+            "jina",
         ],
         help="The search engine API to use for retrieving information.",
     )

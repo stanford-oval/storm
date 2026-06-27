@@ -1236,3 +1236,351 @@ class AzureAISearch(dspy.Retrieve):
                 logging.error(f"Error occurs when searching query {query}: {e}")
 
         return collected_results
+
+
+class ExaRM(dspy.Retrieve):
+    """Retrieve information from custom queries using Exa (https://exa.ai).
+
+    Exa is a neural/semantic search engine built for AI agents. The `/search`
+    endpoint returns relevant results and can optionally extract page contents
+    (text and highlights) in the same call, which makes it a good fit for
+    STORM's knowledge curation.
+
+    API reference: https://docs.exa.ai/reference/search
+    """
+
+    def __init__(
+        self,
+        exa_search_api_key=None,
+        k=3,
+        is_valid_source: Callable = None,
+        type: str = "auto",
+        include_domains: List[str] = None,
+        exclude_domains: List[str] = None,
+    ):
+        """
+        Params:
+            exa_search_api_key: Exa API key, obtainable from https://dashboard.exa.ai/api-keys.
+            k: Number of top results to retrieve.
+            is_valid_source: Optional function that takes a URL and returns a boolean.
+            type: Exa search mode, one of "auto", "fast", "instant", "deep", etc.
+                Defaults to "auto" which balances quality and speed.
+            include_domains: If provided, results will only come from these domains.
+            exclude_domains: If provided, no results will be returned from these domains.
+        """
+        super().__init__(k=k)
+        if not exa_search_api_key and not os.environ.get("EXA_API_KEY"):
+            raise RuntimeError(
+                "You must supply exa_search_api_key or set environment variable EXA_API_KEY"
+            )
+        elif exa_search_api_key:
+            self.exa_search_api_key = exa_search_api_key
+        else:
+            self.exa_search_api_key = os.environ["EXA_API_KEY"]
+        self.endpoint = "https://api.exa.ai/search"
+        self.type = type
+        self.include_domains = include_domains
+        self.exclude_domains = exclude_domains
+        self.usage = 0
+
+        # If not None, is_valid_source shall be a function that takes a URL and returns a boolean.
+        if is_valid_source:
+            self.is_valid_source = is_valid_source
+        else:
+            self.is_valid_source = lambda x: True
+
+    def get_usage_and_reset(self):
+        usage = self.usage
+        self.usage = 0
+
+        return {"ExaRM": usage}
+
+    def forward(
+        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
+    ):
+        """Search with Exa for self.k top passages for query or queries
+
+        Args:
+            query_or_queries (Union[str, List[str]]): The query or queries to search for.
+            exclude_urls (List[str]): A list of urls to exclude from the search results.
+
+        Returns:
+            a list of Dicts, each dict has keys of 'description', 'snippets' (list of strings), 'title', 'url'
+        """
+        queries = (
+            [query_or_queries]
+            if isinstance(query_or_queries, str)
+            else query_or_queries
+        )
+        self.usage += len(queries)
+        collected_results = []
+        headers = {
+            "x-api-key": self.exa_search_api_key,
+            "Content-Type": "application/json",
+        }
+        for query in queries:
+            try:
+                payload = {
+                    "query": query,
+                    "numResults": self.k,
+                    "type": self.type,
+                    "contents": {"text": True, "highlights": True},
+                }
+                if self.include_domains:
+                    payload["includeDomains"] = self.include_domains
+                if self.exclude_domains:
+                    payload["excludeDomains"] = self.exclude_domains
+
+                response = requests.post(
+                    self.endpoint, headers=headers, json=payload
+                ).json()
+
+                for r in response.get("results", []):
+                    url = r.get("url")
+                    if not url:
+                        continue
+                    if self.is_valid_source(url) and url not in exclude_urls:
+                        text = r.get("text", "") or ""
+                        highlights = r.get("highlights", []) or []
+                        snippets = (
+                            highlights if highlights else ([text] if text else [])
+                        )
+                        description = r.get("summary", "") or text[:500]
+                        collected_results.append(
+                            {
+                                "description": description,
+                                "snippets": snippets,
+                                "title": r.get("title", ""),
+                                "url": url,
+                            }
+                        )
+            except Exception as e:
+                logging.error(f"Error occurs when searching query {query}: {e}")
+
+        return collected_results
+
+
+class FirecrawlRM(dspy.Retrieve):
+    """Retrieve information from custom queries using Firecrawl (https://firecrawl.dev).
+
+    Firecrawl's `/search` endpoint combines web search with scraping: by default
+    it returns search results (title, url, description); when `include_content`
+    is enabled it also returns the full page content as markdown in a single
+    call, which is handy for deeper research beyond snippets.
+
+    API reference: https://docs.firecrawl.dev/api-reference/endpoint/search
+    """
+
+    def __init__(
+        self,
+        firecrawl_api_key=None,
+        k=3,
+        is_valid_source: Callable = None,
+        include_content: bool = False,
+    ):
+        """
+        Params:
+            firecrawl_api_key: Firecrawl API key, obtainable from https://firecrawl.dev.
+            k: Number of top results to retrieve.
+            is_valid_source: Optional function that takes a URL and returns a boolean.
+            include_content: If True, scrape and return the full page markdown for
+                each result (uses more credits). Otherwise only the search result
+                description is returned.
+        """
+        super().__init__(k=k)
+        if not firecrawl_api_key and not os.environ.get("FIRECRAWL_API_KEY"):
+            raise RuntimeError(
+                "You must supply firecrawl_api_key or set environment variable FIRECRAWL_API_KEY"
+            )
+        elif firecrawl_api_key:
+            self.firecrawl_api_key = firecrawl_api_key
+        else:
+            self.firecrawl_api_key = os.environ["FIRECRAWL_API_KEY"]
+        self.endpoint = "https://api.firecrawl.dev/v2/search"
+        self.include_content = include_content
+        self.usage = 0
+
+        # If not None, is_valid_source shall be a function that takes a URL and returns a boolean.
+        if is_valid_source:
+            self.is_valid_source = is_valid_source
+        else:
+            self.is_valid_source = lambda x: True
+
+    def get_usage_and_reset(self):
+        usage = self.usage
+        self.usage = 0
+
+        return {"FirecrawlRM": usage}
+
+    def forward(
+        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
+    ):
+        """Search with Firecrawl for self.k top passages for query or queries
+
+        Args:
+            query_or_queries (Union[str, List[str]]): The query or queries to search for.
+            exclude_urls (List[str]): A list of urls to exclude from the search results.
+
+        Returns:
+            a list of Dicts, each dict has keys of 'description', 'snippets' (list of strings), 'title', 'url'
+        """
+        queries = (
+            [query_or_queries]
+            if isinstance(query_or_queries, str)
+            else query_or_queries
+        )
+        self.usage += len(queries)
+        collected_results = []
+        headers = {
+            "Authorization": f"Bearer {self.firecrawl_api_key}",
+            "Content-Type": "application/json",
+        }
+        for query in queries:
+            try:
+                payload = {"query": query, "limit": self.k}
+                if self.include_content:
+                    payload["scrapeOptions"] = {"formats": [{"type": "markdown"}]}
+
+                response = requests.post(
+                    self.endpoint, headers=headers, json=payload
+                ).json()
+
+                results = response.get("data", {}).get("web", [])
+                for r in results:
+                    url = r.get("url")
+                    if not url:
+                        continue
+                    if self.is_valid_source(url) and url not in exclude_urls:
+                        description = r.get("description", "") or ""
+                        markdown = r.get("markdown")
+                        snippets = (
+                            [markdown]
+                            if markdown
+                            else ([description] if description else [])
+                        )
+                        collected_results.append(
+                            {
+                                "description": description,
+                                "snippets": snippets,
+                                "title": r.get("title", ""),
+                                "url": url,
+                            }
+                        )
+            except Exception as e:
+                logging.error(f"Error occurs when searching query {query}: {e}")
+
+        return collected_results
+
+
+class JinaRM(dspy.Retrieve):
+    """Retrieve information from custom queries using Jina AI Search (https://jina.ai).
+
+    The Jina Search endpoint (`s.jina.ai`) returns LLM-friendly clean content for
+    each result. With `include_content` enabled (default) each result includes
+    the scraped page content; disabling it returns SERP-only results (title,
+    url, description), which is faster.
+
+    API reference: https://jina.ai/reader/
+    """
+
+    def __init__(
+        self,
+        jina_api_key=None,
+        k=3,
+        is_valid_source: Callable = None,
+        include_content: bool = True,
+    ):
+        """
+        Params:
+            jina_api_key: Jina API key, obtainable from https://jina.ai/api-dashboard/.
+            k: Number of top results to retrieve.
+            is_valid_source: Optional function that takes a URL and returns a boolean.
+            include_content: If True (default), return the cleaned page content for
+                each result. Set to False for faster SERP-only results.
+        """
+        super().__init__(k=k)
+        if not jina_api_key and not os.environ.get("JINA_API_KEY"):
+            raise RuntimeError(
+                "You must supply jina_api_key or set environment variable JINA_API_KEY"
+            )
+        elif jina_api_key:
+            self.jina_api_key = jina_api_key
+        else:
+            self.jina_api_key = os.environ["JINA_API_KEY"]
+        self.endpoint = "https://s.jina.ai/"
+        self.include_content = include_content
+        self.usage = 0
+
+        # If not None, is_valid_source shall be a function that takes a URL and returns a boolean.
+        if is_valid_source:
+            self.is_valid_source = is_valid_source
+        else:
+            self.is_valid_source = lambda x: True
+
+    def get_usage_and_reset(self):
+        usage = self.usage
+        self.usage = 0
+
+        return {"JinaRM": usage}
+
+    def forward(
+        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = []
+    ):
+        """Search with Jina for self.k top passages for query or queries
+
+        Args:
+            query_or_queries (Union[str, List[str]]): The query or queries to search for.
+            exclude_urls (List[str]): A list of urls to exclude from the search results.
+
+        Returns:
+            a list of Dicts, each dict has keys of 'description', 'snippets' (list of strings), 'title', 'url'
+        """
+        queries = (
+            [query_or_queries]
+            if isinstance(query_or_queries, str)
+            else query_or_queries
+        )
+        self.usage += len(queries)
+        collected_results = []
+        headers = {
+            "Accept": "application/json",
+            "Authorization": f"Bearer {self.jina_api_key}",
+        }
+        if not self.include_content:
+            # Return search results without scraping each page's content.
+            headers["X-Respond-With"] = "no-content"
+        for query in queries:
+            try:
+                response = requests.get(
+                    self.endpoint,
+                    headers=headers,
+                    params={"q": query},
+                ).json()
+
+                data = response.get("data", [])
+                if isinstance(data, dict):
+                    data = [data]
+                for r in data[: self.k]:
+                    url = r.get("url")
+                    if not url:
+                        continue
+                    if self.is_valid_source(url) and url not in exclude_urls:
+                        description = r.get("description", "") or ""
+                        content = r.get("content", "") or ""
+                        snippets = (
+                            [content]
+                            if content
+                            else ([description] if description else [])
+                        )
+                        collected_results.append(
+                            {
+                                "description": description,
+                                "snippets": snippets,
+                                "title": r.get("title", ""),
+                                "url": url,
+                            }
+                        )
+            except Exception as e:
+                logging.error(f"Error occurs when searching query {query}: {e}")
+
+        return collected_results
