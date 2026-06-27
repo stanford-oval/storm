@@ -475,7 +475,7 @@ class SerperRM(dspy.Retrieve):
             "POST", self.search_url, headers=headers, json=query_params
         )
 
-        if response == None:
+        if not response.ok:
             raise RuntimeError(
                 f"Error had occurred while running the search process.\n Error is {response.reason}, had failed with status code {response.status_code}"
             )
@@ -545,7 +545,8 @@ class SerperRM(dspy.Retrieve):
                 knowledge_graph = result.get("knowledgeGraph")
                 for organic in organic_results:
                     snippets = [organic.get("snippet")]
-                    if self.ENABLE_EXTRA_SNIPPET_EXTRACTION:
+                    url = organic.get("link")
+                    if self.ENABLE_EXTRA_SNIPPET_EXTRACTION and url:
                         snippets.extend(
                             valid_url_to_snippets.get(url, {}).get("snippets", [])
                         )
