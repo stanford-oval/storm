@@ -1,6 +1,7 @@
 import logging
 import os
 from typing import Callable, Union, List
+from urllib.parse import quote
 
 import backoff
 import dspy
@@ -58,7 +59,7 @@ class YouRM(dspy.Retrieve):
             try:
                 headers = {"X-API-Key": self.ydc_api_key}
                 results = requests.get(
-                    f"https://api.ydc-index.io/search?query={query}",
+                    f"https://api.ydc-index.io/search?query={quote(query, safe='')}",
                     headers=headers,
                 ).json()
 
@@ -154,7 +155,7 @@ class BingSearch(dspy.Retrieve):
                     self.endpoint, headers=headers, params={**self.params, "q": query}
                 ).json()
 
-                for d in results["webPages"]["value"]:
+                for d in results.get("webPages", {}).get("value", []):
                     if self.is_valid_source(d["url"]) and d["url"] not in exclude_urls:
                         url_to_results[d["url"]] = {
                             "url": d["url"],
@@ -621,20 +622,27 @@ class BraveRM(dspy.Retrieve):
                     "X-Subscription-Token": self.brave_search_api_key,
                 }
                 response = requests.get(
-                    f"https://api.search.brave.com/res/v1/web/search?result_filter=web&q={query}",
+                    f"https://api.search.brave.com/res/v1/web/search?result_filter=web&q={quote(query, safe='')}&count={self.k}",
                     headers=headers,
                 ).json()
                 results = response.get("web", {}).get("results", [])
 
+                query_results = []
                 for result in results:
-                    collected_results.append(
+                    url = result.get("url")
+                    if not url or not self.is_valid_source(url) or url in exclude_urls:
+                        continue
+                    query_results.append(
                         {
                             "snippets": result.get("extra_snippets", []),
                             "title": result.get("title"),
-                            "url": result.get("url"),
+                            "url": url,
                             "description": result.get("description"),
                         }
                     )
+                    if len(query_results) >= self.k:
+                        break
+                collected_results.extend(query_results)
             except Exception as e:
                 logging.error(f"Error occurs when searching query {query}: {e}")
 
@@ -709,7 +717,7 @@ class SearXNG(dspy.Retrieve):
                 )
                 results = response.json()
 
-                for r in results["results"]:
+                for r in results.get("results", []):
                     if self.is_valid_source(r["url"]) and r["url"] not in exclude_urls:
                         collected_results.append(
                             {
