@@ -1104,7 +1104,7 @@ class GoogleSearch(dspy.Retrieve):
             r["snippets"] = valid_url_to_snippets[url]["snippets"]
             collected_results.append(r)
 
-        return collected_results
+        return collected_results[:self.k]
 
 
 class AzureAISearch(dspy.Retrieve):
