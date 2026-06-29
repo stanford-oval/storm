@@ -440,11 +440,9 @@ class StormArticle(Article):
         Create StormArticle class instance from outline only string.
         """
         lines = []
-        try:
+        if outline_str:
             lines = outline_str.split("\n")
             lines = [line.strip() for line in lines if line.strip()]
-        except:
-            pass
 
         instance = cls(topic)
         if lines:

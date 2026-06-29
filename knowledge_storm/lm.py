@@ -958,13 +958,14 @@ class TGIClient(dspy.HFClientTGI):
     def _generate(self, prompt, **kwargs):
         """Copied from dspy/dsp/modules/hf_client.py with the addition of removing hard-coded parameters."""
         kwargs = {**self.kwargs, **kwargs}
+        n = kwargs.get("n", 1)
 
         payload = {
             "inputs": prompt,
             "parameters": {
-                "do_sample": kwargs["n"] > 1,
-                "best_of": kwargs["n"],
-                "details": kwargs["n"] > 1,
+                "do_sample": n > 1,
+                "best_of": n,
+                "details": n > 1,
                 **kwargs,
             },
         }
