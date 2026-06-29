@@ -509,7 +509,7 @@ class SerperRM(dspy.Retrieve):
         self.results = []
         collected_results = []
         for query in queries:
-            if query == "Queries:":
+            if not query or not str(query).strip() or query == "Queries:":
                 continue
             query_params = self.query_params
 
