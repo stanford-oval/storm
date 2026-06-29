@@ -204,7 +204,7 @@ class TopicExpert(dspy.Module):
     def forward(self, topic: str, question: str, ground_truth_url: str):
         with dspy.settings.context(lm=self.engine, show_guidelines=False):
             # Identify: Break down question into queries.
-            queries = self.generate_queries(topic=topic, question=question).queries
+            queries = self.generate_queries(topic=topic, question=question).queries or ""
             queries = [
                 q.replace("-", "").strip().strip('"').strip('"').strip()
                 for q in queries.split("\n")

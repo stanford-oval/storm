@@ -69,8 +69,8 @@ class AnswerQuestionModule(dspy.Module):
             f"AnswerQuestionModule.question_to_query ({hash(question)})"
         ):
             with dspy.settings.context(lm=self.question_answering_lm):
-                queries = self.question_to_query(topic=topic, question=question).queries
-            queries = trim_output_after_hint(queries, hint="Queries:")
+                queries = self.question_to_query(topic=topic, question=question).queries or ""
+            queries = trim_output_after_hint(queries, hint="Queries:") or ""
             queries = [
                 q.replace("-", "").strip().strip('"').strip('"').strip()
                 for q in queries.split("\n")

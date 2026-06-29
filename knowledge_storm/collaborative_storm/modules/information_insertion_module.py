@@ -168,7 +168,7 @@ class InsertInformationModule(dspy.Module):
             return int(match.group(1))
         try:
             return int(string.strip())
-        except:
+        except ValueError:
             pass
         return None
 
