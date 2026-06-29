@@ -334,7 +334,7 @@ class VectorRM(dspy.Retrieve):
                     }
                 )
 
-        return collected_results
+        return collected_results[: self.k]
 
 
 class StanfordOvalArxivRM(dspy.Retrieve):
@@ -1222,16 +1222,21 @@ class AzureAISearch(dspy.Retrieve):
         for query in queries:
             try:
                 # https://learn.microsoft.com/en-us/python/api/azure-search-documents/azure.search.documents.searchclient?view=azure-python#azure-search-documents-searchclient-search
-                results = client.search(search_text=query, top=1)
+                results = client.search(search_text=query, top=self.k)
 
                 for result in results:
+                    url = result.get("metadata_storage_path")
+                    if not url or not self.is_valid_source(url) or url in exclude_urls:
+                        continue
                     document = {
-                        "url": result["metadata_storage_path"],
-                        "title": result["title"],
+                        "url": url,
+                        "title": result.get("title"),
                         "description": "N/A",
-                        "snippets": [result["chunk"]],
+                        "snippets": [result.get("chunk")],
                     }
                     collected_results.append(document)
+                    if len(collected_results) >= self.k:
+                        break
             except Exception as e:
                 logging.error(f"Error occurs when searching query {query}: {e}")
 
