@@ -327,10 +327,10 @@ class VectorRM(dspy.Retrieve):
                 doc = related_docs[i][0]
                 collected_results.append(
                     {
-                        "description": doc.metadata["description"],
+                        "description": doc.metadata.get("description", ""),
                         "snippets": [doc.page_content],
-                        "title": doc.metadata["title"],
-                        "url": doc.metadata["url"],
+                        "title": doc.metadata.get("title", ""),
+                        "url": doc.metadata.get("url", ""),
                     }
                 )
 
@@ -397,10 +397,18 @@ class StanfordOvalArxivRM(dspy.Retrieve):
         for query in queries:
             try:
                 results = self._retrieve(query)
-                collected_results.extend(results)
+                for result in results:
+                    url = result.get("url")
+                    if not url or url in exclude_urls:
+                        continue
+                    collected_results.append(result)
+                    if len(collected_results) >= self.k:
+                        break
+                if len(collected_results) >= self.k:
+                    break
             except Exception as e:
                 logging.error(f"Error occurs when searching query {query}: {e}")
-        return collected_results
+        return collected_results[: self.k]
 
 
 class SerperRM(dspy.Retrieve):
