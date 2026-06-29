@@ -541,7 +541,7 @@ class SerperRM(dspy.Retrieve):
         for result in self.results:
             try:
                 # An array of dictionaries that contains the snippets, title of the document and url that will be used.
-                organic_results = result.get("organic")
+                organic_results = result.get("organic") or []
                 knowledge_graph = result.get("knowledgeGraph")
                 for organic in organic_results:
                     snippets = [organic.get("snippet")]
@@ -561,7 +561,8 @@ class SerperRM(dspy.Retrieve):
                             ),
                         }
                     )
-            except:
+            except Exception as e:
+                logging.warning("Error processing Serper search result: %s", e)
                 continue
 
         return collected_results
