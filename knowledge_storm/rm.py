@@ -849,7 +849,7 @@ class DuckDuckGoSearchRM(dspy.Retrieve):
                     else:
                         print(f"invalid source {url} or url in exclude_urls")
                 except Exception as e:
-                    print(f"Error occurs when processing {result=}: {e}\n")
+                    print(f"Error occurs when processing result {d}: {e}\n")
                     print(f"Error occurs when searching query {query}: {e}")
 
         return collected_results
@@ -975,7 +975,7 @@ class TavilySearchRM(dspy.Retrieve):
                     else:
                         print(f"invalid source {url} or url in exclude_urls")
                 except Exception as e:
-                    print(f"Error occurs when processing {result=}: {e}\n")
+                    print(f"Error occurs when processing result {d}: {e}\n")
                     print(f"Error occurs when searching query {query}: {e}")
 
         return collected_results
