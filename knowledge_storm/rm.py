@@ -717,16 +717,22 @@ class SearXNG(dspy.Retrieve):
                 )
                 results = response.json()
 
+                query_results = []
                 for r in results.get("results", []):
-                    if self.is_valid_source(r["url"]) and r["url"] not in exclude_urls:
-                        collected_results.append(
-                            {
-                                "description": r.get("content", ""),
-                                "snippets": [r.get("content", "")],
-                                "title": r.get("title", ""),
-                                "url": r["url"],
-                            }
-                        )
+                    url = r.get("url")
+                    if not url or not self.is_valid_source(url) or url in exclude_urls:
+                        continue
+                    query_results.append(
+                        {
+                            "description": r.get("content", ""),
+                            "snippets": [r.get("content", "")],
+                            "title": r.get("title", ""),
+                            "url": url,
+                        }
+                    )
+                    if len(query_results) >= self.k:
+                        break
+                collected_results.extend(query_results)
             except Exception as e:
                 logging.error(f"Error occurs when searching query {query}: {e}")
 
