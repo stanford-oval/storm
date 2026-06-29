@@ -75,6 +75,7 @@ class AnswerQuestionModule(dspy.Module):
                 q.replace("-", "").strip().strip('"').strip('"').strip()
                 for q in queries.split("\n")
             ]
+            queries = [q for q in queries if q]
             queries = queries[: self.max_search_queries]
         self.logging_wrapper.add_query_count(count=len(queries))
         with self.logging_wrapper.log_event(
