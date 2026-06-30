@@ -1079,13 +1079,13 @@ class GoogleSearch(dspy.Retrieve):
                 )
 
                 for item in response.get("items", []):
-                    if (
-                        self.is_valid_source(item["link"])
-                        and item["link"] not in exclude_urls
-                    ):
-                        url_to_results[item["link"]] = {
-                            "title": item["title"],
-                            "url": item["link"],
+                    url = item.get("link")
+                    if not url:
+                        continue
+                    if self.is_valid_source(url) and url not in exclude_urls:
+                        url_to_results[url] = {
+                            "title": item.get("title", ""),
+                            "url": url,
                             # "snippet": item.get("snippet", ""),  # Google search snippet is very short.
                             "description": item.get("snippet", ""),
                         }
