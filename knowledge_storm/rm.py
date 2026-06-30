@@ -795,7 +795,11 @@ class DuckDuckGoSearchRM(dspy.Retrieve):
     )
     def request(self, query: str):
         results = self.ddgs.text(
-            query, max_results=self.k, backend=self.duck_duck_go_backend
+            keywords=query,
+            max_results=self.k,
+            backend=self.duck_duck_go_backend,
+            safesearch=self.duck_duck_go_safe_search,
+            region=self.duck_duck_go_region,
         )
         return results
 
