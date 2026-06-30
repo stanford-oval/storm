@@ -1,0 +1,4 @@
+interface:
+  display_name: "Native STORM Research"
+  short_description: "Run STORM-style research with the active agent"
+  default_prompt: "Use $storm-native-research to research a topic and draft a source-grounded article."

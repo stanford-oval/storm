@@ -256,6 +256,10 @@ python examples/storm_examples/run_storm_wiki_gpt.py \
 
 **To run STORM using your favorite language models or grounding on your own corpus:** Check out [examples/storm_examples/README.md](examples/storm_examples/README.md).
 
+### Agent skill examples
+
+For Codex and Claude Code users who want a STORM-inspired workflow that runs inside the active agent session instead of calling the `knowledge-storm` Python package, see [examples/agent_skills](examples/agent_skills).
+
 ### Co-STORM examples
 
 To run Co-STORM with `gpt` family models with default configurations,
