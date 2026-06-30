@@ -55,9 +55,12 @@ class StormInformationTable(InformationTable):
     would be perspective guided dialogue history.
     """
 
-    def __init__(self, conversations=List[Tuple[str, List[DialogueTurn]]]):
+    def __init__(
+        self,
+        conversations: Optional[List[Tuple[str, List[DialogueTurn]]]] = None,
+    ):
         super().__init__()
-        self.conversations = conversations
+        self.conversations = conversations if conversations is not None else []
         self.url_to_info: Dict[str, Information] = (
             StormInformationTable.construct_url_to_info(self.conversations)
         )
