@@ -644,7 +644,8 @@ class StreamlitCallbackHandler(BaseCallbackHandler):
         self.status_container.info("Start browsing the Internet.")
 
     def on_dialogue_turn_end(self, dlg_turn, **kwargs):
-        urls = list(set([r.url for r in dlg_turn.search_results]))
+        search_results = dlg_turn.search_results or []
+        urls = list(set([r.url for r in search_results]))
         for url in urls:
             self.status_container.markdown(
                 f"""

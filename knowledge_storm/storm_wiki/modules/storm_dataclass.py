@@ -40,7 +40,9 @@ class DialogueTurn:
                 "agent_utterance": self.agent_utterance,
                 "user_utterance": self.user_utterance,
                 "search_queries": self.search_queries,
-                "search_results": [data.to_dict() for data in self.search_results],
+                "search_results": [
+                    data.to_dict() for data in (self.search_results or [])
+                ],
             }
         )
 
@@ -70,6 +72,8 @@ class StormInformationTable(InformationTable):
 
         for persona, conv in conversations:
             for turn in conv:
+                if not turn.search_results:
+                    continue
                 for storm_info in turn.search_results:
                     if storm_info.url in url_to_info:
                         url_to_info[storm_info.url].snippets.extend(storm_info.snippets)
