@@ -24,7 +24,28 @@ We host a number of example scripts for various customization of STORM (e.g., us
    - `--url` URL of the VLLM server.
    - `--port` Port of the VLLM server.
 
-Besides VLLM server, STORM is also compatible with [TGI](https://huggingface.co/docs/text-generation-inference/en/index) server or [Together.ai](https://www.together.ai/products#inference) endpoint. 
+Besides VLLM server, STORM is also compatible with [TGI](https://huggingface.co/docs/text-generation-inference/en/index) server or [Together.ai](https://www.together.ai/products#inference) endpoint.
+
+### OpenAI-compatible multi-model gateway (DaoXE)
+
+[run_storm_wiki_daoxe.py](run_storm_wiki_daoxe.py) shows how to point STORM's `LitellmModel` at an OpenAI-compatible multi-model gateway. [DaoXE](https://daoxe.com) is multi-protocol (OpenAI Chat Completions / Responses and Anthropic Messages); this script uses the OpenAI-compatible Chat Completions path via LiteLLM.
+
+1. Create an API key at [DaoXE](https://daoxe.com) and set `DAOXE_API_KEY` (optional: `DAOXE_API_BASE`, default `https://daoxe.com/v1`).
+2. Copy an exact model ID currently available to your account (`GET /v1/models` or the account catalog). Do not hardcode a static public list.
+3. Run under the repository root:
+
+   ```
+   python examples/storm_examples/run_storm_wiki_daoxe.py \
+      --model $DAOXE_MODEL_ID \
+      --output-dir $OUTPUT_DIR \
+      --retriever you \
+      --do-research \
+      --do-generate-outline \
+      --do-generate-article \
+      --do-polish-article
+   ```
+
+Notes: model availability is account-scoped; requests may be billed. DaoXE is not available in mainland China. Contributor is affiliated with DaoXE.
 
 
 ## Run STORM with your own corpus
