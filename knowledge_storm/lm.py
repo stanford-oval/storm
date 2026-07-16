@@ -81,6 +81,12 @@ class LM:
         messages = messages or [{"role": "user", "content": prompt}]
         kwargs = {**self.kwargs, **kwargs}
 
+        # o-series reject max_tokens; LiteLLM expects max_completion_tokens.
+        model_name = (self.model or "").lower()
+        if any(tag in model_name for tag in ("o1", "o3", "o4")):
+            if "max_tokens" in kwargs and "max_completion_tokens" not in kwargs:
+                kwargs["max_completion_tokens"] = kwargs.pop("max_tokens")
+
         # Make the request and handle LRU & disk caching.
         if self.model_type == "chat":
             completion = cached_litellm_completion if cache else litellm_completion
