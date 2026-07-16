@@ -443,7 +443,8 @@ class ArticleTextProcessing:
             except Exception as e:
                 max_ref_num = 0
             if max_ref_num > len(turn.search_results):
-                for i in range(len(turn.search_results), max_ref_num + 1):
+                # Start after the last valid citation index (1-based).
+                for i in range(len(turn.search_results) + 1, max_ref_num + 1):
                     turn.agent_utterance = turn.agent_utterance.replace(f"[{i}]", "")
             turn.agent_utterance = (
                 ArticleTextProcessing.remove_uncompleted_sentences_with_citations(
