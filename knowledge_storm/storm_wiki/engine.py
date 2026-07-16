@@ -38,8 +38,8 @@ class STORMWikiLMConfigs(LMConfigs):
     def init_openai_model(
         self,
         openai_api_key: str,
-        azure_api_key: str,
-        openai_type: Literal["openai", "azure"],
+        azure_api_key: Optional[str] = None,
+        openai_type: Literal["openai", "azure"] = "openai",
         api_base: Optional[str] = None,
         api_version: Optional[str] = None,
         temperature: Optional[float] = 1.0,
@@ -307,7 +307,10 @@ class STORMWikiRunner(Engine):
                     call.pop(
                         "kwargs"
                     )  # All kwargs are dumped together to run_config.json.
-                f.write(json.dumps(call) + "\n")
+                f.write(
+                    json.dumps(call, default=FileIOHelper.handle_non_serializable)
+                    + "\n"
+                )
 
     def _load_information_table_from_local_fs(self, information_table_local_path):
         assert os.path.exists(information_table_local_path), makeStringRed(

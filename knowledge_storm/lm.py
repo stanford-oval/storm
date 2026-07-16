@@ -522,9 +522,14 @@ class AzureOpenAIModel(dspy.LM):
 
             self.log_usage(response)
 
+            # model_dump() recursively converts nested Choice objects (dict() does not)
+            if hasattr(response, "model_dump"):
+                response_for_history = response.model_dump()
+            else:
+                response_for_history = dict(response)
             history_entry = {
                 "prompt": prompt,
-                "response": dict(response),
+                "response": response_for_history,
                 "kwargs": kwargs,
             }
             self.history.append(history_entry)
@@ -922,9 +927,16 @@ class VLLMClient(dspy.dsp.LM):
         choices = response.choices
         completions = [choice.message.content for choice in choices]
 
+        # model_dump() so nested Choice objects are JSON-serializable in post_run()
+        if hasattr(response, "model_dump"):
+            response_for_history = response.model_dump()
+        elif hasattr(response, "to_dict"):
+            response_for_history = response.to_dict()
+        else:
+            response_for_history = response
         history = {
             "prompt": prompt,
-            "response": response,
+            "response": response_for_history,
             "kwargs": kwargs,
         }
         self.history.append(history)
