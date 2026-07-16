@@ -278,7 +278,7 @@ class QdrantVectorStoreManager:
                 "\uff0c",  # Fullwidth comma
                 "\u3001",  # Ideographic comma
                 " ",
-                "\u200B",  # Zero-width space
+                "\u200b",  # Zero-width space
                 "",
             ],
         )
@@ -427,6 +427,10 @@ class ArticleTextProcessing:
     @staticmethod
     def clean_up_citation(conv):
         for turn in conv.dlg_history:
+            # Guard None utterances from failed LM turns (#257).
+            if not turn.agent_utterance:
+                turn.agent_utterance = ""
+                continue
             if "References:" in turn.agent_utterance:
                 turn.agent_utterance = turn.agent_utterance[
                     : turn.agent_utterance.find("References:")
@@ -666,7 +670,7 @@ class WebPageHelper:
                 "\uff0c",  # Fullwidth comma
                 "\u3001",  # Ideographic comma
                 " ",
-                "\u200B",  # Zero-width space
+                "\u200b",  # Zero-width space
                 "",
             ],
         )
