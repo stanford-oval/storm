@@ -702,21 +702,27 @@ class SearXNG(dspy.Retrieve):
         )
 
         for query in queries:
+            if not query or not str(query).strip():
+                continue
             try:
                 params = {"q": query, "format": "json"}
                 response = requests.get(
                     self.searxng_api_url, headers=headers, params=params
                 )
-                results = response.json()
+                results = response.json() if response is not None else {}
+                hits = results.get("results") or []
 
-                for r in results["results"]:
-                    if self.is_valid_source(r["url"]) and r["url"] not in exclude_urls:
+                for r in hits[: self.k]:
+                    url = r.get("url")
+                    if not url:
+                        continue
+                    if self.is_valid_source(url) and url not in exclude_urls:
                         collected_results.append(
                             {
                                 "description": r.get("content", ""),
                                 "snippets": [r.get("content", "")],
                                 "title": r.get("title", ""),
-                                "url": r["url"],
+                                "url": url,
                             }
                         )
             except Exception as e:
