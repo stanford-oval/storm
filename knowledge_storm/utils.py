@@ -278,7 +278,7 @@ class QdrantVectorStoreManager:
                 "\uff0c",  # Fullwidth comma
                 "\u3001",  # Ideographic comma
                 " ",
-                "\u200B",  # Zero-width space
+                "\u200b",  # Zero-width space
                 "",
             ],
         )
@@ -666,7 +666,7 @@ class WebPageHelper:
                 "\uff0c",  # Fullwidth comma
                 "\u3001",  # Ideographic comma
                 " ",
-                "\u200B",  # Zero-width space
+                "\u200b",  # Zero-width space
                 "",
             ],
         )
@@ -722,8 +722,9 @@ def user_input_appropriateness_check(user_input):
     if len(user_input.split()) > 20:
         return "The input is too long. Please make your input topic more concise!"
 
-    if not re.match(r'^[a-zA-Z0-9\s\-"\,\.?\']*$', user_input):
-        return "The input contains invalid characters. The input should only contain a-z, A-Z, 0-9, space, -/\"/,./?/'."
+    # Allow Unicode letters/digits (e.g. Chinese topics) plus common punctuation (#338/#339).
+    if not re.match(r'^[\w\s\-\/"\,\.?\']+$', user_input, flags=re.UNICODE):
+        return "The input contains invalid characters. Please use letters, numbers, spaces, and basic punctuation only."
 
     prompt = f"""Here is a topic input into a knowledge curation engine that can write a Wikipedia-like article for the topic. Please judge whether it is appropriate or not for the engine to curate information for this topic based on English search engine. The following types of inputs are inappropriate:
 1. Inputs that may be related to illegal, harmful, violent, racist, or sexual purposes.
