@@ -915,7 +915,7 @@ class VLLMClient(dspy.dsp.LM):
             response = self.request(prompt, **kwargs)
         except Exception as e:
             print(f"Failed to generate completion: {e}")
-            raise Exception(e)
+            raise
 
         self.log_usage(response)
 
