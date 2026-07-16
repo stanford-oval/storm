@@ -105,8 +105,9 @@ class WikiWriter(dspy.Module):
                 f"You: {turn.user_utterance}\nExpert: Omit the answer here due to space limit."
             )
         for turn in dialogue_turns[-4:]:
+            agent_utt = turn.agent_utterance or ""
             conv.append(
-                f"You: {turn.user_utterance}\nExpert: {ArticleTextProcessing.remove_citations(turn.agent_utterance)}"
+                f"You: {turn.user_utterance}\nExpert: {ArticleTextProcessing.remove_citations(agent_utt)}"
             )
         conv = "\n".join(conv)
         conv = conv.strip() or "N/A"
@@ -121,6 +122,9 @@ class WikiWriter(dspy.Module):
                 question = self.ask_question(
                     topic=topic, persona=persona, conv=conv
                 ).question
+
+        if not isinstance(question, str):
+            question = "" if question is None else str(question)
 
         return dspy.Prediction(question=question)
 

@@ -346,7 +346,8 @@ class ArticleTextProcessing:
         Returns:
             str: The string with all citation patterns removed.
         """
-
+        if s is None:
+            return ""
         return re.sub(r"\[\d+(?:,\s*\d+)*\]", "", s)
 
     @staticmethod
