@@ -278,7 +278,7 @@ class QdrantVectorStoreManager:
                 "\uff0c",  # Fullwidth comma
                 "\u3001",  # Ideographic comma
                 " ",
-                "\u200B",  # Zero-width space
+                "\u200b",  # Zero-width space
                 "",
             ],
         )
@@ -455,6 +455,8 @@ class ArticleTextProcessing:
 
     @staticmethod
     def clean_up_outline(outline, topic=""):
+        if not outline:
+            return ""
         output_lines = []
         current_level = 0  # To track the current section level
 
@@ -490,10 +492,10 @@ class ArticleTextProcessing:
         )
         outline = re.sub(r"#[#]? Bibliography.*?(?=##|$)", "", outline, flags=re.DOTALL)
         outline = re.sub(
-            r"#[#]? Further reading*?(?=##|$)", "", outline, flags=re.DOTALL
+            r"#[#]? Further reading.*?(?=##|$)", "", outline, flags=re.DOTALL
         )
         outline = re.sub(
-            r"#[#]? Further Reading*?(?=##|$)", "", outline, flags=re.DOTALL
+            r"#[#]? Further Reading.*?(?=##|$)", "", outline, flags=re.DOTALL
         )
         outline = re.sub(r"#[#]? Summary.*?(?=##|$)", "", outline, flags=re.DOTALL)
         outline = re.sub(r"#[#]? Appendices.*?(?=##|$)", "", outline, flags=re.DOTALL)
@@ -666,7 +668,7 @@ class WebPageHelper:
                 "\uff0c",  # Fullwidth comma
                 "\u3001",  # Ideographic comma
                 " ",
-                "\u200B",  # Zero-width space
+                "\u200b",  # Zero-width space
                 "",
             ],
         )
