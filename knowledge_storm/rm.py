@@ -10,6 +10,21 @@ from dsp import backoff_hdlr, giveup_hdlr
 from .utils import WebPageHelper
 
 
+def _storm_backoff_hdlr(details):
+    """Like dsp.backoff_hdlr but safe when exception has no .message (e.g. AssertionError)."""
+    exc = details.get("exception")
+    msg = getattr(exc, "message", None) or str(exc)
+    logging.info(
+        "Backing off %.1f seconds after %d tries calling function %s with args %s kwargs %s due to %s",
+        details.get("wait"),
+        details.get("tries"),
+        getattr(details.get("target"), "__name__", details.get("target")),
+        details.get("args"),
+        details.get("kwargs"),
+        msg,
+    )
+
+
 class YouRM(dspy.Retrieve):
     def __init__(self, ydc_api_key=None, k=3, is_valid_source: Callable = None):
         super().__init__(k=k)
@@ -762,8 +777,8 @@ class DuckDuckGoSearchRM(dspy.Retrieve):
         # All params for search can be found here:
         #   https://duckduckgo.com/duckduckgo-help-pages/settings/params/
 
-        # Sets the backend to be api
-        self.duck_duck_go_backend = "api"
+        # Sets the backend; "api" is deprecated in recent duckduckgo_search.
+        self.duck_duck_go_backend = "auto"
 
         # Only gets safe search results
         self.duck_duck_go_safe_search = safe_search
@@ -790,12 +805,16 @@ class DuckDuckGoSearchRM(dspy.Retrieve):
         (Exception,),
         max_time=1000,
         max_tries=8,
-        on_backoff=backoff_hdlr,
+        on_backoff=_storm_backoff_hdlr,
         giveup=giveup_hdlr,
     )
     def request(self, query: str):
         results = self.ddgs.text(
-            query, max_results=self.k, backend=self.duck_duck_go_backend
+            keywords=query,
+            max_results=self.k,
+            backend=self.duck_duck_go_backend,
+            safesearch=self.duck_duck_go_safe_search,
+            region=self.duck_duck_go_region,
         )
         return results
 
@@ -819,6 +838,8 @@ class DuckDuckGoSearchRM(dspy.Retrieve):
         collected_results = []
 
         for query in queries:
+            if not query or not str(query).strip():
+                continue
             #  list of dicts that will be parsed to return
             results = self.request(query)
 
