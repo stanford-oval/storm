@@ -986,6 +986,8 @@ class GoogleSearch(dspy.Retrieve):
         self,
         google_search_api_key=None,
         google_cse_id=None,
+        api_key=None,
+        cse_id=None,
         k=3,
         is_valid_source: Callable = None,
         min_char_count: int = 150,
@@ -995,9 +997,9 @@ class GoogleSearch(dspy.Retrieve):
         """
         Params:
             google_search_api_key: Google API key. Check out https://developers.google.com/custom-search/v1/overview
-                "API key" section
+                "API key" section. Alias: api_key.
             google_cse_id: Custom search engine ID. Check out https://developers.google.com/custom-search/v1/overview
-                "Search engine ID" section
+                "Search engine ID" section. Alias: cse_id.
             k: Number of top results to retrieve.
             is_valid_source: Optional function to filter valid sources.
             min_char_count: Minimum character count for the article to be considered valid.
@@ -1011,19 +1013,25 @@ class GoogleSearch(dspy.Retrieve):
             raise ImportError(
                 "GoogleSearch requires `pip install google-api-python-client`."
             ) from err
-        if not google_search_api_key and not os.environ.get("GOOGLE_SEARCH_API_KEY"):
+        google_search_api_key = (
+            google_search_api_key
+            or api_key
+            or os.environ.get("GOOGLE_SEARCH_API_KEY")
+            or os.environ.get("GOOGLE_API_KEY")
+        )
+        google_cse_id = google_cse_id or cse_id or os.environ.get("GOOGLE_CSE_ID")
+        if not google_search_api_key:
             raise RuntimeError(
-                "You must supply google_search_api_key or set the GOOGLE_SEARCH_API_KEY environment variable"
+                "You must supply google_search_api_key/api_key or set "
+                "GOOGLE_SEARCH_API_KEY / GOOGLE_API_KEY"
             )
-        if not google_cse_id and not os.environ.get("GOOGLE_CSE_ID"):
+        if not google_cse_id:
             raise RuntimeError(
-                "You must supply google_cse_id or set the GOOGLE_CSE_ID environment variable"
+                "You must supply google_cse_id/cse_id or set the GOOGLE_CSE_ID environment variable"
             )
 
-        self.google_search_api_key = (
-            google_search_api_key or os.environ["GOOGLE_SEARCH_API_KEY"]
-        )
-        self.google_cse_id = google_cse_id or os.environ["GOOGLE_CSE_ID"]
+        self.google_search_api_key = google_search_api_key
+        self.google_cse_id = google_cse_id
 
         if is_valid_source:
             self.is_valid_source = is_valid_source
