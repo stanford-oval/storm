@@ -440,6 +440,10 @@ class DeepSeekModel(dspy.OpenAI):
         assert only_completed, "for now"
         assert return_sorted is False, "for now"
 
+        kwargs = {**self.kwargs, **kwargs}
+        for key in ("model", "api_key", "api_base"):
+            kwargs.pop(key, None)
+
         response = self._create_completion(prompt, **kwargs)
 
         # Log the token usage from the DeepSeek API response.
@@ -687,6 +691,10 @@ class GroqModel(dspy.OpenAI):
         """Call the Groq API to generate completions."""
         assert only_completed, "for now"
         assert return_sorted is False, "for now"
+
+        kwargs = {**self.kwargs, **kwargs}
+        for key in ("model", "api_key", "api_base"):
+            kwargs.pop(key, None)
 
         response = self._create_completion(prompt, **kwargs)
 
