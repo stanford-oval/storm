@@ -80,18 +80,30 @@ class Encoder:
             raise ValueError("ENCODER_API_TYPE environment variable is not set.")
 
         if encoder_type.lower() == "openai":
-            self.embedding_model_name = "text-embedding-3-small"
+            self.embedding_model_name = os.getenv(
+                "ENCODER_MODEL", "text-embedding-3-small"
+            )
             self.kargs = {"api_key": api_key or os.getenv("OPENAI_API_KEY")}
         elif encoder_type.lower() == "azure":
-            self.embedding_model_name = "azure/text-embedding-3-small"
+            self.embedding_model_name = os.getenv(
+                "ENCODER_MODEL", "azure/text-embedding-3-small"
+            )
             self.kargs = {
                 "api_key": api_key or os.getenv("AZURE_API_KEY"),
                 "api_base": api_base or os.getenv("AZURE_API_BASE"),
                 "api_version": api_version or os.getenv("AZURE_API_VERSION"),
             }
+        elif encoder_type.lower() == "together":
+            # LiteLLM Together embeddings; override with ENCODER_MODEL if needed.
+            self.embedding_model_name = os.getenv(
+                "ENCODER_MODEL",
+                "together_ai/togethercomputer/m2-bert-80M-8k-retrieval",
+            )
+            self.kargs = {"api_key": api_key or os.getenv("TOGETHER_API_KEY")}
         else:
             raise ValueError(
-                f"Unsupported ENCODER_API_TYPE '{encoder_type}'. Supported types are 'openai', 'azure', 'together'."
+                f"Unsupported ENCODER_API_TYPE '{encoder_type}'. "
+                "Supported types are 'openai', 'azure', 'together'."
             )
 
     def get_total_token_usage(self, reset: bool = False) -> int:
