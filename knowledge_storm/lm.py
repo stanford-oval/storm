@@ -6,7 +6,7 @@ import os
 import random
 import requests
 import threading
-from typing import Optional, Literal, Any
+from typing import Optional, Literal, Any, Mapping
 import ujson
 from pathlib import Path
 
@@ -193,6 +193,7 @@ class LitellmModel(LM):
     """A wrapper class for LiteLLM.
 
     Check out https://docs.litellm.ai/docs/providers for usage details.
+    Supports OpenAI-compatible gateways via api_base and default_headers/extra_headers.
     """
 
     def __init__(
@@ -200,8 +201,16 @@ class LitellmModel(LM):
         model: str = "openai/gpt-4o-mini",
         api_key: Optional[str] = None,
         model_type: Literal["chat", "text"] = "chat",
+        api_base: Optional[str] = None,
+        default_headers: Optional[Mapping[str, str]] = None,
+        extra_headers: Optional[Mapping[str, str]] = None,
         **kwargs,
     ):
+        headers = extra_headers if extra_headers is not None else default_headers
+        if headers is not None:
+            kwargs["extra_headers"] = dict(headers)
+        if api_base is not None:
+            kwargs["api_base"] = api_base
         super().__init__(model=model, api_key=api_key, model_type=model_type, **kwargs)
         self._token_usage_lock = threading.Lock()
         self.prompt_tokens = 0
@@ -281,8 +290,14 @@ class OpenAIModel(dspy.OpenAI):
         model: str = "gpt-4o-mini",
         api_key: Optional[str] = None,
         model_type: Literal["chat", "text"] = None,
+        api_base: Optional[str] = None,
+        default_headers: Optional[Mapping[str, str]] = None,
         **kwargs,
     ):
+        if api_base is not None:
+            kwargs["api_base"] = api_base
+        if default_headers is not None:
+            kwargs["default_headers"] = dict(default_headers)
         super().__init__(model=model, api_key=api_key, model_type=model_type, **kwargs)
         self._token_usage_lock = threading.Lock()
         self.prompt_tokens = 0
@@ -471,6 +486,7 @@ class AzureOpenAIModel(dspy.LM):
         model: str,
         api_key: str,
         model_type: Literal["chat", "text"] = "chat",
+        default_headers: Optional[Mapping[str, str]] = None,
         **kwargs,
     ):
         super().__init__(model=model)
@@ -481,10 +497,14 @@ class AzureOpenAIModel(dspy.LM):
         self.provider = "azure"
         self.model_type = model_type
 
+        client_kwargs = {}
+        if default_headers is not None:
+            client_kwargs["default_headers"] = dict(default_headers)
         self.client = AzureOpenAI(
             azure_endpoint=azure_endpoint,
             api_key=api_key,
             api_version=api_version,
+            **client_kwargs,
         )
         self.prompt_tokens = 0
         self.completion_tokens = 0
