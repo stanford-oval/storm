@@ -278,7 +278,7 @@ class QdrantVectorStoreManager:
                 "\uff0c",  # Fullwidth comma
                 "\u3001",  # Ideographic comma
                 " ",
-                "\u200B",  # Zero-width space
+                "\u200b",  # Zero-width space
                 "",
             ],
         )
@@ -666,7 +666,7 @@ class WebPageHelper:
                 "\uff0c",  # Fullwidth comma
                 "\u3001",  # Ideographic comma
                 " ",
-                "\u200B",  # Zero-width space
+                "\u200b",  # Zero-width space
                 "",
             ],
         )
@@ -692,12 +692,23 @@ class WebPageHelper:
         for h, u in zip(htmls, urls):
             if h is None:
                 continue
-            article_text = extract(
-                h,
-                include_tables=False,
-                include_comments=False,
-                output_format="txt",
-            )
+            # Skip empty/near-empty responses (e.g. 403 bodies) — trafilatura can
+            # segfault on invalid/empty HTML trees (#340).
+            if isinstance(h, (bytes, bytearray)):
+                if len(h) < 64:
+                    continue
+            elif isinstance(h, str) and len(h.strip()) < 64:
+                continue
+            try:
+                article_text = extract(
+                    h,
+                    include_tables=False,
+                    include_comments=False,
+                    output_format="txt",
+                )
+            except Exception as exc:
+                print(f"Error extracting article from {u!r} - {exc!r}")
+                continue
             if article_text is not None and len(article_text) > self.min_char_count:
                 articles[u] = {"text": article_text}
 
