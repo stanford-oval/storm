@@ -427,7 +427,7 @@ class DiscourseManager:
             expert_descriptions = [expert_descriptions]
         agents: CoStormExpert = []
         for expert_name in expert_descriptions:
-            role_name, role_description = expert_name.split(":")
+            role_name, role_description = expert_name.split(":", 1)
             role_name = role_name.strip()
             role_description = role_description.strip()
             new_costorm_expert = CoStormExpert(
