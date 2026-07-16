@@ -37,8 +37,13 @@ class ConversationTurn:
     ):
         self.utterance = utterance if utterance is not None else raw_utterance
         self.raw_utterance = raw_utterance
-        self.role = role if ":" not in role else role.split(":")[0]
-        self.role_description = "" if ":" not in role else role.split(":")[1]
+        if ":" in role:
+            self.role, self.role_description = role.split(":", 1)
+            self.role = self.role.strip()
+            self.role_description = self.role_description.strip()
+        else:
+            self.role = role
+            self.role_description = ""
         self.queries = queries if queries is not None else []
         self.raw_retrieved_info = (
             raw_retrieved_info if raw_retrieved_info is not None else []
