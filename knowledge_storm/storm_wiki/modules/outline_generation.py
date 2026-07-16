@@ -90,15 +90,14 @@ class WriteOutline(dspy.Module):
     ):
         trimmed_dlg_history = []
         for turn in dlg_history:
-            if (
-                "topic you" in turn.agent_utterance.lower()
-                or "topic you" in turn.user_utterance.lower()
-            ):
+            agent_utt = turn.agent_utterance or ""
+            user_utt = turn.user_utterance or ""
+            if "topic you" in agent_utt.lower() or "topic you" in user_utt.lower():
                 continue
             trimmed_dlg_history.append(turn)
         conv = "\n".join(
             [
-                f"Wikipedia Writer: {turn.user_utterance}\nExpert: {turn.agent_utterance}"
+                f"Wikipedia Writer: {turn.user_utterance or ''}\nExpert: {turn.agent_utterance or ''}"
                 for turn in trimmed_dlg_history
             ]
         )
