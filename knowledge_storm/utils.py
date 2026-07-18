@@ -29,7 +29,11 @@ def truncate_filename(filename, max_length=125):
     """
 
     if len(filename) > max_length:
-        truncated_filename = filename[:max_length]
+        stem, extension = os.path.splitext(filename)
+        if extension and len(extension) < max_length:
+            truncated_filename = stem[: max_length - len(extension)] + extension
+        else:
+            truncated_filename = filename[:max_length]
         logging.warning(
             f"Filename is too long. Filename is truncated to {truncated_filename}."
         )
