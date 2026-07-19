@@ -334,7 +334,7 @@ class VectorRM(dspy.Retrieve):
                     }
                 )
 
-        return collected_results
+        return collected_results[: self.k]
 
 
 class StanfordOvalArxivRM(dspy.Retrieve):
@@ -400,7 +400,7 @@ class StanfordOvalArxivRM(dspy.Retrieve):
                 collected_results.extend(results)
             except Exception as e:
                 logging.error(f"Error occurs when searching query {query}: {e}")
-        return collected_results
+        return collected_results[: self.k]
 
 
 class SerperRM(dspy.Retrieve):
