@@ -561,7 +561,7 @@ class SerperRM(dspy.Retrieve):
                             ),
                         }
                     )
-            except:
+            except Exception:
                 continue
 
         return collected_results
