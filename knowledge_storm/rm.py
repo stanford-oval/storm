@@ -509,9 +509,10 @@ class SerperRM(dspy.Retrieve):
         self.results = []
         collected_results = []
         for query in queries:
-            if query == "Queries:":
+            if not query or not str(query).strip() or query == "Queries:":
                 continue
-            query_params = self.query_params
+            # copy so concurrent / multi-query calls do not share one mutable dict
+            query_params = dict(self.query_params)
 
             # All available parameters can be found in the playground: https://serper.dev/playground
             # Sets the json value for query to be the query that is being parsed.
