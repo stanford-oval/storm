@@ -67,14 +67,6 @@ class Information:
         self.meta = meta if meta is not None else {}
         self.citation_uuid = -1
 
-    def __hash__(self):
-        return hash(
-            (
-                self.url,
-                tuple(sorted(self.snippets)),
-            )
-        )
-
     def __eq__(self, other):
         if not isinstance(other, Information):
             return False
