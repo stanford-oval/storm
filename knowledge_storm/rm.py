@@ -494,7 +494,7 @@ class SerperRM(dspy.Retrieve):
 
         Args:
             query_or_queries (Union[str, List[str]]): The query or queries to search for.
-            exclude_urls (List[str]): Dummy parameter to match the interface. Does not have any effect.
+            exclude_urls (List[str]): A list of urls to exclude from the search results.
 
         Returns:
             a list of dictionaries, each dictionary has keys of 'description', 'snippets' (list of strings), 'title', 'url'
@@ -541,19 +541,22 @@ class SerperRM(dspy.Retrieve):
         for result in self.results:
             try:
                 # An array of dictionaries that contains the snippets, title of the document and url that will be used.
-                organic_results = result.get("organic")
+                organic_results = result.get("organic") or []
                 knowledge_graph = result.get("knowledgeGraph")
                 for organic in organic_results:
+                    link = organic.get("link")
+                    if not link or link in exclude_urls:
+                        continue
                     snippets = [organic.get("snippet")]
                     if self.ENABLE_EXTRA_SNIPPET_EXTRACTION:
                         snippets.extend(
-                            valid_url_to_snippets.get(url, {}).get("snippets", [])
+                            valid_url_to_snippets.get(link, {}).get("snippets", [])
                         )
                     collected_results.append(
                         {
                             "snippets": snippets,
                             "title": organic.get("title"),
-                            "url": organic.get("link"),
+                            "url": link,
                             "description": (
                                 knowledge_graph.get("description")
                                 if knowledge_graph is not None
@@ -849,7 +852,7 @@ class DuckDuckGoSearchRM(dspy.Retrieve):
                     else:
                         print(f"invalid source {url} or url in exclude_urls")
                 except Exception as e:
-                    print(f"Error occurs when processing {result=}: {e}\n")
+                    print(f"Error occurs when processing result {d}: {e}\n")
                     print(f"Error occurs when searching query {query}: {e}")
 
         return collected_results
