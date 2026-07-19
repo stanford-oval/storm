@@ -97,7 +97,7 @@ class Information:
     def _md5_hash(self, value):
         """Generate an MD5 hash for a given value."""
         if isinstance(value, (dict, list, tuple)):
-            value = json.dumps(value, sort_keys=True)
+            value = json.dumps(value, sort_keys=True, default=str)
         return hashlib.md5(str(value).encode("utf-8")).hexdigest()
 
     @classmethod
