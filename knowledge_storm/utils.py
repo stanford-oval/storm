@@ -86,11 +86,15 @@ class QdrantVectorStoreManager:
             print(
                 f"Collection {collection_name} does not exist. Creating the collection..."
             )
-            # create the collection
+            # match collection dim to the embedding model (not a fixed 1024)
+            try:
+                vector_size = model.client.get_sentence_embedding_dimension()
+            except Exception:
+                vector_size = len(model.embed_query("dimension"))
             client.create_collection(
                 collection_name=f"{collection_name}",
                 vectors_config=models.VectorParams(
-                    size=1024, distance=models.Distance.COSINE
+                    size=vector_size, distance=models.Distance.COSINE
                 ),
             )
             return Qdrant(
@@ -278,7 +282,7 @@ class QdrantVectorStoreManager:
                 "\uff0c",  # Fullwidth comma
                 "\u3001",  # Ideographic comma
                 " ",
-                "\u200B",  # Zero-width space
+                "\u200b",  # Zero-width space
                 "",
             ],
         )
@@ -666,7 +670,7 @@ class WebPageHelper:
                 "\uff0c",  # Fullwidth comma
                 "\u3001",  # Ideographic comma
                 " ",
-                "\u200B",  # Zero-width space
+                "\u200b",  # Zero-width space
                 "",
             ],
         )
