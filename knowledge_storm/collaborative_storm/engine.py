@@ -137,7 +137,7 @@ class CollaborativeStormLMConfigs(LMConfigs):
                 **together_kwargs,
             )
         else:
-            raise Exception(
+            raise ValueError(
                 "No valid OpenAI API provider is provided. Cannot use default LLM configurations."
             )
 
