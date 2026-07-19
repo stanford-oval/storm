@@ -52,22 +52,25 @@ class YouRM(dspy.Retrieve):
             if isinstance(query_or_queries, str)
             else query_or_queries
         )
+        queries = [q for q in queries if isinstance(q, str) and q.strip()]
         self.usage += len(queries)
         collected_results = []
         for query in queries:
             try:
                 headers = {"X-API-Key": self.ydc_api_key}
                 results = requests.get(
-                    f"https://api.ydc-index.io/search?query={query}",
+                    "https://api.ydc-index.io/search",
                     headers=headers,
+                    params={"query": query},
                 ).json()
 
                 authoritative_results = []
-                for r in results["hits"]:
-                    if self.is_valid_source(r["url"]) and r["url"] not in exclude_urls:
-                        authoritative_results.append(r)
-                if "hits" in results:
-                    collected_results.extend(authoritative_results[: self.k])
+                for r in results.get("hits", []):
+                    url = r.get("url")
+                    if not url or not self.is_valid_source(url) or url in exclude_urls:
+                        continue
+                    authoritative_results.append(r)
+                collected_results.extend(authoritative_results[: self.k])
             except Exception as e:
                 logging.error(f"Error occurs when searching query {query}: {e}")
 
