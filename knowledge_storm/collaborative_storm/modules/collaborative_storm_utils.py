@@ -56,16 +56,17 @@ def format_search_results(
 
     extracted_snippet_queue = []
     max_snippets = (
-        max(len(info.snippets) for info in searched_results) if searched_results else 0
+        max(len(info.snippets or []) for info in searched_results) if searched_results else 0
     )
     max_snippets = 1 if mode == "brief" else max_snippets
     abort = False
     included_snippets = set()
     for i in range(max_snippets):
         for info in searched_results:
-            if i < len(info.snippets) and not abort:
-                cur_snippet = info.snippets[i]
-                cur_snippet_len = len(info.snippets[i].split())
+            snippets = info.snippets or []
+            if i < len(snippets) and not abort:
+                cur_snippet = snippets[i]
+                cur_snippet_len = len(cur_snippet.split())
                 if total_length + cur_snippet_len > info_max_num_words:
                     abort = True
                     break

@@ -70,7 +70,7 @@ class AnswerQuestionModule(dspy.Module):
         ):
             with dspy.settings.context(lm=self.question_answering_lm):
                 queries = self.question_to_query(topic=topic, question=question).queries
-            queries = trim_output_after_hint(queries, hint="Queries:")
+            queries = trim_output_after_hint(queries or "", hint="Queries:")
             queries = [
                 q.replace("-", "").strip().strip('"').strip('"').strip()
                 for q in queries.split("\n")

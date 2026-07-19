@@ -47,7 +47,7 @@ class GenerateExpertModule(dspy.Module):
         self.generate_expert_w_focus = dspy.ChainOfThought(GenerateExpertWithFocus)
 
     def trim_background(self, background: str, max_words: int = 100):
-        words = background.split()
+        words = (background or "").split()
         cur_len = len(words)
         if cur_len <= max_words:
             return background
