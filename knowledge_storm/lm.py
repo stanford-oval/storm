@@ -1002,9 +1002,9 @@ class TGIClient(dspy.HFClientTGI):
 
             response = {"prompt": prompt, "choices": [{"text": c} for c in completions]}
             return response
-        except Exception:
-            print("Failed to parse JSON response:", response.text)
-            raise Exception("Received invalid JSON response from server")
+        except Exception as e:
+            print("Failed to parse JSON response:", getattr(response, "text", response))
+            raise ValueError("Received invalid JSON response from server") from e
 
 
 class TogetherClient(dspy.HFModel):

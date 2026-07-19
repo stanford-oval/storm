@@ -71,7 +71,7 @@ class YouRM(dspy.Retrieve):
             except Exception as e:
                 logging.error(f"Error occurs when searching query {query}: {e}")
 
-        return collected_results
+        return collected_results[: self.k]
 
 
 class BingSearch(dspy.Retrieve):
@@ -173,7 +173,7 @@ class BingSearch(dspy.Retrieve):
             r["snippets"] = valid_url_to_snippets[url]["snippets"]
             collected_results.append(r)
 
-        return collected_results
+        return collected_results[: self.k]
 
 
 class VectorRM(dspy.Retrieve):
@@ -334,7 +334,7 @@ class VectorRM(dspy.Retrieve):
                     }
                 )
 
-        return collected_results
+        return collected_results[: self.k]
 
 
 class StanfordOvalArxivRM(dspy.Retrieve):
@@ -400,7 +400,7 @@ class StanfordOvalArxivRM(dspy.Retrieve):
                 collected_results.extend(results)
             except Exception as e:
                 logging.error(f"Error occurs when searching query {query}: {e}")
-        return collected_results
+        return collected_results[: self.k]
 
 
 class SerperRM(dspy.Retrieve):
@@ -564,7 +564,7 @@ class SerperRM(dspy.Retrieve):
             except:
                 continue
 
-        return collected_results
+        return collected_results[: self.k]
 
 
 class BraveRM(dspy.Retrieve):
@@ -638,7 +638,7 @@ class BraveRM(dspy.Retrieve):
             except Exception as e:
                 logging.error(f"Error occurs when searching query {query}: {e}")
 
-        return collected_results
+        return collected_results[: self.k]
 
 
 class SearXNG(dspy.Retrieve):
@@ -722,7 +722,7 @@ class SearXNG(dspy.Retrieve):
             except Exception as e:
                 logging.error(f"Error occurs when searching query {query}: {e}")
 
-        return collected_results
+        return collected_results[: self.k]
 
 
 class DuckDuckGoSearchRM(dspy.Retrieve):
@@ -852,7 +852,7 @@ class DuckDuckGoSearchRM(dspy.Retrieve):
                     print(f"Error occurs when processing {result=}: {e}\n")
                     print(f"Error occurs when searching query {query}: {e}")
 
-        return collected_results
+        return collected_results[: self.k]
 
 
 class TavilySearchRM(dspy.Retrieve):
@@ -978,7 +978,7 @@ class TavilySearchRM(dspy.Retrieve):
                     print(f"Error occurs when processing {result=}: {e}\n")
                     print(f"Error occurs when searching query {query}: {e}")
 
-        return collected_results
+        return collected_results[: self.k]
 
 
 class GoogleSearch(dspy.Retrieve):
