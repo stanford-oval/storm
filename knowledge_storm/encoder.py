@@ -125,8 +125,21 @@ class Encoder:
         response = litellm.embedding(
             model=self.embedding_model_name, input=text, caching=True, **self.kargs
         )
-        embedding = response.data[0]["embedding"]
-        token_usage = response.get("usage", {}).get("total_tokens", 0)
+        data0 = response.data[0]
+        embedding = (
+            data0["embedding"]
+            if isinstance(data0, dict)
+            else getattr(data0, "embedding")
+        )
+        usage = getattr(response, "usage", None)
+        if usage is None and isinstance(response, dict):
+            usage = response.get("usage")
+        if usage is None:
+            token_usage = 0
+        elif isinstance(usage, dict):
+            token_usage = usage.get("total_tokens", 0) or 0
+        else:
+            token_usage = getattr(usage, "total_tokens", 0) or 0
         return text, embedding, token_usage
 
     def _get_text_embeddings(
