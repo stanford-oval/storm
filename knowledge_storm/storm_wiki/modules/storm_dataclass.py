@@ -443,7 +443,7 @@ class StormArticle(Article):
         try:
             lines = outline_str.split("\n")
             lines = [line.strip() for line in lines if line.strip()]
-        except:
+        except (AttributeError, TypeError):
             pass
 
         instance = cls(topic)
