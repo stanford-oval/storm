@@ -541,19 +541,20 @@ class SerperRM(dspy.Retrieve):
         for result in self.results:
             try:
                 # An array of dictionaries that contains the snippets, title of the document and url that will be used.
-                organic_results = result.get("organic")
+                organic_results = result.get("organic") or []
                 knowledge_graph = result.get("knowledgeGraph")
                 for organic in organic_results:
+                    link = organic.get("link")
                     snippets = [organic.get("snippet")]
-                    if self.ENABLE_EXTRA_SNIPPET_EXTRACTION:
+                    if self.ENABLE_EXTRA_SNIPPET_EXTRACTION and link:
                         snippets.extend(
-                            valid_url_to_snippets.get(url, {}).get("snippets", [])
+                            valid_url_to_snippets.get(link, {}).get("snippets", [])
                         )
                     collected_results.append(
                         {
                             "snippets": snippets,
                             "title": organic.get("title"),
-                            "url": organic.get("link"),
+                            "url": link,
                             "description": (
                                 knowledge_graph.get("description")
                                 if knowledge_graph is not None
@@ -561,7 +562,8 @@ class SerperRM(dspy.Retrieve):
                             ),
                         }
                     )
-            except:
+            except Exception as e:
+                logging.warning("Error processing Serper search result: %s", e)
                 continue
 
         return collected_results
