@@ -278,7 +278,7 @@ class QdrantVectorStoreManager:
                 "\uff0c",  # Fullwidth comma
                 "\u3001",  # Ideographic comma
                 " ",
-                "\u200B",  # Zero-width space
+                "\u200b",  # Zero-width space
                 "",
             ],
         )
@@ -648,7 +648,16 @@ class WebPageHelper:
             snippet_chunk_size: Maximum character count for each snippet.
             max_thread_num: Maximum number of threads to use for concurrent requests (e.g., downloading webpages).
         """
-        self.httpx_client = httpx.Client(verify=False)
+        self.httpx_client = httpx.Client(
+            verify=False,
+            headers={
+                "User-Agent": (
+                    "Mozilla/5.0 (compatible; STORM/1.0; "
+                    "+https://github.com/stanford-oval/storm)"
+                )
+            },
+            timeout=10.0,
+        )
         self.min_char_count = min_char_count
         self.max_thread_num = max_thread_num
         self.text_splitter = RecursiveCharacterTextSplitter(
@@ -666,14 +675,14 @@ class WebPageHelper:
                 "\uff0c",  # Fullwidth comma
                 "\u3001",  # Ideographic comma
                 " ",
-                "\u200B",  # Zero-width space
+                "\u200b",  # Zero-width space
                 "",
             ],
         )
 
     def download_webpage(self, url: str):
         try:
-            res = self.httpx_client.get(url, timeout=4)
+            res = self.httpx_client.get(url)
             if res.status_code >= 400:
                 res.raise_for_status()
             return res.content
