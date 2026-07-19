@@ -621,17 +621,25 @@ class BraveRM(dspy.Retrieve):
                     "X-Subscription-Token": self.brave_search_api_key,
                 }
                 response = requests.get(
-                    f"https://api.search.brave.com/res/v1/web/search?result_filter=web&q={query}",
+                    "https://api.search.brave.com/res/v1/web/search",
                     headers=headers,
+                    params={
+                        "result_filter": "web",
+                        "q": query,
+                        "count": self.k,
+                    },
                 ).json()
                 results = response.get("web", {}).get("results", [])
 
                 for result in results:
+                    url = result.get("url")
+                    if not url or not self.is_valid_source(url) or url in exclude_urls:
+                        continue
                     collected_results.append(
                         {
                             "snippets": result.get("extra_snippets", []),
                             "title": result.get("title"),
-                            "url": result.get("url"),
+                            "url": url,
                             "description": result.get("description"),
                         }
                     )
