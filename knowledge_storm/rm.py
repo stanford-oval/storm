@@ -322,6 +322,8 @@ class VectorRM(dspy.Retrieve):
         self.usage += len(queries)
         collected_results = []
         for query in queries:
+            if not query or not str(query).strip():
+                continue
             related_docs = self.qdrant.similarity_search_with_score(query, k=self.k)
             for i in range(len(related_docs)):
                 doc = related_docs[i][0]
@@ -361,7 +363,10 @@ class StanfordOvalArxivRM(dspy.Retrieve):
 
         # Check if the request was successful
         if response.status_code == 200:
-            response_data_list = response.json()[0]["results"]
+            payload = response.json()
+            if not payload:
+                return []
+            response_data_list = payload[0].get("results", [])
             results = []
             for response_data in response_data_list:
                 result = {
