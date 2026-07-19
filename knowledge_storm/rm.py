@@ -614,6 +614,8 @@ class BraveRM(dspy.Retrieve):
         self.usage += len(queries)
         collected_results = []
         for query in queries:
+            if not query or not str(query).strip():
+                continue
             try:
                 headers = {
                     "Accept": "application/json",
