@@ -63,7 +63,7 @@ class DemoFileIOHelper:
         Returns:
             str: The content of the file as a single string.
         """
-        with open(file_path) as f:
+        with open(file_path, encoding="utf-8") as f:
             return f.read()
 
     @staticmethod
@@ -79,7 +79,7 @@ class DemoFileIOHelper:
             dict or list: The content of the JSON file. The type depends on the
                         structure of the JSON file (object or array at the root).
         """
-        with open(file_path) as f:
+        with open(file_path, encoding="utf-8") as f:
             return json.load(f)
 
     @staticmethod
