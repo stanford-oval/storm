@@ -444,11 +444,13 @@ class SerperRM(dspy.Retrieve):
             max_thread_num=webpage_helper_max_threads,
         )
 
+        # Serper Google search allows num in [1, 100]
+        num = min(max(int(k), 1), 100)
         if query_params is None:
-            self.query_params = {"num": k, "autocorrect": True, "page": 1}
+            self.query_params = {"num": num, "autocorrect": True, "page": 1}
         else:
             self.query_params = query_params
-            self.query_params.update({"num": k})
+            self.query_params.update({"num": num})
         self.serper_search_api_key = serper_search_api_key
         if not self.serper_search_api_key and not os.environ.get("SERPER_API_KEY"):
             raise RuntimeError(
@@ -621,8 +623,14 @@ class BraveRM(dspy.Retrieve):
                     "X-Subscription-Token": self.brave_search_api_key,
                 }
                 response = requests.get(
-                    f"https://api.search.brave.com/res/v1/web/search?result_filter=web&q={query}",
+                    "https://api.search.brave.com/res/v1/web/search",
                     headers=headers,
+                    params={
+                        "result_filter": "web",
+                        "q": query,
+                        # Brave web search allows count in [1, 20]
+                        "count": min(max(int(self.k), 1), 20),
+                    },
                 ).json()
                 results = response.get("web", {}).get("results", [])
 
