@@ -297,12 +297,13 @@ class Retriever:
             )
             local_to_return = []
             for data in retrieved_data_list:
-                for i in range(len(data["snippets"])):
-                    # STORM generate the article with citations. We do not consider multi-hop citations.
-                    # Remove citations in the source to avoid confusion.
-                    data["snippets"][i] = ArticleTextProcessing.remove_citations(
-                        data["snippets"][i]
-                    )
+                snippets = data.get("snippets") or []
+                if not isinstance(snippets, list):
+                    snippets = [snippets]
+                data["snippets"] = [
+                    ArticleTextProcessing.remove_citations(s) if s else s
+                    for s in snippets
+                ]
                 storm_info = Information.from_dict(data)
                 storm_info.meta["query"] = q
                 local_to_return.append(storm_info)
