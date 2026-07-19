@@ -1073,7 +1073,8 @@ class GoogleSearch(dspy.Retrieve):
                     .list(
                         q=query,
                         cx=self.google_cse_id,
-                        num=self.k,
+                        # Custom Search JSON API only allows num in [1, 10].
+                        num=min(max(int(self.k), 1), 10),
                     )
                     .execute()
                 )

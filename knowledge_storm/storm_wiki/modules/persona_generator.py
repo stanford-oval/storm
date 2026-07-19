@@ -10,11 +10,22 @@ from bs4 import BeautifulSoup
 def get_wiki_page_title_and_toc(url):
     """Get the main title and table of contents from an url of a Wikipedia page."""
 
-    response = requests.get(url)
+    # Wikimedia requires a descriptive User-Agent; bare requests often get 403.
+    response = requests.get(
+        url,
+        headers={
+            "User-Agent": "STORM/1.0 (https://github.com/stanford-oval/storm; research)"
+        },
+        timeout=20,
+    )
+    response.raise_for_status()
     soup = BeautifulSoup(response.content, "html.parser")
 
     # Get the main title from the first h1 tag
-    main_title = soup.find("h1").text.replace("[edit]", "").strip().replace("\xa0", " ")
+    h1 = soup.find("h1")
+    if h1 is None:
+        raise ValueError(f"No h1 title found at {url}")
+    main_title = h1.text.replace("[edit]", "").strip().replace("\xa0", " ")
 
     toc = ""
     levels = []
