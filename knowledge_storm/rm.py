@@ -1068,6 +1068,11 @@ class GoogleSearch(dspy.Retrieve):
 
         for query in queries:
             try:
+                # httplib2 connections are not reliably reusable across threads /
+                # concurrent SSL use; a fresh Http per request avoids
+                # intermittent SSL: WRONG_VERSION_NUMBER failures (#310).
+                import httplib2
+
                 response = (
                     self.service.cse()
                     .list(
@@ -1075,7 +1080,7 @@ class GoogleSearch(dspy.Retrieve):
                         cx=self.google_cse_id,
                         num=self.k,
                     )
-                    .execute()
+                    .execute(http=httplib2.Http())
                 )
 
                 for item in response.get("items", []):
