@@ -152,27 +152,28 @@ class Encoder:
             self.total_token_usage += tokens
             return np.array(embedding)
 
-        embeddings = []
+        embeddings = [None] * len(texts)
         total_tokens = 0
 
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             futures = {
-                executor.submit(self._get_single_text_embedding, text): text
-                for text in texts
+                executor.submit(self._get_single_text_embedding, text): i
+                for i, text in enumerate(texts)
             }
 
             for future in as_completed(futures):
+                i = futures[future]
                 try:
-                    text, embedding, tokens = future.result()
-                    embeddings.append((text, embedding, tokens))
+                    _, embedding, tokens = future.result()
+                    embeddings[i] = embedding
                     total_tokens += tokens
                 except Exception as e:
-                    print(f"An error occurred for text: {futures[future]}")
+                    print(f"An error occurred for text: {texts[i]}")
                     print(e)
+                    raise
 
-        # Sort results to match the order of the input texts
-        embeddings.sort(key=lambda x: texts.index(x[0]))
-        embeddings = [result[1] for result in embeddings]
+        if any(e is None for e in embeddings):
+            raise RuntimeError("Failed to compute embeddings for one or more texts")
+
         self.total_token_usage += total_tokens
-
         return np.array(embeddings)
