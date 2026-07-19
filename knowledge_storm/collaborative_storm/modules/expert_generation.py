@@ -73,7 +73,7 @@ class GenerateExpertModule(dspy.Module):
                     focus=focus,
                     topN=num_experts,
                 ).experts
-        output = output.replace("*", "").replace("[", "").replace("]", "")
+        output = (output or "").replace("*", "").replace("[", "").replace("]", "")
         expert_list = []
         for s in output.split("\n"):
             match = re.search(r"\d+\.\s*(.*)", s)
