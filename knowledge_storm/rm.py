@@ -142,6 +142,7 @@ class BingSearch(dspy.Retrieve):
             if isinstance(query_or_queries, str)
             else query_or_queries
         )
+        queries = [q for q in queries if isinstance(q, str) and q.strip()]
         self.usage += len(queries)
 
         url_to_results = {}
@@ -154,13 +155,15 @@ class BingSearch(dspy.Retrieve):
                     self.endpoint, headers=headers, params={**self.params, "q": query}
                 ).json()
 
-                for d in results["webPages"]["value"]:
-                    if self.is_valid_source(d["url"]) and d["url"] not in exclude_urls:
-                        url_to_results[d["url"]] = {
-                            "url": d["url"],
-                            "title": d["name"],
-                            "description": d["snippet"],
-                        }
+                for d in results.get("webPages", {}).get("value", []):
+                    url = d.get("url")
+                    if not url or not self.is_valid_source(url) or url in exclude_urls:
+                        continue
+                    url_to_results[url] = {
+                        "url": url,
+                        "title": d.get("name"),
+                        "description": d.get("snippet"),
+                    }
             except Exception as e:
                 logging.error(f"Error occurs when searching query {query}: {e}")
 
@@ -1062,6 +1065,7 @@ class GoogleSearch(dspy.Retrieve):
             if isinstance(query_or_queries, str)
             else query_or_queries
         )
+        queries = [q for q in queries if isinstance(q, str) and q.strip()]
         self.usage += len(queries)
 
         url_to_results = {}
