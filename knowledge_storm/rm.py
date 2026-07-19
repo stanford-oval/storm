@@ -151,7 +151,9 @@ class BingSearch(dspy.Retrieve):
         for query in queries:
             try:
                 results = requests.get(
-                    self.endpoint, headers=headers, params={**self.params, "q": query}
+                    self.endpoint,
+                    headers=headers,
+                    params={**self.params, "q": query, "count": self.k},
                 ).json()
 
                 for d in results["webPages"]["value"]:
