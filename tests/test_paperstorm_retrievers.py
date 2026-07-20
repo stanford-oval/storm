@@ -118,6 +118,41 @@ class PaperStormRetrieversTest(unittest.TestCase):
                 SimpleNamespace(retriever="local-pdf", search_top_k=2, pdf_dir=None)
             )
 
+    def test_paper_storm_runner_builds_deepseek_flash_settings(self):
+        from examples.storm_examples.run_paper_storm_minimax import (
+            build_lm_settings,
+        )
+
+        settings = build_lm_settings(
+            SimpleNamespace(llm_provider="deepseek", llm_model="flash")
+        )
+
+        self.assertEqual(settings["model"], "deepseek/deepseek-chat")
+        self.assertEqual(settings["api_env"], "DEEPSEEK_API_KEY")
+        self.assertEqual(settings["api_base"], "https://api.deepseek.com")
+
+    def test_paper_storm_runner_builds_minimax_settings(self):
+        from examples.storm_examples.run_paper_storm_minimax import (
+            build_lm_settings,
+        )
+
+        settings = build_lm_settings(
+            SimpleNamespace(llm_provider="minimax", llm_model=None)
+        )
+
+        self.assertEqual(settings["model"], "openai/MiniMax-M3")
+        self.assertEqual(settings["api_env"], "MINIMAX_API_KEY")
+
+    def test_paper_storm_runner_uses_larger_outline_token_budget(self):
+        from examples.storm_examples.run_paper_storm_minimax import (
+            build_lm_token_limits,
+        )
+
+        limits = build_lm_token_limits()
+
+        self.assertGreaterEqual(limits["outline_gen"], 1800)
+        self.assertGreaterEqual(limits["article_gen"], 1800)
+
 
 if __name__ == "__main__":
     unittest.main()

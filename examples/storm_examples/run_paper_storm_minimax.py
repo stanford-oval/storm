@@ -32,35 +32,75 @@ from examples.storm_examples.run_storm_wiki_minimax import (
 )
 
 
-MODEL_NAME = "openai/MiniMax-M3"
+def build_lm_settings(args):
+    if args.llm_provider == "minimax":
+        return {
+            "model": args.llm_model or "openai/MiniMax-M3",
+            "api_env": "MINIMAX_API_KEY",
+            "api_base": os.getenv("MINIMAX_API_BASE", "https://api.minimax.chat/v1"),
+        }
+    if args.llm_provider == "deepseek":
+        model = args.llm_model or "deepseek/deepseek-chat"
+        if model == "flash":
+            model = "deepseek/deepseek-chat"
+        return {
+            "model": model,
+            "api_env": "DEEPSEEK_API_KEY",
+            "api_base": os.getenv("DEEPSEEK_API_BASE", "https://api.deepseek.com"),
+        }
+    raise ValueError(f"Unsupported llm provider: {args.llm_provider}")
 
 
-def build_lm_configs():
-    if not os.getenv("MINIMAX_API_KEY"):
-        raise ValueError("Please set MINIMAX_API_KEY in secrets.toml.")
+def build_lm_token_limits():
+    return {
+        "conv_simulator": 700,
+        "question_asker": 700,
+        "outline_gen": 1800,
+        "article_gen": 1800,
+        "article_polish": 4000,
+    }
 
-    minimax_kwargs = {
-        "api_key": os.getenv("MINIMAX_API_KEY"),
-        "api_base": os.getenv("MINIMAX_API_BASE", "https://api.minimax.chat/v1"),
+
+def build_lm_configs(args):
+    settings = build_lm_settings(args)
+    token_limits = build_lm_token_limits()
+    api_key = os.getenv(settings["api_env"])
+    if not api_key:
+        raise ValueError(f"Please set {settings['api_env']} in secrets.toml.")
+
+    llm_kwargs = {
+        "api_key": api_key,
+        "api_base": settings["api_base"],
         "temperature": 1.0,
         "top_p": 0.9,
     }
+    model_name = settings["model"]
 
     lm_configs = STORMWikiLMConfigs()
     lm_configs.set_conv_simulator_lm(
-        LitellmModel(model=MODEL_NAME, max_tokens=500, **minimax_kwargs)
+        LitellmModel(
+            model=model_name, max_tokens=token_limits["conv_simulator"], **llm_kwargs
+        )
     )
     lm_configs.set_question_asker_lm(
-        LitellmModel(model=MODEL_NAME, max_tokens=500, **minimax_kwargs)
+        LitellmModel(
+            model=model_name, max_tokens=token_limits["question_asker"], **llm_kwargs
+        )
     )
     lm_configs.set_outline_gen_lm(
-        LitellmModel(model=MODEL_NAME, max_tokens=500, **minimax_kwargs)
+        LitellmModel(
+            model=model_name, max_tokens=token_limits["outline_gen"], **llm_kwargs
+        )
     )
     lm_configs.set_article_gen_lm(
-        LitellmModel(model=MODEL_NAME, max_tokens=900, **minimax_kwargs)
+        LitellmModel(
+            model=model_name, max_tokens=token_limits["article_gen"], **llm_kwargs
+        )
     )
     lm_configs.set_article_polish_lm(
-        LitellmModel(model=MODEL_NAME, max_tokens=4000, **minimax_kwargs)
+        LitellmModel(
+            model=model_name, max_tokens=token_limits["article_polish"], **llm_kwargs
+        )
     )
     return lm_configs
 
@@ -78,7 +118,7 @@ def build_paper_retriever(args):
 def main(args):
     load_api_key(toml_file_path="secrets.toml")
 
-    lm_configs = build_lm_configs()
+    lm_configs = build_lm_configs(args)
     engine_args = STORMWikiRunnerArguments(
         output_dir=args.output_dir,
         max_conv_turn=args.max_conv_turn,
@@ -117,6 +157,15 @@ if __name__ == "__main__":
     parser.add_argument("--topic", type=str, default=None)
     parser.add_argument("--output-dir", type=str, default="./results/paperstorm")
     parser.add_argument("--output-language", choices=["original", "zh"], default="zh")
+    parser.add_argument(
+        "--llm-provider", choices=["minimax", "deepseek"], default="deepseek"
+    )
+    parser.add_argument(
+        "--llm-model",
+        type=str,
+        default="flash",
+        help="Model name. For DeepSeek, flash maps to deepseek/deepseek-chat.",
+    )
     parser.add_argument(
         "--retriever", choices=["arxiv", "local-pdf"], default="arxiv"
     )
