@@ -121,6 +121,8 @@ class StormInformationTable(InformationTable):
     ) -> List[Information]:
         selected_urls = []
         selected_snippets = []
+        if not self.collected_snippets:
+            return []
         if type(queries) is str:
             queries = [queries]
         for query in queries:
