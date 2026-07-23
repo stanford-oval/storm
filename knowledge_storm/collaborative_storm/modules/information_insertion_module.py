@@ -208,7 +208,9 @@ class InsertInformationModule(dspy.Module):
                         and selected_index >= 0
                     ):
                         return dspy.Prediction(
-                            information_placement=considered_candidates[selected_index],
+                            information_placement=considered_candidates[
+                                selected_index
+                            ],
                             note=f"Choosing from:\n{considered_candidates}",
                         )
             return None
