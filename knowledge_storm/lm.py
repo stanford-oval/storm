@@ -702,11 +702,21 @@ class GroqModel(dspy.OpenAI):
 
     def log_usage(self, response):
         """Log the total tokens from the Groq API response."""
-        usage_data = response.get("usage")
+        usage_data = (
+            response.get("usage")
+            if isinstance(response, dict)
+            else getattr(response, "usage", None)
+        )
         if usage_data:
+            if not isinstance(usage_data, dict):
+                prompt_tokens = getattr(usage_data, "prompt_tokens", 0) or 0
+                completion_tokens = getattr(usage_data, "completion_tokens", 0) or 0
+            else:
+                prompt_tokens = usage_data.get("prompt_tokens", 0) or 0
+                completion_tokens = usage_data.get("completion_tokens", 0) or 0
             with self._token_usage_lock:
-                self.prompt_tokens += usage_data.get("prompt_tokens", 0)
-                self.completion_tokens += usage_data.get("completion_tokens", 0)
+                self.prompt_tokens += prompt_tokens
+                self.completion_tokens += completion_tokens
 
     def get_usage_and_reset(self):
         """Get the total tokens used and reset the token usage."""
