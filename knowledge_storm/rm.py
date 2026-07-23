@@ -149,6 +149,8 @@ class BingSearch(dspy.Retrieve):
         headers = {"Ocp-Apim-Subscription-Key": self.bing_api_key}
 
         for query in queries:
+            if not query or not str(query).strip():
+                continue
             try:
                 results = requests.get(
                     self.endpoint,
@@ -174,8 +176,10 @@ class BingSearch(dspy.Retrieve):
             r = url_to_results[url]
             r["snippets"] = valid_url_to_snippets[url]["snippets"]
             collected_results.append(r)
+            if len(collected_results) >= self.k:
+                break
 
-        return collected_results
+        return collected_results[: self.k]
 
 
 class VectorRM(dspy.Retrieve):
@@ -616,6 +620,8 @@ class BraveRM(dspy.Retrieve):
         self.usage += len(queries)
         collected_results = []
         for query in queries:
+            if not query or not str(query).strip():
+                continue
             try:
                 headers = {
                     "Accept": "application/json",
@@ -628,7 +634,7 @@ class BraveRM(dspy.Retrieve):
                     params={
                         "result_filter": "web",
                         "q": query,
-                        "count": self.k,
+                        "count": min(max(self.k, 1), 20),
                     },
                 ).json()
                 results = response.get("web", {}).get("results", [])
@@ -645,6 +651,10 @@ class BraveRM(dspy.Retrieve):
                             "description": result.get("description"),
                         }
                     )
+                    if len(collected_results) >= self.k:
+                        break
+                if len(collected_results) >= self.k:
+                    break
             except Exception as e:
                 logging.error(f"Error occurs when searching query {query}: {e}")
 
@@ -1077,6 +1087,8 @@ class GoogleSearch(dspy.Retrieve):
         url_to_results = {}
 
         for query in queries:
+            if not query or not str(query).strip():
+                continue
             try:
                 # httplib2 connections are not reliably reusable across threads /
                 # concurrent SSL use; a fresh Http per request avoids
@@ -1116,8 +1128,10 @@ class GoogleSearch(dspy.Retrieve):
             r = url_to_results[url]
             r["snippets"] = valid_url_to_snippets[url]["snippets"]
             collected_results.append(r)
+            if len(collected_results) >= self.k:
+                break
 
-        return collected_results
+        return collected_results[: self.k]
 
 
 class AzureAISearch(dspy.Retrieve):
