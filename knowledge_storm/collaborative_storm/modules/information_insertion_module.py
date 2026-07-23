@@ -361,7 +361,9 @@ class ExpandNodeModule(dspy.Module):
         information = self._get_cited_info_meta_string(node, knowledge_base)
         node_path = node.get_path_from_root()
         with dspy.settings.context(lm=self.engine, show_guidelines=False):
-            output = self.expand_section(section=node_path, info=information).output or ""
+            output = (
+                self.expand_section(section=node_path, info=information).output or ""
+            )
         subsections = []
         if "\n" in output and output != "None":
             subsections = output.split("\n")
