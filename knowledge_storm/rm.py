@@ -806,8 +806,8 @@ class DuckDuckGoSearchRM(dspy.Retrieve):
         # All params for search can be found here:
         #   https://duckduckgo.com/duckduckgo-help-pages/settings/params/
 
-        # Sets the backend to be api
-        self.duck_duck_go_backend = "api"
+        # Prefer auto; backend="api" is deprecated and breaks newer duckduckgo_search (#357).
+        self.duck_duck_go_backend = "auto"
 
         # Only gets safe search results
         self.duck_duck_go_safe_search = safe_search
@@ -1039,6 +1039,8 @@ class GoogleSearch(dspy.Retrieve):
         min_char_count: int = 150,
         snippet_chunk_size: int = 1000,
         webpage_helper_max_threads=10,
+        api_key=None,
+        cse_id=None,
     ):
         """
         Params:
@@ -1059,19 +1061,21 @@ class GoogleSearch(dspy.Retrieve):
             raise ImportError(
                 "GoogleSearch requires `pip install google-api-python-client`."
             ) from err
-        if not google_search_api_key and not os.environ.get("GOOGLE_SEARCH_API_KEY"):
+        google_search_api_key = (
+            google_search_api_key or api_key or os.environ.get("GOOGLE_SEARCH_API_KEY")
+        )
+        google_cse_id = google_cse_id or cse_id or os.environ.get("GOOGLE_CSE_ID")
+        if not google_search_api_key:
             raise RuntimeError(
-                "You must supply google_search_api_key or set the GOOGLE_SEARCH_API_KEY environment variable"
+                "You must supply google_search_api_key (or api_key) or set GOOGLE_SEARCH_API_KEY"
             )
-        if not google_cse_id and not os.environ.get("GOOGLE_CSE_ID"):
+        if not google_cse_id:
             raise RuntimeError(
-                "You must supply google_cse_id or set the GOOGLE_CSE_ID environment variable"
+                "You must supply google_cse_id (or cse_id) or set GOOGLE_CSE_ID"
             )
 
-        self.google_search_api_key = (
-            google_search_api_key or os.environ["GOOGLE_SEARCH_API_KEY"]
-        )
-        self.google_cse_id = google_cse_id or os.environ["GOOGLE_CSE_ID"]
+        self.google_search_api_key = google_search_api_key
+        self.google_cse_id = google_cse_id
 
         if is_valid_source:
             self.is_valid_source = is_valid_source
