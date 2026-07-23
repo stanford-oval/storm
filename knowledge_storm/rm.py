@@ -491,9 +491,10 @@ class SerperRM(dspy.Retrieve):
             "POST", self.search_url, headers=headers, json=query_params
         )
 
-        if response == None:
+        if not response.ok:
             raise RuntimeError(
-                f"Error had occurred while running the search process.\n Error is {response.reason}, had failed with status code {response.status_code}"
+                f"Error occurred while running the search process.\n"
+                f"Error is {response.reason}, failed with status code {response.status_code}"
             )
 
         return response.json()
@@ -865,7 +866,7 @@ class DuckDuckGoSearchRM(dspy.Retrieve):
             if not query or not str(query).strip():
                 continue
             #  list of dicts that will be parsed to return
-            results = self.request(query)
+            results = self.request(query) or []
 
             for d in results:
                 # assert d is dict
