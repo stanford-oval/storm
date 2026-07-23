@@ -137,9 +137,12 @@ def handle_completed():
         current_working_dir_paths = DemoFileIOHelper.read_structure_to_dict(
             st.session_state["page3_current_working_dir"]
         )
-        current_article_file_path_dict = current_working_dir_paths[
-            st.session_state["page3_topic_name_truncated"]
-        ]
+        topic_key = st.session_state["page3_topic_name_truncated"]
+        if topic_key not in current_working_dir_paths:
+            st.error("Article output not found. Please try researching the topic again.")
+            st.session_state["page3_write_article_state"] = "not started"
+            return
+        current_article_file_path_dict = current_working_dir_paths[topic_key]
         demo_util.display_article_page(
             selected_article_name=st.session_state["page3_topic_name_cleaned"],
             selected_article_file_path_dict=current_article_file_path_dict,
