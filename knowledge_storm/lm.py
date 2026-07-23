@@ -81,6 +81,12 @@ class LM:
         messages = messages or [{"role": "user", "content": prompt}]
         kwargs = {**self.kwargs, **kwargs}
 
+        # o-series reject max_tokens; LiteLLM expects max_completion_tokens.
+        model_name = (self.model or "").lower()
+        if any(tag in model_name for tag in ("o1", "o3", "o4")):
+            if "max_tokens" in kwargs and "max_completion_tokens" not in kwargs:
+                kwargs["max_completion_tokens"] = kwargs.pop("max_tokens")
+
         # Make the request and handle LRU & disk caching.
         if self.model_type == "chat":
             completion = cached_litellm_completion if cache else litellm_completion
@@ -509,6 +515,9 @@ class AzureOpenAIModel(dspy.LM):
     )
     def basic_request(self, prompt: str, **kwargs) -> Any:
         kwargs = {**self.kwargs, **kwargs}
+        # Azure o1/o3 deployments reject max_tokens (#345).
+        if any(tag in (self.model or "") for tag in ("o1", "o3")) and "max_tokens" in kwargs:
+            kwargs["max_completion_tokens"] = kwargs.pop("max_tokens")
 
         try:
             if self.model_type == "chat":
@@ -522,9 +531,14 @@ class AzureOpenAIModel(dspy.LM):
 
             self.log_usage(response)
 
+            # model_dump() recursively converts nested Choice objects (dict() does not)
+            if hasattr(response, "model_dump"):
+                response_for_history = response.model_dump()
+            else:
+                response_for_history = dict(response)
             history_entry = {
                 "prompt": prompt,
-                "response": dict(response),
+                "response": response_for_history,
                 "kwargs": kwargs,
             }
             self.history.append(history_entry)
