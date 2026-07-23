@@ -201,9 +201,7 @@ class Moderator(Agent):
         # get all cited information
         cited_info = list(knowledge_base.info_uuid_to_info_dict.values())
         cited_info_hash_set = set([hash(info) for info in cited_info])
-        cited_snippets = [
-            info.snippets[0] for info in cited_info if info.snippets
-        ]
+        cited_snippets = [info.snippets[0] for info in cited_info if info.snippets]
         # get list of unused information
         unused_information: List[Information] = [
             info
@@ -228,9 +226,7 @@ class Moderator(Agent):
         if cited_snippets:
             cited_snippets_embedding = self.encoder.encode(cited_snippets)
             cited_snippets_similarity = np.max(
-                cosine_similarity(
-                    unused_snippets_embeddings, cited_snippets_embedding
-                ),
+                cosine_similarity(unused_snippets_embeddings, cited_snippets_embedding),
                 axis=1,
             )
             cited_snippets_similarity = np.clip(cited_snippets_similarity, 0, 1)
