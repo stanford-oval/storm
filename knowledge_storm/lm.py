@@ -433,9 +433,12 @@ class DeepSeekModel(dspy.OpenAI):
             "messages": [{"role": "user", "content": prompt}],
             **kwargs,
         }
-        response = requests.post(
-            f"{self.api_base}/v1/chat/completions", headers=headers, json=data
-        )
+        base = self.api_base.rstrip("/")
+        if base.endswith("/v1"):
+            url = f"{base}/chat/completions"
+        else:
+            url = f"{base}/v1/chat/completions"
+        response = requests.post(url, headers=headers, json=data)
         response.raise_for_status()
         return response.json()
 
