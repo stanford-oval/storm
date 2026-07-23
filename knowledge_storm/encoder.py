@@ -91,7 +91,7 @@ class Encoder:
             }
         else:
             raise ValueError(
-                f"Unsupported ENCODER_API_TYPE '{encoder_type}'. Supported types are 'openai', 'azure', 'together'."
+                f"Unsupported ENCODER_API_TYPE '{encoder_type}'. Supported types are 'openai', 'azure'."
             )
 
     def get_total_token_usage(self, reset: bool = False) -> int:
