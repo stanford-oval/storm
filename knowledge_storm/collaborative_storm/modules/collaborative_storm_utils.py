@@ -140,6 +140,8 @@ def separate_citations(text: str) -> str:
         citations = match.group(1).split(",")
         return "".join(f"[{citation.strip()}]" for citation in citations)
 
+    if text is None:
+        return ""
     # Use regular expressions to find and replace citations
     pattern = re.compile(r"\[(\d+(?:,\s*\d+)*)\]")
     return pattern.sub(replace_citations, text)
@@ -163,6 +165,8 @@ def extract_and_remove_citations(text: str) -> Tuple[str, List[int]]:
         citations.append(citation)
         return ""
 
+    if text is None:
+        return "", []
     # Use regular expressions to find and replace citations
     pattern = re.compile(r"\[(\d+)\]")
     modified_text = pattern.sub(extract_citation, text)

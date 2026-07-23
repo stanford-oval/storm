@@ -95,7 +95,7 @@ class PolishPageModule(dspy.Module):
         if polish_whole_page:
             # NOTE: Change show_guidelines to false to make the generation more robust to different LM families.
             with dspy.settings.context(lm=self.polish_engine, show_guidelines=False):
-                page = self.polish_page(draft_page=draft_page).page
+                page = self.polish_page(draft_page=draft_page).page or ""
         else:
             page = draft_page
 
