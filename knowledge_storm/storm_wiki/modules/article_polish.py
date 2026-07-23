@@ -43,7 +43,7 @@ class StormArticlePolishingModule(ArticlePolishingModule):
             topic=topic, draft_page=article_text, polish_whole_page=remove_duplicate
         )
         lead_section = f"# summary\n{polish_result.lead_section}"
-        polished_article = "\n\n".join([lead_section, polish_result.page])
+        polished_article = "\n\n".join([lead_section, polish_result.page or ""])
         polished_article_dict = ArticleTextProcessing.parse_article_into_dict(
             polished_article
         )
