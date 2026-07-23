@@ -350,7 +350,10 @@ class ExpandNodeModule(dspy.Module):
         meta_string = set()
         for index in sorted(list(node.content)):
             info = knowledge_base.info_uuid_to_info_dict[index]
-            intent = f"Question: {info.meta['question']}\nQuery: {info.meta['query']}"
+            intent = (
+                f"Question: {info.meta.get('question', '')}\n"
+                f"Query: {info.meta.get('query', '')}"
+            )
             meta_string.add(intent)
 
         return "\n\n".join(meta_string)
