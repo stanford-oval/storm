@@ -370,7 +370,10 @@ class StanfordOvalArxivRM(dspy.Retrieve):
 
         # Check if the request was successful
         if response.status_code == 200:
-            response_data_list = response.json()[0]["results"]
+            response_json = response.json()
+            if not response_json:
+                return []
+            response_data_list = response_json[0].get("results", [])
             results = []
             for response_data in response_data_list:
                 result = {
@@ -975,13 +978,15 @@ class TavilySearchRM(dspy.Retrieve):
         collected_results = []
 
         for query in queries:
+            if not query or not str(query).strip():
+                continue
             args = {
                 "max_results": self.k,
-                "include_raw_contents": self.include_raw_content,
+                "include_raw_content": self.include_raw_content,
             }
             #  list of dicts that will be parsed to return
-            responseData = self.tavily_client.search(query)
-            results = responseData.get("results")
+            responseData = self.tavily_client.search(query, **args)
+            results = responseData.get("results") or []
             for d in results:
                 # assert d is dict
                 if not isinstance(d, dict):
@@ -1013,7 +1018,7 @@ class TavilySearchRM(dspy.Retrieve):
                     else:
                         print(f"invalid source {url} or url in exclude_urls")
                 except Exception as e:
-                    print(f"Error occurs when processing {result=}: {e}\n")
+                    print(f"Error occurs when processing result {d}: {e}\n")
                     print(f"Error occurs when searching query {query}: {e}")
 
         return collected_results
