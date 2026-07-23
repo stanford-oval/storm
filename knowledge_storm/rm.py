@@ -845,6 +845,8 @@ class DuckDuckGoSearchRM(dspy.Retrieve):
         collected_results = []
 
         for query in queries:
+            if not query or not str(query).strip():
+                continue
             #  list of dicts that will be parsed to return
             results = self.request(query)
 
