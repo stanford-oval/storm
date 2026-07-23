@@ -201,12 +201,14 @@ class Moderator(Agent):
         # get all cited information
         cited_info = list(knowledge_base.info_uuid_to_info_dict.values())
         cited_info_hash_set = set([hash(info) for info in cited_info])
-        cited_snippets = [info.snippets[0] for info in cited_info]
+        cited_snippets = [
+            info.snippets[0] for info in cited_info if info.snippets
+        ]
         # get list of unused information
         unused_information: List[Information] = [
             info
             for info in raw_retrieved_single_snippet_info
-            if hash(info) not in cited_info_hash_set
+            if hash(info) not in cited_info_hash_set and info.snippets
         ]
         if not unused_information:
             return []
@@ -218,17 +220,22 @@ class Moderator(Agent):
         )
         claim_embedding = self.encoder.encode(conv_turn.claim_to_make)
         query_embedding = self.encoder.encode(conv_turn.queries)
-        cited_snippets_embedding = self.encoder.encode(cited_snippets)
         # calculate similarity
         query_similarities = cosine_similarity(
             unused_snippets_embeddings, query_embedding
         )
         max_query_similarity = np.max(query_similarities, axis=1)
-        cited_snippets_similarity = np.max(
-            cosine_similarity(unused_snippets_embeddings, cited_snippets_embedding),
-            axis=1,
-        )
-        cited_snippets_similarity = np.clip(cited_snippets_similarity, 0, 1)
+        if cited_snippets:
+            cited_snippets_embedding = self.encoder.encode(cited_snippets)
+            cited_snippets_similarity = np.max(
+                cosine_similarity(
+                    unused_snippets_embeddings, cited_snippets_embedding
+                ),
+                axis=1,
+            )
+            cited_snippets_similarity = np.clip(cited_snippets_similarity, 0, 1)
+        else:
+            cited_snippets_similarity = np.zeros(len(unused_information_snippets))
         # use claim similarity to filter out "real" not useful data
         claim_similarity = cosine_similarity(
             unused_snippets_embeddings, claim_embedding.reshape(1, -1)
