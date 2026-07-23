@@ -891,10 +891,11 @@ class DuckDuckGoSearchRM(dspy.Retrieve):
                     url = d.get("href", None)
                     title = d.get("title", None)
                     description = d.get("description", title)
-                    snippets = [d.get("body", None)]
+                    body = d.get("body", None)
+                    snippets = [body] if body else []
 
                     # raise exception of missing key(s)
-                    if not all([url, title, description, snippets]):
+                    if not all([url, title, description]) or not snippets:
                         raise ValueError(f"Missing key(s) in result: {d}")
                     if self.is_valid_source(url) and url not in exclude_urls:
                         result = {
@@ -1018,11 +1019,11 @@ class TavilySearchRM(dspy.Retrieve):
                     snippets = []
                     if d.get("raw_body_content"):
                         snippets.append(d.get("raw_body_content"))
-                    else:
+                    elif d.get("content"):
                         snippets.append(d.get("content"))
 
                     # raise exception of missing key(s)
-                    if not all([url, title, description, snippets]):
+                    if not all([url, title, description]) or not snippets:
                         raise ValueError(f"Missing key(s) in result: {d}")
                     if self.is_valid_source(url) and url not in exclude_urls:
                         result = {
