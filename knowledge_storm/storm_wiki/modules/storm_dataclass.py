@@ -58,9 +58,9 @@ class StormInformationTable(InformationTable):
     def __init__(self, conversations=List[Tuple[str, List[DialogueTurn]]]):
         super().__init__()
         self.conversations = conversations
-        self.url_to_info: Dict[str, Information] = (
-            StormInformationTable.construct_url_to_info(self.conversations)
-        )
+        self.url_to_info: Dict[
+            str, Information
+        ] = StormInformationTable.construct_url_to_info(self.conversations)
 
     @staticmethod
     def construct_url_to_info(

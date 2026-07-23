@@ -641,14 +641,16 @@ class WebPageHelper:
         min_char_count: int = 150,
         snippet_chunk_size: int = 1000,
         max_thread_num: int = 10,
+        verify_ssl: bool = True,
     ):
         """
         Args:
             min_char_count: Minimum character count for the article to be considered valid.
             snippet_chunk_size: Maximum character count for each snippet.
             max_thread_num: Maximum number of threads to use for concurrent requests (e.g., downloading webpages).
+            verify_ssl: Verify TLS certificates when fetching pages (default True; #375).
         """
-        self.httpx_client = httpx.Client(verify=False)
+        self.httpx_client = httpx.Client(verify=verify_ssl)
         self.min_char_count = min_char_count
         self.max_thread_num = max_thread_num
         self.text_splitter = RecursiveCharacterTextSplitter(
