@@ -939,9 +939,16 @@ class VLLMClient(dspy.dsp.LM):
         choices = response.choices
         completions = [choice.message.content for choice in choices]
 
+        # model_dump() so nested Choice objects are JSON-serializable in post_run()
+        if hasattr(response, "model_dump"):
+            response_for_history = response.model_dump()
+        elif hasattr(response, "to_dict"):
+            response_for_history = response.to_dict()
+        else:
+            response_for_history = response
         history = {
             "prompt": prompt,
-            "response": response,
+            "response": response_for_history,
             "kwargs": kwargs,
         }
         self.history.append(history)
@@ -975,13 +982,14 @@ class TGIClient(dspy.HFClientTGI):
     def _generate(self, prompt, **kwargs):
         """Copied from dspy/dsp/modules/hf_client.py with the addition of removing hard-coded parameters."""
         kwargs = {**self.kwargs, **kwargs}
+        n = kwargs.get("n", 1)
 
         payload = {
             "inputs": prompt,
             "parameters": {
-                "do_sample": kwargs["n"] > 1,
-                "best_of": kwargs["n"],
-                "details": kwargs["n"] > 1,
+                "do_sample": n > 1,
+                "best_of": n,
+                "details": n > 1,
                 **kwargs,
             },
         }

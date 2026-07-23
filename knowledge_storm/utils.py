@@ -28,6 +28,9 @@ def truncate_filename(filename, max_length=125):
         max_length: int, default to 125 (usual path length limit is 255 chars)
     """
 
+    # Topics may include '/' after input validation; keep a single path segment.
+    filename = filename.replace("/", "-").replace("\\", "-")
+
     if len(filename) > max_length:
         truncated_filename = filename[:max_length]
         logging.warning(
