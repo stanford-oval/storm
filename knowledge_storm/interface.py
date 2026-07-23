@@ -61,6 +61,10 @@ class Information:
             title (str): The title or headline of the information.
         """
         self.description = description
+        if snippets is None:
+            snippets = []
+        elif not isinstance(snippets, list):
+            snippets = [snippets]
         self.snippets = snippets
         self.title = title
         self.url = url

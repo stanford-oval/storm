@@ -218,7 +218,8 @@ class TopicExpert(dspy.Module):
                 # Evaluate: Simplify this part by directly using the top 1 snippet.
                 info = ""
                 for n, r in enumerate(searched_results):
-                    info += "\n".join(f"[{n + 1}]: {s}" for s in r.snippets[:1])
+                    snippets = r.snippets or []
+                    info += "\n".join(f"[{n + 1}]: {s}" for s in snippets[:1])
                     info += "\n\n"
 
                 info = ArticleTextProcessing.limit_word_count_preserve_newline(
