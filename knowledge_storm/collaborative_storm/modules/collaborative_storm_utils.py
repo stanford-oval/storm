@@ -116,6 +116,8 @@ def trim_output_after_hint(response: str, hint: str) -> str:
     Returns:
         str: The trimmed output string, or the original string if the hint is not found.
     """
+    if response is None:
+        return ""
     if hint in response:
         start_index = response.find(hint) + len(hint)
         return response[start_index:].strip()
