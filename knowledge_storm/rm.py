@@ -578,10 +578,13 @@ class SerperRM(dspy.Retrieve):
                     if not link or link in exclude_urls:
                         continue
                     snippets = [organic.get("snippet")]
+                    snippets = [s for s in snippets if s]
                     if self.ENABLE_EXTRA_SNIPPET_EXTRACTION:
                         snippets.extend(
                             valid_url_to_snippets.get(link, {}).get("snippets", [])
                         )
+                    if not snippets:
+                        continue
                     collected_results.append(
                         {
                             "snippets": snippets,
