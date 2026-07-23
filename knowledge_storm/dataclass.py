@@ -37,8 +37,14 @@ class ConversationTurn:
     ):
         self.utterance = utterance if utterance is not None else raw_utterance
         self.raw_utterance = raw_utterance
-        self.role = role if ":" not in role else role.split(":")[0]
-        self.role_description = "" if ":" not in role else role.split(":")[1]
+        normalized = (role or "").replace("\uff1a", ":", 1)
+        if ":" in normalized:
+            self.role, self.role_description = normalized.split(":", 1)
+            self.role = self.role.strip()
+            self.role_description = self.role_description.strip()
+        else:
+            self.role = normalized.strip()
+            self.role_description = ""
         self.queries = queries if queries is not None else []
         self.raw_retrieved_info = (
             raw_retrieved_info if raw_retrieved_info is not None else []
@@ -785,9 +791,9 @@ class KnowledgeBase:
     def update_all_info_path(self):
         def _helper(node):
             for citation_idx in node.content:
-                self.info_uuid_to_info_dict[citation_idx].meta["placement"] = (
-                    " -> ".join(node.get_path_from_root())
-                )
+                self.info_uuid_to_info_dict[citation_idx].meta[
+                    "placement"
+                ] = " -> ".join(node.get_path_from_root())
             for child in node.children:
                 _helper(child)
 
