@@ -55,16 +55,19 @@ class StormInformationTable(InformationTable):
     would be perspective guided dialogue history.
     """
 
-    def __init__(self, conversations=List[Tuple[str, List[DialogueTurn]]]):
+    def __init__(
+        self,
+        conversations: Optional[List[Tuple[str, List[DialogueTurn]]]] = None,
+    ):
         super().__init__()
-        self.conversations = conversations
+        self.conversations = conversations if conversations is not None else []
         self.url_to_info: Dict[str, Information] = (
             StormInformationTable.construct_url_to_info(self.conversations)
         )
 
     @staticmethod
     def construct_url_to_info(
-        conversations: List[Tuple[str, List[DialogueTurn]]]
+        conversations: List[Tuple[str, List[DialogueTurn]]],
     ) -> Dict[str, Information]:
         url_to_info = {}
 
@@ -81,7 +84,7 @@ class StormInformationTable(InformationTable):
 
     @staticmethod
     def construct_log_dict(
-        conversations: List[Tuple[str, List[DialogueTurn]]]
+        conversations: List[Tuple[str, List[DialogueTurn]]],
     ) -> List[Dict[str, Union[str, Any]]]:
         conversation_log = []
         for persona, conv in conversations:
@@ -114,11 +117,18 @@ class StormInformationTable(InformationTable):
             for snippet in information.snippets:
                 self.collected_urls.append(url)
                 self.collected_snippets.append(snippet)
-        self.encoded_snippets = self.encoder.encode(self.collected_snippets)
+        if not self.collected_snippets:
+            # Empty research tables must not call encode([]) / cosine_similarity
+            # (raises ValueError and aborts article generation; #547 / #304).
+            self.encoded_snippets = None
+        else:
+            self.encoded_snippets = self.encoder.encode(self.collected_snippets)
 
     def retrieve_information(
         self, queries: Union[List[str], str], search_top_k
     ) -> List[Information]:
+        if not self.collected_snippets or self.encoded_snippets is None:
+            return []
         selected_urls = []
         selected_snippets = []
         if type(queries) is str:
@@ -440,11 +450,9 @@ class StormArticle(Article):
         Create StormArticle class instance from outline only string.
         """
         lines = []
-        try:
+        if outline_str:
             lines = outline_str.split("\n")
             lines = [line.strip() for line in lines if line.strip()]
-        except:
-            pass
 
         instance = cls(topic)
         if lines:

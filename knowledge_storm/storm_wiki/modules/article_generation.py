@@ -146,14 +146,14 @@ class ConvToSection(dspy.Module):
     ):
         info = ""
         for idx, storm_info in enumerate(collected_info):
-            info += f"[{idx + 1}]\n" + "\n".join(storm_info.snippets)
+            info += f"[{idx + 1}]\n" + "\n".join(storm_info.snippets or [])
             info += "\n\n"
 
         info = ArticleTextProcessing.limit_word_count_preserve_newline(info, 1500)
 
         with dspy.settings.context(lm=self.engine):
             section = ArticleTextProcessing.clean_up_section(
-                self.write_section(topic=topic, info=info, section=section).output
+                self.write_section(topic=topic, info=info, section=section).output or ""
             )
 
         return dspy.Prediction(section=section)

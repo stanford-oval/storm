@@ -204,7 +204,9 @@ class TopicExpert(dspy.Module):
     def forward(self, topic: str, question: str, ground_truth_url: str):
         with dspy.settings.context(lm=self.engine, show_guidelines=False):
             # Identify: Break down question into queries.
-            queries = self.generate_queries(topic=topic, question=question).queries
+            queries = (
+                self.generate_queries(topic=topic, question=question).queries or ""
+            )
             queries = [
                 q.replace("-", "").strip().strip('"').strip('"').strip()
                 for q in queries.split("\n")
@@ -218,7 +220,8 @@ class TopicExpert(dspy.Module):
                 # Evaluate: Simplify this part by directly using the top 1 snippet.
                 info = ""
                 for n, r in enumerate(searched_results):
-                    info += "\n".join(f"[{n + 1}]: {s}" for s in r.snippets[:1])
+                    snippets = r.snippets or []
+                    info += "\n".join(f"[{n + 1}]: {s}" for s in snippets[:1])
                     info += "\n\n"
 
                 info = ArticleTextProcessing.limit_word_count_preserve_newline(

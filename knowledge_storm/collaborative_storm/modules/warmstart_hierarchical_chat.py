@@ -194,7 +194,13 @@ class WarmStartConversation(dspy.Module):
 
         # hierarchical chat: chat with one expert. Generate question, get answer
         def process_expert(expert):
-            expert_name, expert_descriptoin = expert.split(":")
+            # LLMs may use fullwidth ':' or omit the separator (#339).
+            normalized = expert.replace("\uff1a", ":", 1)
+            if ":" in normalized:
+                expert_name, _expert_description = normalized.split(":", 1)
+            else:
+                expert_name = normalized
+            expert_name = expert_name.strip()
             for idx in range(self.max_turn_per_experts):
                 with self.logging_wrapper.log_event(
                     f"warm start, perspective guided QA: expert {expert_name}; turn {idx + 1}"
@@ -205,9 +211,12 @@ class WarmStartConversation(dspy.Module):
                                 conversation_history
                             )
                         with dspy.settings.context(lm=self.question_asking_lm):
-                            question = self.ask_question(
-                                topic=topic, history=history, current_expert=expert
-                            ).question
+                            question = (
+                                self.ask_question(
+                                    topic=topic, history=history, current_expert=expert
+                                ).question
+                                or ""
+                            )
                         answer = self.answer_question_module(
                             topic=topic,
                             question=question,

@@ -116,6 +116,8 @@ def trim_output_after_hint(response: str, hint: str) -> str:
     Returns:
         str: The trimmed output string, or the original string if the hint is not found.
     """
+    if response is None:
+        return ""
     if hint in response:
         start_index = response.find(hint) + len(hint)
         return response[start_index:].strip()
@@ -138,6 +140,8 @@ def separate_citations(text: str) -> str:
         citations = match.group(1).split(",")
         return "".join(f"[{citation.strip()}]" for citation in citations)
 
+    if text is None:
+        return ""
     # Use regular expressions to find and replace citations
     pattern = re.compile(r"\[(\d+(?:,\s*\d+)*)\]")
     return pattern.sub(replace_citations, text)
@@ -161,6 +165,8 @@ def extract_and_remove_citations(text: str) -> Tuple[str, List[int]]:
         citations.append(citation)
         return ""
 
+    if text is None:
+        return "", []
     # Use regular expressions to find and replace citations
     pattern = re.compile(r"\[(\d+)\]")
     modified_text = pattern.sub(extract_citation, text)
@@ -227,7 +233,7 @@ def clean_up_section(text):
 
 def load_api_key(toml_file_path):
     try:
-        with open(toml_file_path, "r") as file:
+        with open(toml_file_path, "r", encoding="utf-8") as file:
             data = toml.load(file)
     except FileNotFoundError:
         print(f"File not found: {toml_file_path}", file=sys.stderr)

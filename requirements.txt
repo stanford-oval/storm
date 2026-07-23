@@ -4,6 +4,7 @@ sentence-transformers
 toml
 langchain-text-splitters
 trafilatura
+lxml_html_clean
 langchain-huggingface
 qdrant-client
 langchain-qdrant

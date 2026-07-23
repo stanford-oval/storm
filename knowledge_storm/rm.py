@@ -52,22 +52,25 @@ class YouRM(dspy.Retrieve):
             if isinstance(query_or_queries, str)
             else query_or_queries
         )
+        queries = [q for q in queries if isinstance(q, str) and q.strip()]
         self.usage += len(queries)
         collected_results = []
         for query in queries:
             try:
                 headers = {"X-API-Key": self.ydc_api_key}
                 results = requests.get(
-                    f"https://api.ydc-index.io/search?query={query}",
+                    "https://api.ydc-index.io/search",
                     headers=headers,
+                    params={"query": query},
                 ).json()
 
                 authoritative_results = []
-                for r in results["hits"]:
-                    if self.is_valid_source(r["url"]) and r["url"] not in exclude_urls:
-                        authoritative_results.append(r)
-                if "hits" in results:
-                    collected_results.extend(authoritative_results[: self.k])
+                for r in results.get("hits", []):
+                    url = r.get("url")
+                    if not url or not self.is_valid_source(url) or url in exclude_urls:
+                        continue
+                    authoritative_results.append(r)
+                collected_results.extend(authoritative_results[: self.k])
             except Exception as e:
                 logging.error(f"Error occurs when searching query {query}: {e}")
 
@@ -105,7 +108,15 @@ class BingSearch(dspy.Retrieve):
         else:
             self.bing_api_key = os.environ["BING_SEARCH_API_KEY"]
         self.endpoint = "https://api.bing.microsoft.com/v7.0/search"
-        self.params = {"mkt": mkt, "setLang": language, "count": k, **kwargs}
+        # Bing Web Search v7 allows count in [1, 50]
+        self.params = {
+            "mkt": mkt,
+            "setLang": language,
+            "count": min(max(int(k), 1), 50),
+            **kwargs,
+        }
+        if "count" in self.params:
+            self.params["count"] = min(max(int(self.params["count"]), 1), 50)
         self.webpage_helper = WebPageHelper(
             min_char_count=min_char_count,
             snippet_chunk_size=snippet_chunk_size,
@@ -149,12 +160,20 @@ class BingSearch(dspy.Retrieve):
         headers = {"Ocp-Apim-Subscription-Key": self.bing_api_key}
 
         for query in queries:
+            if not query or not str(query).strip():
+                continue
             try:
                 results = requests.get(
-                    self.endpoint, headers=headers, params={**self.params, "q": query}
+                    self.endpoint,
+                    headers=headers,
+                    params={
+                        **self.params,
+                        "q": query,
+                        "count": min(max(int(self.k), 1), 50),
+                    },
                 ).json()
 
-                for d in results["webPages"]["value"]:
+                for d in results.get("webPages", {}).get("value", []):
                     if self.is_valid_source(d["url"]) and d["url"] not in exclude_urls:
                         url_to_results[d["url"]] = {
                             "url": d["url"],
@@ -172,8 +191,10 @@ class BingSearch(dspy.Retrieve):
             r = url_to_results[url]
             r["snippets"] = valid_url_to_snippets[url]["snippets"]
             collected_results.append(r)
+            if len(collected_results) >= self.k:
+                break
 
-        return collected_results
+        return collected_results[: self.k]
 
 
 class VectorRM(dspy.Retrieve):
@@ -322,19 +343,21 @@ class VectorRM(dspy.Retrieve):
         self.usage += len(queries)
         collected_results = []
         for query in queries:
+            if not query or not str(query).strip():
+                continue
             related_docs = self.qdrant.similarity_search_with_score(query, k=self.k)
             for i in range(len(related_docs)):
                 doc = related_docs[i][0]
                 collected_results.append(
                     {
-                        "description": doc.metadata["description"],
+                        "description": doc.metadata.get("description", ""),
                         "snippets": [doc.page_content],
-                        "title": doc.metadata["title"],
-                        "url": doc.metadata["url"],
+                        "title": doc.metadata.get("title", ""),
+                        "url": doc.metadata.get("url", ""),
                     }
                 )
 
-        return collected_results
+        return collected_results[: self.k]
 
 
 class StanfordOvalArxivRM(dspy.Retrieve):
@@ -361,7 +384,10 @@ class StanfordOvalArxivRM(dspy.Retrieve):
 
         # Check if the request was successful
         if response.status_code == 200:
-            response_data_list = response.json()[0]["results"]
+            response_json = response.json()
+            if not response_json:
+                return []
+            response_data_list = response_json[0].get("results", [])
             results = []
             for response_data in response_data_list:
                 result = {
@@ -400,7 +426,7 @@ class StanfordOvalArxivRM(dspy.Retrieve):
                 collected_results.extend(results)
             except Exception as e:
                 logging.error(f"Error occurs when searching query {query}: {e}")
-        return collected_results
+        return collected_results[: self.k]
 
 
 class SerperRM(dspy.Retrieve):
@@ -444,11 +470,13 @@ class SerperRM(dspy.Retrieve):
             max_thread_num=webpage_helper_max_threads,
         )
 
+        # Serper Google search allows num in [1, 100]
+        num = min(max(int(k), 1), 100)
         if query_params is None:
-            self.query_params = {"num": k, "autocorrect": True, "page": 1}
+            self.query_params = {"num": num, "autocorrect": True, "page": 1}
         else:
             self.query_params = query_params
-            self.query_params.update({"num": k})
+            self.query_params.update({"num": num})
         self.serper_search_api_key = serper_search_api_key
         if not self.serper_search_api_key and not os.environ.get("SERPER_API_KEY"):
             raise RuntimeError(
@@ -475,9 +503,10 @@ class SerperRM(dspy.Retrieve):
             "POST", self.search_url, headers=headers, json=query_params
         )
 
-        if response == None:
+        if not response.ok:
             raise RuntimeError(
-                f"Error had occurred while running the search process.\n Error is {response.reason}, had failed with status code {response.status_code}"
+                f"Error occurred while running the search process.\n"
+                f"Error is {response.reason}, failed with status code {response.status_code}"
             )
 
         return response.json()
@@ -494,7 +523,7 @@ class SerperRM(dspy.Retrieve):
 
         Args:
             query_or_queries (Union[str, List[str]]): The query or queries to search for.
-            exclude_urls (List[str]): Dummy parameter to match the interface. Does not have any effect.
+            exclude_urls (List[str]): A list of urls to exclude from the search results.
 
         Returns:
             a list of dictionaries, each dictionary has keys of 'description', 'snippets' (list of strings), 'title', 'url'
@@ -509,9 +538,10 @@ class SerperRM(dspy.Retrieve):
         self.results = []
         collected_results = []
         for query in queries:
-            if query == "Queries:":
+            if not query or not str(query).strip() or query == "Queries:":
                 continue
-            query_params = self.query_params
+            # copy so concurrent / multi-query calls do not share one mutable dict
+            query_params = dict(self.query_params)
 
             # All available parameters can be found in the playground: https://serper.dev/playground
             # Sets the json value for query to be the query that is being parsed.
@@ -541,19 +571,22 @@ class SerperRM(dspy.Retrieve):
         for result in self.results:
             try:
                 # An array of dictionaries that contains the snippets, title of the document and url that will be used.
-                organic_results = result.get("organic")
+                organic_results = result.get("organic") or []
                 knowledge_graph = result.get("knowledgeGraph")
                 for organic in organic_results:
+                    link = organic.get("link")
+                    if not link or link in exclude_urls:
+                        continue
                     snippets = [organic.get("snippet")]
                     if self.ENABLE_EXTRA_SNIPPET_EXTRACTION:
                         snippets.extend(
-                            valid_url_to_snippets.get(url, {}).get("snippets", [])
+                            valid_url_to_snippets.get(link, {}).get("snippets", [])
                         )
                     collected_results.append(
                         {
                             "snippets": snippets,
                             "title": organic.get("title"),
-                            "url": organic.get("link"),
+                            "url": link,
                             "description": (
                                 knowledge_graph.get("description")
                                 if knowledge_graph is not None
@@ -561,7 +594,8 @@ class SerperRM(dspy.Retrieve):
                             ),
                         }
                     )
-            except:
+            except Exception as e:
+                logging.warning("Error processing Serper search result: %s", e)
                 continue
 
         return collected_results
@@ -614,6 +648,8 @@ class BraveRM(dspy.Retrieve):
         self.usage += len(queries)
         collected_results = []
         for query in queries:
+            if not query or not str(query).strip():
+                continue
             try:
                 headers = {
                     "Accept": "application/json",
@@ -621,24 +657,36 @@ class BraveRM(dspy.Retrieve):
                     "X-Subscription-Token": self.brave_search_api_key,
                 }
                 response = requests.get(
-                    f"https://api.search.brave.com/res/v1/web/search?result_filter=web&q={query}",
+                    "https://api.search.brave.com/res/v1/web/search",
                     headers=headers,
+                    params={
+                        "result_filter": "web",
+                        "q": query,
+                        "count": min(max(self.k, 1), 20),
+                    },
                 ).json()
                 results = response.get("web", {}).get("results", [])
 
                 for result in results:
+                    url = result.get("url")
+                    if not url or not self.is_valid_source(url) or url in exclude_urls:
+                        continue
                     collected_results.append(
                         {
                             "snippets": result.get("extra_snippets", []),
                             "title": result.get("title"),
-                            "url": result.get("url"),
+                            "url": url,
                             "description": result.get("description"),
                         }
                     )
+                    if len(collected_results) >= self.k:
+                        break
+                if len(collected_results) >= self.k:
+                    break
             except Exception as e:
                 logging.error(f"Error occurs when searching query {query}: {e}")
 
-        return collected_results
+        return collected_results[: self.k]
 
 
 class SearXNG(dspy.Retrieve):
@@ -702,6 +750,8 @@ class SearXNG(dspy.Retrieve):
         )
 
         for query in queries:
+            if not query or not str(query).strip():
+                continue
             try:
                 params = {"q": query, "format": "json"}
                 response = requests.get(
@@ -709,16 +759,22 @@ class SearXNG(dspy.Retrieve):
                 )
                 results = response.json()
 
-                for r in results["results"]:
-                    if self.is_valid_source(r["url"]) and r["url"] not in exclude_urls:
-                        collected_results.append(
-                            {
-                                "description": r.get("content", ""),
-                                "snippets": [r.get("content", "")],
-                                "title": r.get("title", ""),
-                                "url": r["url"],
-                            }
-                        )
+                query_results = []
+                for r in results.get("results", []):
+                    url = r.get("url")
+                    if not url or not self.is_valid_source(url) or url in exclude_urls:
+                        continue
+                    query_results.append(
+                        {
+                            "description": r.get("content", ""),
+                            "snippets": [r.get("content", "")],
+                            "title": r.get("title", ""),
+                            "url": url,
+                        }
+                    )
+                    if len(query_results) >= self.k:
+                        break
+                collected_results.extend(query_results)
             except Exception as e:
                 logging.error(f"Error occurs when searching query {query}: {e}")
 
@@ -762,8 +818,8 @@ class DuckDuckGoSearchRM(dspy.Retrieve):
         # All params for search can be found here:
         #   https://duckduckgo.com/duckduckgo-help-pages/settings/params/
 
-        # Sets the backend to be api
-        self.duck_duck_go_backend = "api"
+        # Prefer auto; backend="api" is deprecated and breaks newer duckduckgo_search (#357).
+        self.duck_duck_go_backend = "auto"
 
         # Only gets safe search results
         self.duck_duck_go_safe_search = safe_search
@@ -819,8 +875,10 @@ class DuckDuckGoSearchRM(dspy.Retrieve):
         collected_results = []
 
         for query in queries:
+            if not query or not str(query).strip():
+                continue
             #  list of dicts that will be parsed to return
-            results = self.request(query)
+            results = self.request(query) or []
 
             for d in results:
                 # assert d is dict
@@ -849,7 +907,7 @@ class DuckDuckGoSearchRM(dspy.Retrieve):
                     else:
                         print(f"invalid source {url} or url in exclude_urls")
                 except Exception as e:
-                    print(f"Error occurs when processing {result=}: {e}\n")
+                    print(f"Error occurs when processing result {d}: {e}\n")
                     print(f"Error occurs when searching query {query}: {e}")
 
         return collected_results
@@ -937,13 +995,15 @@ class TavilySearchRM(dspy.Retrieve):
         collected_results = []
 
         for query in queries:
+            if not query or not str(query).strip():
+                continue
             args = {
                 "max_results": self.k,
-                "include_raw_contents": self.include_raw_content,
+                "include_raw_content": self.include_raw_content,
             }
             #  list of dicts that will be parsed to return
-            responseData = self.tavily_client.search(query)
-            results = responseData.get("results")
+            responseData = self.tavily_client.search(query, **args)
+            results = responseData.get("results") or []
             for d in results:
                 # assert d is dict
                 if not isinstance(d, dict):
@@ -975,7 +1035,7 @@ class TavilySearchRM(dspy.Retrieve):
                     else:
                         print(f"invalid source {url} or url in exclude_urls")
                 except Exception as e:
-                    print(f"Error occurs when processing {result=}: {e}\n")
+                    print(f"Error occurs when processing result {d}: {e}\n")
                     print(f"Error occurs when searching query {query}: {e}")
 
         return collected_results
@@ -991,6 +1051,8 @@ class GoogleSearch(dspy.Retrieve):
         min_char_count: int = 150,
         snippet_chunk_size: int = 1000,
         webpage_helper_max_threads=10,
+        api_key=None,
+        cse_id=None,
     ):
         """
         Params:
@@ -1011,19 +1073,21 @@ class GoogleSearch(dspy.Retrieve):
             raise ImportError(
                 "GoogleSearch requires `pip install google-api-python-client`."
             ) from err
-        if not google_search_api_key and not os.environ.get("GOOGLE_SEARCH_API_KEY"):
+        google_search_api_key = (
+            google_search_api_key or api_key or os.environ.get("GOOGLE_SEARCH_API_KEY")
+        )
+        google_cse_id = google_cse_id or cse_id or os.environ.get("GOOGLE_CSE_ID")
+        if not google_search_api_key:
             raise RuntimeError(
-                "You must supply google_search_api_key or set the GOOGLE_SEARCH_API_KEY environment variable"
+                "You must supply google_search_api_key (or api_key) or set GOOGLE_SEARCH_API_KEY"
             )
-        if not google_cse_id and not os.environ.get("GOOGLE_CSE_ID"):
+        if not google_cse_id:
             raise RuntimeError(
-                "You must supply google_cse_id or set the GOOGLE_CSE_ID environment variable"
+                "You must supply google_cse_id (or cse_id) or set GOOGLE_CSE_ID"
             )
 
-        self.google_search_api_key = (
-            google_search_api_key or os.environ["GOOGLE_SEARCH_API_KEY"]
-        )
-        self.google_cse_id = google_cse_id or os.environ["GOOGLE_CSE_ID"]
+        self.google_search_api_key = google_search_api_key
+        self.google_cse_id = google_cse_id
 
         if is_valid_source:
             self.is_valid_source = is_valid_source
@@ -1067,15 +1131,22 @@ class GoogleSearch(dspy.Retrieve):
         url_to_results = {}
 
         for query in queries:
+            if not query or not str(query).strip():
+                continue
             try:
+                # httplib2 connections are not reliably reusable across threads /
+                # concurrent SSL use; a fresh Http per request avoids
+                # intermittent SSL: WRONG_VERSION_NUMBER failures (#310).
+                import httplib2
+
                 response = (
                     self.service.cse()
                     .list(
                         q=query,
                         cx=self.google_cse_id,
-                        num=self.k,
+                        num=min(max(self.k, 1), 10),
                     )
-                    .execute()
+                    .execute(http=httplib2.Http())
                 )
 
                 for item in response.get("items", []):
@@ -1101,8 +1172,10 @@ class GoogleSearch(dspy.Retrieve):
             r = url_to_results[url]
             r["snippets"] = valid_url_to_snippets[url]["snippets"]
             collected_results.append(r)
+            if len(collected_results) >= self.k:
+                break
 
-        return collected_results
+        return collected_results[: self.k]
 
 
 class AzureAISearch(dspy.Retrieve):
@@ -1220,19 +1293,30 @@ class AzureAISearch(dspy.Retrieve):
             AzureKeyCredential(self.azure_ai_search_api_key),
         )
         for query in queries:
+            if not query or not str(query).strip():
+                continue
             try:
                 # https://learn.microsoft.com/en-us/python/api/azure-search-documents/azure.search.documents.searchclient?view=azure-python#azure-search-documents-searchclient-search
-                results = client.search(search_text=query, top=1)
+                results = client.search(search_text=query, top=self.k)
 
                 for result in results:
+                    url = result.get("metadata_storage_path")
+                    if not url or url in exclude_urls:
+                        continue
+                    if not self.is_valid_source(url):
+                        continue
                     document = {
-                        "url": result["metadata_storage_path"],
-                        "title": result["title"],
+                        "url": url,
+                        "title": result.get("title", ""),
                         "description": "N/A",
-                        "snippets": [result["chunk"]],
+                        "snippets": [result.get("chunk", "")],
                     }
                     collected_results.append(document)
+                    if len(collected_results) >= self.k:
+                        break
+                if len(collected_results) >= self.k:
+                    break
             except Exception as e:
                 logging.error(f"Error occurs when searching query {query}: {e}")
 
-        return collected_results
+        return collected_results[: self.k]

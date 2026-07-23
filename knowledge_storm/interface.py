@@ -61,19 +61,15 @@ class Information:
             title (str): The title or headline of the information.
         """
         self.description = description
+        if snippets is None:
+            snippets = []
+        elif not isinstance(snippets, list):
+            snippets = [snippets]
         self.snippets = snippets
         self.title = title
         self.url = url
         self.meta = meta if meta is not None else {}
         self.citation_uuid = -1
-
-    def __hash__(self):
-        return hash(
-            (
-                self.url,
-                tuple(sorted(self.snippets)),
-            )
-        )
 
     def __eq__(self, other):
         if not isinstance(other, Information):
@@ -97,7 +93,7 @@ class Information:
     def _md5_hash(self, value):
         """Generate an MD5 hash for a given value."""
         if isinstance(value, (dict, list, tuple)):
-            value = json.dumps(value, sort_keys=True)
+            value = json.dumps(value, sort_keys=True, default=str)
         return hashlib.md5(str(value).encode("utf-8")).hexdigest()
 
     @classmethod
@@ -112,11 +108,14 @@ class Information:
         Returns:
             Information: An instance of Information.
         """
+        snippets = info_dict.get("snippets") or []
+        if not isinstance(snippets, list):
+            snippets = [snippets]
         info = cls(
-            url=info_dict["url"],
-            description=info_dict["description"],
-            snippets=info_dict["snippets"],
-            title=info_dict["title"],
+            url=info_dict.get("url") or "",
+            description=info_dict.get("description") or "",
+            snippets=snippets,
+            title=info_dict.get("title") or "",
             meta=info_dict.get("meta", None),
         )
         info.citation_uuid = int(info_dict.get("citation_uuid", -1))

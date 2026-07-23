@@ -34,7 +34,7 @@ class ArticleGenerationModule(dspy.Module):
                 break
             cur_word_count += cur_snippet_length
             information.append(info_text)
-        return "\n".join(information)
+        return "\n".join(information or [])
 
     def gen_section(
         self, topic: str, node: KnowledgeNode, knowledge_base: KnowledgeBase
