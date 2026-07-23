@@ -106,9 +106,28 @@ class LM:
         # Logging, with removed api key & where `cost` is None on cache hit.
         kwargs = {k: v for k, v in kwargs.items() if not k.startswith("api_")}
         entry = dict(prompt=prompt, messages=messages, kwargs=kwargs, response=response)
-        entry = dict(**entry, outputs=outputs, usage=dict(response["usage"]))
+        usage = (
+            response.get("usage")
+            if isinstance(response, dict)
+            else getattr(response, "usage", None)
+        )
+        if usage is None:
+            usage = {}
+        elif not isinstance(usage, dict):
+            usage = {
+                "prompt_tokens": getattr(usage, "prompt_tokens", 0) or 0,
+                "completion_tokens": getattr(usage, "completion_tokens", 0) or 0,
+                "total_tokens": getattr(usage, "total_tokens", 0) or 0,
+            }
+        entry = dict(**entry, outputs=outputs, usage=usage)
+        hidden = (
+            response.get("_hidden_params", {})
+            if isinstance(response, dict)
+            else getattr(response, "_hidden_params", None) or {}
+        )
         entry = dict(
-            **entry, cost=response.get("_hidden_params", {}).get("response_cost")
+            **entry,
+            cost=hidden.get("response_cost") if isinstance(hidden, dict) else None,
         )
         self.history.append(entry)
 
@@ -214,12 +233,22 @@ class LitellmModel(LM):
         self.completion_tokens = 0
 
     def log_usage(self, response):
-        """Log the total tokens from the OpenAI API response."""
-        usage_data = response.get("usage")
+        """Log the total tokens from the LiteLLM API response."""
+        usage_data = (
+            response.get("usage")
+            if isinstance(response, dict)
+            else getattr(response, "usage", None)
+        )
         if usage_data:
+            if not isinstance(usage_data, dict):
+                prompt_tokens = getattr(usage_data, "prompt_tokens", 0) or 0
+                completion_tokens = getattr(usage_data, "completion_tokens", 0) or 0
+            else:
+                prompt_tokens = usage_data.get("prompt_tokens", 0) or 0
+                completion_tokens = usage_data.get("completion_tokens", 0) or 0
             with self._token_usage_lock:
-                self.prompt_tokens += usage_data.get("prompt_tokens", 0)
-                self.completion_tokens += usage_data.get("completion_tokens", 0)
+                self.prompt_tokens += prompt_tokens
+                self.completion_tokens += completion_tokens
 
     def get_usage_and_reset(self):
         """Get the total tokens used and reset the token usage."""
@@ -265,9 +294,22 @@ class LitellmModel(LM):
         entry = dict(
             prompt=prompt, messages=messages, kwargs=kwargs, response=response_dict
         )
-        entry = dict(**entry, outputs=outputs, usage=dict(response_dict["usage"]))
+        usage = response_dict.get("usage") or {}
+        if not isinstance(usage, dict):
+            usage = {
+                "prompt_tokens": getattr(usage, "prompt_tokens", 0) or 0,
+                "completion_tokens": getattr(usage, "completion_tokens", 0) or 0,
+                "total_tokens": getattr(usage, "total_tokens", 0) or 0,
+            }
+        entry = dict(**entry, outputs=outputs, usage=usage)
+        hidden = (
+            response.get("_hidden_params", {})
+            if isinstance(response, dict)
+            else getattr(response, "_hidden_params", None) or {}
+        )
         entry = dict(
-            **entry, cost=response.get("_hidden_params", {}).get("response_cost")
+            **entry,
+            cost=hidden.get("response_cost") if isinstance(hidden, dict) else None,
         )
         self.history.append(entry)
 
