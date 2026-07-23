@@ -331,6 +331,8 @@ class VectorRM(dspy.Retrieve):
         self.usage += len(queries)
         collected_results = []
         for query in queries:
+            if not query or not str(query).strip():
+                continue
             related_docs = self.qdrant.similarity_search_with_score(query, k=self.k)
             for i in range(len(related_docs)):
                 doc = related_docs[i][0]
@@ -735,6 +737,8 @@ class SearXNG(dspy.Retrieve):
         )
 
         for query in queries:
+            if not query or not str(query).strip():
+                continue
             try:
                 params = {"q": query, "format": "json"}
                 response = requests.get(
