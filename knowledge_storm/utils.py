@@ -40,7 +40,7 @@ def truncate_filename(filename, max_length=125):
 
 def load_api_key(toml_file_path):
     try:
-        with open(toml_file_path, "r") as file:
+        with open(toml_file_path, "r", encoding="utf-8") as file:
             data = toml.load(file)
     except FileNotFoundError:
         print(f"File not found: {toml_file_path}", file=sys.stderr)
@@ -611,13 +611,13 @@ class FileIOHelper:
 
     @staticmethod
     def write_str(s, path):
-        with open(path, "w") as f:
+        with open(path, "w", encoding="utf-8") as f:
             f.write(s)
 
     @staticmethod
     def load_str(path):
-        with open(path, "r") as f:
-            return "\n".join(f.readlines())
+        with open(path, "r", encoding="utf-8") as f:
+            return f.read()
 
     @staticmethod
     def dump_pickle(obj, path):
@@ -641,14 +641,16 @@ class WebPageHelper:
         min_char_count: int = 150,
         snippet_chunk_size: int = 1000,
         max_thread_num: int = 10,
+        verify_ssl: bool = True,
     ):
         """
         Args:
             min_char_count: Minimum character count for the article to be considered valid.
             snippet_chunk_size: Maximum character count for each snippet.
             max_thread_num: Maximum number of threads to use for concurrent requests (e.g., downloading webpages).
+            verify_ssl: Verify TLS certificates when fetching pages (default True; #375).
         """
-        self.httpx_client = httpx.Client(verify=False)
+        self.httpx_client = httpx.Client(verify=verify_ssl)
         self.min_char_count = min_char_count
         self.max_thread_num = max_thread_num
         self.text_splitter = RecursiveCharacterTextSplitter(

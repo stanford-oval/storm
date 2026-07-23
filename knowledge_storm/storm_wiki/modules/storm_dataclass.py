@@ -58,9 +58,9 @@ class StormInformationTable(InformationTable):
     def __init__(self, conversations=List[Tuple[str, List[DialogueTurn]]]):
         super().__init__()
         self.conversations = conversations
-        self.url_to_info: Dict[str, Information] = (
-            StormInformationTable.construct_url_to_info(self.conversations)
-        )
+        self.url_to_info: Dict[
+            str, Information
+        ] = StormInformationTable.construct_url_to_info(self.conversations)
 
     @staticmethod
     def construct_url_to_info(
@@ -114,11 +114,18 @@ class StormInformationTable(InformationTable):
             for snippet in information.snippets:
                 self.collected_urls.append(url)
                 self.collected_snippets.append(snippet)
-        self.encoded_snippets = self.encoder.encode(self.collected_snippets)
+        if not self.collected_snippets:
+            # Empty research tables must not call encode([]) / cosine_similarity
+            # (raises ValueError and aborts article generation; #547 / #304).
+            self.encoded_snippets = None
+        else:
+            self.encoded_snippets = self.encoder.encode(self.collected_snippets)
 
     def retrieve_information(
         self, queries: Union[List[str], str], search_top_k
     ) -> List[Information]:
+        if not self.collected_snippets or self.encoded_snippets is None:
+            return []
         selected_urls = []
         selected_snippets = []
         if type(queries) is str:

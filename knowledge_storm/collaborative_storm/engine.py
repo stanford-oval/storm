@@ -177,12 +177,26 @@ class CollaborativeStormLMConfigs(LMConfigs):
         """
         Converts the CollaborativeStormLMConfigs instance to a dictionary representation.
 
+        Sensitive credential fields (api keys / tokens) are omitted so session dumps
+        can be shared without leaking secrets. Pass lm_config explicitly to from_dict
+        when restoring a runner.
+
         Returns:
             dict: The dictionary representation of the CollaborativeStormLMConfigs.
         """
+        sensitive = {"api_key", "api_keys", "key", "token", "secret", "password"}
         config_dict = {}
         for attr_name in self.__dict__:
-            config_dict[attr_name] = getattr(self, attr_name).kwargs
+            lm = getattr(self, attr_name)
+            if lm is None or not hasattr(lm, "kwargs"):
+                config_dict[attr_name] = None
+                continue
+            config_dict[attr_name] = {
+                k: v
+                for k, v in lm.kwargs.items()
+                if k.lower() not in sensitive
+                and not any(s in k.lower() for s in ("api_key", "token", "secret"))
+            }
         return config_dict
 
 
@@ -427,9 +441,19 @@ class DiscourseManager:
             expert_descriptions = [expert_descriptions]
         agents: CoStormExpert = []
         for expert_name in expert_descriptions:
-            role_name, role_description = expert_name.split(":")
+            if not expert_name or not str(expert_name).strip():
+                continue
+            # LLMs often emit fullwidth "：" for non-English topics, or omit the
+            # separator entirely (#339). split(":") alone raises ValueError.
+            normalized = expert_name.replace("\uff1a", ":", 1)
+            if ":" in normalized:
+                role_name, role_description = normalized.split(":", 1)
+            else:
+                role_name, role_description = normalized, ""
             role_name = role_name.strip()
             role_description = role_description.strip()
+            if not role_name:
+                continue
             new_costorm_expert = CoStormExpert(
                 topic=self.runner_argument.topic,
                 role_name=role_name,
@@ -552,10 +576,17 @@ class CoStormRunner:
         }
 
     @classmethod
-    def from_dict(cls, data, callback_handler: BaseCallbackHandler = None):
-        # FIXME: does not use the lm_config data but naively use default setting
-        lm_config = CollaborativeStormLMConfigs()
-        lm_config.init(lm_type=os.getenv("OPENAI_API_TYPE"))
+    def from_dict(
+        cls,
+        data,
+        lm_config: CollaborativeStormLMConfigs = None,
+        callback_handler: BaseCallbackHandler = None,
+    ):
+        # LM objects cannot be rebuilt from to_dict() alone (credentials stripped).
+        # Callers must pass the same lm_config used when the session was saved (#343).
+        if lm_config is None:
+            lm_config = CollaborativeStormLMConfigs()
+            lm_config.init(lm_type=os.getenv("OPENAI_API_TYPE", "openai"))
         costorm_runner = cls(
             lm_config=lm_config,
             runner_argument=RunnerArgument.from_dict(data["runner_argument"]),
