@@ -52,22 +52,25 @@ class YouRM(dspy.Retrieve):
             if isinstance(query_or_queries, str)
             else query_or_queries
         )
+        queries = [q for q in queries if isinstance(q, str) and q.strip()]
         self.usage += len(queries)
         collected_results = []
         for query in queries:
             try:
                 headers = {"X-API-Key": self.ydc_api_key}
                 results = requests.get(
-                    f"https://api.ydc-index.io/search?query={query}",
+                    "https://api.ydc-index.io/search",
                     headers=headers,
+                    params={"query": query},
                 ).json()
 
                 authoritative_results = []
-                for r in results["hits"]:
-                    if self.is_valid_source(r["url"]) and r["url"] not in exclude_urls:
-                        authoritative_results.append(r)
-                if "hits" in results:
-                    collected_results.extend(authoritative_results[: self.k])
+                for r in results.get("hits", []):
+                    url = r.get("url")
+                    if not url or not self.is_valid_source(url) or url in exclude_urls:
+                        continue
+                    authoritative_results.append(r)
+                collected_results.extend(authoritative_results[: self.k])
             except Exception as e:
                 logging.error(f"Error occurs when searching query {query}: {e}")
 
@@ -333,10 +336,10 @@ class VectorRM(dspy.Retrieve):
                 doc = related_docs[i][0]
                 collected_results.append(
                     {
-                        "description": doc.metadata["description"],
+                        "description": doc.metadata.get("description", ""),
                         "snippets": [doc.page_content],
-                        "title": doc.metadata["title"],
-                        "url": doc.metadata["url"],
+                        "title": doc.metadata.get("title", ""),
+                        "url": doc.metadata.get("url", ""),
                     }
                 )
 
@@ -517,9 +520,10 @@ class SerperRM(dspy.Retrieve):
         self.results = []
         collected_results = []
         for query in queries:
-            if query == "Queries:":
+            if not query or not str(query).strip() or query == "Queries:":
                 continue
-            query_params = self.query_params
+            # copy so concurrent / multi-query calls do not share one mutable dict
+            query_params = dict(self.query_params)
 
             # All available parameters can be found in the playground: https://serper.dev/playground
             # Sets the json value for query to be the query that is being parsed.
@@ -735,16 +739,22 @@ class SearXNG(dspy.Retrieve):
                 )
                 results = response.json()
 
-                for r in results["results"]:
-                    if self.is_valid_source(r["url"]) and r["url"] not in exclude_urls:
-                        collected_results.append(
-                            {
-                                "description": r.get("content", ""),
-                                "snippets": [r.get("content", "")],
-                                "title": r.get("title", ""),
-                                "url": r["url"],
-                            }
-                        )
+                query_results = []
+                for r in results.get("results", []):
+                    url = r.get("url")
+                    if not url or not self.is_valid_source(url) or url in exclude_urls:
+                        continue
+                    query_results.append(
+                        {
+                            "description": r.get("content", ""),
+                            "snippets": [r.get("content", "")],
+                            "title": r.get("title", ""),
+                            "url": url,
+                        }
+                    )
+                    if len(query_results) >= self.k:
+                        break
+                collected_results.extend(query_results)
             except Exception as e:
                 logging.error(f"Error occurs when searching query {query}: {e}")
 
