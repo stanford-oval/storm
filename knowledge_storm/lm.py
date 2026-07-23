@@ -287,8 +287,12 @@ class OpenAIModel(dspy.OpenAI):
         model: str = "gpt-4o-mini",
         api_key: Optional[str] = None,
         model_type: Literal["chat", "text"] = None,
+        api_base: Optional[str] = None,
         **kwargs,
     ):
+        # Custom OpenAI-compatible gateways (#356).
+        if api_base is not None:
+            kwargs["api_base"] = api_base
         super().__init__(model=model, api_key=api_key, model_type=model_type, **kwargs)
         self._token_usage_lock = threading.Lock()
         self.prompt_tokens = 0
