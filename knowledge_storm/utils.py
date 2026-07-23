@@ -40,7 +40,7 @@ def truncate_filename(filename, max_length=125):
 
 def load_api_key(toml_file_path):
     try:
-        with open(toml_file_path, "r") as file:
+        with open(toml_file_path, "r", encoding="utf-8") as file:
             data = toml.load(file)
     except FileNotFoundError:
         print(f"File not found: {toml_file_path}", file=sys.stderr)
@@ -611,13 +611,13 @@ class FileIOHelper:
 
     @staticmethod
     def write_str(s, path):
-        with open(path, "w") as f:
+        with open(path, "w", encoding="utf-8") as f:
             f.write(s)
 
     @staticmethod
     def load_str(path):
-        with open(path, "r") as f:
-            return "\n".join(f.readlines())
+        with open(path, "r", encoding="utf-8") as f:
+            return f.read()
 
     @staticmethod
     def dump_pickle(obj, path):
