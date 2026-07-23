@@ -205,9 +205,12 @@ class WarmStartConversation(dspy.Module):
                                 conversation_history
                             )
                         with dspy.settings.context(lm=self.question_asking_lm):
-                            question = self.ask_question(
-                                topic=topic, history=history, current_expert=expert
-                            ).question
+                            question = (
+                                self.ask_question(
+                                    topic=topic, history=history, current_expert=expert
+                                ).question
+                                or ""
+                            )
                         answer = self.answer_question_module(
                             topic=topic,
                             question=question,
