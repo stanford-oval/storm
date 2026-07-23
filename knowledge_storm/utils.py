@@ -86,11 +86,15 @@ class QdrantVectorStoreManager:
             print(
                 f"Collection {collection_name} does not exist. Creating the collection..."
             )
-            # create the collection
+            # match collection dim to the embedding model (not a fixed 1024)
+            try:
+                vector_size = model.client.get_sentence_embedding_dimension()
+            except Exception:
+                vector_size = len(model.embed_query("dimension"))
             client.create_collection(
                 collection_name=f"{collection_name}",
                 vectors_config=models.VectorParams(
-                    size=1024, distance=models.Distance.COSINE
+                    size=vector_size, distance=models.Distance.COSINE
                 ),
             )
             return Qdrant(
@@ -650,7 +654,16 @@ class WebPageHelper:
             max_thread_num: Maximum number of threads to use for concurrent requests (e.g., downloading webpages).
             verify_ssl: Verify TLS certificates when fetching pages (default True; #375).
         """
-        self.httpx_client = httpx.Client(verify=verify_ssl)
+        self.httpx_client = httpx.Client(
+            verify=verify_ssl,
+            headers={
+                "User-Agent": (
+                    "Mozilla/5.0 (compatible; STORM/1.0; "
+                    "+https://github.com/stanford-oval/storm)"
+                )
+            },
+            timeout=10.0,
+        )
         self.min_char_count = min_char_count
         self.max_thread_num = max_thread_num
         self.text_splitter = RecursiveCharacterTextSplitter(
@@ -668,14 +681,14 @@ class WebPageHelper:
                 "\uff0c",  # Fullwidth comma
                 "\u3001",  # Ideographic comma
                 " ",
-                "\u200B",  # Zero-width space
+                "\u200b",  # Zero-width space
                 "",
             ],
         )
 
     def download_webpage(self, url: str):
         try:
-            res = self.httpx_client.get(url, timeout=4)
+            res = self.httpx_client.get(url)
             if res.status_code >= 400:
                 res.raise_for_status()
             return res.content
