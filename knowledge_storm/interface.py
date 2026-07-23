@@ -71,14 +71,6 @@ class Information:
         self.meta = meta if meta is not None else {}
         self.citation_uuid = -1
 
-    def __hash__(self):
-        return hash(
-            (
-                self.url,
-                tuple(sorted(self.snippets)),
-            )
-        )
-
     def __eq__(self, other):
         if not isinstance(other, Information):
             return False
@@ -101,7 +93,7 @@ class Information:
     def _md5_hash(self, value):
         """Generate an MD5 hash for a given value."""
         if isinstance(value, (dict, list, tuple)):
-            value = json.dumps(value, sort_keys=True)
+            value = json.dumps(value, sort_keys=True, default=str)
         return hashlib.md5(str(value).encode("utf-8")).hexdigest()
 
     @classmethod
