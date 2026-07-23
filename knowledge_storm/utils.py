@@ -605,7 +605,12 @@ class FileIOHelper:
     @staticmethod
     def dump_json(obj, file_name, encoding="utf-8"):
         with open(file_name, "w", encoding=encoding) as fw:
-            json.dump(obj, fw, default=FileIOHelper.handle_non_serializable)
+            json.dump(
+                obj,
+                fw,
+                ensure_ascii=False,
+                default=FileIOHelper.handle_non_serializable,
+            )
 
     @staticmethod
     def handle_non_serializable(obj):
@@ -710,12 +715,17 @@ class WebPageHelper:
         for h, u in zip(htmls, urls):
             if h is None:
                 continue
-            article_text = extract(
-                h,
-                include_tables=False,
-                include_comments=False,
-                output_format="txt",
-            )
+            try:
+                article_text = extract(
+                    h,
+                    include_tables=False,
+                    include_comments=False,
+                    output_format="txt",
+                )
+            except Exception as exc:
+                # Invalid/empty HTML (e.g. 403 bodies) can crash trafilatura (#340).
+                logging.warning("trafilatura failed for %s: %s", u, exc)
+                continue
             if article_text is not None and len(article_text) > self.min_char_count:
                 articles[u] = {"text": article_text}
 
