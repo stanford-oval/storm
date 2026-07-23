@@ -108,7 +108,15 @@ class BingSearch(dspy.Retrieve):
         else:
             self.bing_api_key = os.environ["BING_SEARCH_API_KEY"]
         self.endpoint = "https://api.bing.microsoft.com/v7.0/search"
-        self.params = {"mkt": mkt, "setLang": language, "count": k, **kwargs}
+        # Bing Web Search v7 allows count in [1, 50]
+        self.params = {
+            "mkt": mkt,
+            "setLang": language,
+            "count": min(max(int(k), 1), 50),
+            **kwargs,
+        }
+        if "count" in self.params:
+            self.params["count"] = min(max(int(self.params["count"]), 1), 50)
         self.webpage_helper = WebPageHelper(
             min_char_count=min_char_count,
             snippet_chunk_size=snippet_chunk_size,
@@ -158,7 +166,11 @@ class BingSearch(dspy.Retrieve):
                 results = requests.get(
                     self.endpoint,
                     headers=headers,
-                    params={**self.params, "q": query, "count": self.k},
+                    params={
+                        **self.params,
+                        "q": query,
+                        "count": min(max(int(self.k), 1), 50),
+                    },
                 ).json()
 
                 for d in results.get("webPages", {}).get("value", []):
