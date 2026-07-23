@@ -58,13 +58,13 @@ class StormInformationTable(InformationTable):
     def __init__(self, conversations=List[Tuple[str, List[DialogueTurn]]]):
         super().__init__()
         self.conversations = conversations
-        self.url_to_info: Dict[
-            str, Information
-        ] = StormInformationTable.construct_url_to_info(self.conversations)
+        self.url_to_info: Dict[str, Information] = (
+            StormInformationTable.construct_url_to_info(self.conversations)
+        )
 
     @staticmethod
     def construct_url_to_info(
-        conversations: List[Tuple[str, List[DialogueTurn]]]
+        conversations: List[Tuple[str, List[DialogueTurn]]],
     ) -> Dict[str, Information]:
         url_to_info = {}
 
@@ -81,7 +81,7 @@ class StormInformationTable(InformationTable):
 
     @staticmethod
     def construct_log_dict(
-        conversations: List[Tuple[str, List[DialogueTurn]]]
+        conversations: List[Tuple[str, List[DialogueTurn]]],
     ) -> List[Dict[str, Union[str, Any]]]:
         conversation_log = []
         for persona, conv in conversations:
