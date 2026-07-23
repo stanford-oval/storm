@@ -168,7 +168,7 @@ class InsertInformationModule(dspy.Module):
             return int(match.group(1))
         try:
             return int(string.strip())
-        except:
+        except ValueError:
             pass
         return None
 
@@ -203,9 +203,12 @@ class InsertInformationModule(dspy.Module):
                 selected_index = self._parse_selected_index(decision)
                 if selected_index is not None:
                     selected_index = selected_index - 1
-                    if selected_index < len(sorted_candidates) and selected_index >= 0:
+                    if (
+                        selected_index < len(considered_candidates)
+                        and selected_index >= 0
+                    ):
                         return dspy.Prediction(
-                            information_placement=sorted_candidates[selected_index],
+                            information_placement=considered_candidates[selected_index],
                             note=f"Choosing from:\n{considered_candidates}",
                         )
             return None
