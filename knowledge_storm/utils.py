@@ -31,14 +31,19 @@ def truncate_filename(filename, max_length=125):
     # Topics may include '/' after input validation; keep a single path segment.
     filename = filename.replace("/", "-").replace("\\", "-")
 
-    if len(filename) > max_length:
-        truncated_filename = filename[:max_length]
-        logging.warning(
-            f"Filename is too long. Filename is truncated to {truncated_filename}."
-        )
-        return truncated_filename
+    if len(filename) <= max_length:
+        return filename
 
-    return filename
+    root, ext = os.path.splitext(filename)
+    # Keep a real extension when it fits; otherwise fall back to plain truncation.
+    if ext and len(ext) < max_length:
+        truncated_filename = root[: max_length - len(ext)] + ext
+    else:
+        truncated_filename = filename[:max_length]
+    logging.warning(
+        f"Filename is too long. Filename is truncated to {truncated_filename}."
+    )
+    return truncated_filename
 
 
 def load_api_key(toml_file_path):
