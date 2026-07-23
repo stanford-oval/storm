@@ -441,9 +441,19 @@ class DiscourseManager:
             expert_descriptions = [expert_descriptions]
         agents: CoStormExpert = []
         for expert_name in expert_descriptions:
-            role_name, role_description = expert_name.split(":")
+            if not expert_name or not str(expert_name).strip():
+                continue
+            # LLMs often emit fullwidth "：" for non-English topics, or omit the
+            # separator entirely (#339). split(":") alone raises ValueError.
+            normalized = expert_name.replace("\uff1a", ":", 1)
+            if ":" in normalized:
+                role_name, role_description = normalized.split(":", 1)
+            else:
+                role_name, role_description = normalized, ""
             role_name = role_name.strip()
             role_description = role_description.strip()
+            if not role_name:
+                continue
             new_costorm_expert = CoStormExpert(
                 topic=self.runner_argument.topic,
                 role_name=role_name,
