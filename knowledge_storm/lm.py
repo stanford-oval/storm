@@ -516,7 +516,10 @@ class AzureOpenAIModel(dspy.LM):
     def basic_request(self, prompt: str, **kwargs) -> Any:
         kwargs = {**self.kwargs, **kwargs}
         # Azure o1/o3 deployments reject max_tokens (#345).
-        if any(tag in (self.model or "") for tag in ("o1", "o3")) and "max_tokens" in kwargs:
+        if (
+            any(tag in (self.model or "") for tag in ("o1", "o3"))
+            and "max_tokens" in kwargs
+        ):
             kwargs["max_completion_tokens"] = kwargs.pop("max_tokens")
 
         try:
