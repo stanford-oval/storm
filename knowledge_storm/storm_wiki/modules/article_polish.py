@@ -89,7 +89,7 @@ class PolishPageModule(dspy.Module):
         with dspy.settings.context(lm=self.write_lead_engine, show_guidelines=False):
             lead_section = self.write_lead(
                 topic=topic, draft_page=draft_page
-            ).lead_section
+            ).lead_section or ""
             if "The lead section:" in lead_section:
                 lead_section = lead_section.split("The lead section:")[1].strip()
         if polish_whole_page:
