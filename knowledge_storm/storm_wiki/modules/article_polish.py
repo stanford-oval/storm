@@ -43,7 +43,7 @@ class StormArticlePolishingModule(ArticlePolishingModule):
             topic=topic, draft_page=article_text, polish_whole_page=remove_duplicate
         )
         lead_section = f"# summary\n{polish_result.lead_section}"
-        polished_article = "\n\n".join([lead_section, polish_result.page])
+        polished_article = "\n\n".join([lead_section, polish_result.page or ""])
         polished_article_dict = ArticleTextProcessing.parse_article_into_dict(
             polished_article
         )
@@ -87,15 +87,15 @@ class PolishPageModule(dspy.Module):
     def forward(self, topic: str, draft_page: str, polish_whole_page: bool = True):
         # NOTE: Change show_guidelines to false to make the generation more robust to different LM families.
         with dspy.settings.context(lm=self.write_lead_engine, show_guidelines=False):
-            lead_section = self.write_lead(
-                topic=topic, draft_page=draft_page
-            ).lead_section
+            lead_section = (
+                self.write_lead(topic=topic, draft_page=draft_page).lead_section or ""
+            )
             if "The lead section:" in lead_section:
                 lead_section = lead_section.split("The lead section:")[1].strip()
         if polish_whole_page:
             # NOTE: Change show_guidelines to false to make the generation more robust to different LM families.
             with dspy.settings.context(lm=self.polish_engine, show_guidelines=False):
-                page = self.polish_page(draft_page=draft_page).page
+                page = self.polish_page(draft_page=draft_page).page or ""
         else:
             page = draft_page
 

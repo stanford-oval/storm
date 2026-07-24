@@ -28,19 +28,27 @@ def truncate_filename(filename, max_length=125):
         max_length: int, default to 125 (usual path length limit is 255 chars)
     """
 
-    if len(filename) > max_length:
-        truncated_filename = filename[:max_length]
-        logging.warning(
-            f"Filename is too long. Filename is truncated to {truncated_filename}."
-        )
-        return truncated_filename
+    # Topics may include '/' after input validation; keep a single path segment.
+    filename = filename.replace("/", "-").replace("\\", "-")
 
-    return filename
+    if len(filename) <= max_length:
+        return filename
+
+    root, ext = os.path.splitext(filename)
+    # Keep a real extension when it fits; otherwise fall back to plain truncation.
+    if ext and len(ext) < max_length:
+        truncated_filename = root[: max_length - len(ext)] + ext
+    else:
+        truncated_filename = filename[:max_length]
+    logging.warning(
+        f"Filename is too long. Filename is truncated to {truncated_filename}."
+    )
+    return truncated_filename
 
 
 def load_api_key(toml_file_path):
     try:
-        with open(toml_file_path, "r") as file:
+        with open(toml_file_path, "r", encoding="utf-8") as file:
             data = toml.load(file)
     except FileNotFoundError:
         print(f"File not found: {toml_file_path}", file=sys.stderr)
@@ -86,11 +94,15 @@ class QdrantVectorStoreManager:
             print(
                 f"Collection {collection_name} does not exist. Creating the collection..."
             )
-            # create the collection
+            # match collection dim to the embedding model (not a fixed 1024)
+            try:
+                vector_size = model.client.get_sentence_embedding_dimension()
+            except Exception:
+                vector_size = len(model.embed_query("dimension"))
             client.create_collection(
                 collection_name=f"{collection_name}",
                 vectors_config=models.VectorParams(
-                    size=1024, distance=models.Distance.COSINE
+                    size=vector_size, distance=models.Distance.COSINE
                 ),
             )
             return Qdrant(
@@ -278,7 +290,7 @@ class QdrantVectorStoreManager:
                 "\uff0c",  # Fullwidth comma
                 "\u3001",  # Ideographic comma
                 " ",
-                "\u200B",  # Zero-width space
+                "\u200b",  # Zero-width space
                 "",
             ],
         )
@@ -443,7 +455,8 @@ class ArticleTextProcessing:
             except Exception as e:
                 max_ref_num = 0
             if max_ref_num > len(turn.search_results):
-                for i in range(len(turn.search_results), max_ref_num + 1):
+                # 1-based cites; only strip indices past the last valid result (#168).
+                for i in range(len(turn.search_results) + 1, max_ref_num + 1):
                     turn.agent_utterance = turn.agent_utterance.replace(f"[{i}]", "")
             turn.agent_utterance = (
                 ArticleTextProcessing.remove_uncompleted_sentences_with_citations(
@@ -598,7 +611,12 @@ class FileIOHelper:
     @staticmethod
     def dump_json(obj, file_name, encoding="utf-8"):
         with open(file_name, "w", encoding=encoding) as fw:
-            json.dump(obj, fw, default=FileIOHelper.handle_non_serializable)
+            json.dump(
+                obj,
+                fw,
+                ensure_ascii=False,
+                default=FileIOHelper.handle_non_serializable,
+            )
 
     @staticmethod
     def handle_non_serializable(obj):
@@ -611,13 +629,13 @@ class FileIOHelper:
 
     @staticmethod
     def write_str(s, path):
-        with open(path, "w") as f:
+        with open(path, "w", encoding="utf-8") as f:
             f.write(s)
 
     @staticmethod
     def load_str(path):
-        with open(path, "r") as f:
-            return "\n".join(f.readlines())
+        with open(path, "r", encoding="utf-8") as f:
+            return f.read()
 
     @staticmethod
     def dump_pickle(obj, path):
@@ -641,14 +659,25 @@ class WebPageHelper:
         min_char_count: int = 150,
         snippet_chunk_size: int = 1000,
         max_thread_num: int = 10,
+        verify_ssl: bool = True,
     ):
         """
         Args:
             min_char_count: Minimum character count for the article to be considered valid.
             snippet_chunk_size: Maximum character count for each snippet.
             max_thread_num: Maximum number of threads to use for concurrent requests (e.g., downloading webpages).
+            verify_ssl: Verify TLS certificates when fetching pages (default True; #375).
         """
-        self.httpx_client = httpx.Client(verify=False)
+        self.httpx_client = httpx.Client(
+            verify=verify_ssl,
+            headers={
+                "User-Agent": (
+                    "Mozilla/5.0 (compatible; STORM/1.0; "
+                    "+https://github.com/stanford-oval/storm)"
+                )
+            },
+            timeout=10.0,
+        )
         self.min_char_count = min_char_count
         self.max_thread_num = max_thread_num
         self.text_splitter = RecursiveCharacterTextSplitter(
@@ -666,14 +695,14 @@ class WebPageHelper:
                 "\uff0c",  # Fullwidth comma
                 "\u3001",  # Ideographic comma
                 " ",
-                "\u200B",  # Zero-width space
+                "\u200b",  # Zero-width space
                 "",
             ],
         )
 
     def download_webpage(self, url: str):
         try:
-            res = self.httpx_client.get(url, timeout=4)
+            res = self.httpx_client.get(url)
             if res.status_code >= 400:
                 res.raise_for_status()
             return res.content
@@ -692,12 +721,17 @@ class WebPageHelper:
         for h, u in zip(htmls, urls):
             if h is None:
                 continue
-            article_text = extract(
-                h,
-                include_tables=False,
-                include_comments=False,
-                output_format="txt",
-            )
+            try:
+                article_text = extract(
+                    h,
+                    include_tables=False,
+                    include_comments=False,
+                    output_format="txt",
+                )
+            except Exception as exc:
+                # Invalid/empty HTML (e.g. 403 bodies) can crash trafilatura (#340).
+                logging.warning("trafilatura failed for %s: %s", u, exc)
+                continue
             if article_text is not None and len(article_text) > self.min_char_count:
                 articles[u] = {"text": article_text}
 
@@ -722,7 +756,7 @@ def user_input_appropriateness_check(user_input):
     if len(user_input.split()) > 20:
         return "The input is too long. Please make your input topic more concise!"
 
-    if not re.match(r'^[a-zA-Z0-9\s\-"\,\.?\']*$', user_input):
+    if not re.match(r"^[a-zA-Z0-9\s\-/\"\,\.?\']*$", user_input):
         return "The input contains invalid characters. The input should only contain a-z, A-Z, 0-9, space, -/\"/,./?/'."
 
     prompt = f"""Here is a topic input into a knowledge curation engine that can write a Wikipedia-like article for the topic. Please judge whether it is appropriate or not for the engine to curate information for this topic based on English search engine. The following types of inputs are inappropriate:

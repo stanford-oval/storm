@@ -27,14 +27,20 @@ class ArticleGenerationModule(dspy.Module):
         cur_word_count = 0
         for index in sorted(list(all_citation_index)):
             info = knowledge_base.info_uuid_to_info_dict[index]
-            snippet = info.snippets[0]
-            info_text = f"[{index}]: {snippet} (Question: {info.meta['question']}. Query: {info.meta['query']})"
+            snippets = info.snippets or []
+            if not snippets:
+                continue
+            snippet = snippets[0]
+            info_text = (
+                f"[{index}]: {snippet} (Question: {info.meta.get('question', '')}."
+                f" Query: {info.meta.get('query', '')})"
+            )
             cur_snippet_length = len(info_text.split())
             if cur_snippet_length + cur_word_count > max_words:
                 break
             cur_word_count += cur_snippet_length
             information.append(info_text)
-        return "\n".join(information)
+        return "\n".join(information or [])
 
     def gen_section(
         self, topic: str, node: KnowledgeNode, knowledge_base: KnowledgeBase

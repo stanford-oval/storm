@@ -37,8 +37,14 @@ class ConversationTurn:
     ):
         self.utterance = utterance if utterance is not None else raw_utterance
         self.raw_utterance = raw_utterance
-        self.role = role if ":" not in role else role.split(":")[0]
-        self.role_description = "" if ":" not in role else role.split(":")[1]
+        normalized = (role or "").replace("\uff1a", ":", 1)
+        if ":" in normalized:
+            self.role, self.role_description = normalized.split(":", 1)
+            self.role = self.role.strip()
+            self.role_description = self.role_description.strip()
+        else:
+            self.role = normalized.strip()
+            self.role_description = ""
         self.queries = queries if queries is not None else []
         self.raw_retrieved_info = (
             raw_retrieved_info if raw_retrieved_info is not None else []
@@ -53,6 +59,11 @@ class ConversationTurn:
 
     def to_dict(self):
         raw_retrieved_info = [info.to_dict() for info in self.raw_retrieved_info]
+        cited_info = None
+        if self.cited_info:
+            cited_info = {
+                str(idx): info.to_dict() for idx, info in self.cited_info.items()
+            }
         return {
             "utterance": self.utterance,
             "raw_utterance": self.raw_utterance,
@@ -62,7 +73,7 @@ class ConversationTurn:
             "utterance_type": self.utterance_type,
             "claim_to_make": self.claim_to_make,
             "raw_retrieved_info": raw_retrieved_info,
-            "cited_info": None,
+            "cited_info": cited_info,
         }
 
     @classmethod
@@ -71,13 +82,20 @@ class ConversationTurn:
             Information.from_dict(info) for info in conv_turn_dict["raw_retrieved_info"]
         ]
 
+        cited_info = None
+        if conv_turn_dict.get("cited_info"):
+            cited_info = {
+                int(idx): Information.from_dict(info)
+                for idx, info in conv_turn_dict["cited_info"].items()
+            }
+
         return cls(
             utterance=conv_turn_dict["utterance"],
             raw_utterance=conv_turn_dict["raw_utterance"],
             role=f"{conv_turn_dict['role']}: {conv_turn_dict['role_description']}",
             queries=conv_turn_dict["queries"],
             raw_retrieved_info=raw_retrieved_info,
-            cited_info=None,
+            cited_info=cited_info,
             utterance_type=conv_turn_dict["utterance_type"],
             claim_to_make=conv_turn_dict["claim_to_make"],
         )
@@ -773,9 +791,9 @@ class KnowledgeBase:
     def update_all_info_path(self):
         def _helper(node):
             for citation_idx in node.content:
-                self.info_uuid_to_info_dict[citation_idx].meta["placement"] = (
-                    " -> ".join(node.get_path_from_root())
-                )
+                self.info_uuid_to_info_dict[citation_idx].meta[
+                    "placement"
+                ] = " -> ".join(node.get_path_from_root())
             for child in node.children:
                 _helper(child)
 
@@ -815,12 +833,14 @@ class KnowledgeBase:
             conv_turn.utterance = conv_turn.utterance.replace(
                 f"[_{new_idx}_]", f"[{new_idx}]"
             )
-            conv_turn.utterance.replace("[-1]", "")
             conv_turn.raw_utterance = conv_turn.raw_utterance.replace(
                 f"[_{new_idx}_]", f"[{new_idx}]"
             )
-            conv_turn.raw_utterance.replace("[-1]", "")
-        conv_turn.cited_info = None
+        conv_turn.utterance = conv_turn.utterance.replace("[-1]", "")
+        conv_turn.raw_utterance = conv_turn.raw_utterance.replace("[-1]", "")
+        # Remap cited_info to knowledge-base citation UUIDs so step() callers
+        # can still inspect sources (previously cleared unconditionally).
+        conv_turn.cited_info = {info.citation_uuid: info for info in info_to_insert}
 
     def get_knowledge_base_summary(self):
         return self.gen_summary_module(self)

@@ -168,7 +168,7 @@ class InsertInformationModule(dspy.Module):
             return int(match.group(1))
         try:
             return int(string.strip())
-        except:
+        except ValueError:
             pass
         return None
 
@@ -203,9 +203,12 @@ class InsertInformationModule(dspy.Module):
                 selected_index = self._parse_selected_index(decision)
                 if selected_index is not None:
                     selected_index = selected_index - 1
-                    if selected_index < len(sorted_candidates) and selected_index >= 0:
+                    if (
+                        selected_index < len(considered_candidates)
+                        and selected_index >= 0
+                    ):
                         return dspy.Prediction(
-                            information_placement=sorted_candidates[selected_index],
+                            information_placement=considered_candidates[selected_index],
                             note=f"Choosing from:\n{considered_candidates}",
                         )
             return None
@@ -347,7 +350,10 @@ class ExpandNodeModule(dspy.Module):
         meta_string = set()
         for index in sorted(list(node.content)):
             info = knowledge_base.info_uuid_to_info_dict[index]
-            intent = f"Question: {info.meta['question']}\nQuery: {info.meta['query']}"
+            intent = (
+                f"Question: {info.meta.get('question', '')}\n"
+                f"Query: {info.meta.get('query', '')}"
+            )
             meta_string.add(intent)
 
         return "\n\n".join(meta_string)
@@ -356,7 +362,9 @@ class ExpandNodeModule(dspy.Module):
         information = self._get_cited_info_meta_string(node, knowledge_base)
         node_path = node.get_path_from_root()
         with dspy.settings.context(lm=self.engine, show_guidelines=False):
-            output = self.expand_section(section=node_path, info=information).output
+            output = (
+                self.expand_section(section=node_path, info=information).output or ""
+            )
         subsections = []
         if "\n" in output and output != "None":
             subsections = output.split("\n")

@@ -77,7 +77,7 @@ class CreateWriterWithPersona(dspy.Module):
     def forward(self, topic: str, draft=None):
         with dspy.settings.context(lm=self.engine):
             # Get section names from wiki pages of relevant topics for inspiration.
-            related_topics = self.find_related_topic(topic=topic).related_topics
+            related_topics = self.find_related_topic(topic=topic).related_topics or ""
             urls = []
             for s in related_topics.split("\n"):
                 if "http" in s:
@@ -92,9 +92,12 @@ class CreateWriterWithPersona(dspy.Module):
                     continue
             if len(examples) == 0:
                 examples.append("N/A")
-            gen_persona_output = self.gen_persona(
-                topic=topic, examples="\n----------\n".join(examples)
-            ).personas
+            gen_persona_output = (
+                self.gen_persona(
+                    topic=topic, examples="\n----------\n".join(examples)
+                ).personas
+                or ""
+            )
 
         personas = []
         for s in gen_persona_output.split("\n"):

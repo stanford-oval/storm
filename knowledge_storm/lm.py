@@ -81,6 +81,12 @@ class LM:
         messages = messages or [{"role": "user", "content": prompt}]
         kwargs = {**self.kwargs, **kwargs}
 
+        # o-series reject max_tokens; LiteLLM expects max_completion_tokens.
+        model_name = (self.model or "").lower()
+        if any(tag in model_name for tag in ("o1", "o3", "o4")):
+            if "max_tokens" in kwargs and "max_completion_tokens" not in kwargs:
+                kwargs["max_completion_tokens"] = kwargs.pop("max_tokens")
+
         # Make the request and handle LRU & disk caching.
         if self.model_type == "chat":
             completion = cached_litellm_completion if cache else litellm_completion
@@ -100,9 +106,28 @@ class LM:
         # Logging, with removed api key & where `cost` is None on cache hit.
         kwargs = {k: v for k, v in kwargs.items() if not k.startswith("api_")}
         entry = dict(prompt=prompt, messages=messages, kwargs=kwargs, response=response)
-        entry = dict(**entry, outputs=outputs, usage=dict(response["usage"]))
+        usage = (
+            response.get("usage")
+            if isinstance(response, dict)
+            else getattr(response, "usage", None)
+        )
+        if usage is None:
+            usage = {}
+        elif not isinstance(usage, dict):
+            usage = {
+                "prompt_tokens": getattr(usage, "prompt_tokens", 0) or 0,
+                "completion_tokens": getattr(usage, "completion_tokens", 0) or 0,
+                "total_tokens": getattr(usage, "total_tokens", 0) or 0,
+            }
+        entry = dict(**entry, outputs=outputs, usage=usage)
+        hidden = (
+            response.get("_hidden_params", {})
+            if isinstance(response, dict)
+            else getattr(response, "_hidden_params", None) or {}
+        )
         entry = dict(
-            **entry, cost=response.get("_hidden_params", {}).get("response_cost")
+            **entry,
+            cost=hidden.get("response_cost") if isinstance(hidden, dict) else None,
         )
         self.history.append(entry)
 
@@ -208,12 +233,22 @@ class LitellmModel(LM):
         self.completion_tokens = 0
 
     def log_usage(self, response):
-        """Log the total tokens from the OpenAI API response."""
-        usage_data = response.get("usage")
+        """Log the total tokens from the LiteLLM API response."""
+        usage_data = (
+            response.get("usage")
+            if isinstance(response, dict)
+            else getattr(response, "usage", None)
+        )
         if usage_data:
+            if not isinstance(usage_data, dict):
+                prompt_tokens = getattr(usage_data, "prompt_tokens", 0) or 0
+                completion_tokens = getattr(usage_data, "completion_tokens", 0) or 0
+            else:
+                prompt_tokens = usage_data.get("prompt_tokens", 0) or 0
+                completion_tokens = usage_data.get("completion_tokens", 0) or 0
             with self._token_usage_lock:
-                self.prompt_tokens += usage_data.get("prompt_tokens", 0)
-                self.completion_tokens += usage_data.get("completion_tokens", 0)
+                self.prompt_tokens += prompt_tokens
+                self.completion_tokens += completion_tokens
 
     def get_usage_and_reset(self):
         """Get the total tokens used and reset the token usage."""
@@ -259,9 +294,22 @@ class LitellmModel(LM):
         entry = dict(
             prompt=prompt, messages=messages, kwargs=kwargs, response=response_dict
         )
-        entry = dict(**entry, outputs=outputs, usage=dict(response_dict["usage"]))
+        usage = response_dict.get("usage") or {}
+        if not isinstance(usage, dict):
+            usage = {
+                "prompt_tokens": getattr(usage, "prompt_tokens", 0) or 0,
+                "completion_tokens": getattr(usage, "completion_tokens", 0) or 0,
+                "total_tokens": getattr(usage, "total_tokens", 0) or 0,
+            }
+        entry = dict(**entry, outputs=outputs, usage=usage)
+        hidden = (
+            response.get("_hidden_params", {})
+            if isinstance(response, dict)
+            else getattr(response, "_hidden_params", None) or {}
+        )
         entry = dict(
-            **entry, cost=response.get("_hidden_params", {}).get("response_cost")
+            **entry,
+            cost=hidden.get("response_cost") if isinstance(hidden, dict) else None,
         )
         self.history.append(entry)
 
@@ -281,8 +329,12 @@ class OpenAIModel(dspy.OpenAI):
         model: str = "gpt-4o-mini",
         api_key: Optional[str] = None,
         model_type: Literal["chat", "text"] = None,
+        api_base: Optional[str] = None,
         **kwargs,
     ):
+        # Custom OpenAI-compatible gateways (#356).
+        if api_base is not None:
+            kwargs["api_base"] = api_base
         super().__init__(model=model, api_key=api_key, model_type=model_type, **kwargs)
         self._token_usage_lock = threading.Lock()
         self.prompt_tokens = 0
@@ -290,11 +342,21 @@ class OpenAIModel(dspy.OpenAI):
 
     def log_usage(self, response):
         """Log the total tokens from the OpenAI API response."""
-        usage_data = response.get("usage")
+        usage_data = (
+            response.get("usage")
+            if isinstance(response, dict)
+            else getattr(response, "usage", None)
+        )
         if usage_data:
+            if not isinstance(usage_data, dict):
+                prompt_tokens = getattr(usage_data, "prompt_tokens", 0) or 0
+                completion_tokens = getattr(usage_data, "completion_tokens", 0) or 0
+            else:
+                prompt_tokens = usage_data.get("prompt_tokens", 0) or 0
+                completion_tokens = usage_data.get("completion_tokens", 0) or 0
             with self._token_usage_lock:
-                self.prompt_tokens += usage_data.get("prompt_tokens", 0)
-                self.completion_tokens += usage_data.get("completion_tokens", 0)
+                self.prompt_tokens += prompt_tokens
+                self.completion_tokens += completion_tokens
 
     def get_usage_and_reset(self):
         """Get the total tokens used and reset the token usage."""
@@ -387,11 +449,21 @@ class DeepSeekModel(dspy.OpenAI):
 
     def log_usage(self, response):
         """Log the total tokens from the DeepSeek API response."""
-        usage_data = response.get("usage")
+        usage_data = (
+            response.get("usage")
+            if isinstance(response, dict)
+            else getattr(response, "usage", None)
+        )
         if usage_data:
+            if not isinstance(usage_data, dict):
+                prompt_tokens = getattr(usage_data, "prompt_tokens", 0) or 0
+                completion_tokens = getattr(usage_data, "completion_tokens", 0) or 0
+            else:
+                prompt_tokens = usage_data.get("prompt_tokens", 0) or 0
+                completion_tokens = usage_data.get("completion_tokens", 0) or 0
             with self._token_usage_lock:
-                self.prompt_tokens += usage_data.get("prompt_tokens", 0)
-                self.completion_tokens += usage_data.get("completion_tokens", 0)
+                self.prompt_tokens += prompt_tokens
+                self.completion_tokens += completion_tokens
 
     def get_usage_and_reset(self):
         """Get the total tokens used and reset the token usage."""
@@ -423,9 +495,12 @@ class DeepSeekModel(dspy.OpenAI):
             "messages": [{"role": "user", "content": prompt}],
             **kwargs,
         }
-        response = requests.post(
-            f"{self.api_base}/v1/chat/completions", headers=headers, json=data
-        )
+        base = self.api_base.rstrip("/")
+        if base.endswith("/v1"):
+            url = f"{base}/chat/completions"
+        else:
+            url = f"{base}/v1/chat/completions"
+        response = requests.post(url, headers=headers, json=data)
         response.raise_for_status()
         return response.json()
 
@@ -509,6 +584,12 @@ class AzureOpenAIModel(dspy.LM):
     )
     def basic_request(self, prompt: str, **kwargs) -> Any:
         kwargs = {**self.kwargs, **kwargs}
+        # Azure o1/o3/o4 deployments reject max_tokens (#345).
+        if (
+            any(tag in (self.model or "") for tag in ("o1", "o3", "o4"))
+            and "max_tokens" in kwargs
+        ):
+            kwargs["max_completion_tokens"] = kwargs.pop("max_tokens")
 
         try:
             if self.model_type == "chat":
@@ -522,9 +603,14 @@ class AzureOpenAIModel(dspy.LM):
 
             self.log_usage(response)
 
+            # model_dump() recursively converts nested Choice objects (dict() does not)
+            if hasattr(response, "model_dump"):
+                response_for_history = response.model_dump()
+            else:
+                response_for_history = dict(response)
             history_entry = {
                 "prompt": prompt,
-                "response": dict(response),
+                "response": response_for_history,
                 "kwargs": kwargs,
             }
             self.history.append(history_entry)
@@ -616,11 +702,21 @@ class GroqModel(dspy.OpenAI):
 
     def log_usage(self, response):
         """Log the total tokens from the Groq API response."""
-        usage_data = response.get("usage")
+        usage_data = (
+            response.get("usage")
+            if isinstance(response, dict)
+            else getattr(response, "usage", None)
+        )
         if usage_data:
+            if not isinstance(usage_data, dict):
+                prompt_tokens = getattr(usage_data, "prompt_tokens", 0) or 0
+                completion_tokens = getattr(usage_data, "completion_tokens", 0) or 0
+            else:
+                prompt_tokens = usage_data.get("prompt_tokens", 0) or 0
+                completion_tokens = usage_data.get("completion_tokens", 0) or 0
             with self._token_usage_lock:
-                self.prompt_tokens += usage_data.get("prompt_tokens", 0)
-                self.completion_tokens += usage_data.get("completion_tokens", 0)
+                self.prompt_tokens += prompt_tokens
+                self.completion_tokens += completion_tokens
 
     def get_usage_and_reset(self):
         """Get the total tokens used and reset the token usage."""
@@ -915,16 +1011,23 @@ class VLLMClient(dspy.dsp.LM):
             response = self.request(prompt, **kwargs)
         except Exception as e:
             print(f"Failed to generate completion: {e}")
-            raise Exception(e)
+            raise
 
         self.log_usage(response)
 
         choices = response.choices
         completions = [choice.message.content for choice in choices]
 
+        # model_dump() so nested Choice objects are JSON-serializable in post_run()
+        if hasattr(response, "model_dump"):
+            response_for_history = response.model_dump()
+        elif hasattr(response, "to_dict"):
+            response_for_history = response.to_dict()
+        else:
+            response_for_history = response
         history = {
             "prompt": prompt,
-            "response": response,
+            "response": response_for_history,
             "kwargs": kwargs,
         }
         self.history.append(history)
@@ -958,13 +1061,14 @@ class TGIClient(dspy.HFClientTGI):
     def _generate(self, prompt, **kwargs):
         """Copied from dspy/dsp/modules/hf_client.py with the addition of removing hard-coded parameters."""
         kwargs = {**self.kwargs, **kwargs}
+        n = kwargs.get("n", 1)
 
         payload = {
             "inputs": prompt,
             "parameters": {
-                "do_sample": kwargs["n"] > 1,
-                "best_of": kwargs["n"],
-                "details": kwargs["n"] > 1,
+                "do_sample": n > 1,
+                "best_of": n,
+                "details": n > 1,
                 **kwargs,
             },
         }
@@ -1002,9 +1106,9 @@ class TGIClient(dspy.HFClientTGI):
 
             response = {"prompt": prompt, "choices": [{"text": c} for c in completions]}
             return response
-        except Exception:
+        except Exception as e:
             print("Failed to parse JSON response:", response.text)
-            raise Exception("Received invalid JSON response from server")
+            raise Exception("Received invalid JSON response from server") from e
 
 
 class TogetherClient(dspy.HFModel):
@@ -1066,11 +1170,21 @@ class TogetherClient(dspy.HFModel):
 
     def log_usage(self, response):
         """Log the total tokens from the OpenAI API response."""
-        usage_data = response.get("usage")
+        usage_data = (
+            response.get("usage")
+            if isinstance(response, dict)
+            else getattr(response, "usage", None)
+        )
         if usage_data:
+            if not isinstance(usage_data, dict):
+                prompt_tokens = getattr(usage_data, "prompt_tokens", 0) or 0
+                completion_tokens = getattr(usage_data, "completion_tokens", 0) or 0
+            else:
+                prompt_tokens = usage_data.get("prompt_tokens", 0) or 0
+                completion_tokens = usage_data.get("completion_tokens", 0) or 0
             with self._token_usage_lock:
-                self.prompt_tokens += usage_data.get("prompt_tokens", 0)
-                self.completion_tokens += usage_data.get("completion_tokens", 0)
+                self.prompt_tokens += prompt_tokens
+                self.completion_tokens += completion_tokens
 
     def get_usage_and_reset(self):
         """Get the total tokens used and reset the token usage."""

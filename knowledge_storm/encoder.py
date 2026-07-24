@@ -91,7 +91,7 @@ class Encoder:
             }
         else:
             raise ValueError(
-                f"Unsupported ENCODER_API_TYPE '{encoder_type}'. Supported types are 'openai', 'azure', 'together'."
+                f"Unsupported ENCODER_API_TYPE '{encoder_type}'. Supported types are 'openai', 'azure'."
             )
 
     def get_total_token_usage(self, reset: bool = False) -> int:
@@ -125,8 +125,21 @@ class Encoder:
         response = litellm.embedding(
             model=self.embedding_model_name, input=text, caching=True, **self.kargs
         )
-        embedding = response.data[0]["embedding"]
-        token_usage = response.get("usage", {}).get("total_tokens", 0)
+        data0 = response.data[0]
+        embedding = (
+            data0["embedding"]
+            if isinstance(data0, dict)
+            else getattr(data0, "embedding")
+        )
+        usage = getattr(response, "usage", None)
+        if usage is None and isinstance(response, dict):
+            usage = response.get("usage")
+        if usage is None:
+            token_usage = 0
+        elif isinstance(usage, dict):
+            token_usage = usage.get("total_tokens", 0) or 0
+        else:
+            token_usage = getattr(usage, "total_tokens", 0) or 0
         return text, embedding, token_usage
 
     def _get_text_embeddings(
@@ -152,27 +165,28 @@ class Encoder:
             self.total_token_usage += tokens
             return np.array(embedding)
 
-        embeddings = []
+        embeddings = [None] * len(texts)
         total_tokens = 0
 
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             futures = {
-                executor.submit(self._get_single_text_embedding, text): text
-                for text in texts
+                executor.submit(self._get_single_text_embedding, text): i
+                for i, text in enumerate(texts)
             }
 
             for future in as_completed(futures):
+                i = futures[future]
                 try:
-                    text, embedding, tokens = future.result()
-                    embeddings.append((text, embedding, tokens))
+                    _, embedding, tokens = future.result()
+                    embeddings[i] = embedding
                     total_tokens += tokens
                 except Exception as e:
-                    print(f"An error occurred for text: {futures[future]}")
+                    print(f"An error occurred for text: {texts[i]}")
                     print(e)
+                    raise
 
-        # Sort results to match the order of the input texts
-        embeddings.sort(key=lambda x: texts.index(x[0]))
-        embeddings = [result[1] for result in embeddings]
+        if any(e is None for e in embeddings):
+            raise RuntimeError("Failed to compute embeddings for one or more texts")
+
         self.total_token_usage += total_tokens
-
         return np.array(embeddings)
