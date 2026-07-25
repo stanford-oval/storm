@@ -221,7 +221,7 @@ class STORMWikiRunner(Engine):
             ground_truth_url=ground_truth_url,
             callback_handler=callback_handler,
             max_perspective=self.args.max_perspective,
-            disable_perspective=False,
+            disable_perspective=self.args.disable_perspective,
             return_conversation_log=True,
         )
 
