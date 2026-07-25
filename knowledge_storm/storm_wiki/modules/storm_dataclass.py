@@ -64,7 +64,7 @@ class StormInformationTable(InformationTable):
 
     @staticmethod
     def construct_url_to_info(
-        conversations: List[Tuple[str, List[DialogueTurn]]]
+        conversations: List[Tuple[str, List[DialogueTurn]]],
     ) -> Dict[str, Information]:
         url_to_info = {}
 
@@ -81,7 +81,7 @@ class StormInformationTable(InformationTable):
 
     @staticmethod
     def construct_log_dict(
-        conversations: List[Tuple[str, List[DialogueTurn]]]
+        conversations: List[Tuple[str, List[DialogueTurn]]],
     ) -> List[Dict[str, Union[str, Any]]]:
         conversation_log = []
         for persona, conv in conversations:
@@ -111,10 +111,13 @@ class StormInformationTable(InformationTable):
         self.collected_urls = []
         self.collected_snippets = []
         for url, information in self.url_to_info.items():
-            for snippet in information.snippets:
+            for snippet in information.snippets or []:
                 self.collected_urls.append(url)
                 self.collected_snippets.append(snippet)
-        self.encoded_snippets = self.encoder.encode(self.collected_snippets)
+        if self.collected_snippets:
+            self.encoded_snippets = self.encoder.encode(self.collected_snippets)
+        else:
+            self.encoded_snippets = None
 
     def retrieve_information(
         self, queries: Union[List[str], str], search_top_k
@@ -123,6 +126,8 @@ class StormInformationTable(InformationTable):
         selected_snippets = []
         if type(queries) is str:
             queries = [queries]
+        if not self.collected_snippets or self.encoded_snippets is None:
+            return []
         for query in queries:
             encoded_query = self.encoder.encode(query)
             sim = cosine_similarity([encoded_query], self.encoded_snippets)[0]
