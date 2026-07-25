@@ -146,7 +146,8 @@ class ConvToSection(dspy.Module):
     ):
         info = ""
         for idx, storm_info in enumerate(collected_info):
-            info += f"[{idx + 1}]\n" + "\n".join(storm_info.snippets)
+            snippets = storm_info.snippets or []
+            info += f"[{idx + 1}]\n" + "\n".join(snippets)
             info += "\n\n"
 
         info = ArticleTextProcessing.limit_word_count_preserve_newline(info, 1500)
