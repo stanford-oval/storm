@@ -278,7 +278,7 @@ class QdrantVectorStoreManager:
                 "\uff0c",  # Fullwidth comma
                 "\u3001",  # Ideographic comma
                 " ",
-                "\u200B",  # Zero-width space
+                "\u200b",  # Zero-width space
                 "",
             ],
         )
@@ -666,7 +666,7 @@ class WebPageHelper:
                 "\uff0c",  # Fullwidth comma
                 "\u3001",  # Ideographic comma
                 " ",
-                "\u200B",  # Zero-width space
+                "\u200b",  # Zero-width space
                 "",
             ],
         )
@@ -690,14 +690,20 @@ class WebPageHelper:
         articles = {}
 
         for h, u in zip(htmls, urls):
-            if h is None:
+            # Skip empty/invalid bodies (e.g. 403 pages) before calling trafilatura.
+            # Passing tiny or empty HTML has caused native crashes in some environments.
+            if h is None or len(h) < 32:
                 continue
-            article_text = extract(
-                h,
-                include_tables=False,
-                include_comments=False,
-                output_format="txt",
-            )
+            try:
+                article_text = extract(
+                    h,
+                    include_tables=False,
+                    include_comments=False,
+                    output_format="txt",
+                )
+            except Exception as e:
+                logging.warning("Failed to extract article from %s: %s", u, e)
+                continue
             if article_text is not None and len(article_text) > self.min_char_count:
                 articles[u] = {"text": article_text}
 
