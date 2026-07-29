@@ -110,7 +110,7 @@ def main(args):
     match args.retriever:
         case "bing":
             rm = BingSearch(
-                bing_search_api=os.getenv("BING_SEARCH_API_KEY"),
+                bing_search_api_key=os.getenv("BING_SEARCH_API_KEY"),
                 k=engine_args.search_top_k,
             )
         case "you":
