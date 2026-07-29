@@ -470,12 +470,15 @@ def _construct_citation_dict_from_search_result(search_results):
 
 def _display_main_article_text(article_text, citation_dict, table_content_sidebar):
     # Post-process the generated article for better display.
+    if not article_text:
+        st.info("No article text available to display.")
+        return
     if "Write the lead section:" in article_text:
         article_text = article_text[
             article_text.find("Write the lead section:")
             + len("Write the lead section:") :
         ]
-    if article_text[0] == "#":
+    if article_text.startswith("#"):
         article_text = "\n".join(article_text.split("\n")[1:])
     article_text = DemoTextProcessingHelper.add_inline_citation_link(
         article_text, citation_dict
@@ -529,6 +532,9 @@ def _display_main_article(
     article_data = DemoFileIOHelper.assemble_article_data(
         selected_article_file_path_dict
     )
+    if not article_data:
+        st.warning("Article content not found for this topic.")
+        return
 
     with st.container(height=1000, border=True):
         table_content_sidebar = st.sidebar.expander(
