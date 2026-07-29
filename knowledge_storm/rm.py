@@ -5,9 +5,18 @@ from typing import Callable, Union, List
 import backoff
 import dspy
 import requests
-from dsp import backoff_hdlr, giveup_hdlr
+from dsp import backoff_hdlr
 
 from .utils import WebPageHelper
+
+
+def _ddgs_should_giveup(exception: Exception) -> bool:
+    """Give up on non-retryable DuckDuckGo errors; keep retrying rate limits.
+
+    dsp.giveup_hdlr reads ``exception.message``, which Python 3 exceptions do not
+    expose, so AssertionError from empty queries becomes AttributeError.
+    """
+    return "rate limits" not in str(exception)
 
 
 class YouRM(dspy.Retrieve):
@@ -791,7 +800,7 @@ class DuckDuckGoSearchRM(dspy.Retrieve):
         max_time=1000,
         max_tries=8,
         on_backoff=backoff_hdlr,
-        giveup=giveup_hdlr,
+        giveup=_ddgs_should_giveup,
     )
     def request(self, query: str):
         results = self.ddgs.text(
@@ -849,7 +858,7 @@ class DuckDuckGoSearchRM(dspy.Retrieve):
                     else:
                         print(f"invalid source {url} or url in exclude_urls")
                 except Exception as e:
-                    print(f"Error occurs when processing {result=}: {e}\n")
+                    print(f"Error occurs when processing {d}: {e}\n")
                     print(f"Error occurs when searching query {query}: {e}")
 
         return collected_results
