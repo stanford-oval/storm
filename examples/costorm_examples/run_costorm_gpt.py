@@ -156,6 +156,7 @@ def main(args):
             )
         case "searxng":
             rm = SearXNG(
+                searxng_api_url=os.getenv("SEARXNG_API_URL"),
                 searxng_api_key=os.getenv("SEARXNG_API_KEY"),
                 k=runner_argument.retrieve_top_k,
             )
