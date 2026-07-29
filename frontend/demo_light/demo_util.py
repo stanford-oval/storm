@@ -375,7 +375,7 @@ class DemoUIHelper:
                 "width": "100%",
                 "height": "116px",
                 "max-width": "640px",
-                "background-color": "#FFFFF",
+                "background-color": "#FFFFFF",
                 "border": "1px solid #CCC",
                 "padding": "20px",
                 "border-radius": "5px",
