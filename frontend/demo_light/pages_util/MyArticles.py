@@ -57,11 +57,7 @@ def my_articles_page():
             with bottom_menu[2]:
                 batch_size = st.selectbox("Page Size", options=[24, 48, 72])
             with bottom_menu[1]:
-                total_pages = (
-                    int(len(article_names) / batch_size)
-                    if int(len(article_names) / batch_size) > 0
-                    else 1
-                )
+                total_pages = max(1, (len(article_names) + batch_size - 1) // batch_size)
                 current_page = st.number_input(
                     "Page", min_value=1, max_value=total_pages, step=1
                 )
