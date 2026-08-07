@@ -107,13 +107,17 @@ class StormInformationTable(InformationTable):
         return cls(conversations)
 
     def prepare_table_for_retrieval(self):
-        self.encoder = SentenceTransformer("paraphrase-MiniLM-L6-v2")
+        self.encoder = None
         self.collected_urls = []
         self.collected_snippets = []
         for url, information in self.url_to_info.items():
             for snippet in information.snippets:
                 self.collected_urls.append(url)
                 self.collected_snippets.append(snippet)
+        if not self.collected_snippets:
+            self.encoded_snippets = np.empty((0, 0))
+            return
+        self.encoder = SentenceTransformer("paraphrase-MiniLM-L6-v2")
         self.encoded_snippets = self.encoder.encode(self.collected_snippets)
 
     def retrieve_information(
@@ -121,6 +125,8 @@ class StormInformationTable(InformationTable):
     ) -> List[Information]:
         selected_urls = []
         selected_snippets = []
+        if not getattr(self, "collected_snippets", []):
+            return []
         if type(queries) is str:
             queries = [queries]
         for query in queries:

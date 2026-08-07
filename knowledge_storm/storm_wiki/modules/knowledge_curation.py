@@ -22,6 +22,46 @@ except ImportError as err:
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
 
+def clean_search_queries(queries: str, max_search_queries: int) -> List[str]:
+    noise_exact = {
+        "[",
+        "]",
+        "{",
+        "}",
+        "```",
+        "```json",
+        "```markdown",
+        "**queries:**",
+        "queries:",
+        '"queries": [',
+        "queries\": [",
+    }
+    noise_prefixes = (
+        "以下是",
+        "好的，",
+        "作为",
+        "我将",
+        "queries =",
+        '"queries"',
+    )
+    cleaned_queries = []
+    for query in queries.split("\n"):
+        query = query.replace("-", "").strip().strip('"').strip("'").strip()
+        query = query.rstrip(",").strip()
+        query_key = query.lower()
+        if query_key in noise_exact:
+            continue
+        if any(query.startswith(prefix) for prefix in noise_prefixes):
+            continue
+        if query.startswith("```") or query.endswith("```"):
+            continue
+        if query:
+            cleaned_queries.append(query)
+        if len(cleaned_queries) >= max_search_queries:
+            break
+    return cleaned_queries
+
+
 class ConvSimulator(dspy.Module):
     """Simulate a conversation between a Wikipedia writer with specific persona and an expert."""
 
@@ -205,11 +245,7 @@ class TopicExpert(dspy.Module):
         with dspy.settings.context(lm=self.engine, show_guidelines=False):
             # Identify: Break down question into queries.
             queries = self.generate_queries(topic=topic, question=question).queries
-            queries = [
-                q.replace("-", "").strip().strip('"').strip('"').strip()
-                for q in queries.split("\n")
-            ]
-            queries = queries[: self.max_search_queries]
+            queries = clean_search_queries(queries, self.max_search_queries)
             # Search
             searched_results: List[Information] = self.retriever.retrieve(
                 list(set(queries)), exclude_urls=[ground_truth_url]

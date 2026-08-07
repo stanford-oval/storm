@@ -1,0 +1,39 @@
+[
+  {
+    "topic": "pim 神经网络抑制",
+    "expected_keywords": [
+      "passive intermodulation",
+      "intermodulation",
+      "RF",
+      "radio frequency",
+      "neural network",
+      "suppression",
+      "cancellation"
+    ],
+    "forbidden_keywords": [
+      "processing-in-memory",
+      "DRAM",
+      "RAM",
+      "product information management"
+    ],
+    "expected_language": "zh",
+    "min_sources": 3
+  },
+  {
+    "topic": "retrieval augmented generation evaluation",
+    "expected_keywords": [
+      "retrieval augmented generation",
+      "RAG",
+      "evaluation",
+      "faithfulness",
+      "relevance",
+      "benchmark"
+    ],
+    "forbidden_keywords": [
+      "random access memory",
+      "product information management"
+    ],
+    "expected_language": "zh",
+    "min_sources": 3
+  }
+]
