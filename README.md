@@ -1,371 +1,608 @@
-<p align="center">
-  <img src="assets/logo.svg" style="width: 25%; height: auto;">
-</p>
+# PaperStorm Agent
 
-# STORM: Synthesis of Topic Outlines through Retrieval and Multi-perspective Question Asking
+> 基于 Stanford STORM 二次开发的中文论文调研 Agent，面向 RAG、Memory、Tool Calling、MCP、Multi-Agent 与 Agent Eval 持续演进。
 
-<p align="center">
-| <a href="http://storm.genie.stanford.edu"><b>Research preview</b></a> | <a href="https://arxiv.org/abs/2402.14207"><b>STORM Paper</b></a>| <a href="https://www.arxiv.org/abs/2408.15232"><b>Co-STORM Paper</b></a>  | <a href="https://storm-project.stanford.edu/"><b>Website</b></a> |
-</p>
-**Latest News** 🔥
+本仓库原始项目来自 Stanford STORM。官方 README 已保留在：
 
-- [2025/01] We add [litellm](https://github.com/BerriAI/litellm) integration for language models and embedding models in `knowledge-storm` v1.1.0.
+```text
+README_STORM_OFFICIAL.md
+```
 
-- [2024/09] Co-STORM codebase is now released and integrated into `knowledge-storm` python package v1.0.0. Run `pip install knowledge-storm --upgrade` to check it out.
+官方中文说明：
 
-- [2024/09] We introduce collaborative STORM (Co-STORM) to support human-AI collaborative knowledge curation! [Co-STORM Paper](https://www.arxiv.org/abs/2408.15232) has been accepted to EMNLP 2024 main conference.
+```text
+docs/STORM_OFFICIAL_CN.md
+```
 
-- [2024/07] You can now install our package with `pip install knowledge-storm`!
-- [2024/07] We add `VectorRM` to support grounding on user-provided documents, complementing existing support of search engines (`YouRM`, `BingSearch`). (check out [#58](https://github.com/stanford-oval/storm/pull/58))
-- [2024/07] We release demo light for developers a minimal user interface built with streamlit framework in Python, handy for local development and demo hosting (checkout [#54](https://github.com/stanford-oval/storm/pull/54))
-- [2024/06] We will present STORM at NAACL 2024! Find us at Poster Session 2 on June 17 or check our [presentation material](assets/storm_naacl2024_slides.pdf). 
-- [2024/05] We add Bing Search support in [rm.py](knowledge_storm/rm.py). Test STORM with `GPT-4o` - we now configure the article generation part in our demo using `GPT-4o` model.
-- [2024/04] We release refactored version of STORM codebase! We define [interface](knowledge_storm/interface.py) for STORM pipeline and reimplement STORM-wiki (check out [`src/storm_wiki`](knowledge_storm/storm_wiki)) to demonstrate how to instantiate the pipeline. We provide API to support customization of different language models and retrieval/search integration.
+当前 GitHub 仓库：
 
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+```text
+https://github.com/yzy-151/paperstorm-agent
+```
 
-## Overview [(Try STORM now!)](https://storm.genie.stanford.edu/)
+当前 README 记录本 fork 的中文项目定位、运行方式、版本计划和求职展示重点。
+
+## 1. 官方 STORM 基础架构
+
+STORM 全称是：
+
+```text
+Synthesis of Topic Outlines through Retrieval and Multi-perspective Question Asking
+```
+
+它是 Stanford OVAL 提出的长文调研与写作系统，目标是从一个 topic 出发，通过检索、多视角提问、模拟对话、知识整理和写作，生成类似 Wikipedia 风格的长文章。
+
+官方整体架构图：
 
 <p align="center">
   <img src="assets/overview.svg" style="width: 90%; height: auto;">
 </p>
-STORM is a LLM system that writes Wikipedia-like articles from scratch based on Internet search. Co-STORM further enhanced its feature by enabling human to collaborative LLM system to support more aligned and preferred information seeking and knowledge curation.
 
-While the system cannot produce publication-ready articles that often require a significant number of edits, experienced Wikipedia editors have found it helpful in their pre-writing stage.
-
-**More than 70,000 people have tried our [live research preview](https://storm.genie.stanford.edu/). Try it out to see how STORM can help your knowledge exploration journey and please provide feedback to help us improve the system 🙏!**
-
-
-
-## How STORM & Co-STORM works
-
-### STORM
-
-STORM breaks down generating long articles with citations into two steps:
-
-1. **Pre-writing stage**: The system conducts Internet-based research to collect references and generates an outline.
-2. **Writing stage**: The system uses the outline and references to generate the full-length article with citations.
-<p align="center">
-  <img src="assets/two_stages.jpg" style="width: 60%; height: auto;">
-</p>
-
-STORM identifies the core of automating the research process as automatically coming up with good questions to ask. Directly prompting the language model to ask questions does not work well. To improve the depth and breadth of the questions, STORM adopts two strategies:
-1. **Perspective-Guided Question Asking**: Given the input topic, STORM discovers different perspectives by surveying existing articles from similar topics and uses them to control the question-asking process.
-2. **Simulated Conversation**: STORM simulates a conversation between a Wikipedia writer and a topic expert grounded in Internet sources to enable the language model to update its understanding of the topic and ask follow-up questions.
-
-### CO-STORM
-
-Co-STORM proposes **a collaborative discourse protocol** which implements a turn management policy to support smooth collaboration among 
-
-- **Co-STORM LLM experts**: This type of agent generates answers grounded on external knowledge sources and/or raises follow-up questions based on the discourse history.
-- **Moderator**: This agent generates thought-provoking questions inspired by information discovered by the retriever but not directly used in previous turns. Question generation can also be grounded!
-- **Human user**: The human user will take the initiative to either (1) observe the discourse to gain deeper understanding of the topic, or (2) actively engage in the conversation by injecting utterances to steer the discussion focus.
+官方两阶段流程图：
 
 <p align="center">
-  <img src="assets/co-storm-workflow.jpg" style="width: 60%; height: auto;">
+  <img src="assets/two_stages.jpg" style="width: 65%; height: auto;">
 </p>
 
-Co-STORM also maintains a dynamic updated **mind map**, which organize collected information into a hierarchical concept structure, aiming to **build a shared conceptual space between the human user and the system**. The mind map has been proven to help reduce the mental load when the discourse goes long and in-depth. 
+STORM 的核心流程：
 
-Both STORM and Co-STORM are implemented in a highly modular way using [dspy](https://github.com/stanfordnlp/dspy).
-
-## Installation
-
-
-To install the knowledge storm library, use `pip install knowledge-storm`. 
-
-You could also install the source code which allows you to modify the behavior of STORM engine directly.
-1. Clone the git repository.
-    ```shell
-    git clone https://github.com/stanford-oval/storm.git
-    cd storm
-    ```
-   
-2. Install the required packages.
-   ```shell
-   conda create -n storm python=3.11
-   conda activate storm
-   pip install -r requirements.txt
-   ```
-   
-
-## API
-
-Currently, our package support:
-
-- Language model components: All language models supported by litellm as listed [here](https://docs.litellm.ai/docs/providers)
-- Embedding model components: All embedding models supported by litellm as listed [here](https://docs.litellm.ai/docs/embedding/supported_embedding)
-- retrieval module components: `YouRM`, `BingSearch`, `VectorRM`, `SerperRM`, `BraveRM`, `SearXNG`, `DuckDuckGoSearchRM`, `TavilySearchRM`, `GoogleSearch`, and `AzureAISearch` as 
-
-:star2: **PRs for integrating more search engines/retrievers into [knowledge_storm/rm.py](knowledge_storm/rm.py) are highly appreciated!**
-
-Both STORM and Co-STORM are working in the information curation layer, you need to set up the information retrieval module and language model module to create their `Runner` classes respectively.
-
-### STORM
-
-The STORM knowledge curation engine is defined as a simple Python `STORMWikiRunner` class. Here is an example of using You.com search engine and OpenAI models.
-
-```python
-import os
-from knowledge_storm import STORMWikiRunnerArguments, STORMWikiRunner, STORMWikiLMConfigs
-from knowledge_storm.lm import LitellmModel
-from knowledge_storm.rm import YouRM
-
-lm_configs = STORMWikiLMConfigs()
-openai_kwargs = {
-    'api_key': os.getenv("OPENAI_API_KEY"),
-    'temperature': 1.0,
-    'top_p': 0.9,
-}
-# STORM is a LM system so different components can be powered by different models to reach a good balance between cost and quality.
-# For a good practice, choose a cheaper/faster model for `conv_simulator_lm` which is used to split queries, synthesize answers in the conversation.
-# Choose a more powerful model for `article_gen_lm` to generate verifiable text with citations.
-gpt_35 = LitellmModel(model='gpt-3.5-turbo', max_tokens=500, **openai_kwargs)
-gpt_4 = LitellmModel(model='gpt-4o', max_tokens=3000, **openai_kwargs)
-lm_configs.set_conv_simulator_lm(gpt_35)
-lm_configs.set_question_asker_lm(gpt_35)
-lm_configs.set_outline_gen_lm(gpt_4)
-lm_configs.set_article_gen_lm(gpt_4)
-lm_configs.set_article_polish_lm(gpt_4)
-# Check out the STORMWikiRunnerArguments class for more configurations.
-engine_args = STORMWikiRunnerArguments(...)
-rm = YouRM(ydc_api_key=os.getenv('YDC_API_KEY'), k=engine_args.search_top_k)
-runner = STORMWikiRunner(engine_args, lm_configs, rm)
+```text
+Pre-writing stage: research -> outline
+Writing stage: article -> polish
 ```
 
-The `STORMWikiRunner` instance can be evoked with the simple `run` method:
-```python
-topic = input('Topic: ')
-runner.run(
-    topic=topic,
-    do_research=True,
-    do_generate_outline=True,
-    do_generate_article=True,
-    do_polish_article=True,
-)
-runner.post_run()
-runner.summary()
-```
-- `do_research`: if True, simulate conversations with difference perspectives to collect information about the topic; otherwise, load the results.
-- `do_generate_outline`: if True, generate an outline for the topic; otherwise, load the results.
-- `do_generate_article`: if True, generate an article for the topic based on the outline and the collected information; otherwise, load the results.
-- `do_polish_article`: if True, polish the article by adding a summarization section and (optionally) removing duplicate content; otherwise, load the results.
+在工程入口中，对应 `STORMWikiRunner.run()` 的四个开关：
 
-### Co-STORM
-
-The Co-STORM knowledge curation engine is defined as a simple Python `CoStormRunner` class. Here is an example of using Bing search engine and OpenAI models.
-
-```python
-from knowledge_storm.collaborative_storm.engine import CollaborativeStormLMConfigs, RunnerArgument, CoStormRunner
-from knowledge_storm.lm import LitellmModel
-from knowledge_storm.logging_wrapper import LoggingWrapper
-from knowledge_storm.rm import BingSearch
-
-# Co-STORM adopts the same multi LM system paradigm as STORM 
-lm_config: CollaborativeStormLMConfigs = CollaborativeStormLMConfigs()
-openai_kwargs = {
-    "api_key": os.getenv("OPENAI_API_KEY"),
-    "api_provider": "openai",
-    "temperature": 1.0,
-    "top_p": 0.9,
-    "api_base": None,
-} 
-question_answering_lm = LitellmModel(model=gpt_4o_model_name, max_tokens=1000, **openai_kwargs)
-discourse_manage_lm = LitellmModel(model=gpt_4o_model_name, max_tokens=500, **openai_kwargs)
-utterance_polishing_lm = LitellmModel(model=gpt_4o_model_name, max_tokens=2000, **openai_kwargs)
-warmstart_outline_gen_lm = LitellmModel(model=gpt_4o_model_name, max_tokens=500, **openai_kwargs)
-question_asking_lm = LitellmModel(model=gpt_4o_model_name, max_tokens=300, **openai_kwargs)
-knowledge_base_lm = LitellmModel(model=gpt_4o_model_name, max_tokens=1000, **openai_kwargs)
-
-lm_config.set_question_answering_lm(question_answering_lm)
-lm_config.set_discourse_manage_lm(discourse_manage_lm)
-lm_config.set_utterance_polishing_lm(utterance_polishing_lm)
-lm_config.set_warmstart_outline_gen_lm(warmstart_outline_gen_lm)
-lm_config.set_question_asking_lm(question_asking_lm)
-lm_config.set_knowledge_base_lm(knowledge_base_lm)
-
-# Check out the Co-STORM's RunnerArguments class for more configurations.
-topic = input('Topic: ')
-runner_argument = RunnerArgument(topic=topic, ...)
-logging_wrapper = LoggingWrapper(lm_config)
-bing_rm = BingSearch(bing_search_api_key=os.environ.get("BING_SEARCH_API_KEY"),
-                     k=runner_argument.retrieve_top_k)
-costorm_runner = CoStormRunner(lm_config=lm_config,
-                               runner_argument=runner_argument,
-                               logging_wrapper=logging_wrapper,
-                               rm=bing_rm)
+```text
+do_research
+do_generate_outline
+do_generate_article
+do_polish_article
 ```
 
-The `CoStormRunner` instance can be evoked with the `warmstart()` and `step(...)` methods.
+官方 STORM 的关键机制：
 
-```python
-# Warm start the system to build shared conceptual space between Co-STORM and users
-costorm_runner.warm_start()
+- `Perspective-Guided Question Asking`：先发现不同视角，再让不同视角控制问题生成，避免问题浅、散、重复。
+- `Simulated Conversation`：模拟 Wikipedia writer 和 topic expert 的多轮对话，让 writer 追问、expert 基于检索结果回答。
+- 模块化 `dspy` 实现：retriever、LM、runner、module 解耦，便于替换搜索引擎和语言模型。
+- 多 LLM 配置：不同阶段可使用不同模型，在成本、速度、上下文长度和生成质量之间做权衡。
 
-# Step through the collaborative discourse 
-# Run either of the code snippets below in any order, as many times as you'd like
-# To observe the conversation:
-conv_turn = costorm_runner.step()
-# To inject your utterance to actively steer the conversation:
-costorm_runner.step(user_utterance="YOUR UTTERANCE HERE")
+Co-STORM 是官方协作版本，加入 human-AI collaborative knowledge curation、Moderator、LLM experts 和动态 mind map：
 
-# Generate report based on the collaborative discourse
-costorm_runner.knowledge_base.reorganize()
-article = costorm_runner.generate_report()
-print(article)
+<p align="center">
+  <img src="assets/co-storm-workflow.jpg" style="width: 65%; height: auto;">
+</p>
+
+更详细的官方中文整理见：
+
+```text
+docs/STORM_OFFICIAL_CN.md
 ```
 
+## 2. PaperStorm Agent 项目定位
 
+PaperStorm Agent 的目标不是从零重写 STORM，而是在成熟 Deep Research / RAG 框架上做面向 Agent 开发岗的工程化改造：
 
-## Quick Start with Example Scripts
+- 中文论文调研报告生成。
+- arXiv / 本地 PDF 检索。
+- LLM query 清洗与领域消歧。
+- Runtime Trace / Hook。
+- Tool Schema 与 MCP-style 工具入口。
+- Memory、Context Compression 与知识库问答。
+- Eval Harness 量化评估 Agent 运行质量。
+- 后续补 Multi-Agent、知识库服务化、高并发实验和前端展示。
 
-We provide scripts in our [examples folder](examples) as a quick start to run STORM and Co-STORM with different configurations.
+与另一个项目 `nonlinear-nn-agent` 的分工：
 
-We suggest using `secrets.toml` to set up the API keys. Create a file `secrets.toml` under the root directory and add the following content:
+- `nonlinear-nn-agent`：从零实现轻量 Agent Harness Runtime，突出 ToolRegistry、Hook、Session、Trace、Async、Retry。
+- `PaperStorm Agent`：基于成熟 RAG/Deep Research 框架二次开发，突出 RAG、Memory、MCP、Multi-Agent、Eval、知识库与前端展示。
 
-```shell
-# ============ language model configurations ============ 
-# Set up OpenAI API key.
-OPENAI_API_KEY="your_openai_api_key"
-# If you are using the API service provided by OpenAI, include the following line:
-OPENAI_API_TYPE="openai"
-# If you are using the API service provided by Microsoft Azure, include the following lines:
-OPENAI_API_TYPE="azure"
-AZURE_API_BASE="your_azure_api_base_url"
-AZURE_API_VERSION="your_azure_api_version"
-# ============ retriever configurations ============ 
-BING_SEARCH_API_KEY="your_bing_search_api_key" # if using bing search
-# ============ encoder configurations ============ 
-ENCODER_API_TYPE="openai" # if using openai encoder
+## 3. 当前已完成能力
+
+### v0.1：PaperStorm MVP
+
+- 支持 DeepSeek / MiniMax LLM 后端。
+- 支持 arXiv 论文检索。
+- 支持本地 PDF 论文片段检索。
+- 支持中文输出。
+- 复用 STORM 四阶段流程：
+
+```text
+research -> outline -> article -> polish
 ```
 
-### STORM examples
+### 运行稳定性
 
-**To run STORM with `gpt` family models with default configurations:**
+- LLM query sanitizer：过滤空 query、Markdown、JSON、解释性句子。
+- PIM 缩写消歧：将“PIM 神经网络抑制”指向 `passive intermodulation suppression`，过滤 `processing-in-memory / RAM / DRAM` 跑题结果。
+- arXiv 单 query 失败降级，不中断主流程。
+- 空检索结果防护，避免文章生成阶段崩溃。
+- Wikipedia 辅助抓取增加 User-Agent、timeout 和结构检查。
+- Windows UTF-8、surrogate、输出目录名、run_config 脱敏等修复。
 
-Run the following command.
-```bash
-python examples/storm_examples/run_storm_wiki_gpt.py \
-    --output-dir $OUTPUT_DIR \
-    --retriever bing \
-    --do-research \
-    --do-generate-outline \
-    --do-generate-article \
-    --do-polish-article
+### Agent Runtime 能力
+
+- `paperstorm_trace.jsonl`：记录工具调用、耗时、结果数量、失败原因和产物路径。
+- `run_summary.json`：记录一次运行摘要。
+- `PaperStormTool`：统一工具 schema。
+- `paperstorm_mcp_server.py`：MCP-style stdio server，支持 `tools/list` 和 `tools/call`。
+- `paperstorm_eval.py`：规则版 Eval Harness，输出 `scorecard.json` 和 `scorecard.md`。
+
+### v0.2：Memory / Context Compression / QA
+
+- `PaperStormMemoryStore`：提供 working / episodic / semantic 三层记忆和用户偏好保存。
+- `compress_context`：把长上下文压缩为结构化摘要，并检查期望关键词和禁止关键词。
+- `PaperStormKnowledgeBase`：从一次 PaperStorm 运行目录加载文章和检索结果，支持基于证据的问答。
+- `KnowledgeBaseQATool`：将知识库问答封装为标准 `PaperStormTool`，可被 MCP-style server 发现和调用。
+- `PaperStormRuntimeSession`：轻量 runtime session，统一管理 tool registry、trace 写入和 working memory。
+- `evaluate_qa_artifact`：对 `qa_answer.json` 进行规则版 QA 评估，检查引用、groundedness、关键词覆盖和跑题内容。
+
+### v0.3：Runtime / Hook / Trace 标准化
+
+- `ToolRegistry`：统一注册、查询、列出和校验 PaperStorm 工具。
+- `HookManager`：支持 `before_tool_call`、`after_tool_call`、`on_tool_error`、`on_context_compress` 等生命周期 hook。
+- `RuntimeEvent`：统一 runtime trace 字段，包括 `run_id`、`task_id`、`stage`、`tool`、`status`、`duration_sec`、`input_summary`、`output_summary`、`error`。
+- `PaperStormRuntimeSession` v2：统一 tool registry、hook、trace、memory 和 context compression。
+- MCP-style server 已接入 `ToolRegistry`，工具发现和工具调用共享同一套注册模型。
+
+### v0.4：Multi-Agent 论文调研协作
+
+- `PlannerAgent`：根据 topic 和关键词生成带 intent 的 query plan。
+- `RetrieverAgent`：通过 `PaperStormRuntimeSession` 调用检索工具，并保留 query 来源。
+- `CriticAgent`：基于 expected / forbidden keywords 判断结果保留或过滤，并写明理由。
+- `MemoryAgent`：把保留和过滤发现写入 episodic memory。
+- `EvaluatorAgent`：给 query plan、critic signal 和 agent trace 打分。
+- `PaperStormResearchOrchestrator`：中心化编排多 Agent，输出 `agent_trace.jsonl` 和 `multi_agent_report.json`。
+
+### v0.5：知识库平台化与服务 API
+
+- `PaperStormTaskService`：文件存储版服务核心，管理 task_id、状态、output_dir、trace、summary、scorecard。
+- 支持任务状态：`queued / running / succeeded / failed`。
+- 支持读取文章、scorecard、trace。
+- 支持基于 task artifacts 的知识库 QA。
+- 支持 fake runner，不依赖真实 API key 也能测试服务链路。
+- 失败任务输出结构化 error，并对 secret / key / token 字段脱敏。
+- `paperstorm_service_api.py`：可选 FastAPI 适配器，提供任务提交、运行、状态查询、文章读取、scorecard、trace 和知识库 QA 路由。
+
+### v0.5.1：并发、恢复与压测 baseline
+
+- `PaperStormTaskService(max_concurrent_tasks=...)`：支持可配置并发上限。
+- `worker_tick()`：从 queued 任务中按容量启动任务，避免超过并发上限。
+- `complete_task()`：手动完成 running 任务，释放后续任务容量。
+- `recover_stale_running_tasks()`：将超时 running 任务恢复为 failed，避免任务永久卡住。
+- `run_stress_benchmark()`：使用 fake runner 生成压测报告，包含成功数、失败数、失败率、平均延迟、P95 latency、最大观察并发和 retry 次数。
+- `benchmark_paperstorm_service.py`：命令行压测入口。
+
+### v0.6：前端 Dashboard 与官方中文文档
+
+- 新增静态 Dashboard：`frontend/paperstorm_dashboard/index.html`。
+- Dashboard 展示任务状态、文章、知识库 QA、runtime trace、scorecard、multi-agent 结果和 stress report。
+- 新增 `build_paperstorm_demo_bundle.py`，可生成 `sample_data.json` 供前端离线展示。
+- 新增 `docs/STORM_OFFICIAL_CN.md`，把官方 STORM 架构和核心机制整理为中文说明。
+- README 补充官方 STORM 架构图、两阶段流程图和 Co-STORM 工作流图。
+
+### v0.7：真实 Pipeline Worker 接入
+
+- 新增 `knowledge_storm/paperstorm_pipeline.py`，把真实 STORM pipeline 封装为 service 可调用的 worker。
+- `PaperStormTaskService` 支持 `run_mode="paperstorm"`，同一套 task_id、状态、output_dir、article、trace、scorecard 读取接口可承载 fake 和真实任务。
+- `PaperStormTaskService(..., pipeline_runner=...)` 支持 runner 注入，单元测试可用本地 runner 验证状态机，不依赖真实 LLM/API/网络。
+- 新增 `run_paperstorm_service_task.py`，可从命令行提交并运行单个 service task。
+- FastAPI 请求模型补充真实 worker 参数：LLM provider/model、检索器、PDF 目录、阶段开关、trace 开关等。
+- 修复领域关键词误脱敏问题：`expected_keywords` / `forbidden_keywords` 不再因为字段名包含 `key` 被错误替换。
+
+### v0.8：Dashboard 读取 Service 产物
+
+- `PaperStormTaskService.get_dashboard_bundle(task_id)`：聚合 task、article、QA、scorecard、trace、pipeline worker 和 service snapshot。
+- FastAPI 新增 `GET /research-tasks/{task_id}/dashboard`，前端可一次请求拿到真实任务展示数据。
+- Dashboard 增加 Service URL、Task ID、加载真实任务和加载样例数据控件。
+- Dashboard 新增 Pipeline Worker 面板，展示真实 worker 的 runner、retriever、LLM 和 score 元数据。
+- 静态 `sample_data.json/js` 升级到 v0.8，离线打开 HTML 仍可展示完整样例。
+- Demo bundle 递归清理本机临时路径，静态数据中的运行目录统一展示为 `demo://paperstorm_dashboard/...`。
+
+### v0.9：端到端本地 Demo 与任务轮询
+
+- `PaperStormTaskService.list_tasks(status=None)`：支持 Dashboard 获取全部任务或按状态过滤任务。
+- FastAPI 新增 `GET /research-tasks`，返回任务列表；同时加入 CORS middleware，方便本地 HTML 访问服务。
+- Dashboard 新增任务控制台：topic、run mode、retriever、output language、expected/forbidden keywords。
+- Dashboard 支持提交任务、运行选中任务、轮询选中任务、刷新任务列表。
+- Dashboard 支持展示结构化任务 error，使失败任务可观察、可复盘。
+- 静态 `sample_data.json/js` 升级到 v0.9，离线展示和服务控制台共存。
+
+### v1.0 Release Demo：可投递、可演示的 Agent 平台原型
+
+- 新增 `build_release_demo()`，复用 `PaperStormTaskService` 的 submit -> run -> QA -> dashboard bundle 链路生成稳定演示数据。
+- 新增 `run_paperstorm_release_demo.py`，一条命令生成 release summary、文章、trace、scorecard、QA 和前端 `sample_data.json/js`。
+- Dashboard 样例数据可升级为 v1.0，展示 RAG、Memory、Runtime Trace、Eval、Task Service 和 Dashboard 的闭环。
+- README、版本计划、简历面试文档补充 5 分钟演示路线和面试讲法。
+- v1.0 明确为本地可演示平台原型，不夸大为多租户、分布式或生产部署系统。
+
+## 4. 关键文件
+
+运行入口：
+
+```text
+examples/storm_examples/run_paper_storm_minimax.py
+examples/storm_examples/paperstorm_mcp_server.py
+examples/storm_examples/evaluate_paperstorm_run.py
+examples/storm_examples/paperstorm_service_api.py
+examples/storm_examples/benchmark_paperstorm_service.py
+examples/storm_examples/build_paperstorm_demo_bundle.py
+examples/storm_examples/run_paperstorm_service_task.py
+examples/storm_examples/run_paperstorm_release_demo.py
 ```
 
-**To run STORM using your favorite language models or grounding on your own corpus:** Check out [examples/storm_examples/README.md](examples/storm_examples/README.md).
+核心模块：
 
-### Co-STORM examples
-
-To run Co-STORM with `gpt` family models with default configurations,
-
-1. Add `BING_SEARCH_API_KEY="xxx"` and `ENCODER_API_TYPE="xxx"` to `secrets.toml`
-2. Run the following command
-
-```bash
-python examples/costorm_examples/run_costorm_gpt.py \
-    --output-dir $OUTPUT_DIR \
-    --retriever bing
+```text
+knowledge_storm/rm.py
+knowledge_storm/paperstorm_tools.py
+knowledge_storm/paperstorm_eval.py
+knowledge_storm/paperstorm_memory.py
+knowledge_storm/paperstorm_qa.py
+knowledge_storm/paperstorm_runtime.py
+knowledge_storm/paperstorm_agents.py
+knowledge_storm/paperstorm_service.py
+knowledge_storm/paperstorm_demo.py
+knowledge_storm/paperstorm_pipeline.py
+knowledge_storm/paperstorm_release.py
 ```
 
+测试：
 
-## Customization of the Pipeline
-
-### STORM
-
-If you have installed the source code, you can customize STORM based on your own use case. STORM engine consists of 4 modules:
-
-1. Knowledge Curation Module: Collects a broad coverage of information about the given topic.
-2. Outline Generation Module: Organizes the collected information by generating a hierarchical outline for the curated knowledge.
-3. Article Generation Module: Populates the generated outline with the collected information.
-4. Article Polishing Module: Refines and enhances the written article for better presentation.
-
-The interface for each module is defined in `knowledge_storm/interface.py`, while their implementations are instantiated in `knowledge_storm/storm_wiki/modules/*`. These modules can be customized according to your specific requirements (e.g., generating sections in bullet point format instead of full paragraphs).
-
-### Co-STORM
-
-If you have installed the source code, you can customize Co-STORM based on your own use case
-
-1. Co-STORM introduces multiple LLM agent types (i.e. Co-STORM experts and Moderator). LLM agent interface is defined in `knowledge_storm/interface.py` , while its implementation is instantiated in `knowledge_storm/collaborative_storm/modules/co_storm_agents.py`. Different LLM agent policies can be customized.
-2. Co-STORM introduces a collaborative discourse protocol, with its core function centered on turn policy management. We provide an example implementation of turn policy management through `DiscourseManager` in `knowledge_storm/collaborative_storm/engine.py`. It can be customized and further improved.
-
-## Datasets
-To facilitate the study of automatic knowledge curation and complex information seeking, our project releases the following datasets:
-
-### FreshWiki
-The FreshWiki Dataset is a collection of 100 high-quality Wikipedia articles focusing on the most-edited pages from February 2022 to September 2023. See Section 2.1 in [STORM paper](https://arxiv.org/abs/2402.14207) for more details.
-
-You can download the dataset from [huggingface](https://huggingface.co/datasets/EchoShao8899/FreshWiki) directly. To ease the data contamination issue, we archive the [source code](https://github.com/stanford-oval/storm/tree/NAACL-2024-code-backup/FreshWiki) for the data construction pipeline that can be repeated at future dates.
-
-### WildSeek
-To study users’ interests in complex information seeking tasks in the wild, we utilized data collected from the web research preview to create the WildSeek dataset. We downsampled the data to ensure the diversity of the topics and the quality of the data. Each data point is a pair comprising a topic and the user’s goal for conducting deep search on the topic.  For more details, please refer to Section 2.2 and Appendix A of [Co-STORM paper](https://www.arxiv.org/abs/2408.15232).
-
-The WildSeek dataset is available [here](https://huggingface.co/datasets/YuchengJiang/WildSeek).
-
-## Replicate STORM & Co-STORM paper result
-
-For STORM paper experiments, please switch to the branch `NAACL-2024-code-backup` [here](https://github.com/stanford-oval/storm/tree/NAACL-2024-code-backup).
-
-For Co-STORM paper experiments, please switch to the branch `EMNLP-2024-code-backup` (placeholder for now, will be updated soon).
-
-## Roadmap & Contributions
-Our team is actively working on:
-1. Human-in-the-Loop Functionalities: Supporting user participation in the knowledge curation process.
-2. Information Abstraction: Developing abstractions for curated information to support presentation formats beyond the Wikipedia-style report.
-
-If you have any questions or suggestions, please feel free to open an issue or pull request. We welcome contributions to improve the system and the codebase!
-
-Contact person: [Yijia Shao](mailto:shaoyj@stanford.edu) and [Yucheng Jiang](mailto:yuchengj@stanford.edu)
-
-## Acknowledgement
-We would like to thank Wikipedia for its excellent open-source content. The FreshWiki dataset is sourced from Wikipedia, licensed under the Creative Commons Attribution-ShareAlike (CC BY-SA) license.
-
-We are very grateful to [Michelle Lam](https://michelle123lam.github.io/) for designing the logo for this project and [Dekun Ma](https://dekun.me) for leading the UI development.
-
-Thanks to Vercel for their support of [open-source software](https://storm.genie.stanford.edu)
-
-## Citation
-Please cite our paper if you use this code or part of it in your work:
-```bibtex
-@inproceedings{jiang-etal-2024-unknown,
-    title = "Into the Unknown Unknowns: Engaged Human Learning through Participation in Language Model Agent Conversations",
-    author = "Jiang, Yucheng  and
-      Shao, Yijia  and
-      Ma, Dekun  and
-      Semnani, Sina  and
-      Lam, Monica",
-    editor = "Al-Onaizan, Yaser  and
-      Bansal, Mohit  and
-      Chen, Yun-Nung",
-    booktitle = "Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing",
-    month = nov,
-    year = "2024",
-    address = "Miami, Florida, USA",
-    publisher = "Association for Computational Linguistics",
-    url = "https://aclanthology.org/2024.emnlp-main.554/",
-    doi = "10.18653/v1/2024.emnlp-main.554",
-    pages = "9917--9955",
-}
-
-@inproceedings{shao-etal-2024-assisting,
-    title = "Assisting in Writing {W}ikipedia-like Articles From Scratch with Large Language Models",
-    author = "Shao, Yijia  and
-      Jiang, Yucheng  and
-      Kanell, Theodore  and
-      Xu, Peter  and
-      Khattab, Omar  and
-      Lam, Monica",
-    editor = "Duh, Kevin  and
-      Gomez, Helena  and
-      Bethard, Steven",
-    booktitle = "Proceedings of the 2024 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies (Volume 1: Long Papers)",
-    month = jun,
-    year = "2024",
-    address = "Mexico City, Mexico",
-    publisher = "Association for Computational Linguistics",
-    url = "https://aclanthology.org/2024.naacl-long.347/",
-    doi = "10.18653/v1/2024.naacl-long.347",
-    pages = "6252--6278",
-}
+```text
+tests/test_minimax_runtime_fixes.py
+tests/test_paperstorm_retrievers.py
+tests/test_paperstorm_logging.py
+tests/test_paperstorm_mcp_server.py
+tests/test_paperstorm_eval.py
+tests/test_paperstorm_memory_qa.py
+tests/test_paperstorm_runtime.py
+tests/test_paperstorm_multi_agent.py
+tests/test_paperstorm_service.py
+tests/test_paperstorm_concurrency.py
+tests/test_paperstorm_frontend_docs.py
+tests/test_paperstorm_pipeline.py
+tests/test_paperstorm_service_cli.py
+tests/test_paperstorm_release_demo.py
+tests/test_paperstorm_release_docs.py
 ```
+
+维护文档：
+
+```text
+docs/OPERATION_GUIDE.md
+docs/VERSION_PLAN.md
+docs/RESUME_INTERVIEW_PLAN.md
+docs/STORM_OFFICIAL_CN.md
+```
+
+前端：
+
+```text
+frontend/paperstorm_dashboard/index.html
+frontend/paperstorm_dashboard/styles.css
+frontend/paperstorm_dashboard/app.js
+```
+
+## 5. 环境
+
+当前本地推荐解释器：
+
+```text
+D:\SOFTWARE\spyder\envs\storm\python.exe
+```
+
+不要用系统默认 `python` 直接运行，容易出现环境不一致。
+
+## 6. 运行 PaperStorm
+
+PowerShell 示例：
+
+```powershell
+cd D:\FILEEEEEEEEEEE\projects\storm
+
+D:\SOFTWARE\spyder\envs\storm\python.exe examples\storm_examples\run_paper_storm_minimax.py `
+  --topic "pim 神经网络抑制" `
+  --retriever arxiv `
+  --output-language zh `
+  --output-dir ./results/paperstorm_zh `
+  --llm-provider deepseek `
+  --llm-model flash `
+  --do-research `
+  --do-generate-outline `
+  --do-generate-article `
+  --do-polish-article `
+  --max-conv-turn 1 `
+  --max-perspective 1 `
+  --search-top-k 2 `
+  --max-thread-num 1
+```
+
+常见输出：
+
+```text
+storm_gen_outline.txt
+storm_gen_article.txt
+storm_gen_article_polished.txt
+raw_search_results.json
+conversation_log.json
+url_to_info.json
+paperstorm_trace.jsonl
+run_summary.json
+```
+
+最终可读文章通常是：
+
+```text
+storm_gen_article_polished.txt
+```
+
+## 7. 运行 Dashboard Demo
+
+生成前端样例数据：
+
+```powershell
+D:\SOFTWARE\spyder\envs\storm\python.exe examples\storm_examples\build_paperstorm_demo_bundle.py `
+  --output-dir frontend\paperstorm_dashboard
+```
+
+然后打开：
+
+```text
+frontend/paperstorm_dashboard/index.html
+```
+
+Dashboard 展示：
+
+- 任务状态。
+- 调研文章。
+- 知识库 QA。
+- Runtime trace。
+- Eval scorecard。
+- Multi-Agent 保留/过滤结果。
+- Stress benchmark。
+- Pipeline Worker 元数据。
+- 任务创建、运行和轮询控制。
+
+连接本地 service 查看真实任务：
+
+1. 启动 `paperstorm_service_api.py` 对应的 FastAPI 服务。
+2. 在 Dashboard 顶部输入 service URL，例如 `http://127.0.0.1:8000`。
+3. 输入 task_id。
+4. 点击“加载真实任务”。
+
+本地端到端 fake demo：
+
+1. 启动 FastAPI service。
+2. 打开 `frontend/paperstorm_dashboard/index.html`。
+3. 保持 Run Mode 为 `fake`。
+4. 点击“提交任务”。
+5. 点击“运行选中任务”。
+6. 点击“轮询选中任务”查看 article、trace、scorecard 和 error。
+
+## 8. v1.0 Release Demo
+
+一条命令生成可演示产物：
+
+```powershell
+D:\SOFTWARE\spyder\envs\storm\python.exe examples\storm_examples\run_paperstorm_release_demo.py `
+  --topic "pim 神经网络抑制" `
+  --service-root ./results/paperstorm_release_demo `
+  --dashboard-dir frontend\paperstorm_dashboard
+```
+
+它会生成：
+
+```text
+results/paperstorm_release_demo/release_demo_summary.json
+results/paperstorm_release_demo/results/<task_id>/storm_gen_article_polished.txt
+results/paperstorm_release_demo/results/<task_id>/paperstorm_trace.jsonl
+results/paperstorm_release_demo/results/<task_id>/scorecard.json
+frontend/paperstorm_dashboard/sample_data.json
+frontend/paperstorm_dashboard/sample_data.js
+```
+
+### 5 分钟演示路线
+
+1. 用 README 的官方 STORM 架构图说明原项目的 research -> outline -> article -> polish。
+2. 运行 `run_paperstorm_release_demo.py`，展示同一套 service task 如何生成文章、QA、trace 和 scorecard。
+3. 打开 `frontend/paperstorm_dashboard/index.html`，展示 task 状态、文章、知识库 QA、trace timeline 和 eval scorecard。
+4. 解释 PIM 消歧：本项目把 PIM 指向 `passive intermodulation`，并过滤 `processing-in-memory / RAM / DRAM` 跑题内容。
+5. 讲工程化增强：Tool Schema / MCP-style server、Memory、Context Compression、Multi-Agent、Task Service、Dashboard、Benchmark。
+6. 主动说明边界：当前是本地平台原型，生产级多租户、权限、分布式队列和云部署还在后续计划。
+
+## 9. 通过 Service Worker 运行单个任务
+
+fake 模式不需要真实 API key，适合验证 service 状态机：
+
+```powershell
+D:\SOFTWARE\spyder\envs\storm\python.exe examples\storm_examples\run_paperstorm_service_task.py `
+  --topic "pim 神经网络抑制" `
+  --run-mode fake `
+  --output-dir ./results/paperstorm_service_demo `
+  --expected-keyword "passive intermodulation" `
+  --forbidden-keyword DRAM
+```
+
+真实 PaperStorm worker 示例：
+
+```powershell
+D:\SOFTWARE\spyder\envs\storm\python.exe examples\storm_examples\run_paperstorm_service_task.py `
+  --topic "pim 神经网络抑制" `
+  --run-mode paperstorm `
+  --retriever arxiv `
+  --output-language zh `
+  --llm-provider deepseek `
+  --llm-model flash `
+  --output-dir ./results/paperstorm_service_real `
+  --max-conv-turn 1 `
+  --max-perspective 1 `
+  --search-top-k 2 `
+  --max-thread-num 1 `
+  --expected-keyword "passive intermodulation" `
+  --forbidden-keyword DRAM
+```
+
+真实 worker 会复用 service 的任务状态、产物目录、trace 和 scorecard 读取接口。真实模式需要可用网络和对应 LLM API key。
+
+## 10. 运行 Eval Harness
+
+示例：
+
+```powershell
+D:\SOFTWARE\spyder\envs\storm\python.exe examples\storm_examples\evaluate_paperstorm_run.py `
+  --run-dir .\results\paperstorm_zh\PIM `
+  --case-file examples\storm_examples\paperstorm_eval_cases.json `
+  --topic "pim 神经网络抑制"
+```
+
+输出：
+
+```text
+scorecard.json
+scorecard.md
+```
+
+当前评分维度：
+
+- 任务完成度。
+- 检索相关性。
+- 跑题惩罚。
+- 文章质量。
+- Runtime 可观测性。
+
+## 11. 运行 MCP-style Server
+
+手工 `tools/list` 验证：
+
+```powershell
+'{' + '"jsonrpc":"2.0","id":1,"method":"tools/list"' + '}' |
+  D:\SOFTWARE\spyder\envs\storm\python.exe examples\storm_examples\paperstorm_mcp_server.py
+```
+
+当前工具：
+
+```text
+arxiv_search
+local_pdf_search
+kb_qa
+```
+
+其中 `local_pdf_search` 需要传入 `--pdf-dir` 后启用。
+
+## 12. 测试
+
+推荐回归测试：
+
+```powershell
+D:\SOFTWARE\spyder\envs\storm\python.exe -m unittest `
+  tests.test_paperstorm_frontend_docs `
+  tests.test_paperstorm_concurrency `
+  tests.test_paperstorm_service `
+  tests.test_paperstorm_pipeline `
+  tests.test_paperstorm_service_cli `
+  tests.test_paperstorm_release_demo `
+  tests.test_paperstorm_release_docs `
+  tests.test_paperstorm_multi_agent `
+  tests.test_paperstorm_runtime `
+  tests.test_paperstorm_memory_qa `
+  tests.test_paperstorm_eval `
+  tests.test_paperstorm_mcp_server `
+  tests.test_paperstorm_logging `
+  tests.test_paperstorm_retrievers `
+  tests.test_minimax_runtime_fixes -v
+```
+
+最近目标结果：
+
+```text
+Ran 78 tests
+OK
+```
+
+语法检查：
+
+```powershell
+D:\SOFTWARE\spyder\envs\storm\python.exe -m py_compile `
+  knowledge_storm\paperstorm_eval.py `
+  knowledge_storm\paperstorm_tools.py `
+  knowledge_storm\paperstorm_demo.py `
+  knowledge_storm\paperstorm_service.py `
+  knowledge_storm\paperstorm_pipeline.py `
+  knowledge_storm\paperstorm_release.py `
+  examples\storm_examples\evaluate_paperstorm_run.py `
+  examples\storm_examples\build_paperstorm_demo_bundle.py `
+  examples\storm_examples\run_paperstorm_service_task.py `
+  examples\storm_examples\run_paperstorm_release_demo.py `
+  examples\storm_examples\paperstorm_service_api.py `
+  examples\storm_examples\paperstorm_mcp_server.py
+```
+
+## 13. 后续版本路线
+
+详见：
+
+```text
+docs/VERSION_PLAN.md
+```
+
+当前建议路线：
+
+- v0.2：RAG 质量与 Memory 模块。
+- v0.4：Multi-Agent 论文调研协作。
+- v0.5：知识库平台化与服务 API。
+- v0.6：前端展示 Demo。
+- v0.7：真实 Pipeline Worker 接入。
+- v0.8：Dashboard 读取真实 service 产物。
+- v0.9：端到端本地 Demo 与任务轮询。
+- v1.0：可投递、可演示的 Agent 平台化 Demo。
+
+## 14. 求职与面试材料
+
+详见：
+
+```text
+docs/RESUME_INTERVIEW_PLAN.md
+```
+
+项目可覆盖的面试关键词：
+
+- Agentic Loop。
+- RAG 全流程。
+- Tool Calling。
+- MCP。
+- Memory。
+- Multi-Agent。
+- Runtime Trace。
+- Eval / Benchmark。
+- 错误容灾。
+- 结构化技术文档。
+
+## 15. 当前边界
+
+已经完成：
+
+- 本地命令行 Agent pipeline。
+- RAG 检索与中文报告生成。
+- Tool Schema / MCP-style server。
+- Runtime Trace。
+- Eval Harness v1。
+- Memory / Context Compression / QA。
+- Multi-Agent 调研编排。
+- 文件存储版 Task Service。
+- 静态 Dashboard。
+- 真实 PaperStorm pipeline worker 接口。
+- Dashboard 轻量读取真实 service task 产物。
+- Dashboard 提交、运行和轮询本地 service task。
+- v1.0 release demo 一键生成本地演示产物和前端样例数据。
+
+尚未完成：
+
+- 生产级 API 网关。
+- 多用户和权限系统。
+- 分布式高并发任务队列。
+- 企业级监控告警。
+- 生产级前端构建、鉴权、自动轮询调度和部署。
+- 真实 LLM/API 环境下的大规模压测。
+
+这些内容会按版本计划逐步补齐。
