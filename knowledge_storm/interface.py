@@ -1,4 +1,5 @@
 import concurrent.futures
+import copy
 import dspy
 import functools
 import hashlib
@@ -473,9 +474,34 @@ class LMConfigs(ABC):
         return model_name_to_usage
 
     def log(self):
+        def redact_secrets(value):
+            if isinstance(value, dict):
+                redacted = {}
+                for key, item in value.items():
+                    normalized_key = key.lower()
+                    if any(
+                        normalized_key == secret_name
+                        or normalized_key.endswith(f"_{secret_name}")
+                        for secret_name in (
+                            "api_key",
+                            "apikey",
+                            "access_token",
+                            "refresh_token",
+                            "secret",
+                            "password",
+                        )
+                    ):
+                        redacted[key] = "<redacted>"
+                    else:
+                        redacted[key] = redact_secrets(item)
+                return redacted
+            if isinstance(value, list):
+                return [redact_secrets(item) for item in value]
+            return value
+
         return OrderedDict(
             {
-                attr_name: getattr(self, attr_name).kwargs
+                attr_name: redact_secrets(copy.deepcopy(getattr(self, attr_name).kwargs))
                 for attr_name in self.__dict__
                 if "_lm" in attr_name and hasattr(getattr(self, attr_name), "kwargs")
             }

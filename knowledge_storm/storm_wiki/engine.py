@@ -300,7 +300,9 @@ class STORMWikiRunner(Engine):
 
         llm_call_history = self.lm_configs.collect_and_reset_lm_history()
         with open(
-            os.path.join(self.article_output_dir, "llm_call_history.jsonl"), "w"
+            os.path.join(self.article_output_dir, "llm_call_history.jsonl"),
+            "w",
+            encoding="utf-8",
         ) as f:
             for call in llm_call_history:
                 if "kwargs" in call:
@@ -342,6 +344,7 @@ class STORMWikiRunner(Engine):
         self,
         topic: str,
         ground_truth_url: str = "",
+        output_dir_name: str = None,
         do_research: bool = True,
         do_generate_outline: bool = True,
         do_generate_article: bool = True,
@@ -376,8 +379,9 @@ class STORMWikiRunner(Engine):
         )
 
         self.topic = topic
+        article_dir_source = output_dir_name or topic
         self.article_dir_name = truncate_filename(
-            topic.replace(" ", "_").replace("/", "_")
+            article_dir_source.replace(" ", "_").replace("/", "_")
         )
         self.article_output_dir = os.path.join(
             self.args.output_dir, self.article_dir_name

@@ -7,14 +7,25 @@ import requests
 from bs4 import BeautifulSoup
 
 
+WIKIPEDIA_REQUEST_HEADERS = {
+    "User-Agent": "PaperStorm/0.1 (research prototype; https://github.com/yzy-151/storm)"
+}
+
+
 def get_wiki_page_title_and_toc(url):
     """Get the main title and table of contents from an url of a Wikipedia page."""
 
-    response = requests.get(url)
+    response = requests.get(url, headers=WIKIPEDIA_REQUEST_HEADERS, timeout=10)
+    response.raise_for_status()
     soup = BeautifulSoup(response.content, "html.parser")
 
     # Get the main title from the first h1 tag
-    main_title = soup.find("h1").text.replace("[edit]", "").strip().replace("\xa0", " ")
+    main_title_node = soup.find("h1")
+    if main_title_node is None:
+        raise ValueError(f"Wikipedia page has no h1 title: {url}")
+    main_title = (
+        main_title_node.text.replace("[edit]", "").strip().replace("\xa0", " ")
+    )
 
     toc = ""
     levels = []
@@ -88,7 +99,9 @@ class CreateWriterWithPersona(dspy.Module):
                     title, toc = get_wiki_page_title_and_toc(url)
                     examples.append(f"Title: {title}\nTable of Contents: {toc}")
                 except Exception as e:
-                    logging.error(f"Error occurs when processing {url}: {e}")
+                    logging.info(
+                        "Skipping Wikipedia inspiration page %s: %s", url, e
+                    )
                     continue
             if len(examples) == 0:
                 examples.append("N/A")
