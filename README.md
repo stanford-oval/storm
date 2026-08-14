@@ -318,6 +318,12 @@ If you have any questions or suggestions, please feel free to open an issue or p
 
 Contact person: [Yijia Shao](mailto:shaoyj@stanford.edu) and [Yucheng Jiang](mailto:yuchengj@stanford.edu)
 
+### Community projects
+
+Third-party ports and integrations built on the STORM / Co-STORM methodology. These are not maintained or endorsed by Stanford OVAL.
+
+- [storm — STORM for Claude Code](https://github.com/coolTheWorld/stanford-oval-storm-skills): an unofficial, prompt-only reimplementation of the STORM and Co-STORM pipelines as a Claude Code plugin. Shares no code with `knowledge-storm`; needs no Python and no search API keys.
+
 ## Acknowledgement
 We would like to thank Wikipedia for its excellent open-source content. The FreshWiki dataset is sourced from Wikipedia, licensed under the Creative Commons Attribution-ShareAlike (CC BY-SA) license.
 
