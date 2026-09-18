@@ -10,3 +10,4 @@ langchain-qdrant
 numpy
 litellm
 diskcache
+mcp>=1.26,<2

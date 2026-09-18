@@ -29,6 +29,7 @@ from knowledge_storm import (
 )
 from knowledge_storm.lm import OpenAIModel, AzureOpenAIModel
 from knowledge_storm.rm import (
+    ParallelSearch,
     YouRM,
     BingSearch,
     BraveRM,
@@ -98,6 +99,8 @@ def main(args):
     # Currently, the information source is the Internet and we use search engine API as the retrieval module.
 
     match args.retriever:
+        case "parallel":
+            rm = ParallelSearch(k=engine_args.search_top_k)
         case "bing":
             rm = BingSearch(
                 bing_search_api=os.getenv("BING_SEARCH_API_KEY"),
@@ -136,7 +139,7 @@ def main(args):
             )
         case _:
             raise ValueError(
-                f'Invalid retriever: {args.retriever}. Choose either "bing", "you", "brave", "duckduckgo", "serper", "tavily", "searxng", or "azure_ai_search"'
+                f'Invalid retriever: {args.retriever}. Choose either "parallel", "bing", "you", "brave", "duckduckgo", "serper", "tavily", "searxng", or "azure_ai_search"'
             )
 
     runner = STORMWikiRunner(engine_args, lm_configs, rm)
@@ -173,7 +176,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "--retriever",
         type=str,
+        default="parallel",
         choices=[
+            "parallel",
             "bing",
             "you",
             "brave",
@@ -183,7 +188,7 @@ if __name__ == "__main__":
             "searxng",
             "azure_ai_search",
         ],
-        help="The search engine API to use for retrieving information.",
+        help="The search provider to use (default: keyless Parallel Search MCP).",
     )
     # stage of the pipeline
     parser.add_argument(

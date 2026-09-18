@@ -1,13 +1,192 @@
+import asyncio
+import concurrent.futures
+import json
 import logging
+import math
 import os
+import threading
+import uuid
 from typing import Callable, Union, List
 
 import backoff
 import dspy
+import httpx
 import requests
 from dsp import backoff_hdlr, giveup_hdlr
+from mcp import ClientSession
+from mcp.client.streamable_http import streamable_http_client
+from mcp.types import Implementation
 
 from .utils import WebPageHelper
+
+
+class ParallelSearch(dspy.Retrieve):
+    """Search the hosted Parallel Search MCP server, without a key by default.
+
+    Queries and the search objective are sent to https://search.parallel.ai/mcp.
+    An optional api_key (or PARALLEL_API_KEY) enables authenticated access. Failed
+    authenticated requests are never retried anonymously.
+    """
+
+    def __init__(self, api_key=None, k=3, is_valid_source: Callable = None, timeout=30):
+        super().__init__(k=k)
+        if k < 1:
+            raise ValueError("k must be positive")
+        if not math.isfinite(timeout) or timeout <= 0:
+            raise ValueError("timeout must be a finite positive number of seconds")
+        self.api_key = api_key if api_key is not None else os.getenv("PARALLEL_API_KEY")
+        if self.api_key is not None and not self.api_key.strip():
+            raise ValueError("Parallel API key must not be empty")
+        self.timeout = timeout
+        self.is_valid_source = is_valid_source or (lambda url: True)
+        # Parallel's task identifier stays the same across concurrent queries.
+        self.session_id = uuid.uuid4().hex
+        self.usage = 0
+        self._usage_lock = threading.Lock()
+
+    def get_usage_and_reset(self):
+        with self._usage_lock:
+            usage = self.usage
+            self.usage = 0
+        return {"ParallelSearch": usage}
+
+    async def _search(self, query):
+        from . import __version__
+
+        async with httpx.AsyncClient(
+            timeout=self.timeout, follow_redirects=False
+        ) as client:
+            # Identify STORM's aggregate integration traffic, keeping httpx's token.
+            client.headers["User-Agent"] = (
+                f"knowledge-storm/{__version__} {client.headers['User-Agent']}"
+            )
+            if self.api_key is not None:
+                client.headers["Authorization"] = f"Bearer {self.api_key}"
+            async with streamable_http_client(
+                "https://search.parallel.ai/mcp", http_client=client
+            ) as (read, write, _):
+                async with ClientSession(
+                    read,
+                    write,
+                    client_info=Implementation(
+                        name="knowledge-storm", version=__version__
+                    ),
+                ) as session:
+                    await session.initialize()
+                    cursor = None
+                    while True:
+                        tools = await session.list_tools(cursor=cursor)
+                        if any(tool.name == "web_search" for tool in tools.tools):
+                            break
+                        cursor = tools.nextCursor
+                        if not cursor:
+                            raise RuntimeError(
+                                "Parallel Search MCP has no web_search tool"
+                            )
+                    return await session.call_tool(
+                        "web_search",
+                        arguments={
+                            "objective": query,
+                            "search_queries": [query],
+                            "session_id": self.session_id,
+                        },
+                    )
+
+    async def _search_with_timeout(self, query):
+        return await asyncio.wait_for(self._search(query), timeout=self.timeout)
+
+    def _search_sync(self, query):
+        # Canonical Retriever calls this from worker threads. Also support callers
+        # with an active event loop without sharing transports between loops.
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            return asyncio.run(self._search_with_timeout(query))
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+            return executor.submit(
+                lambda: asyncio.run(self._search_with_timeout(query))
+            ).result()
+
+    def _results(self, response):
+        if response.isError:
+            raise RuntimeError("Parallel Search MCP returned a tool error")
+        payload = response.structuredContent
+        if payload is None:
+            # The server may include the same payload as structured content and
+            # JSON text. Prefer structured content so results are only read once.
+            texts = [part.text for part in response.content if part.type == "text"]
+            if len(texts) != 1:
+                raise ValueError("Parallel Search MCP returned no unique JSON payload")
+            payload = json.loads(texts[0])
+        if not isinstance(payload, dict) or not isinstance(
+            payload.get("results"), list
+        ):
+            raise ValueError("Parallel Search MCP response must contain a results list")
+        warnings = payload.get("warnings") or []
+        if not isinstance(warnings, list):
+            warnings = [warnings]
+        for warning in warnings:
+            logging.getLogger(__name__).warning("Parallel Search: %s", warning)
+        results = []
+        for item in payload["results"]:
+            if (
+                not isinstance(item, dict)
+                or not isinstance(item.get("url"), str)
+                or not item["url"].strip()
+                or not isinstance(item.get("excerpts"), list)
+                or any(not isinstance(text, str) for text in item["excerpts"])
+            ):
+                raise ValueError(
+                    "Parallel Search MCP returned a malformed search result"
+                )
+            title = item.get("title")
+            if title is not None and not isinstance(title, str):
+                raise ValueError("Parallel Search MCP returned a malformed title")
+            snippets = [text for text in item["excerpts"] if text.strip()]
+            if snippets:
+                results.append(
+                    {
+                        "url": item["url"],
+                        "title": title or "",
+                        "description": snippets[0],
+                        "snippets": snippets,
+                    }
+                )
+        return results
+
+    def forward(self, query_or_queries: Union[str, List[str]], exclude_urls=None):
+        """Return up to k sources per query, after local URL filters.
+
+        Each source has url, title, description, and snippets. Transport, RPC,
+        tool, and malformed response errors raise rather than look like no hits.
+        Usage counts attempted queries, including failed requests.
+        """
+        queries = (
+            [query_or_queries]
+            if isinstance(query_or_queries, str)
+            else query_or_queries
+        )
+        if any(not isinstance(query, str) or not query.strip() for query in queries):
+            raise ValueError("Search queries must be non-empty strings")
+        collected_results = []
+        excluded = set(exclude_urls or [])
+        for query in queries:
+            with self._usage_lock:
+                self.usage += 1
+            try:
+                response = self._search_sync(query)
+            except Exception as exc:
+                raise RuntimeError(
+                    "Parallel Search MCP transport or RPC request failed"
+                ) from exc
+            results = self._results(response)
+            valid = [
+                result
+                for result in results
+                if result["url"] not in excluded and self.is_valid_source(result["url"])
+            ]
+            collected_results.extend(valid[: self.k])
+        return collected_results
 
 
 class YouRM(dspy.Retrieve):

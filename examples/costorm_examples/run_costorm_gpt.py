@@ -27,6 +27,7 @@ from knowledge_storm.collaborative_storm.modules.callback import (
 from knowledge_storm.lm import OpenAIModel, AzureOpenAIModel
 from knowledge_storm.logging_wrapper import LoggingWrapper
 from knowledge_storm.rm import (
+    ParallelSearch,
     YouRM,
     BingSearch,
     BraveRM,
@@ -125,6 +126,8 @@ def main(args):
     # Co-STORM is a knowledge curation system which consumes information from the retrieval module.
     # Currently, the information source is the Internet and we use search engine API as the retrieval module.
     match args.retriever:
+        case "parallel":
+            rm = ParallelSearch(k=args.retrieve_top_k)
         case "bing":
             rm = BingSearch(
                 bing_search_api=os.getenv("BING_SEARCH_API_KEY"),
@@ -161,7 +164,7 @@ def main(args):
             )
         case _:
             raise ValueError(
-                f'Invalid retriever: {args.retriever}. Choose either "bing", "you", "brave", "duckduckgo", "serper", "tavily", or "searxng"'
+                f'Invalid retriever: {args.retriever}. Choose either "parallel", "bing", "you", "brave", "duckduckgo", "serper", "tavily", or "searxng"'
             )
 
     costorm_runner = CoStormRunner(
@@ -225,8 +228,18 @@ if __name__ == "__main__":
     parser.add_argument(
         "--retriever",
         type=str,
-        choices=["bing", "you", "brave", "serper", "duckduckgo", "tavily", "searxng"],
-        help="The search engine API to use for retrieving information.",
+        default="parallel",
+        choices=[
+            "parallel",
+            "bing",
+            "you",
+            "brave",
+            "serper",
+            "duckduckgo",
+            "tavily",
+            "searxng",
+        ],
+        help="The search provider to use (default: keyless Parallel Search MCP).",
     )
     # hyperparameters for co-storm
     parser.add_argument(

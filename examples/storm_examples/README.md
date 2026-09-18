@@ -2,6 +2,18 @@
 
 We host a number of example scripts for various customization of STORM (e.g., use your favorite language models, use your own corpus, etc.). These examples can be starting points for your own customizations and you are welcome to contribute your own examples by submitting a pull request to this directory.
 
+The seven scripts with a generic `--retriever` selector use keyless Parallel Search
+MCP by default. Keep setting the credentials for your language model. Searches
+send their query and objective to `https://search.parallel.ai/mcp`, where anonymous
+access is subject to rate limits. The client sends a `knowledge-storm/<version>`
+User-Agent plus httpx's token and a random `session_id` for one retriever's lifetime;
+it sends no model metadata. You can optionally set `PARALLEL_API_KEY` for
+authenticated access; failed authentication raises rather than falling back to
+anonymous access. [The root setup guide](../../README.md#quick-start-with-example-scripts)
+has more details, including the Co-STORM CLI default. Pass `--retriever you`,
+`--retriever bing`, or another existing option to keep your chosen search provider.
+Scripts for a specific retriever or your own corpus keep their configurations.
+
 ## Run STORM with your own language model
 [run_storm_wiki_gpt.py](run_storm_wiki_gpt.py) provides an example of running STORM with GPT models, and [run_storm_wiki_claude.py](run_storm_wiki_claude.py) provides an example of running STORM with Claude models. Besides using close-source models, you can also run STORM with models with open weights.
 

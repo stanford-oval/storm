@@ -75,7 +75,7 @@ class AnswerQuestionModule(dspy.Module):
                 q.replace("-", "").strip().strip('"').strip('"').strip()
                 for q in queries.split("\n")
             ]
-            queries = queries[: self.max_search_queries]
+            queries = [query for query in queries if query][: self.max_search_queries]
         self.logging_wrapper.add_query_count(count=len(queries))
         with self.logging_wrapper.log_event(
             f"AnswerQuestionModule.retriever.retrieve ({hash(question)})"

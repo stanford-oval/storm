@@ -95,7 +95,7 @@ Currently, our package support:
 
 - Language model components: All language models supported by litellm as listed [here](https://docs.litellm.ai/docs/providers)
 - Embedding model components: All embedding models supported by litellm as listed [here](https://docs.litellm.ai/docs/embedding/supported_embedding)
-- retrieval module components: `YouRM`, `BingSearch`, `VectorRM`, `SerperRM`, `BraveRM`, `SearXNG`, `DuckDuckGoSearchRM`, `TavilySearchRM`, `GoogleSearch`, and `AzureAISearch` as 
+- retrieval module components: `ParallelSearch`, `YouRM`, `BingSearch`, `VectorRM`, `SerperRM`, `BraveRM`, `SearXNG`, `DuckDuckGoSearchRM`, `TavilySearchRM`, `GoogleSearch`, and `AzureAISearch`.
 
 :star2: **PRs for integrating more search engines/retrievers into [knowledge_storm/rm.py](knowledge_storm/rm.py) are highly appreciated!**
 
@@ -221,6 +221,34 @@ print(article)
 
 We provide scripts in our [examples folder](examples) as a quick start to run STORM and Co-STORM with different configurations.
 
+The seven STORM scripts with a generic `--retriever` selector and
+`run_costorm_gpt.py` use keyless Parallel Search MCP when you omit that option.
+Keep the language model and encoder setup for your chosen configuration. To use another search provider, pass an explicit option such as
+`--retriever bing` or `--retriever you` and set its credentials.
+
+Parallel sends each search query as both the query and objective to the hosted
+server at `https://search.parallel.ai/mcp`. Anonymous access is subject to rate
+limits. The client identifies this integration with a `knowledge-storm/<version>`
+User-Agent alongside httpx's token, and sends a random `session_id` shared across
+one retriever's lifetime to group related searches. It sends no model metadata.
+See [Parallel's Search MCP documentation](https://docs.parallel.ai/integrations/mcp/search-mcp)
+for access details. For authenticated access, optionally set `PARALLEL_API_KEY`
+in your environment or `secrets.toml`; an authentication failure will raise an
+error without retrying anonymously.
+
+You can also supply the retriever directly:
+
+```python
+from knowledge_storm.rm import ParallelSearch
+
+rm = ParallelSearch(k=3)  # No search API key needed.
+sources = rm("What is knowledge curation?")
+# Each source has url, title, description, and snippets.
+```
+
+This default applies to the generic example CLIs. Existing programmatic examples,
+the demo, and scripts dedicated to a specific retriever keep their configurations.
+
 We suggest using `secrets.toml` to set up the API keys. Create a file `secrets.toml` under the root directory and add the following content:
 
 ```shell
@@ -247,7 +275,6 @@ Run the following command.
 ```bash
 python examples/storm_examples/run_storm_wiki_gpt.py \
     --output-dir $OUTPUT_DIR \
-    --retriever bing \
     --do-research \
     --do-generate-outline \
     --do-generate-article \
@@ -260,13 +287,12 @@ python examples/storm_examples/run_storm_wiki_gpt.py \
 
 To run Co-STORM with `gpt` family models with default configurations,
 
-1. Add `BING_SEARCH_API_KEY="xxx"` and `ENCODER_API_TYPE="xxx"` to `secrets.toml`
+1. Set your language model credentials and `ENCODER_API_TYPE="xxx"` in `secrets.toml`.
 2. Run the following command
 
 ```bash
 python examples/costorm_examples/run_costorm_gpt.py \
-    --output-dir $OUTPUT_DIR \
-    --retriever bing
+    --output-dir $OUTPUT_DIR
 ```
 
 
