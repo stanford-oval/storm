@@ -40,7 +40,7 @@ def truncate_filename(filename, max_length=125):
 
 def load_api_key(toml_file_path):
     try:
-        with open(toml_file_path, "r") as file:
+        with open(toml_file_path, "r", encoding="utf-8") as file:
             data = toml.load(file)
     except FileNotFoundError:
         print(f"File not found: {toml_file_path}", file=sys.stderr)
@@ -49,8 +49,10 @@ def load_api_key(toml_file_path):
         print(f"Error decoding TOML file: {toml_file_path}", file=sys.stderr)
         return
     # Set environment variables
+    # Skip empty values so they don't clobber keys already set in the environment
     for key, value in data.items():
-        os.environ[key] = str(value)
+        if value:
+            os.environ[key] = str(value)
 
 
 def makeStringRed(message):

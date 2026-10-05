@@ -40,11 +40,12 @@ from knowledge_storm.utils import load_api_key
 def main(args):
     load_api_key(toml_file_path="secrets.toml")
     lm_configs = STORMWikiLMConfigs()
-    claude_kwargs = {
-        "api_key": os.getenv("ANTHROPIC_API_KEY"),
-        "temperature": 1.0,
-        "top_p": 0.9,
-    }
+    api_key = os.getenv("ANTHROPIC_API_KEY")
+    # Haiku 4.5 still accepts sampling params.
+    haiku_kwargs = {"api_key": api_key, "temperature": 1.0, "top_p": 0.9}
+    # Opus 5.5 always thinks and rejects sampling params; effort controls thinking depth,
+    # and max_tokens must leave room for thinking on top of the visible output.
+    opus_kwargs = {"api_key": api_key, "output_config": {"effort": args.effort}}
 
     # STORM is a LM system so different components can be powered by different models.
     # For a good balance between cost and quality, you can choose a cheaper/faster model for conv_simulator_lm
@@ -52,19 +53,19 @@ def main(args):
     # for outline_gen_lm which is responsible for organizing the collected information, and article_gen_lm
     # which is responsible for generating sections with citations.
     conv_simulator_lm = ClaudeModel(
-        model="claude-3-haiku-20240307", max_tokens=500, **claude_kwargs
+        model="claude-haiku-4-5", max_tokens=500, **haiku_kwargs
     )
     question_asker_lm = ClaudeModel(
-        model="claude-3-sonnet-20240229", max_tokens=500, **claude_kwargs
+        model="claude-haiku-4-5", max_tokens=500, **haiku_kwargs
     )
     outline_gen_lm = ClaudeModel(
-        model="claude-3-opus-20240229", max_tokens=400, **claude_kwargs
+        model="claude-opus-5-5", max_tokens=4000, **opus_kwargs
     )
     article_gen_lm = ClaudeModel(
-        model="claude-3-opus-20240229", max_tokens=700, **claude_kwargs
+        model="claude-opus-5-5", max_tokens=8000, **opus_kwargs
     )
     article_polish_lm = ClaudeModel(
-        model="claude-3-opus-20240229", max_tokens=4000, **claude_kwargs
+        model="claude-opus-5-5", max_tokens=16000, **opus_kwargs
     )
 
     lm_configs.set_conv_simulator_lm(conv_simulator_lm)
@@ -156,6 +157,13 @@ if __name__ == "__main__":
         type=str,
         choices=["bing", "you", "brave", "serper", "duckduckgo", "tavily", "searxng"],
         help="The search engine API to use for retrieving information.",
+    )
+    parser.add_argument(
+        "--effort",
+        type=str,
+        default="low",
+        choices=["low", "medium", "high", "xhigh", "max"],
+        help="Thinking effort for the Opus 5.5 stages (outline, article, polish). Higher is slower and costlier.",
     )
     # stage of the pipeline
     parser.add_argument(

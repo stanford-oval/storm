@@ -729,9 +729,22 @@ class ClaudeModel(dspy.dsp.modules.lm.LM):
         self.api_base = (
             "https://api.anthropic.com/v1/messages" if api_base is None else api_base
         )
+        # Newer Claude models (Opus 4.7+, Sonnet 5+, Fable, Mythos) reject sampling
+        # params with a 400, so they are only sent to models that still accept them.
+        self.supports_sampling = not model.startswith(
+            (
+                "claude-opus-4-7",
+                "claude-opus-4-8",
+                "claude-opus-5",
+                "claude-sonnet-5",
+                "claude-fable",
+                "claude-mythos",
+            )
+        )
         self.kwargs = {
             "temperature": kwargs.get("temperature", 0.0),
-            "max_tokens": min(kwargs.get("max_tokens", 4096), 4096),
+            # Thinking tokens count toward max_tokens, so allow a higher ceiling.
+            "max_tokens": min(kwargs.get("max_tokens", 4096), 16000),
             "top_p": kwargs.get("top_p", 1.0),
             "top_k": kwargs.get("top_k", 1),
             "n": kwargs.pop("n", kwargs.pop("num_generations", 1)),
@@ -773,6 +786,9 @@ class ClaudeModel(dspy.dsp.modules.lm.LM):
         # caching mechanism requires hashable kwargs
         kwargs["messages"] = [{"role": "user", "content": prompt}]
         kwargs.pop("n")
+        if not self.supports_sampling:
+            for key in ("temperature", "top_p", "top_k"):
+                kwargs.pop(key, None)
         response = self.client.messages.create(**kwargs)
         # history = {
         #     "prompt": prompt,
@@ -783,7 +799,7 @@ class ClaudeModel(dspy.dsp.modules.lm.LM):
         json_serializable_history = {
             "prompt": prompt,
             "response": {
-                "content": response.content[0].text,
+                "content": self._response_text(response),
                 "model": response.model,
                 "role": response.role,
                 "stop_reason": response.stop_reason,
@@ -838,8 +854,13 @@ class ClaudeModel(dspy.dsp.modules.lm.LM):
             # which is not transparent to developers.
             # if only_completed and response.stop_reason == "max_tokens":
             #     continue
-            completions = [c.text for c in response.content]
+            completions.append(self._response_text(response))
         return completions
+
+    @staticmethod
+    def _response_text(response) -> str:
+        """Join the text blocks of a response, skipping thinking blocks."""
+        return "".join(c.text for c in response.content if c.type == "text")
 
 
 class VLLMClient(dspy.dsp.LM):
