@@ -375,13 +375,35 @@ class STORMWikiRunner(Engine):
             "No action is specified. Please set at least one of --do-research, --do-generate-outline, --do-generate-article, --do-polish-article"
         )
 
+        if not topic or not topic.strip():
+            raise ValueError("Topic cannot be empty.")
+
         self.topic = topic
-        self.article_dir_name = truncate_filename(
-            topic.replace(" ", "_").replace("/", "_")
-        )
+        clean_topic = topic.replace(" ", "_").replace("/", "_").replace("\\", "_")
+        self.article_dir_name = truncate_filename(clean_topic)
+        if (
+            not self.article_dir_name
+            or self.article_dir_name in (".", "..")
+            or self.article_dir_name.strip("._") == ""
+        ):
+            raise ValueError(
+                f"Invalid topic '{topic}': cannot be used as an article directory name."
+            )
+
         self.article_output_dir = os.path.join(
             self.args.output_dir, self.article_dir_name
         )
+        base_output_dir = os.path.abspath(self.args.output_dir)
+        resolved_article_dir = os.path.abspath(self.article_output_dir)
+        if (
+            os.path.commonpath([base_output_dir, resolved_article_dir])
+            != base_output_dir
+            or resolved_article_dir == base_output_dir
+        ):
+            raise ValueError(
+                f"Invalid topic '{topic}': output path resolves outside '{self.args.output_dir}'."
+            )
+
         os.makedirs(self.article_output_dir, exist_ok=True)
 
         # research module
