@@ -38,14 +38,24 @@ def handle_not_started():
                             "topic could not be empty"
                         )
 
-                    st.session_state["page3_topic_name_cleaned"] = (
+                    clean_topic = (
                         st.session_state["page3_topic"]
                         .replace(" ", "_")
                         .replace("/", "_")
+                        .replace("\\", "_")
                     )
-                    st.session_state["page3_topic_name_truncated"] = truncate_filename(
-                        st.session_state["page3_topic_name_cleaned"]
-                    )
+                    truncated_topic = truncate_filename(clean_topic)
+                    if (
+                        truncated_topic in (".", "..")
+                        or truncated_topic.strip("._") == ""
+                    ):
+                        pass_appropriateness_check = False
+                        st.session_state["page3_warning_message"] = (
+                            "topic cannot be '.' or '..' or a relative path reference"
+                        )
+
+                    st.session_state["page3_topic_name_cleaned"] = clean_topic
+                    st.session_state["page3_topic_name_truncated"] = truncated_topic
                     if not pass_appropriateness_check:
                         st.session_state["page3_write_article_state"] = "not started"
                         alert = st.warning(
