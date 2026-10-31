@@ -1236,3 +1236,65 @@ class AzureAISearch(dspy.Retrieve):
                 logging.error(f"Error occurs when searching query {query}: {e}")
 
         return collected_results
+
+
+class DesearchRM(dspy.Retrieve):
+    """Search the web with Desearch (https://desearch.ai/docs)."""
+
+    def __init__(self, desearch_api_key=None, k=3, is_valid_source: Callable = None):
+        super().__init__(k=k)
+        self.desearch_api_key = desearch_api_key or os.environ.get("DESEARCH_API_KEY")
+        if not self.desearch_api_key:
+            raise RuntimeError(
+                "You must supply desearch_api_key or set environment variable DESEARCH_API_KEY"
+            )
+        if not 1 <= k <= 20:
+            raise ValueError("k must be between 1 and 20")
+        self.is_valid_source = is_valid_source or (lambda url: True)
+        self.usage = 0
+
+    def get_usage_and_reset(self):
+        usage = self.usage
+        self.usage = 0
+        return {"DesearchRM": usage}
+
+    def forward(
+        self, query_or_queries: Union[str, List[str]], exclude_urls: List[str] = None
+    ):
+        """Return up to k results per query with url, title, description and snippets."""
+        queries = (
+            [query_or_queries]
+            if isinstance(query_or_queries, str)
+            else query_or_queries
+        )
+        exclude_urls = exclude_urls or []
+        self.usage += len(queries)
+        collected_results = []
+        for query in queries:
+            try:
+                response = requests.get(
+                    "https://api.desearch.ai/web",
+                    headers={"Authorization": f"Bearer {self.desearch_api_key}"},
+                    params={"query": query, "num": self.k},
+                    timeout=30,
+                )
+                response.raise_for_status()
+                results = []
+                for result in response.json().get("data", []):
+                    url = result.get("link")
+                    if url and url not in exclude_urls and self.is_valid_source(url):
+                        description = result.get("snippet", "")
+                        results.append(
+                            {
+                                "url": url,
+                                "title": result.get("title", ""),
+                                "description": description,
+                                "snippets": result.get("highlights") or [description],
+                            }
+                        )
+                    if len(results) >= self.k:
+                        break
+                collected_results.extend(results)
+            except (requests.RequestException, ValueError):
+                logging.error("Error occurs when searching with Desearch")
+        return collected_results
