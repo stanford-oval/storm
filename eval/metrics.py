@@ -73,7 +73,7 @@ def heading_entity_recall(golden_entities: Optional[List[str]] = None,
     g = set(golden_entities)
     p = set(predicted_entities)
     if len(g) == 0:
-        return 1
+        return 0
     else:
         return len(g.intersection(p)) / len(g)
 
@@ -100,7 +100,7 @@ def article_entity_recall(golden_entities: Optional[List[str]] = None,
     g = set(golden_entities)
     p = set(predicted_entities)
     if len(g) == 0:
-        return 1
+        return 0
     else:
         return len(g.intersection(p)) / len(g)
 

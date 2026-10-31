@@ -73,8 +73,6 @@ def main(args):
     aggregated_results = {}
 
     for i, row in tqdm(df.iterrows()):
-        import pdb
-        pdb.set_trace()
         topic = row['topic']
         topic_name = topic.replace(" ", "_").replace("/", "_")
         llm_output_path = os.path.join(args.pred_dir, topic_name, args.pred_file_name)
