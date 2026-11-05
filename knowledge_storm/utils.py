@@ -577,8 +577,11 @@ class ArticleTextProcessing:
 
         for line in lines:
             if line.startswith("#"):
-                level = line.count("#")
-                title = line.strip("# ").strip()
+                # Only the leading '#' run marks the section level; '#' characters
+                # inside the title (e.g. "C#") must not change the depth or the title.
+                level = len(line) - len(line.lstrip("#"))
+                title = line[level:].strip()
+                title = re.sub(r"\s+#+\s*$", "", title).strip()
                 new_section = {"content": "", "subsections": {}}
 
                 # Pop from stack until find the parent level
