@@ -1,4 +1,5 @@
 import concurrent.futures
+import hashlib
 import dspy
 import httpx
 import json
@@ -18,6 +19,25 @@ from trafilatura import extract
 from .lm import LitellmModel
 
 logging.getLogger("httpx").setLevel(logging.WARNING)  # Disable INFO logging for httpx.
+
+
+def sanitize_dirname(name: str, max_length: int = 125) -> str:
+    """Sanitize a user-supplied topic into a safe single path component.
+
+    Replaces path separators and removes "."-only components so that inputs like
+    "..", "." or "a/../.." cannot escape the output directory (path traversal).
+    Falls back to "topic_<hash>" when nothing usable remains, then truncates.
+
+    Args:
+        name: str, the raw user-supplied topic/directory name
+        max_length: int, default to 125 (usual path length limit is 255 chars)
+    """
+
+    sanitized = name.replace(" ", "_").replace("/", "_").replace("\\", "_")
+    sanitized = "_".join(part for part in sanitized.split("_") if part not in ("", ".", ".."))
+    if not sanitized:
+        sanitized = "topic_" + hashlib.md5(name.encode("utf-8")).hexdigest()[:12]
+    return truncate_filename(sanitized, max_length=max_length)
 
 
 def truncate_filename(filename, max_length=125):

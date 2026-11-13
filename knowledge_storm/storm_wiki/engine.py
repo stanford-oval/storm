@@ -15,7 +15,7 @@ from .modules.persona_generator import StormPersonaGenerator
 from .modules.storm_dataclass import StormInformationTable, StormArticle
 from ..interface import Engine, LMConfigs, Retriever
 from ..lm import LitellmModel
-from ..utils import FileIOHelper, makeStringRed, truncate_filename
+from ..utils import FileIOHelper, makeStringRed, sanitize_dirname
 
 
 class STORMWikiLMConfigs(LMConfigs):
@@ -376,9 +376,7 @@ class STORMWikiRunner(Engine):
         )
 
         self.topic = topic
-        self.article_dir_name = truncate_filename(
-            topic.replace(" ", "_").replace("/", "_")
-        )
+        self.article_dir_name = sanitize_dirname(topic)
         self.article_output_dir = os.path.join(
             self.args.output_dir, self.article_dir_name
         )
