@@ -458,15 +458,21 @@ class StormArticle(Article):
             node_stack = [(0, instance.root)]  # Stack to keep track of (level, node)
 
             for line in lines:
-                level = line.count("#") - adjust_level
-                section_name = line.replace("#", "").strip()
+                # Only the leading hashtags define the section level. A "#" inside a
+                # section name (e.g. "## C# history") does not deepen the section.
+                level = len(line) - len(line.lstrip("#"))
+                if level == 0:
+                    # An outline only carries section headings.
+                    continue
+                section_name = line.lstrip("#").strip()
 
                 if section_name == topic:
                     continue
 
                 new_node = ArticleSectionNode(section_name)
 
-                while node_stack and level <= node_stack[-1][0]:
+                # Keep the root on the stack so that every section has a parent node.
+                while len(node_stack) > 1 and level <= node_stack[-1][0]:
                     node_stack.pop()
 
                 node_stack[-1][1].add_child(new_node)
