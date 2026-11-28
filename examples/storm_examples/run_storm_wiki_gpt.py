@@ -91,6 +91,7 @@ def main(args):
         max_conv_turn=args.max_conv_turn,
         max_perspective=args.max_perspective,
         search_top_k=args.search_top_k,
+        retrieve_top_k=args.retrieve_top_k,
         max_thread_num=args.max_thread_num,
     )
 
